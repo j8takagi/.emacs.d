@@ -2,8 +2,45 @@
 ;;; Ubuntu Linuxの設定
 (provide 'init-ubuntu-x)
 
+;; Emacs変数exec-pathに、環境変数PATHの内容を設定
+(setq exec-path nil)
+(dolist
+    (adir (split-string (getenv "PATH") "[:\n]"))
+  (when (and (not (member adir exec-path)) (file-exists-p adir))
+    (add-to-list 'exec-path adir t)))
+
+;; 環境変数LANGの設定
+(setenv "LANG" "en_US.UTF-8")
+
 ;; Emacs Server
-(server-start)
+(require 'server)
+(unless (server-running-p)
+    (server-start))
+
+;; フレームの設定
+(setq default-frame-alist
+      (append (list
+               '(foreground-color . "black")
+               '(background-color . "gray99")
+               '(cursor-color . "DarkOliveGreen")
+               '(width . 100)
+               '(height . 34)
+               '(top . 0)
+               '(left . 0)
+               '(cursor-type . box))
+              default-frame-alist))
+
+;; ツールバーを表示しない
+(tool-bar-mode 0)
+
+;; 文字コードのデフォルトはUTF-8
+(set-default-coding-systems 'utf-8)
+(prefer-coding-system 'utf-8-unix)
+
+;; ターミナルの文字コード UTF-8
+(set-terminal-coding-system 'utf-8)
+
+(global-unset-key "\C-\\")
 
 (defvar ex-open-cmd "xdg-open")
 

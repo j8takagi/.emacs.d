@@ -3,6 +3,7 @@
 (setq load-path (append (list "~/.emacs.d/") load-path))
 
 ;; パッケージを使う（Emacs24）
+
 (require 'package)
 
 ; Add package-archives
@@ -19,10 +20,10 @@
 (set-language-environment 'Japanese)
 
 ;; OSごとの設定
-(when (window-system 'ns)
+(when (eq window-system 'ns)
   (load "init-mac"))
-(when (window-system 'x)
-  (load "init-x"))
+(when (eq window-system 'x)
+  (load "init-ubuntu-x"))
 
 ;; 起動時の画面を表示しない
 (setq inhibit-startup-message t)
@@ -438,8 +439,8 @@
 (setq user-mail-address "j8takagi@nifty.com")
 (setq change-log-default-name "~/ChangeLog")
 
-;; pukiwiki-mode
-(load-library "pukiwiki-mode")
+;; ;; pukiwiki-mode
+;; (load-library "pukiwiki-mode")
 
 (setq pukiwiki-site-list
        '(("kanka" "http://plusone.ath.cx/pukiwiki/index.php" nil euc-jp)
@@ -499,11 +500,11 @@
              (cons '("(gmp)Function Index" nil "^ -.* " "\\>")
                    (nth 3 mode-value)))))
 
-; ESS
-(require 'ess-site)
-(setq auto-mode-alist
-      (cons (cons "\\.[rR]$" 'R-mode) auto-mode-alist))
-(autoload 'R-mode "ess-site" "Emacs Speaks Statistics mode" t)
+;; ; ESS
+;; (require 'ess-site)
+;; (setq auto-mode-alist
+;;       (cons (cons "\\.[rR]$" 'R-mode) auto-mode-alist))
+;; (autoload 'R-mode "ess-site" "Emacs Speaks Statistics mode" t)
 
 ; CSV mode
 (add-to-list 'auto-mode-alist '("\\.[Cc][Ss][Vv]\\'" . csv-mode))
