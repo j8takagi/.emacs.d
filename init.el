@@ -432,7 +432,10 @@
 ;; YaTeX
 (setq auto-mode-alist (cons '("\\.tex$" . yatex-mode) auto-mode-alist))
 (autoload 'yatex-mode "yatex" "Yet Another LaTeX mode" t)
-(setq tex-command "eplatex")
+(setq tex-command "platex")
+; ~/.LaTeX-templateは新規ファイル作成時に自動挿入するファイル名
+(setq YaTeX-template-file "~/.emacs.d/.LaTeX-template")
+(setq YaTeX-kanji-code nil)
 
 ;; ChangeLog
 (setq user-full-name "高木和人")
