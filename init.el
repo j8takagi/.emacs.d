@@ -1,16 +1,21 @@
 ;;;-*-Emacs-Lisp-*-
 ;; load-pathを追加
-(setq load-path (append (list "~/.emacs.d/") load-path))
+(add-to-list 'load-path "~/.emacs.d/")
+
+;; site-lispディレクトリーを~/.emacs.d/site-lispに
+(defvar site-lisp-dir (expand-file-name "~/.emacs.d/site-lisp"))
+(add-to-list 'load-path site-lisp-dir)
+(let ((default-directory site-lisp-dir))
+      (load (expand-file-name "subdirs.el")))
 
 ;; パッケージを使う（Emacs24）
-
 (require 'package)
 
-; Add package-archives
-(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/")) ; ついでにmarmaladeも追加
+; パッケージアーカイブ
+(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
+(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
 
-; Initialize
+; パッケージ初期化
 (package-initialize)
 
 ; melpa.el
@@ -19,11 +24,12 @@
 ;; 日本語環境
 (set-language-environment 'Japanese)
 
+;; Windowシステムごとの設定
+(if (eq window-system 'ns) (load "init-mac"))
+(if (eq window-system 'x) (load "init-ubuntu-x"))
+
 ;; OSごとの設定
-(when (eq window-system 'ns)
-  (load "init-mac"))
-(when (eq window-system 'x)
-  (load "init-ubuntu-x"))
+(if (eq system-type 'gnu/linux) (load "init-linux"))
 
 ;; 起動時の画面を表示しない
 (setq inhibit-startup-message t)
@@ -34,14 +40,8 @@
 ;; カーソルは点滅しない
 (blink-cursor-mode 0)
 
-;; 現在行に色を付ける
-(global-hl-line-mode 1)
-
-;; GCを減らす
-;(setq gc-cons-threshold (* 100 gc-cons-threshold))
-
 ;; 履歴の数を増やす
-;(setq history-length 500)
+(setq history-length 100)
 
 ;; 重複する履歴は削除
 (setq history-delete-duplicates 1)
@@ -62,32 +62,29 @@
 ;; タブをスペースに展開
 (setq-default indent-tabs-mode nil)
 
-;; タブ、全角スペース、行末の空白を表示する
-(defface my-navy-box
-  '((t (:box "navy"))) nil :group 'font-lock-highlighting-faces)
-(defface my-orange-box
-  '((t (:box "orange"))) nil :group 'font-lock-highlighting-faces)
-(defface my-navy-underline
-  '((t (:foreground "navy" :underline t))) nil :group 'font-lock-highlighting-faces)
+;; whitespace
+(require 'whitespace)
 
-(defvar my-navy-box 'my-navy-box)
-(defvar my-orange-box 'my-orange-box)
-(defvar my-navy-underline 'my-navy-underline)
+(setq whitespace-style '(face tabs spaces trailing))
+(setq whitespace-space-regexp "\\(　\\)")
+(setq whitespace-trailing-regexp "\\( +$\\)")
 
-(defadvice font-lock-mode (before my-font-lock-mode ())
-  (font-lock-add-keywords
-   major-mode
-   '(("　" 0 my-orange-box append)
-     ("\t" 0 my-navy-box append)
-     ("[ ]+$" 0 my-navy-underline append))))
-(ad-enable-advice 'font-lock-mode 'before 'my-font-lock-mode)
+(set-face-attribute whitespace-tab nil :box "navy" :background "inherit")
+(set-face-attribute whitespace-space nil :box "orange" :background "inherit")
+(set-face-attribute whitespace-trailing nil
+                    :foreground "navy" :background "inherit" :underline "navy")
 
-(ad-activate 'font-lock-mode)
+;; whitespaceを無効にするメジャーモード
+(defvar whitespace-disabled-major-mode-list)
+(setq whitespace-disabled-major-mode-list
+      '(mew-summary-mode completion-list-mode help-mode
+        magit-mode tetris-mode))
 
-(add-hook 'find-file-hooks
+;; メジャーモード設定後、whitespaceを有効にする
+(add-hook 'after-change-major-mode-hook
           '(lambda ()
-             (if font-lock-mode nil
-               (font-lock-mode t))) t)
+             (unless (member major-mode whitespace-disabled-major-mode-list)
+               (whitespace-mode 1))))
 
 ;; 再帰的なミニバッファ
 (setq enable-recursive-minibuffers t)
@@ -130,25 +127,102 @@
 ;; 括弧の対応を表示
 (show-paren-mode 1)
 
-;; 画面最下（上）部で下（上）向きにスクロールするとき、1行ずつスクロールさせる
+;; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、
+;; 1行ずつスクロール
 (setq scroll-conservatively 1)
 
 ;; 行番号を表示
 (column-number-mode 1)
 
 ;; バックアップファイルは、~/backupに格納
-(setq backupdir "~/backup")
-(when (file-exists-p backupdir)
-  (setq backup-directory-alist
-        (cons (cons "\\.*$" (expand-file-name backupdir))
-              backup-directory-alist)))
-(setq make-backup-files t)
+(setq backup-dir (expand-file-name "~/backup"))
 
-;; sorter
-(load "sorter")
+(if (file-exists-p backup-dir)
+    (progn
+      (setq backup-directory-alist `(("." . ,backup-dir)))
+      (setq make-backup-files t)
+      (setq version-control t)
+      (setq delete-old-versions t)))
+
+;; 現在のバッファファイルを閉じ、ウインドウが2つ以上あるときはウィンドウも閉じる
+(defun my-kill-buffer-window ()
+  (interactive)
+  (kill-buffer nil)
+  (if (one-window-p)
+      (message "one-window-p")
+    (delete-window)))
+
+;; 隣のバッファファイルを閉じる。ウィンドウはそのまま
+(defun my-kill-next-buffer ()
+  (interactive)
+  (if (one-window-p)
+      (message "one-window-p")
+    (kill-buffer (window-buffer(next-window)))))
+
+;; 隣のバッファファイルを閉じ、ウインドウが2つ以上あるときはウィンドウも閉じる
+(defun my-kill-next-buffer-window ()
+  (interactive)
+  (if (one-window-p)
+      (message "one-window-p")
+    (kill-buffer (window-buffer(next-window)))
+    (delete-window (next-window))))
+
+;; インデント
+(setq indent-line-function 'indent-relative-maybe)
+
+;; 1行上へスクロール
+(defun scroll-up-one-line ()
+  (interactive)
+  (scroll-up 1))
+
+;; 1行下へスクロール
+(defun scroll-down-one-line ()
+  (interactive)
+  (scroll-down 1))
+
+;; 日本語を数える
+(defun count-japanese ()
+  (interactive)
+  (message "日本語の文字数: %d字" (how-many "\\cj" (point-min) (point-max))))
+
+;; iswitchb
+(iswitchb-mode 1)
+(setq read-buffer-function 'iswitchb-read-buffer)
+(setq iswitchb-regexp t)
+(setq iswitchb-prompt-newbuffer nil)
+
+(global-set-key "\C-c\C-c" 'comment-region)              ; コメントを付ける
+(global-set-key "\C-c\C-u" 'uncomment-region)            ; コメントを外す
+(global-set-key "\C-c\C-v" 'view-mode)                   ; View mode
+(global-set-key "\C-cc" 'compile)                        ; make
+(global-set-key "\C-cg" 'magit-status)                   ; git
+(global-set-key "\C-cww" 'whitespace-mode)               ; whitespace-mode
+(global-set-key "\C-cwt" 'whitespace-toggle-options)     ; whitespace-toggle-options
+(global-set-key "\C-m" 'newline-and-indent)              ; インデント
+(global-set-key "\C-x4K" 'my-kill-next-buffer-window)    ; 隣のバッファとウィンドウを削除
+(global-set-key "\C-x4k" 'my-kill-next-buffer)           ; 隣のバッファを削除
+(global-set-key "\C-xK" 'my-kill-buffer-window)          ; バッファとウィンドウを削除
+(global-set-key "\C-x\C-e" 'electric-buffer-list)        ; バッファ一覧
+(global-set-key "\C-xm" 'man)                            ; man
+(global-set-key "\C-xp" 'call-last-kbd-macro)            ; マクロ
+(global-set-key "\M-?" 'help)                            ; ヘルプ
+(global-set-key "\M-[" 'backward-paragraph)              ; 前のパラグラフへ移動
+(global-set-key "\M-]" 'forward-paragraph)               ; 次のパラグラフへ移動
+(global-set-key "\M-g" 'goto-line)                       ; 指定行へジャンプ
+(global-set-key "\M-p" 'call-last-kbd-macro)             ; マクロ
+(global-set-key "\M-y" 'browse-yank)                     ; 貼り付け拡張
+(global-set-key [?\C-,] 'scroll-up-one-line)             ; 1行上へスクロール
+(global-set-key [?\C-.] 'scroll-down-one-line)           ; 1行下へスクロール
 
 ;; uniq
 (load "uniq")
+
+;; session
+(require 'session)
+(add-hook 'after-init-hook 'session-initialize)
+
+;; Ediff
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
 
 ;; 圧縮されたファイルを直接編集する
 (auto-compression-mode)
@@ -159,99 +233,46 @@
 ;; kill-lineのとき、改行も含めて切り取り
 (setq kill-whole-line t)
 
+;; lcomp
+;; 補完ウィンドウを補完完了時に消す
+(require 'lcomp)
+(lcomp-install)
+
+;; browse-yank
+(load "browse-yank")
+
 ;; 同一ファイル名のバッファ名を分かりやすく: uniquify
 ;; http://www.bookshelf.jp/cgi-bin/goto.cgi?file=meadow&node=uniquify
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
 (setq uniquify-ignore-buffers-re "*[^*]+*")
 
-;; emacs lispファイル保存時に、バイトコンパイルする
+;; elispファイル保存時に、バイトコンパイルする
 ;;    http://www-tsujii.is.s.u-tokyo.ac.jp/~yoshinag/tips/junk_elisp.html#bytecompile
 (add-hook 'after-save-hook
-          (function
            (lambda ()
              (if (eq major-mode 'emacs-lisp-mode)
                  (save-excursion
-                   (byte-compile-file buffer-file-name))))))
+                   (byte-compile-file buffer-file-name)
+                   (eval-buffer)))))
 
-;; \M-?でヘルプ
-(global-set-key "\M-?" 'help)
+;; magit-mode
+(autoload 'magit-status "magit" nil t)
 
-;; View mode
-(global-set-key "\C-c\C-v" 'view-mode)
+;; Make
+(setq auto-mode-alist
+      (append
+       '(("[Mm]akefile". makefile-gmake-mode)
+         ("\.mk$". makefile-gmake-mode)
+         ("\.d$". makefile-gmake-mode))
+       auto-mode-alist))
 
-;; C-xKで、ウインドウとバッファを削除
-(defun my-kill-buffer-window ()
-  (interactive)
-  (if (not (one-window-p))
-      (progn
-        (kill-buffer nil)
-        (delete-window))
-    (message "one-window-p")))
-(global-set-key "\C-xK" 'my-kill-buffer-window)
+;; lisp-interaction-mode
+;; M-[space] でLisp補完
+(define-key lisp-interaction-mode-map "\M- " 'lisp-complete-symbol)
 
-;; C-x4Kで、隣のバッファを削除
-(defun my-kill-next-buffer ()
-  (interactive)
-  (if (not (one-window-p))
-        (kill-buffer (window-buffer(next-window)))
-    (message "one-window-p")))
-(global-set-key "\C-x4k" 'my-kill-next-buffer)
-
-;; C-x4Kで、隣のバッファとウィンドウを削除
-(defun my-kill-next-buffer-window ()
-  (interactive)
-  (if (not (one-window-p))
-      (progn
-        (kill-buffer (window-buffer(next-window)))
-        (delete-window (next-window)))
-    (message "one-window-p")))
-(global-set-key "\C-x4K" 'my-kill-next-buffer-window)
-
-;; M-pでマクロ
-(global-set-key "\M-p" 'call-last-kbd-macro)
-(global-set-key "\C-xp" 'call-last-kbd-macro)
-
-;; auto indent
-(define-key global-map "\C-m" 'newline-and-indent)
-(setq indent-line-function 'indent-relative-maybe)
-
-;; M-g: goto-line
-(global-set-key "\M-g" 'goto-line)
-
-;;;paragraph
-(global-set-key "\M-[" 'backward-paragraph)
-(global-set-key "\M-]" 'forward-paragraph)
-
-;; \C,で1行上へスクロール
-(defun scroll-up-one-line ()
-  (interactive)
-  (scroll-up 1))
-(global-set-key '[?\C-,] 'scroll-up-one-line)
-
-;; \C.で1行下へスクロール
-(defun scroll-down-one-line ()
-  (interactive)
-  (scroll-down 1))
-(global-set-key [?\C-.] 'scroll-down-one-line)
-
-;; lisp-interaction-mode で M-[space] と M-[TAB] を交換する
-(define-key lisp-interaction-mode-map "\e " 'lisp-complete-symbol)
-(define-key lisp-interaction-mode-map "\e\t" 'dabbrev-expand)
-
-;; \C-x\C-eでelectric-buffer-list
-(global-set-key "\C-x\C-e" 'electric-buffer-list)
-
-;; 日本語を数える
-(defun count-japanese ()
-  (interactive)
-  (message "日本語の文字数: %d字" (how-many "\\cj" (point-min) (point-max))))
-
-;; shell-command のコマンド入力に補完が効くようにする
-(require 'shell-command)
-(shell-command-completion-mode)
-
-(setq shell-mode-hook
+;; shell-mode
+(add-hook 'shell-mode-hook
  '(lambda ()
     (setq shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ")
     (setq tab-width 4)))
@@ -267,73 +288,44 @@
     (rename-buffer bufname)))
 (ad-activate 'shell)
 
-(load "dired-x")
+;; shell-commandでコマンド入力に補完が効くようにする
+(require 'shell-command)
+(shell-command-completion-mode 1)
 
-(add-hook 'dired-mode-hook
-      (lambda ()
-        (defun dired-open-file ()
-          "In dired, `open' the file or directory named on this line."
-          (interactive)
-          (let ((file-name (file-name-sans-versions (dired-get-filename) t)))
-        (if (file-exists-p file-name)
-            (start-process "dired-open" nil "open" file-name)
-          (if (file-symlink-p file-name)
-              (error "File is a symlink to a nonexistent target")
-            (error "File no longer exists; type `g' to update Dired buffer")))))
-        (define-key dired-mode-map "r" 'dired-open-file)))
-
-(require 'wdired)
-
-(define-key dired-mode-map "\C-cw" 'wdired-change-to-wdired-mode)
-
-(put 'dired-find-alternate-file 'disabled nil)
-
-;; GNU GLOBAL
-(autoload 'gtags-mode "gtags" "" t)
-(setq gtags-select-buffer-single t)
-(global-set-key [?\C-\M-.] 'gtags-find-rtag)
-(global-set-key [?\M-,] 'gtags-find-tag-from-here)
-(global-set-key [?\C-\M-,] 'gtags-pop-stack)
-(global-set-key "\C-c\C-f" 'gtags-find-file)
-(global-set-key "\C-c\C-s" 'gtags-find-symbol)
-(global-set-key "\C-c\C-p" 'gtags-find-pattern)
+;; dired
+(add-hook 'dired-load-hook
+          (lambda ()
+            ;; sorter - diredでのソート
+            (load "sorter")
+            ;; dired-x - diredの拡張機能
+            (load "dired-x")
+            ;; wdired - ファイル名の編集を可能にする
+            (require 'wdired)
+            (define-key dired-mode-map "\C-cw" 'wdired-change-to-wdired-mode)
+            ;;
+            (put 'dired-find-alternate-file 'disabled nil))
+          (require 'image-dired))
 
 ;;; CC-Mode
 (require 'cc-mode)
 
-(setq c-default-style "k&r")
-
 (add-hook 'c-mode-common-hook
           '(lambda ()
-             ;; (c-toggle-hungry-state 1)
+             (setq c-default-style "k&r")
              (setq c-basic-offset 4)
              (setq indent-tab-mode nil)
              (gtags-mode 1)
-             (gtags-make-complete-list)
-             ))
+             (gtags-make-complete-list)))
 
-(defun set-compile-command-for-c ()
-  (interactive)
-  (let* ((filename (file-name-nondirectory buffer-file-name))
-         (index (string-match "\\.c$" filename))
-         (filename-no-suffix (substring filename 0 index)))
-    (cond
-     ;; make exists: "make -k"
-     ((or (file-exists-p "Makefile")
-          (file-exists-p "makefile"))
-      (setq compile-command "make -k"))
-     ;; header file exists: make object file
-     ((file-exists-p (concat filename-no-suffix ".h"))
-      (setq compile-command
-            (concat "gcc -g -c " filename)))
-     ;; others
-     (t
-      (setq compile-command
-            (concat "gcc -o "
-                    filename-no-suffix " " filename))))))
+;; find documentation on GNU MP functions in programing C
+(eval-after-load "info-look"
+  '(let ((mode-value (assoc 'c-mode (assoc 'symbol info-lookup-alist))))
+     (setcar (nthcdr 3 mode-value)
+             (cons '("(gmp)Function Index" nil "^ -.* " "\\>")
+                   (nth 3 mode-value)))))
 
-;; C-c c で compile コマンドを呼び出す
-(global-set-key "\C-cc" 'compile)
+;; gtags-mode: GNU GLOBAL
+(autoload 'gtags-mode "gtags" "" t)
 
 ;; bison-mode
 (autoload 'bison-mode "bison-mode")
@@ -343,18 +335,17 @@
              (setq bison-decl-token-column 0)
              (setq bison-rule-enumeration-column 8)))
 
-;; *.y *.yy ファイルを 自動的に bison-mode にする
-(setq auto-mode-alist (cons '("\\.yy?$" . bison-mode) auto-mode-alist))
+(add-to-list 'auto-mode-alist '("\\.yy?$" . bison-mode))
 
+;; flex-mode
 (autoload 'flex-mode "flex-mode")
-
-;; *.l *.ll ファイルを 自動的に flex-mode にする
-(setq auto-mode-alist (cons '("\\.ll?$$" . flex-mode) auto-mode-alist))
+(add-to-list 'auto-mode-alist '("\\.ll?$" . flex-mode))
 
 ;; Mew
+(require 'mew)
 (autoload 'mew "mew" nil t)
 (autoload 'mew-send "mew" nil t)
-(eval-after-load "mew" '(require 'mew-browse))
+;(eval-after-load "mew" '(require 'mew-browse))
 
 ;; mewメッセージファイルの開き方
 ;; Spotlightから.mewファイルを開けるようにする
@@ -368,13 +359,11 @@
     (mew)
     (mew-summary-visit-folder fld)
     (mew-summary-move-and-display mes)))
-(setq auto-mode-alist (cons '("\\.mew$" . mew-open-mesg) auto-mode-alist))
+(add-to-list 'auto-mode-alist '("\\.mew$" . mew-open-mesg))
 
-;; Optional setup (Read Mail menu for Emacs 21):
 (if (boundp 'read-mail-command)
     (setq read-mail-command 'mew))
 
-;; Optional setup (e.g. C-xm for sending a message):
 (autoload 'mew-user-agent-compose "mew" nil t)
 
 (if (boundp 'mail-user-agent)
@@ -392,50 +381,33 @@
 (autoload 'navi2ch "navi2ch" "Navigator for 2ch for Emacs" t)
 (setq navi2ch-list-bbstable-url "http://menu.2ch.net/bbsmenu.html")
 
-;; image
-(auto-image-file-mode)
-
 ;; w3m
 (require 'w3m-load)
 (setq w3m-default-display-inline-images t)
 (setq mew-use-w3m-minor-mode 1)
 
-;; NXML
+;; nxml-mode
+(require 'nxml-mode)
 (autoload 'nxml-mode "nxml-mode" "major mode for editing XML" t)
 (setq magic-mode-alist '(("<\\?xml " . nxml-mode)))
-(setq auto-mode-alist (cons '("\\.xml$" . nxml-mode) auto-mode-alist))
-(setq auto-mode-alist (cons '("\\.svg$" . nxml-mode) auto-mode-alist))
+(add-to-list 'auto-mode-alist '("\\.xml$" . nxml-mode))
+(add-to-list 'auto-mode-alist '("\\.svg$" . nxml-mode))
 
 (add-hook 'nxml-mode-hook
           (lambda ()
             (setq nxml-child-indent 0)
             (setq indent-tabs-mode nil)))
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(nxml-comment-content-face ((t (:foreground "yellow4"))))
- '(nxml-comment-delimiter-face ((t (:foreground "yellow4"))))
- '(nxml-delimited-data-face ((t (:foreground "lime green"))))
- '(nxml-delimiter-face ((t (:foreground "gray"))))
- '(nxml-element-local-name-face ((t (:inherit nxml-name-face :foreground "medium turquoise"))))
- '(nxml-name-face ((t (:foreground "rosy brown"))))
- '(nxml-tag-slash-face ((t (:inherit nxml-name-face :foreground "gray")))))
+;; image-file-mode
+(setq image-file-name-extensions '("png" "jpeg" "jpg" "gif" "tiff" "tif"))
+(add-hook 'after-change-major-mode-hook
+          '(lambda () (if (eq major-mode 'svg-clock-mode)
+                   (image-mode))))
 
 ;; css-mode
 (autoload 'css-mode "css-mode")
-(setq auto-mode-alist (cons '("\\.css$" . css-mode) auto-mode-alist))
+(add-to-list 'auto-mode-alist '("\\.css$" . css-mode))
 (setq cssm-indent-function #'cssm-c-style-indenter)
-
-;; YaTeX
-(setq auto-mode-alist (cons '("\\.tex$" . yatex-mode) auto-mode-alist))
-(autoload 'yatex-mode "yatex" "Yet Another LaTeX mode" t)
-(setq tex-command "platex")
-; ~/.LaTeX-templateは新規ファイル作成時に自動挿入するファイル名
-(setq YaTeX-template-file "~/.emacs.d/.LaTeX-template")
-(setq YaTeX-kanji-code nil)
 
 ;; ChangeLog
 (setq user-full-name "高木和人")
@@ -445,83 +417,63 @@
 ;; ;; pukiwiki-mode
 ;; (load-library "pukiwiki-mode")
 
-(setq pukiwiki-site-list
-       '(("kanka" "http://plusone.ath.cx/pukiwiki/index.php" nil euc-jp)
-         ("bookshelf" "http://www.bookshelf.jp/pukiwiki/pukiwiki" nil euc-jp)
-         ("macemacs" "http://macemacsjp.sourceforge.jp/index.php" nil euc-jp)
-         ("pukiwiki" "http://pukiwiki.org/index.php" nil utf-8)
-         ))
+;; (setq pukiwiki-site-list
+;;        '(("kanka" "http://plusone.ath.cx/pukiwiki/index.php" nil euc-jp)
+;;          ("bookshelf" "http://www.bookshelf.jp/pukiwiki/pukiwiki" nil euc-jp)
+;;          ("macemacs" "http://macemacsjp.sourceforge.jp/index.php" nil euc-jp)
+;;          ("pukiwiki" "http://pukiwiki.org/index.php" nil utf-8)
+;;          ))
 
-;; iswitchb
-(iswitchb-mode 1)
-
-(setq read-buffer-function 'iswitchb-read-buffer)
-
-(setq iswitchb-regexp t)
-
-(setq iswitchb-prompt-newbuffer nil)
-
-;; recentf
-(require 'recentf-ext)
-
-(global-set-key "\C-xm" 'man)
-
-(require 'pdf-preview)
-
-;; lcomp
-;; 補完ウィンドウを補完完了時に消す
-(require 'lcomp)
-(lcomp-install)
-
-;; session
-(require 'session)
-(add-hook 'after-init-hook 'session-initialize)
-
-;; browse-yank
-(load "browse-yank")
-(global-set-key "\M-y" 'browse-yank)
-
-;; CASLII
-(setq auto-mode-alist (cons '("\\.casl?$" . asm-mode) auto-mode-alist))
+;; CASL II
+(add-to-list 'auto-mode-alist '("\\.casl?$" . asm-mode))
 
 ;; graphviz mode
-(load "graphviz-dot-mode.el")
+(load "graphviz-dot-mode")
 
-;; magit-mode
-(require 'magit)
+;; ESS
+(require 'ess-site)
+(add-to-list 'auto-mode-alist '("\\.[rR]$" 'R-mode))
+(autoload 'R-mode "ess-site" "Emacs Speaks Statistics mode" t)
 
-(setq auto-mode-alist (cons '("[Mm]akefile". makefile-gmake-mode) auto-mode-alist))
-(setq auto-mode-alist (cons '("\.mk$". makefile-gmake-mode) auto-mode-alist))
-
-;; ediff の操作用小ウィンドウを新規 frame にしない
-(setq ediff-window-setup-function 'ediff-setup-windows-plain)
-
-;; GMP
-(eval-after-load "info-look"
-  '(let ((mode-value (assoc 'c-mode (assoc 'symbol info-lookup-alist))))
-     (setcar (nthcdr 3 mode-value)
-             (cons '("(gmp)Function Index" nil "^ -.* " "\\>")
-                   (nth 3 mode-value)))))
-
-;; ; ESS
-;; (require 'ess-site)
-;; (setq auto-mode-alist
-;;       (cons (cons "\\.[rR]$" 'R-mode) auto-mode-alist))
-;; (autoload 'R-mode "ess-site" "Emacs Speaks Statistics mode" t)
-
-; CSV mode
+;; CSV mode
+(autoload 'csv-mode "csv-mode" "Major mode for editing comma-separated value files." t)
 (add-to-list 'auto-mode-alist '("\\.[Cc][Ss][Vv]\\'" . csv-mode))
-(autoload 'csv-mode "csv-mode"
-  "Major mode for editing comma-separated value files." t)
-
 
 ; Maxima
 ; http://emacswiki.org/emacs/MaximaMode
+(add-to-list 'load-path "/usr/local/share/maxima/5.29.1/emacs/")
 (autoload 'maxima-mode "maxima" "Maxima mode" t)
 (autoload 'imaxima "imaxima" "Frontend for maxima with Image support" t)
 (autoload 'maxima "maxima" "Maxima interaction" t)
 (autoload 'imath-mode "imath" "Imath mode for math formula input" t)
 (setq imaxima-use-maxima-mode-flag t)
 
-(setq auto-mode-alist
-      (cons (cons "\\.mac$" 'maxima-mode) auto-mode-alist))
+;; Mediawiki
+(require 'mediawiki)
+(add-to-list 'auto-mode-alist '("\\.wiki$" . mediawiki-mode))
+(add-to-list 'auto-mode-alist '("^ja.wikipedia.org/w/index.php" . mediawiki-mode))
+
+;; exopen-mode 外部プログラムでファイルを開く
+(require 'exopen-mode)
+(add-hook 'exopen-mode-hook
+          '(lambda ()
+          (setq exopen-suffix-cmd '((".dvi" . "pxdvi")))))
+
+;; texplus-mode
+(add-hook 'tex-mode-hook
+          '(lambda ()
+                    (define-key latex-mode-map "\C-cpp" 'exopen-buffer-pdffile)
+                    (define-key latex-mode-map "\C-cpd" 'exopen-buffer-dvifile)))
+
+(add-hook 'latex-mode-hook 'turn-on-reftex)
+
+;; color-selection
+(autoload 'list-hexadecimal-colors-display "color-selection"
+  "Display hexadecimal color codes, and show what they look like." t)
+(defalias 'color-selection 'list-hexadecimal-colors-display)
+
+;; igrep
+(require 'igrep)
+
+;; top-mode
+(require 'top-mode)
