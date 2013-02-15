@@ -1,0 +1,55 @@
+  GNUS や GLOG では窓が分割された状態でニュースやアーティクルを読んだ
+り、レスを書いたりしますが、こんなときにオリジナルの browse-yank 関数
+を呼びだすと、せっかくうまく分割されている窓が壊れてしまい、
+switch-to-buffer で復旧するのに四苦八苦します。
+
+  このパッチを当てることで既に Emacs の窓を分割しているときに 
+browse-yank しても分割された窓を壊さないようになります。
+お試しください。
+
+patch コマンドを使って
+
+% patch < brows-y.dif
+
+などとして当ててください。
+
+ 
+みきみきみっきん(PBC01764)
+
+diff -cbB /usr/tmp/browse-yank.el /usr/tmp/browse-yank.el.new
+*** /usr/tmp/browse-yank.el	Sat Aug 20 12:51:15 1994
+--- /usr/tmp/browse-yank.el.new	Sat Aug 20 17:20:55 1994
+***************
+*** 39,44 ****
+--- 39,48 ----
+  ;; file named COPYING.  Among other things, the copyright notice
+  ;; and this notice must be preserved on all copies.
+  
++ ;; Modified by Mikio Nakajima <PBC01764@niftyserve.or.jp> as of Aug.
++ ;; 20, 1994
++ ;;    not to break splitted window by calling browse-yank function
++ 
+  
+  (defmacro for (i lb ub &rest body)
+  "Iterative \"for\" loop, in the form (for I LB UB BODY).  I is locally
+***************
+*** 163,171 ****
+  	(message browse-yank-barf-message))
+      (progn
+        (setq browse-yank-orig-window-config (current-window-configuration))
+!       (pop-to-buffer (get-buffer-create browse-yank-buffer))
+        (browse-yank-mode)
+-       (enlarge-window (- browse-yank-height (window-height)))
+        (setq browse-yank-cur 0)
+        (browse-yank-make-txt)
+        (browse-yank-display 0))))
+--- 167,175 ----
+  	(message browse-yank-barf-message))
+      (progn
+        (setq browse-yank-orig-window-config (current-window-configuration))
+!       (split-window-vertically browse-yank-height)
+!       (switch-to-buffer (get-buffer-create browse-yank-buffer))
+        (browse-yank-mode)
+        (setq browse-yank-cur 0)
+        (browse-yank-make-txt)
+        (browse-yank-display 0))))
