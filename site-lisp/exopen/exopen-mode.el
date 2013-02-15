@@ -22,7 +22,7 @@
 
 ;;; Commentary:
 
-;; Emacsからの外部プログラム呼び出しを支援するマイナーモードです。
+;; Emacsからの外部プログラム呼び出しを支援するマイナーモード。
 
 ;; ■動作環境
 ;; Linux、Mac OS X、WindowsのいずれかのWindowシステム上
@@ -37,18 +37,21 @@
 ;; Windowシステム上でEmacsが動作している場合、exopen-mode は自動的に有効になります。
 ;;
 ;; ■使い方
-
+;; exopen-modeが有効な場合、次の関数を使うことができます。
+;;
+;;   exopen-file (file) 外部ファイルを呼び出す
+;;
 ;; ■hook
 
 ;; マイナーモードの定義
- (easy-mmode-define-minor-mode exopen-mode
-   "minor mode for opening fle in external program."
- ;; 初期値
-(display-graphic-p)
- ;; モード行の表示
- ""
- ;; マイナーモード用キーマップの初期値
- '(("\C-x\C-\M-f" . exopen-find-file)))
+(easy-mmode-define-minor-mode exopen-mode
+                              "minor mode for opening fle in external program."
+                              ;; 初期値
+                              (display-graphic-p)
+                              ;; モード行の表示
+                              ""
+                              ;; マイナーモード用キーマップの初期値
+                              '(("\C-x\C-\M-f" . exopen-find-file)))
 
 ;; exopen-std-cmd: OSやWindowで設定された関連付けをもとに
 ;; ファイルを開くプログラムコマンド
@@ -90,7 +93,7 @@
 (defun exopen-buffer-file-suffix (suffix)
   "open buffer file of other extension in external program"
   (let (afile)
-    (if (not buffer-file-name)
+    (unless buffer-file-name
         (error "This buffer is not visiting a file"))
     (setq afile (concat (file-name-sans-extension (buffer-file-name)) suffix))
     (if (file-exists-p afile)
@@ -121,7 +124,7 @@
   "open buffer file or find-file in external program"
   (interactive "P")
   (let ((afile))
-    (if (null find-or-buffer)
+    (unless find-or-buffer
         (progn
           (setq afile (expand-file-name
                        (read-file-name "Find external open file: " buffer-file-name)))
