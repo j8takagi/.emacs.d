@@ -6,7 +6,7 @@
 (defvar site-lisp-dir (expand-file-name "~/.emacs.d/site-lisp"))
 (add-to-list 'load-path site-lisp-dir)
 (let ((default-directory site-lisp-dir))
-      (load (expand-file-name "subdirs.el")))
+      (load (expand-file-name "subdirs")))
 
 ;; パッケージを使う（Emacs24）
 (require 'package)
@@ -144,14 +144,6 @@
       (setq version-control t)
       (setq delete-old-versions t)))
 
-;; 現在のバッファファイルを閉じ、ウインドウが2つ以上あるときはウィンドウも閉じる
-(defun my-kill-buffer-window ()
-  (interactive)
-  (kill-buffer nil)
-  (if (one-window-p)
-      (message "one-window-p")
-    (delete-window)))
-
 ;; 隣のバッファファイルを閉じる。ウィンドウはそのまま
 (defun my-kill-next-buffer ()
   (interactive)
@@ -191,29 +183,6 @@
 (setq iswitchb-regexp t)
 (setq iswitchb-prompt-newbuffer nil)
 
-(global-set-key "\C-c\C-c" 'comment-region)              ; コメントを付ける
-(global-set-key "\C-c\C-u" 'uncomment-region)            ; コメントを外す
-(global-set-key "\C-c\C-v" 'view-mode)                   ; View mode
-(global-set-key "\C-cc" 'compile)                        ; make
-(global-set-key "\C-cg" 'magit-status)                   ; git
-(global-set-key "\C-cww" 'whitespace-mode)               ; whitespace-mode
-(global-set-key "\C-cwt" 'whitespace-toggle-options)     ; whitespace-toggle-options
-(global-set-key "\C-m" 'newline-and-indent)              ; インデント
-(global-set-key "\C-x4K" 'my-kill-next-buffer-window)    ; 隣のバッファとウィンドウを削除
-(global-set-key "\C-x4k" 'my-kill-next-buffer)           ; 隣のバッファを削除
-(global-set-key "\C-xK" 'my-kill-buffer-window)          ; バッファとウィンドウを削除
-(global-set-key "\C-x\C-e" 'electric-buffer-list)        ; バッファ一覧
-(global-set-key "\C-xm" 'man)                            ; man
-(global-set-key "\C-xp" 'call-last-kbd-macro)            ; マクロ
-(global-set-key "\M-?" 'help)                            ; ヘルプ
-(global-set-key "\M-[" 'backward-paragraph)              ; 前のパラグラフへ移動
-(global-set-key "\M-]" 'forward-paragraph)               ; 次のパラグラフへ移動
-(global-set-key "\M-g" 'goto-line)                       ; 指定行へジャンプ
-(global-set-key "\M-p" 'call-last-kbd-macro)             ; マクロ
-(global-set-key "\M-y" 'browse-yank)                     ; 貼り付け拡張
-(global-set-key [?\C-,] 'scroll-up-one-line)             ; 1行上へスクロール
-(global-set-key [?\C-.] 'scroll-down-one-line)           ; 1行下へスクロール
-
 ;; uniq
 (load "uniq")
 
@@ -223,6 +192,21 @@
 
 ;; Ediff
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+
+(require 'ediff)
+(declare-function ediff-vc-internal "ediff-vers" (REV1 REV2 &optional STARTUP-HOOKS))
+(defun ediff-vc-latest-current ()
+  "Run Ediff of buffer file by comparing the latest and current."
+  (interactive)
+  (let ((file) (state))
+    (setq file (buffer-file-name))
+    (unless file
+      (error "buffer not visiting file"))
+    (setq state (vc-state file))
+    (if (member state '(up-to-date added))
+        (message "%s: %s" file state)
+      (ediff-load-version-control)
+      (ediff-vc-internal "" ""))))
 
 ;; 圧縮されたファイルを直接編集する
 (auto-compression-mode)
@@ -247,17 +231,35 @@
 (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
 (setq uniquify-ignore-buffers-re "*[^*]+*")
 
-;; elispファイル保存時に、バイトコンパイルする
-;;    http://www-tsujii.is.s.u-tokyo.ac.jp/~yoshinag/tips/junk_elisp.html#bytecompile
-(add-hook 'after-save-hook
-           (lambda ()
-             (if (eq major-mode 'emacs-lisp-mode)
-                 (save-excursion
-                   (byte-compile-file buffer-file-name)
-                   (eval-buffer)))))
+(autoload 'auto-elc-mode "auto-elc-mode")
+(add-hook 'emacs-lisp-mode-hook (lambda () (auto-elc-mode 1)))
 
 ;; magit-mode
 (autoload 'magit-status "magit" nil t)
+
+(global-set-key "\C-c\C-c" 'comment-region)              ; コメントを付ける
+(global-set-key "\C-xve" 'ediff-vc-latest-current)       ; 最新版と現在のファイルでEdiff
+(global-set-key "\C-c\C-u" 'uncomment-region)            ; コメントを外す
+(global-set-key "\C-c\C-v" 'view-mode)                   ; View mode
+(global-set-key "\C-cc" 'compile)                        ; make
+(global-set-key "\C-cg" 'magit-status)                   ; magit
+(global-set-key "\C-cww" 'whitespace-mode)               ; whitespace-mode
+(global-set-key "\C-cwt" 'whitespace-toggle-options)     ; whitespace-toggle-options
+(global-set-key "\C-m" 'newline-and-indent)              ; インデント
+(global-set-key "\C-x4K" 'my-kill-next-buffer-window)    ; 隣のバッファとウィンドウを削除
+(global-set-key "\C-x4k" 'my-kill-next-buffer)           ; 隣のバッファを削除
+(global-set-key "\C-xK" 'kill-buffer-and-window)          ; バッファとウィンドウを削除
+(global-set-key "\C-x\C-e" 'electric-buffer-list)        ; バッファ一覧
+(global-set-key "\C-xm" 'man)                            ; man
+(global-set-key "\C-xp" 'call-last-kbd-macro)            ; マクロ
+(global-set-key "\M-?" 'help)                            ; ヘルプ
+(global-set-key "\M-[" 'backward-paragraph)              ; 前のパラグラフへ移動
+(global-set-key "\M-]" 'forward-paragraph)               ; 次のパラグラフへ移動
+(global-set-key "\M-g" 'goto-line)                       ; 指定行へジャンプ
+(global-set-key "\M-p" 'call-last-kbd-macro)             ; マクロ
+(global-set-key "\M-y" 'browse-yank)                     ; 貼り付け拡張
+(global-set-key [?\C-,] 'scroll-up-one-line)             ; 1行上へスクロール
+(global-set-key [?\C-.] 'scroll-down-one-line)           ; 1行下へスクロール
 
 ;; Make
 (setq auto-mode-alist
@@ -266,6 +268,7 @@
          ("\.mk$". makefile-gmake-mode)
          ("\.d$". makefile-gmake-mode))
        auto-mode-alist))
+(setq compilation-scroll-output 1)
 
 ;; lisp-interaction-mode
 ;; M-[space] でLisp補完
@@ -301,14 +304,23 @@
             (load "dired-x")
             ;; wdired - ファイル名の編集を可能にする
             (require 'wdired)
-            (define-key dired-mode-map "\C-cw" 'wdired-change-to-wdired-mode)
             ;;
-            (put 'dired-find-alternate-file 'disabled nil))
-          (require 'image-dired))
+            (put 'dired-find-alternate-file 'disabled nil)
+            ;; ediff
+            (defun dired-ediff-vc-latest-current ()
+              "Run Ediff of file named on this line by comparing the latest version and current."
+              (interactive)
+              (let ((find-file-run-dired nil))
+                (find-file (dired-get-file-for-visit))
+                (ediff-vc-latest-current)))
+            ;; image-dired
+            (require 'image-dired)
+            ;; ediff-revison
+            (define-key dired-mode-map "\C-cw" 'wdired-change-to-wdired-mode)
+            (define-key dired-mode-map "E" 'dired-ediff-vc-latest-current)
+            (define-key dired-mode-map "\C-e" 'ediff-revision)))
 
 ;;; CC-Mode
-(require 'cc-mode)
-
 (add-hook 'c-mode-common-hook
           '(lambda ()
              (setq c-default-style "k&r")
@@ -342,10 +354,13 @@
 (add-to-list 'auto-mode-alist '("\\.ll?$" . flex-mode))
 
 ;; Mew
-(require 'mew)
 (autoload 'mew "mew" nil t)
 (autoload 'mew-send "mew" nil t)
 ;(eval-after-load "mew" '(require 'mew-browse))
+
+(declare-function mew-path-to-folder "mew-func" (PATH))
+(declare-function mew-summary-visit-folder "mew-summary4" (FOLDER &optional GOEND NO-LS))
+(declare-function mew-summary-move-and-display "mew-exec" (MSG &optional REDISPLAY))
 
 ;; mewメッセージファイルの開き方
 ;; Spotlightから.mewファイルを開けるようにする
@@ -388,7 +403,6 @@
 
 ;; nxml-mode
 (require 'nxml-mode)
-(autoload 'nxml-mode "nxml-mode" "major mode for editing XML" t)
 (setq magic-mode-alist '(("<\\?xml " . nxml-mode)))
 (add-to-list 'auto-mode-alist '("\\.xml$" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.svg$" . nxml-mode))
@@ -398,11 +412,8 @@
             (setq nxml-child-indent 0)
             (setq indent-tabs-mode nil)))
 
-;; image-file-mode
+;; image-mode
 (setq image-file-name-extensions '("png" "jpeg" "jpg" "gif" "tiff" "tif"))
-(add-hook 'after-change-major-mode-hook
-          '(lambda () (if (eq major-mode 'svg-clock-mode)
-                   (image-mode))))
 
 ;; css-mode
 (autoload 'css-mode "css-mode")
@@ -434,6 +445,8 @@
 (require 'ess-site)
 (add-to-list 'auto-mode-alist '("\\.[rR]$" 'R-mode))
 (autoload 'R-mode "ess-site" "Emacs Speaks Statistics mode" t)
+;; R起動時にワーキングディレクトリを訊ねない
+(setq ess-ask-for-ess-directory nil)
 
 ;; CSV mode
 (autoload 'csv-mode "csv-mode" "Major mode for editing comma-separated value files." t)
@@ -459,7 +472,7 @@
           '(lambda ()
           (setq exopen-suffix-cmd '((".dvi" . "pxdvi")))))
 
-;; texplus-mode
+;; tex-mode
 (add-hook 'tex-mode-hook
           '(lambda ()
                     (define-key latex-mode-map "\C-cpp" 'exopen-buffer-pdffile)
@@ -477,3 +490,6 @@
 
 ;; top-mode
 (require 'top-mode)
+
+;; svg-clock
+(autoload 'svg-clock "svg-clock" "Start/stop svg-clock" t)
