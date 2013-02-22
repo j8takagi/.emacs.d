@@ -1,14 +1,39 @@
 INSTALL = install
+RSYNC := rsync
+RSYNCFLAG := -avz --delete
+EMACS := emacs
+RMR := $(RM) -R
+ECHO := echo
+FIND := find
 
-initdir = ~/.emacs.d
-sitelispdir = /usr/local/share/emacs/site-lisp
+COMPILE.el := $(EMACS) -batch -f batch-byte-compile
 
-.PHONY: install-init install-site-lisp
+init-files := $(wildcard init*.el)
+site-lisp-files := $(shell $(FIND) site-lisp -name '*.el')
+
+init-dir := ~/.emacs.d
+site-lisp-dir := $(init-dir)/site-lisp
+
+.PHONY: all install-init install-site-lisp puts_site-lisp-files puts_init-files
+
+all: install-init install-site-lisp
 
 install-init:
-	install -d $(initdir)
-	install init*.el $(initdir)
-	emacs -batch -f batch-byte-compile $(initdir)/init*.el
+	install -d $(init-dir)
+	$(RSYNC) $(RSYNCFLAG) $^ $(init-dir)/
 
 install-site-lisp:
-	which $(sitelispdir) && cp site-lisp/* $(sitelispdir)/
+	install -d $(init-dir)
+	$(RSYNC) $(RSYNCFLAG) site-lisp $(site-lisp-dir)/
+
+clean:
+	$(RMR) *.elc
+
+%.elc: %.el
+	$(COMPILE.el) $<
+
+puts_init-files:
+	@$(ECHO) $(init-files) $(addsuffix c,$(init-files))
+
+puts_site-lisp-files:
+	@$(ECHO) $(site-lisp-files) $(addsuffix c,$(site-lisp-files))
