@@ -19,7 +19,7 @@
                '(foreground-color . "black")
                '(background-color . "gray99")
                '(cursor-color . "DarkOliveGreen")
-               '(width . 100)
+               '(width . 120)
                '(height . 34)
                '(top . 0)
                '(left . 0)
