@@ -208,6 +208,25 @@
       (ediff-load-version-control)
       (ediff-vc-internal "" ""))))
 
+(require 'vc)
+(defun find-file-revision (&optional file revision)
+  "find-file FILE REVISION."
+  (interactive "P")
+  (if (not (stringp file))
+    (setq file (expand-file-name (read-file-name "Find version controled file: "))))
+  (unless (vc-backend file)
+    (error (format "%s is not under version control." file)))
+  (unless (stringp revision)
+    (setq revision
+          (vc-read-revision
+           (format
+            "Revision (default %s's working revision): " (file-name-nondirectory file))
+           (list file))))
+  (if (string= revision "")
+      (setq revision nil))
+  (set-buffer (find-file-noselect file))
+  (switch-to-buffer (vc-find-revision file revision)))
+
 ;; 圧縮されたファイルを直接編集する
 (auto-compression-mode)
 
@@ -231,14 +250,20 @@
 (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
 (setq uniquify-ignore-buffers-re "*[^*]+*")
 
-(autoload 'auto-elc-mode "auto-elc-mode")
-(add-hook 'emacs-lisp-mode-hook (lambda () (auto-elc-mode 1)))
-
 ;; magit-mode
 (autoload 'magit-status "magit" nil t)
 
+;; git
+(require 'git)
+(require 'git-blame)
+
+(defun my-insert-filename (filename)
+  (interactive "*fInsert file name: ")
+  (insert filename))
+
 (global-set-key "\C-c\C-c" 'comment-region)              ; コメントを付ける
 (global-set-key "\C-xve" 'ediff-vc-latest-current)       ; 最新版と現在のファイルでEdiff
+(global-set-key "\C-xvf" 'find-file-revision)            ; ファイル旧版を開く
 (global-set-key "\C-c\C-u" 'uncomment-region)            ; コメントを外す
 (global-set-key "\C-c\C-v" 'view-mode)                   ; View mode
 (global-set-key "\C-cc" 'compile)                        ; make
@@ -260,6 +285,13 @@
 (global-set-key "\M-y" 'browse-yank)                     ; 貼り付け拡張
 (global-set-key [?\C-,] 'scroll-up-one-line)             ; 1行上へスクロール
 (global-set-key [?\C-.] 'scroll-down-one-line)           ; 1行下へスクロール
+(global-set-key "\C-x'" 'just-one-space)
+(global-set-key "\M- " 'expand-abbrev)
+(global-set-key "\C-ci" 'my-insert-filename)          ; ファイル名を挿入する
+
+;; Emacs Lisp
+(autoload 'auto-elc-mode "auto-elc-mode")
+(add-hook 'emacs-lisp-mode-hook (lambda () (auto-elc-mode 1)))
 
 ;; Make
 (setq auto-mode-alist
@@ -318,7 +350,7 @@
             ;; ediff-revison
             (define-key dired-mode-map "\C-cw" 'wdired-change-to-wdired-mode)
             (define-key dired-mode-map "E" 'dired-ediff-vc-latest-current)
-            (define-key dired-mode-map "\C-e" 'ediff-revision)))
+            (define-key dired-mode-map "\C-ce" 'ediff-revision)))
 
 ;;; CC-Mode
 (add-hook 'c-mode-common-hook
@@ -425,15 +457,15 @@
 (setq user-mail-address "j8takagi@nifty.com")
 (setq change-log-default-name "~/ChangeLog")
 
-;; ;; pukiwiki-mode
-;; (load-library "pukiwiki-mode")
+;; pukiwiki-mode
+(load-library "pukiwiki-mode")
 
-;; (setq pukiwiki-site-list
-;;        '(("kanka" "http://plusone.ath.cx/pukiwiki/index.php" nil euc-jp)
-;;          ("bookshelf" "http://www.bookshelf.jp/pukiwiki/pukiwiki" nil euc-jp)
-;;          ("macemacs" "http://macemacsjp.sourceforge.jp/index.php" nil euc-jp)
-;;          ("pukiwiki" "http://pukiwiki.org/index.php" nil utf-8)
-;;          ))
+(setq pukiwiki-site-list
+       '(("kanka" "http://plusone.ath.cx/pukiwiki/index.php" nil euc-jp)
+         ("bookshelf" "http://www.bookshelf.jp/pukiwiki/pukiwiki" nil euc-jp)
+         ("macemacs" "http://macemacsjp.sourceforge.jp/index.php" nil euc-jp)
+         ("pukiwiki" "http://pukiwiki.org/index.php" nil utf-8)
+         ))
 
 ;; CASL II
 (add-to-list 'auto-mode-alist '("\\.casl?$" . asm-mode))
@@ -443,7 +475,7 @@
 
 ;; ESS
 (require 'ess-site)
-(add-to-list 'auto-mode-alist '("\\.[rR]$" 'R-mode))
+(add-to-list 'auto-mode-alist '("\\.[rR]$" . R-mode))
 (autoload 'R-mode "ess-site" "Emacs Speaks Statistics mode" t)
 ;; R起動時にワーキングディレクトリを訊ねない
 (setq ess-ask-for-ess-directory nil)
@@ -475,8 +507,9 @@
 ;; tex-mode
 (add-hook 'tex-mode-hook
           '(lambda ()
-                    (define-key latex-mode-map "\C-cpp" 'exopen-buffer-pdffile)
-                    (define-key latex-mode-map "\C-cpd" 'exopen-buffer-dvifile)))
+             (setq skeleton-pair 1)
+             (define-key latex-mode-map "\C-cpp" 'exopen-buffer-pdffile)
+             (define-key latex-mode-map "\C-cpd" 'exopen-buffer-dvifile)))
 
 (add-hook 'latex-mode-hook 'turn-on-reftex)
 
