@@ -210,10 +210,17 @@
 
 (require 'vc)
 (defun find-file-revision (&optional file revision)
-  "find-file FILE REVISION."
+  "find-file FILE REVISION.
+  Input FILE first, REVISION then.
+  Or, input FILE as 'FILE.~REVISON~' and FILE and REVISION is specified."
   (interactive "P")
   (if (not (stringp file))
     (setq file (expand-file-name (read-file-name "Find version controled file: "))))
+  ;; find-file FILE REVISION by 'FILE.~REVISION~'."
+  (if (string-match "\\(.+\\)\\.~\\(.+\\)~$" file)
+      (progn
+        (setq revision (substring file (match-beginning 2) (match-end 2)))
+        (setq file (substring file (match-beginning 1) (match-end 1)))))
   (unless (vc-backend file)
     (error (format "%s is not under version control." file)))
   (unless (stringp revision)
