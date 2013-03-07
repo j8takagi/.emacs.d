@@ -245,8 +245,7 @@
            (format
             "Revision (default %s's working revision): " (file-name-nondirectory file))
            (list file))))
-  (if (string= revision "")
-      (setq revision nil))
+  (if (string= revision "") (setq revision nil))
   (set-buffer (find-file-noselect file))
   (switch-to-buffer (vc-find-revision file revision)))
 
