@@ -149,14 +149,20 @@
   (interactive)
   (if (one-window-p)
       (message "one-window-p")
-    (kill-buffer (window-buffer(next-window)))))
+    (kill-buffer (window-buffer (next-window)))))
 
-;; 隣のバッファファイルを閉じ、ウインドウが2つ以上あるときはウィンドウも閉じる
+;; 現在のバッファファイルと隣のバッファファイルを閉じる。ウィンドウはそのまま
+(defun my-kill-current-next-buffer ()
+  (interactive)
+  (my-kill-next-buffer-window)
+  (kill-buffer (current-buffer)))
+
+;; 隣のバッファファイルを閉じ、ウィンドウも閉じる
 (defun my-kill-next-buffer-window ()
   (interactive)
   (if (one-window-p)
       (message "one-window-p")
-    (kill-buffer (window-buffer(next-window)))
+    (kill-buffer (window-buffer (next-window)))
     (delete-window (next-window))))
 
 ;; インデント
@@ -280,7 +286,7 @@
 (global-set-key "\C-m" 'newline-and-indent)              ; インデント
 (global-set-key "\C-x4K" 'my-kill-next-buffer-window)    ; 隣のバッファとウィンドウを削除
 (global-set-key "\C-x4k" 'my-kill-next-buffer)           ; 隣のバッファを削除
-(global-set-key "\C-xK" 'kill-buffer-and-window)          ; バッファとウィンドウを削除
+(global-set-key "\C-xK" 'my-kill-current-next-buffer)    ; 現在のバッファと隣のバッファを削除
 (global-set-key "\C-x\C-e" 'electric-buffer-list)        ; バッファ一覧
 (global-set-key "\C-xm" 'man)                            ; man
 (global-set-key "\C-xp" 'call-last-kbd-macro)            ; マクロ
