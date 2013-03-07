@@ -189,6 +189,16 @@
 (setq iswitchb-regexp t)
 (setq iswitchb-prompt-newbuffer nil)
 
+;; テンポラリバッファを開く
+(defun switch-to-temp-buffer ()
+  "Create temporary buffer."
+  (interactive)
+  ;; バッファ名は現在の日時
+  (switch-to-buffer
+   (generate-new-buffer
+    (concat "*" (replace-regexp-in-string " +" "_" (current-time-string)) "*"))
+  (setq buffer-offer-save nil)))
+
 ;; uniq
 (load "uniq")
 
@@ -278,6 +288,7 @@
 (global-set-key "\C-xve" 'ediff-vc-latest-current)       ; 最新版と現在のファイルでEdiff
 (global-set-key "\C-xvf" 'find-file-revision)            ; ファイル旧版を開く
 (global-set-key "\C-c\C-u" 'uncomment-region)            ; コメントを外す
+(global-set-key "\C-ct" 'switch-to-temp-buffer)          ; テンポラリバッファを開く
 (global-set-key "\C-c\C-v" 'view-mode)                   ; View mode
 (global-set-key "\C-cc" 'compile)                        ; make
 (global-set-key "\C-cg" 'magit-status)                   ; magit
