@@ -26,7 +26,7 @@
 
 ;; Windowシステムごとの設定
 (if (eq window-system 'ns) (load "init-mac"))
-(if (eq window-system 'x) (load "init-ubuntu-x"))
+(if (eq window-system 'x) (load "init-x"))
 
 ;; OSごとの設定
 (if (eq system-type 'gnu/linux) (load "init-linux"))

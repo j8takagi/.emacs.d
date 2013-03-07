@@ -7,8 +7,15 @@ ECHO := echo
 FIND := find
 
 COMPILE.el := $(EMACS) -batch -script ~/.emacs.d/init.el -f batch-byte-compile
+KERNEL := $(shell uname)
 
-init-files := $(wildcard init*.el)
+ifeq($(KERNEL),Linux)
+  init-files := init.el init-linux.el init-x.el
+endif
+ifeq($(KERNEL),Darwin)
+  init-files := init.el init-linux.el init-ubuntu-x.el
+endif
+
 site-lisp-files := $(shell $(FIND) site-lisp -name '*.el')
 
 init-dir := ~/.emacs.d
