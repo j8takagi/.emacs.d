@@ -9,10 +9,10 @@ FIND := find
 COMPILE.el := $(EMACS) -batch -script ~/.emacs.d/init.el -f batch-byte-compile
 KERNEL := $(shell uname)
 
-ifeq($(KERNEL),Linux)
+ifeq ($(KERNEL),Linux)
   init-files := init.el init-linux.el init-x.el
 endif
-ifeq($(KERNEL),Darwin)
+ifeq ($(KERNEL),Darwin)
   init-files := init.el init-linux.el init-ubuntu-x.el
 endif
 
