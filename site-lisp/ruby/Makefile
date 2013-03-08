@@ -1,23 +1,18 @@
-prefix ?= /usr/local
-elispdir ?= ~/.emacs.d/site-lisp
-installdir ?= $(elispdir)/ruby
-
-.PHONY: install clean
-
 EMACS := emacs
+
 COMPILE.el := $(EMACS) -batch -f batch-byte-compile
-INSTALL := install
 
-TARGETS = $(wildcard *.el)
+ELFILES := $(wildcard *.el)
+ELCFILES := $(addsuffix c,$(ELFILES))
 
-$(addsuffix c,$(TARGETS)):
+.PHONY: all install clean
 
-install: $(TARGETS) $(addsuffix c,$(TARGETS))
-	$(INSTALL) -d $(installdir)
-	$(INSTALL) $^ $(installdir)/
+all: $(ELCFILES)
+
+install: all
 
 %.elc: %.el
 	$(COMPILE.el) $<
 
 clean:
-	$(RM) *.elc
+	$(RM) $(ELCFILES)

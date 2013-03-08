@@ -13,38 +13,34 @@ ifeq ($(KERNEL),Linux)
   init-files := init.el init-linux.el init-x.el
 endif
 ifeq ($(KERNEL),Darwin)
-  init-files := init.el init-linux.el init-ubuntu-x.el
+  init-files := init.el init-mac.el
 endif
 
-site-lisp-files := $(shell $(FIND) site-lisp -name '*.el')
-
 init-dir := ~/.emacs.d
-site-lisp-dir := $(init-dir)/site-lisp
 
-.PHONY: all install-init install-site-lisp puts_site-lisp-files puts_init-files
+.PHONY: all init site-lisp install-init install-site-lisp
 
-all: $(addsuffix c,$(init-files))
+all: init site-lisp
 
-$(addsuffix c,$(init-files)): $(init-files)
+init: $(addsuffix c,$(init-files))
+
+site-lisp:
+	$(MAKE) -C site-lisp
 
 install: install-init install-site-lisp
 
-install-init: all
+install-init: init
 	install -d $(init-dir)
 	$(RSYNC) $(RSYNCFLAG) $(init-files) $(addsuffix c,$(init-files)) $(init-dir)/
 
 install-site-lisp:
-	install -d $(init-dir)
-	$(RSYNC) $(RSYNCFLAG) site-lisp/ $(site-lisp-dir)/
+	$(MAKE) -C site-lisp install
 
-clean:
-	$(RMR) *.elc
+clean: clean-init
+	$(MAKE) -C site-lisp clean
+
+clean-init:
+	$(RM) *.elc
 
 %.elc: %.el
 	$(COMPILE.el) $<
-
-puts_init-files:
-	@$(ECHO) $(init-files) $(addsuffix c,$(init-files))
-
-puts_site-lisp-files:
-	@$(ECHO) $(site-lisp-files) $(addsuffix c,$(site-lisp-files))
