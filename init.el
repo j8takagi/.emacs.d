@@ -1,4 +1,10 @@
 ;;;-*-Emacs-Lisp-*-
+;; for emacs 24.2
+;; 関連パッケージは、次のとおり
+;;   site-lispディレクトリ
+;;   ARCHIVEディレクトリ（mew, ess）
+;;   packagesで管理（csv-mode, edit-server, gtags, igrep, mediawiki, melpa, session, shell-command）
+
 ;; load-pathを追加
 (add-to-list 'load-path "~/.emacs.d/")
 
@@ -69,10 +75,10 @@
 (setq whitespace-space-regexp "\\(　\\)")
 (setq whitespace-trailing-regexp "\\( +$\\)")
 
-(set-face-attribute whitespace-tab nil :box "navy" :background "inherit")
-(set-face-attribute whitespace-space nil :box "orange" :background "inherit")
+(set-face-attribute whitespace-tab nil :box "navy" :background "white")
+(set-face-attribute whitespace-space nil :box "orange" :background "white")
 (set-face-attribute whitespace-trailing nil
-                    :foreground "navy" :background "inherit" :underline "navy")
+                    :foreground "navy" :background "white" :underline "navy")
 
 ;; whitespaceを無効にするメジャーモード
 (defvar whitespace-disabled-major-mode-list)
@@ -276,8 +282,8 @@
 (autoload 'magit-status "magit" nil t)
 
 ;; git
-(require 'git)
-(require 'git-blame)
+;; (require 'git)
+;; (require 'git-blame)
 
 (defun my-insert-filename (filename)
   (interactive "*fInsert file name: ")
