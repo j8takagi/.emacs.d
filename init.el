@@ -71,9 +71,9 @@
 ;; whitespace
 (require 'whitespace)
 
-(setq whitespace-style '(face tabs spaces trailing))
-(setq whitespace-space-regexp "\\(　\\)")
-(setq whitespace-trailing-regexp "\\( +$\\)")
+(setq whitespace-style '(face tabs spaces trailing)) ;	タブ
+(setq whitespace-space-regexp "\\(　\\)")     ;　全角スペース
+(setq whitespace-trailing-regexp "\\( +$\\)") ;行末の空白    
 
 (set-face-attribute whitespace-tab nil :box "navy" :background "white")
 (set-face-attribute whitespace-space nil :box "orange" :background "white")
