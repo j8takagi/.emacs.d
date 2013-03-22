@@ -44,6 +44,8 @@
 ;; Hi-lock: ( ("make-variable-buffer-\\(local\\)" (0 font-lock-keyword-face)(1 'italic append)))))
 ;; Hi-lock: end
 
+(require 'http)
+
 (defvar pukiwiki-site-list
   '(("Meadow" "http://www.bookshelf.jp/pukiwiki/pukiwiki.php" nil euc-jp-dos)))
 ;;(setq pukiwiki-browser-function 'browse-url)
