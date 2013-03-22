@@ -368,6 +368,7 @@ Also ignores spaces after parenthesis when 'space."
 
 (defun ruby-indent-line (&optional flag)
   "Correct indentation of the current ruby line."
+  (if (string-match "^ *$" (buffer-substring (line-beginning-position) (line-end-position))) (return))
   (ruby-indent-to (ruby-calculate-indent)))
 
 (defun ruby-indent-command ()
@@ -375,25 +376,41 @@ Also ignores spaces after parenthesis when 'space."
   (ruby-indent-line t))
 
 (defun ruby-indent-to (x)
-  (if x
-      (let (shift top beg)
-        (and (< x 0) (error "invalid nest"))
-        (setq shift (current-column))
-        (beginning-of-line)
-        (setq beg (point))
-        (back-to-indentation)
-        (setq top (current-column))
-        (skip-chars-backward " \t")
-        (if (>= shift top) (setq shift (- shift top))
-          (setq shift 0))
-        (if (and (bolp)
-                 (= x top))
-            (move-to-column (+ x shift))
-          (move-to-column top)
-          (delete-region beg (point))
-          (beginning-of-line)
-          (indent-to x)
-          (move-to-column (+ x shift))))))
+  (unless x (return))
+  (let (shift top beg)
+    (and (< x 0) (error "invalid nest"))
+    (setq shift (current-column))
+    (beginning-of-line)
+    (setq beg (point))
+    (back-to-indentation)
+    (setq top (current-column))
+    (skip-chars-backward " \t")
+    (if (>= shift top) (setq shift (- shift top))
+      (setq shift 0))
+    (if (and (bolp) (= x top))
+        (move-to-column (+ x shift))
+      (move-to-column top)
+      (delete-region beg (point))
+      (beginning-of-line)
+      (indent-to x)
+      (move-to-column (+ x shift)))))
+
+(defun ruby-indent-buffer ()
+  "Correct indentation of ruby line in current buffer."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (not (eobp))
+      (ruby-indent-line)
+      (forward-line 1))))
+
+(defun ruby-indent-region ()
+  "Correct indentation of ruby line in current region."
+  (interactive)
+  (save-excursion
+    (save-restriction
+      (narrow-to-region (region-beginning) (region-end))
+      (ruby-indent-buffer))))
 
 (defun ruby-special-char-p (&optional pnt)
   (setq pnt (or pnt (point)))
@@ -874,7 +891,7 @@ Also ignores spaces after parenthesis when 'space."
 
 (defun ruby-electric-brace (arg)
   (interactive "P")
-  (insert-char last-command-char 1)
+  (insert-char last-command-event 1)
   (ruby-indent-line t)
   (delete-char -1)
   (self-insert-command (prefix-numeric-value arg)))
@@ -1023,7 +1040,7 @@ An end of a defun is found by moving forward from the beginning of one."
                   ((looking-at "\\s\"\\|\\\\\\S_")
                    (let ((c (char-to-string (char-before (match-end 0)))))
                      (while (and (search-backward c)
-                                 (oddp (skip-chars-backward "\\")))))
+                                 (eq (logand (skip-chars-backward "\\") 1) 1))))
                    nil)
                   ((looking-at "\\s.\\|\\s\\")
                    (if (ruby-special-char-p) (forward-char -1)))
