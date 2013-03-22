@@ -1,18 +1,26 @@
+prefix ?= /usr/local
+elispdir ?= ~/.emacs.d/site-lisp
+installdir ?= $(elispdir)/exopen
+
+.PHONY: install clean
+
+TARGETS := exopen-mode.el
+
 EMACS := emacs
-
 COMPILE.el := $(EMACS) -batch -f batch-byte-compile
+INSTALL := install
 
-ELFILES := $(wildcard *.el)
-ELCFILES := $(addsuffix c,$(ELFILES))
+$(addsuffix c,$(TARGETS)):
 
-.PHONY: all install clean
+install: $(TARGETS) $(addsuffix c,$(TARGETS))
+	$(INSTALL) -d $(installdir)
+	$(INSTALL) $^ $(installdir)/
 
-all: $(ELCFILES)
+uninstall:
+	$(RM) $(prefix $(installdir)/,$(TARGETS)) $(suffix c,$(prefix $(installdir)/,$(TARGETS)))
 
-install: all
+clean:
+	$(RM) *.elc
 
 %.elc: %.el
 	$(COMPILE.el) $<
-
-clean:
-	$(RM) $(ELCFILES)

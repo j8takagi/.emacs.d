@@ -3,7 +3,7 @@
 ;; Copyright (C) 2013  j8takagi
 
 ;; Author: j8takagi <j8takagi@nifty.com>
-;; Keywords: Emacs 外部プログラム
+;; Keywords: Emacs external program 外部プログラム
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -40,18 +40,20 @@
 ;; exopen-modeが有効な場合、次の関数を使うことができます。
 ;;
 ;;   exopen-file (file) 外部ファイルを呼び出す
-;;
+;;   標準で、C-x C-M-fにバインド
 ;; ■hook
 
 ;; マイナーモードの定義
-(easy-mmode-define-minor-mode exopen-mode
-                              "minor mode for opening fle in external program."
-                              ;; 初期値
-                              (display-graphic-p)
-                              ;; モード行の表示
-                              ""
-                              ;; マイナーモード用キーマップの初期値
-                              '(("\C-x\C-\M-f" . exopen-find-file)))
+(define-minor-mode exopen-mode
+"Toggle exopen-mode.
+With a prefix argument ARG, enable Auto Composition mode if ARG
+is positive, and disable it otherwise.  If called from Lisp,
+enable the mode if ARG is omitted or nil.
+
+open file in external program."
+(display-graphic-p)                     ; Windowシステムかどうかの判定
+nil                                     ; モード行に何も表示しない
+'(("\C-x\C-\M-f" . exopen-find-file)))  ; キーバインド
 
 ;; exopen-std-cmd: OSやWindowで設定された関連付けをもとに
 ;; ファイルを開くプログラムコマンド
@@ -120,19 +122,12 @@
 
 ;;; find-or-bufferがnilの場合はプロンプトで指定したファイル、
 ;;; nil以外の場合はバッファのファイルを外部プログラムでオープン
-(defun exopen-find-file(&optional find-or-buffer)
+(defun exopen-find-file (&optional buffer-file)
   "open buffer file or find-file in external program"
   (interactive "P")
-  (let ((afile))
-    (unless find-or-buffer
-        (progn
-          (setq afile (expand-file-name
-                       (read-file-name "Find external open file: " buffer-file-name)))
-          (if afile
-              (exopen-file afile)
-            (error "file not found")))
+  (if buffer-file
       (exopen-buffer-file)
-      )))
+    (exopen-file (expand-file-name (read-file-name "Find external open file: " buffer-file-name)))))
 
 ;;; dired-modeからファイルやディレクトリーを開く
 (require 'dired)
