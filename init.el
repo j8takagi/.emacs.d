@@ -302,7 +302,8 @@
 (global-set-key "\C-m" 'newline-and-indent)              ; インデント
 (global-set-key "\C-x4K" 'my-kill-next-buffer-window)    ; 隣のバッファとウィンドウを削除
 (global-set-key "\C-x4k" 'my-kill-next-buffer)           ; 隣のバッファを削除
-(global-set-key "\C-xK" 'my-kill-current-next-buffer)    ; 隣のバッファとウィンドウと現在のバッファを削除
+(global-set-key "\C-xK" 'kill-buffer-and-window)         ; 現在のバッファとウィンドウを削除
+(global-set-key "\C-x\C-\M-k" 'my-kill-current-next-buffer)    ; 隣のバッファとウィンドウと現在のバッファを削除
 (global-set-key "\C-x\C-e" 'electric-buffer-list)        ; バッファ一覧
 (global-set-key "\C-xm" 'man)                            ; man
 (global-set-key "\C-xp" 'call-last-kbd-macro)            ; マクロ
@@ -387,8 +388,7 @@
              (setq c-default-style "k&r")
              (setq c-basic-offset 4)
              (setq indent-tab-mode nil)
-             (gtags-mode 1)
-             (gtags-make-complete-list)))
+             (gtags-mode 1)))
 
 ;; find documentation on GNU MP functions in programing C
 (eval-after-load "info-look"
@@ -559,11 +559,17 @@
 ;; ruby-mode
 (autoload 'ruby-mode "ruby-mode"
   "Mode for editing ruby source files" t)
+
 (setq auto-mode-alist
-      (append '(("\\.rb$" . ruby-mode)) auto-mode-alist))
+      (append '(("\\.y?rb$" . ruby-mode)) auto-mode-alist))
+
 (setq interpreter-mode-alist (append '(("ruby" . ruby-mode))
                                      interpreter-mode-alist))
+
 (load "inf-ruby")
+
+;; rubydb - ruby debugger
+(autoload 'rubydb "rubydb3x" "ruby debug" t)
 
 ;; set to load inf-ruby and set inf-ruby key definition in ruby-mode.
 (autoload 'run-ruby "inf-ruby"
@@ -573,3 +579,6 @@
 (add-hook 'ruby-mode-hook
           '(lambda ()
              (inf-ruby-keys)))
+
+;; Riece IRC client
+(autoload 'riece "riece" "Start Riece" t)
