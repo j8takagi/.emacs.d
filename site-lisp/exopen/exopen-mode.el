@@ -56,15 +56,21 @@ nil                                     ; モード行に何も表示しない
 '(("\C-x\C-\M-f" . exopen-find-file)))  ; キーバインド
 
 ;; exopen-std-cmd: OSやWindowで設定された関連付けをもとに
-;; ファイルを開くプログラムコマンド
+;; ファイルを開くプログラムコマンドとオプション
 (defvar exopen-std-cmd nil)
+(defvar exopen-std-cmdargs nil)
 
 ;; Window別にexopen-std-cmdを設定する
 (setq exopen-std-cmd
       (cond
        ((eq window-system 'x) "xdg-open")
        ((eq window-system 'ns) "open")
-       ((eq window-system 'w32) "cmd.exe /c start")))
+       ((eq window-system 'w32) "cmd.exe")))
+
+;; Window別にexopen-std-cmdargsを設定する
+(setq exopen-std-cmdargs
+      (cond
+       ((eq window-system 'w32) "/c start")))
 
 ;; exopen-modeでの拡張子とプログラムの関連付けリスト
 (defvar exopen-suffix-cmd nil)
@@ -73,14 +79,16 @@ nil                                     ; モード行に何も表示しない
 ;;; exopen-std-cmdで指定されたプログラムを使用
 (defun exopen-file (file)
   "open file in external program"
-  (let ((process-connection-type nil) (cmd))
+  (let ((process-connection-type nil) (cmd) (cmdargs) (cmdstr))
     (if exopen-suffix-cmd
         (setq cmd (cdr(assoc (file-name-extension file 1) exopen-suffix-cmd))))
     (unless cmd
-        (setq cmd exopen-std-cmd))
-    (start-process "exopen" nil cmd file)
+        (setq cmd exopen-std-cmd)
+        (setq cmdargs exopen-std-cmdargs))
+    (setq cmdstr (concat cmd " " cmdargs " " file))
+    (start-process-shell-command "exopen" nil cmdstr)
     (message
-     (concat "exopen: " cmd " " file " at "
+     (concat "exopen: " cmdstr " at "
              (format-time-string "%Y/%m/%d %H:%M:%S" (current-time))))))
 
 ;;; バッファで開いているファイルを外部プログラムでオープン
