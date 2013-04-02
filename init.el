@@ -33,6 +33,7 @@
 ;; Windowシステムごとの設定
 (if (eq window-system 'ns) (load "init-mac"))
 (if (eq window-system 'x) (load "init-x"))
+(if (eq window-system 'w32) (load "init-w32"))
 
 ;; OSごとの設定
 (if (eq system-type 'gnu/linux) (load "init-linux"))
