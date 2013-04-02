@@ -1,6 +1,6 @@
 ;;;-*-Emacs-Lisp-*-
-;;; Ubuntu Linuxの設定
-(provide 'init-ubuntu-x)
+;;; X-Windowの設定
+(provide 'init-x)
 
 ;; Emacs Server
 (require 'server)
