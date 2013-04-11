@@ -29,7 +29,7 @@ site-lisp:
 
 install: install-init install-site-lisp
 
-install-init: init
+install-init:
 	install -d $(init-dir)
 	$(RSYNC) $(RSYNCFLAG) $(init-files) $(addsuffix c,$(init-files)) $(init-dir)/
 

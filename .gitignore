@@ -1,1 +1,4 @@
 *.elc
+src/mew*
+src/ess*
+src/navi2ch*

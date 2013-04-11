@@ -86,7 +86,7 @@
 
 (require 'derived)			;; define-derived-mode
 ;(require 'flex-mode)			;; for flex-mode derivation
-(require 'make-regexp)			;; make-regexp
+;(require 'make-regexp)			;; make-regexp
 (require 'cc-fonts)
 
 ;; *************** internal vars ***************
