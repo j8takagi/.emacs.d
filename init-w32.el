@@ -2,6 +2,8 @@
 ;;; MS-Windowsの設定
 (provide 'init-w32)
 
+(cd "~")
+
 ;; Emacs Server
 (require 'server)
 (unless (server-running-p)
