@@ -25,9 +25,9 @@
 ;; ツールバーを表示しない
 (tool-bar-mode 0)
 
-(set-fontset-font (frame-parameter nil 'font)
-                  'japanese-jisx0208
-                  '("メイリオ" . "unicode-bmp"))
+;; 日本語フォントの設定
+(set-fontset-font t 'japanese-jisx0208
+                  (font-spec :family "Meiryo"))
 
 ;; 文字コードのデフォルトはUTF-8
 (set-default-coding-systems 'utf-8)
