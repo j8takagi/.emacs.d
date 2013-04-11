@@ -25,9 +25,9 @@
 ;; ツールバーを表示しない
 (tool-bar-mode 0)
 
-(set-face-attribute 'default nil
-                     :family "Meiryo UI"
-                     :height 100)
+(set-fontset-font (frame-parameter nil 'font)
+                  'japanese-jisx0208
+                  '("メイリオ" . "unicode-bmp"))
 
 ;; 文字コードのデフォルトはUTF-8
 (set-default-coding-systems 'utf-8)
