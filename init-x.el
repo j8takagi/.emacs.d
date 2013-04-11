@@ -31,9 +31,6 @@
 
 (global-unset-key "\C-\\")
 
-(set-face-attribute 'default nil
-                     :family "IPAGothic"
-                     :height 130)
-(set-fontset-font "fontset-default"
-                     'japanese-jisx0208
-                     '("IPAGothic" . "jisx0208-sjis"))
+(set-fontset-font t
+                  'japanese-jisx0208
+                  '("IPAGothic" . "unicode-bmp"))
