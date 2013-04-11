@@ -44,7 +44,7 @@
 ;; ターミナルの文字コード UTF-8
 (set-terminal-coding-system 'utf-8)
 
-(set-fontset-font nil 'japanese-jisx0208
+(set-fontset-font t 'japanese-jisx0208
                   (font-spec :family "Hiragino Kaku Gothic ProN"))
 
 (setq default-input-method "MacOSX")
@@ -59,6 +59,7 @@
 
 ;; commandキーをEmacsのMetaキーとして設定
 (setq mac-command-modifier 'meta)
+
 ;; optionキーはEmacsでは使わない
 ;; (setq mac-option-modifier nil)
 ;; ほかのアプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする

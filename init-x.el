@@ -31,6 +31,5 @@
 
 (global-unset-key "\C-\\")
 
-(set-fontset-font t
-                  'japanese-jisx0208
-                  '("IPAGothic" . "unicode-bmp"))
+(set-fontset-font t 'japanese-jisx0208
+                  (font-spec :family "IPAGothic"))
