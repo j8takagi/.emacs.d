@@ -85,7 +85,7 @@
 (defvar whitespace-disabled-major-mode-list)
 (setq whitespace-disabled-major-mode-list
       '(mew-summary-mode completion-list-mode help-mode
-        magit-mode tetris-mode))
+        magit-mode tetris-mode w3m-mode))
 
 ;; メジャーモード設定後、whitespaceを有効にする
 (add-hook 'after-change-major-mode-hook
@@ -459,9 +459,9 @@
 (setq navi2ch-list-bbstable-url "http://menu.2ch.net/bbsmenu.html")
 
 ;; w3m
-(require 'w3m-load)
-(setq w3m-default-display-inline-images t)
-(setq mew-use-w3m-minor-mode 1)
+;(require 'w3m-load)
+;(setq w3m-default-display-inline-images t)
+;(setq mew-use-w3m-minor-mode 1)
 
 ;; nxml-mode
 (require 'nxml-mode)
@@ -488,14 +488,14 @@
 (setq change-log-default-name "~/ChangeLog")
 
 ;; pukiwiki-mode
-(load-library "pukiwiki-mode")
+;; (load-library "pukiwiki-mode")
 
-(setq pukiwiki-site-list
-       '(("kanka" "http://plusone.ath.cx/pukiwiki/index.php" nil euc-jp)
-         ("bookshelf" "http://www.bookshelf.jp/pukiwiki/pukiwiki" nil euc-jp)
-         ("macemacs" "http://macemacsjp.sourceforge.jp/index.php" nil euc-jp)
-         ("pukiwiki" "http://pukiwiki.org/index.php" nil utf-8)
-         ))
+;; (setq pukiwiki-site-list
+;;        '(("kanka" "http://plusone.ath.cx/pukiwiki/index.php" nil euc-jp)
+;;          ("bookshelf" "http://www.bookshelf.jp/pukiwiki/pukiwiki" nil euc-jp)
+;;          ("macemacs" "http://macemacsjp.sourceforge.jp/index.php" nil euc-jp)
+;;          ("pukiwiki" "http://pukiwiki.org/index.php" nil utf-8)
+;;          ))
 
 ;; CASL II
 (add-to-list 'auto-mode-alist '("\\.casl?$" . asm-mode))
