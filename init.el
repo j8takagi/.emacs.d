@@ -85,7 +85,7 @@
 (defvar whitespace-disabled-major-mode-list)
 (setq whitespace-disabled-major-mode-list
       '(mew-summary-mode completion-list-mode help-mode
-        magit-mode tetris-mode w3m-mode))
+        magit-mode tetris-mode w3m-mode mew-message-mode))
 
 ;; メジャーモード設定後、バッファーが読み取り専用でない場合はwhitespaceを有効にする
 (add-hook 'after-change-major-mode-hook
