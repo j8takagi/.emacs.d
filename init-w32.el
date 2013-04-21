@@ -15,8 +15,8 @@
                '(foreground-color . "black")
                '(background-color . "gray99")
                '(cursor-color . "DarkOliveGreen")
-               '(width . 150)
-               '(height . 36)
+               '(width . 120)
+               '(height . 34)
                '(top . 0)
                '(left . 0)
                '(cursor-type . box))
@@ -24,6 +24,10 @@
 
 ;; ツールバーを表示しない
 (tool-bar-mode 0)
+
+(set-face-attribute 'default nil
+                     :family "Consolas"
+                     :height 120)
 
 ;; 日本語フォントの設定
 (set-fontset-font t 'japanese-jisx0208
