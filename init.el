@@ -87,10 +87,10 @@
       '(mew-summary-mode completion-list-mode help-mode
         magit-mode tetris-mode w3m-mode mew-message-mode))
 
-;; メジャーモード設定後、whitespaceを有効にする
+;; メジャーモード設定後、バッファーが読み取り専用でない場合はwhitespaceを有効にする
 (add-hook 'after-change-major-mode-hook
           '(lambda ()
-             (unless (member major-mode whitespace-disabled-major-mode-list)
+             (unless (or buffer-read-only (member major-mode whitespace-disabled-major-mode-list))
                (whitespace-mode 1))))
 
 ;; 再帰的なミニバッファ
