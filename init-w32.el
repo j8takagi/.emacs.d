@@ -36,3 +36,6 @@
 ;; 文字コードのデフォルトはUTF-8
 (set-default-coding-systems 'utf-8)
 (prefer-coding-system 'utf-8-unix)
+
+;; 日本語ファイル名を正常に処理するための設定
+(setq default-file-name-coding-system 'shift_jis)
