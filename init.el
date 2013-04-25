@@ -30,11 +30,6 @@
 ;; 日本語環境
 (set-language-environment 'Japanese)
 
-;; Windowシステムごとの設定
-(if (eq window-system 'ns) (load "init-mac"))
-(if (eq window-system 'x) (load "init-x"))
-(if (eq window-system 'w32) (load "init-w32"))
-
 ;; OSごとの設定
 (if (eq system-type 'gnu/linux) (load "init-linux"))
 
@@ -583,3 +578,8 @@
 
 ;; Riece IRC client
 (autoload 'riece "riece" "Start Riece" t)
+
+;; Windowシステムごとの設定
+(if (eq window-system 'ns) (load "init-mac"))
+(if (eq window-system 'x) (load "init-x"))
+(if (eq window-system 'w32) (load "init-w32"))
