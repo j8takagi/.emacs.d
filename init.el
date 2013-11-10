@@ -523,6 +523,9 @@
 (require 'mediawiki)
 (add-to-list 'auto-mode-alist '("\\.wiki$" . mediawiki-mode))
 (add-to-list 'auto-mode-alist '("^ja.wikipedia.org/w/index.php" . mediawiki-mode))
+(add-hook 'mediawiki-mode-hook
+          '(lambda ()
+             (define-key mediawiki-mode-map "\C-x\C-s" 'save-buffer)))
 
 ;; exopen-mode 外部プログラムでファイルを開く
 (require 'exopen-mode)
