@@ -378,6 +378,12 @@
             (define-key dired-mode-map "E" 'dired-ediff-vc-latest-current)
             (define-key dired-mode-map "\C-ce" 'ediff-revision)))
 
+(setq completion-ignored-extensions
+      (append completion-ignored-extensions
+              '(".bak" ".d" ".log" ".dvi" ".xbb" ".out" ".prev_aux"
+                ".prev_toc" ".prev_lot" ".prev_lof" ".prev_bbl" ".prev_out"
+                ".idx" ".ind" ".prev_idx" ".prev_ind" ".ilg")))
+
 ;;; CC-Mode
 (add-hook 'c-mode-common-hook
           '(lambda ()
