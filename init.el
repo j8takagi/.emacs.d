@@ -322,7 +322,7 @@
 ;; Make
 (setq auto-mode-alist
       (append
-       '(("[Mm]akefile". makefile-gmake-mode)
+       '(("[Mm]akefile$". makefile-gmake-mode)
          ("\.mk$". makefile-gmake-mode)
          ("\.d$". makefile-gmake-mode))
        auto-mode-alist))
