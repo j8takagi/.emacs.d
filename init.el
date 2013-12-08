@@ -338,17 +338,6 @@
     (setq shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ")
     (setq tab-width 4)))
 
-(defadvice shell (after rename-shell ())
-  "shellのバッファ名を変更する"
-  (let ((num 0) (bufname "*shell*"))
-    (save-excursion
-      (while (get-buffer bufname)
-        (progn
-          (setq bufname (concat "*shell<" (number-to-string num) ">*"))
-          (setq num (+ num 1)))))
-    (rename-buffer bufname)))
-(ad-activate 'shell)
-
 ;; shell-commandでコマンド入力に補完が効くようにする
 (require 'shell-command)
 (shell-command-completion-mode 1)
