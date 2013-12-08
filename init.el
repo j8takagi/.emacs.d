@@ -356,6 +356,8 @@
 ;; dired
 (add-hook 'dired-load-hook
           (lambda ()
+            ;; 確認なしにディレクトリーを再帰的にコピーする
+            (setq dired-recursive-copies 'always)
             ;; sorter - diredでのソート
             (load "sorter")
             ;; dired-x - diredの拡張機能
@@ -380,9 +382,9 @@
 
 (setq completion-ignored-extensions
       (append completion-ignored-extensions
-              '(".bak" ".d" ".log" ".dvi" ".xbb" ".out" ".prev_aux"
-                ".prev_toc" ".prev_lot" ".prev_lof" ".prev_bbl" ".prev_out"
-                ".idx" ".ind" ".prev_idx" ".prev_ind" ".ilg")))
+              '(".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".aux_prev"
+                ".toc_prev" ".lot_prev" ".lof_prev" ".bbl_prev" ".out_prev"
+                ".idx" ".ind" ".idx_prev" ".ind_prev" ".ilg")))
 
 ;;; CC-Mode
 (add-hook 'c-mode-common-hook
