@@ -27,8 +27,8 @@
                '(foreground-color . "black")
                '(background-color . "gray99")
                '(cursor-color . "DarkOliveGreen")
-               '(width . 240)
-               '(height . 65)
+               '(width . 180)
+               '(height . 55)
                '(top . 0)
                '(left . 0)
                '(cursor-type . box))
@@ -62,5 +62,13 @@
 
 ;; optionキーはEmacsでは使わない
 ;; (setq mac-option-modifier nil)
+
 ;; ほかのアプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする
 (global-set-key '[s-f1] 'other-frame)
+
+;; 起動時のカレントディレクトリが"/"になってしまう件への対応
+(defun cd-to-homedir-all-buffers ()
+  "Change every current directory of all buffers to the home directory."
+  (mapc
+   (lambda (buf) (set-buffer buf) (cd (expand-file-name "~"))) (buffer-list)))
+(add-hook 'after-init-hook 'cd-to-homedir-all-buffers)
