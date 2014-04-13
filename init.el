@@ -365,7 +365,7 @@
 
 (setq completion-ignored-extensions
       (append completion-ignored-extensions
-              '(".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".aux_prev"
+              '(".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" ".aux_prev"
                 ".toc_prev" ".lot_prev" ".lof_prev" ".bbl_prev" ".out_prev"
                 ".idx" ".ind" ".idx_prev" ".ind_prev" ".ilg")))
 
