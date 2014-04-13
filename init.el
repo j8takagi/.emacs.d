@@ -574,6 +574,25 @@
 ;; Riece IRC client
 (autoload 'riece "riece" "Start Riece" t)
 
+;; ucs-normalize-NFC-region で濁点分離を直す
+;; M-x ucs-normalize-NFC-buffer または "C-x RET u" で、
+;; バッファ全体の濁点分離を直します。
+;; 参考：
+;; http://d.hatena.ne.jp/nakamura001/20120529/1338305696 
+;; http://www.sakito.com/2010/05/mac-os-x-normalization.html
+
+(require 'ucs-normalize)
+(prefer-coding-system 'utf-8-hfs)
+(setq file-name-coding-system 'utf-8-hfs)
+(setq locale-coding-system 'utf-8-hfs)
+
+(defun ucs-normalize-NFC-buffer ()
+  (interactive)
+  (ucs-normalize-NFC-region (point-min) (point-max))
+  )
+
+(global-set-key (kbd "C-x RET u") 'ucs-normalize-NFC-buffer)
+
 ;; Windowシステムごとの設定
 (if (eq window-system 'ns) (load "init-mac"))
 (if (eq window-system 'x) (load "init-x"))
