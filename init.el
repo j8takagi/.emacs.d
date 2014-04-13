@@ -185,12 +185,6 @@
   (interactive)
   (message "日本語の文字数: %d字" (how-many "\\cj" (point-min) (point-max))))
 
-;; iswitchb
-(iswitchb-mode 1)
-(setq read-buffer-function 'iswitchb-read-buffer)
-(setq iswitchb-regexp t)
-(setq iswitchb-prompt-newbuffer nil)
-
 ;; テンポラリバッファを開く
 (defun switch-to-temp-buffer ()
   "Create temporary buffer."
