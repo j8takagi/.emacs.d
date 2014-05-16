@@ -597,3 +597,8 @@
 (if (eq window-system 'ns) (load "init-mac"))
 (if (eq window-system 'x) (load "init-x"))
 (if (eq window-system 'w32) (load "init-w32"))
+
+;; text-modeで<M-tab>でのispell起動を無効に
+(add-hook 'text-mode-hook
+          (lambda ()
+            (local-unset-key (kbd "C-M-i"))))
