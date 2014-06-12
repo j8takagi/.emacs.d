@@ -56,9 +56,11 @@
 
 ;; Info
 (setq Info-default-directory-list
-      '("/usr/local/share/info/"
-        "/usr/local/share/info/ja"
-        "/usr/share/info/"))
+      (append
+         '("/usr/local/share/info/ja"
+           "~/.emacs.d/share/info"
+           "~/share/info")
+         Info-default-directory-list))
 
 ;; commandキーをEmacsのMetaキーとして設定
 (setq mac-command-modifier 'meta)

@@ -649,3 +649,8 @@
 (add-hook 'text-mode-hook
           (lambda ()
             (local-unset-key (kbd "C-M-i"))))
+
+(add-hook 'Info-mode-hook       ; After Info-mode has started
+          (lambda ()
+            (setq Info-additional-directory-list Info-default-directory-list)
+            ))
