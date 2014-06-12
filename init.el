@@ -449,6 +449,29 @@
 ;(setq w3m-default-display-inline-images t)
 ;(setq mew-use-w3m-minor-mode 1)
 
+;; web-mode
+(require 'web-mode)
+(add-to-list 'magic-mode-alist '("<![Dd][Oo][Cc][Tt][Yy][Pp][Ee] [Hh][Tt][Mm][Ll]" . web-mode))
+
+(add-to-list 'auto-mode-alist '("\\.html$" . web-mode))
+
+(custom-set-variables '(web-mode-indent-style 1))
+
+;; 色の設定
+(custom-set-faces
+ '(web-mode-doctype-face
+   ((t (:foreground "#82AE46"))))       ; doctype
+ '(web-mode-html-tag-face
+   ((t (:foreground "#E6B422" :weight bold)))) ; タグ
+ '(web-mode-html-attr-name-face
+   ((t (:foreground "#C97586"))))       ; 属性名
+ '(web-mode-html-attr-value-face
+   ((t (:foreground "#82AE46"))))       ; 属性値
+ '(web-mode-comment-face
+   ((t (:foreground "#D9333F"))))       ; コメント
+ '(web-mode-server-comment-face
+   ((t (:foreground "#D9333F")))))      ; サーバーコメント
+
 ;; nxml-mode
 (require 'nxml-mode)
 (setq magic-mode-alist '(("<\\?xml " . nxml-mode)))
