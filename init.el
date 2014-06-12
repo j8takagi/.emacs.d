@@ -479,10 +479,6 @@
 (add-to-list 'auto-mode-alist '("\\.xml$" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.svg$" . nxml-mode))
 
-(add-hook 'nxml-mode-hook
-          (lambda ()
-            (setq nxml-child-indent 0)
-            (setq indent-tabs-mode nil)))
 ;; js-mode
 (add-to-list 'auto-mode-alist '("\\.js$" . js-mode))
 
