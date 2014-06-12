@@ -27,11 +27,14 @@ init: $(addsuffix c,$(init-files))
 site-lisp:
 	$(MAKE) -C site-lisp
 
-install: install-init install-site-lisp
+install: install-init install-site-lisp install-etc
 
 install-init:
 	install -d $(init-dir)
 	$(RSYNC) $(RSYNCFLAG) $(init-files) $(addsuffix c,$(init-files)) $(init-dir)/
+
+install-etc:
+	$(RSYNC) $(RSYNCFLAG) -r etc share $(init-dir)/
 
 install-site-lisp:
 	$(MAKE) -C site-lisp install
