@@ -66,8 +66,8 @@
 ;; optionキーはEmacsでは使わない
 ;; (setq mac-option-modifier nil)
 
-;; ほかのアプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする
-(global-set-key '[s-f1] 'other-frame)
+;; Mac OS Xのアプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする
+(global-set-key [M-f1] 'other-frame)
 
 ;; 起動時のカレントディレクトリが"/"になってしまう件への対応
 (defun cd-to-homedir-all-buffers ()
