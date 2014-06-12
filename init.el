@@ -67,7 +67,7 @@
 ;; whitespace
 (require 'whitespace)
 
-(setq whitespace-style '(face tabs spaces trailing)) ;	タブ
+(setq whitespace-style '(face tabs spaces trailing)) ;  タブ
 (setq whitespace-space-regexp "\\(　\\)")     ;　全角スペース
 (setq whitespace-trailing-regexp "\\( +$\\)") ;行末の空白    
 
@@ -474,7 +474,8 @@
 
 ;; nxml-mode
 (require 'nxml-mode)
-(setq magic-mode-alist '(("<\\?xml " . nxml-mode)))
+(add-to-list 'magic-mode-alist '("<\\?xml " . nxml-mode))
+
 (add-to-list 'auto-mode-alist '("\\.xml$" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.svg$" . nxml-mode))
 
