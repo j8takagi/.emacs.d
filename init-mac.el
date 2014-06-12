@@ -4,7 +4,7 @@
 
 ;; OSのpath_helperでPATHを取得し、あらためてPATHとして設定
 (let ((shell-file-name "/bin/bash"))
-    (setenv "PATH" (shell-command-to-string "eval $(/usr/libexec/path_helper -s) && echo -n $PATH")))
+    (setenv "PATH" (shell-command-to-string "eval $(/usr/libexec/path_helper -s) && printf $PATH")))
 
 ;; Emacs変数exec-pathに、環境変数PATHの内容を設定
 (setq exec-path nil)
