@@ -483,6 +483,9 @@
           (lambda ()
             (setq nxml-child-indent 0)
             (setq indent-tabs-mode nil)))
+;; js-mode
+(add-to-list 'auto-mode-alist '("\\.js$" . js-mode))
+
 
 ;; image-mode
 (setq image-file-name-extensions '("png" "jpeg" "jpg" "gif" "tiff" "tif"))
