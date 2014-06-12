@@ -306,7 +306,7 @@
 (global-set-key [?\C-,] 'scroll-up-one-line)             ; 1行上へスクロール
 (global-set-key [?\C-.] 'scroll-down-one-line)           ; 1行下へスクロール
 (global-set-key "\C-x'" 'just-one-space)
-(global-set-key "\M- " 'expand-abbrev)
+(global-set-key [M-return] 'expand-abbrev)
 (global-set-key "\C-ci" 'my-insert-filename)             ; ファイル名を挿入する
 
 ;; Emacs Lisp
@@ -324,7 +324,7 @@
 
 ;; lisp-interaction-mode
 ;; M-[space] でLisp補完
-(define-key lisp-interaction-mode-map "\M- " 'lisp-complete-symbol)
+(define-key lisp-interaction-mode-map [M-return] 'lisp-complete-symbol)
 
 ;; shell-mode
 (add-hook 'shell-mode-hook
