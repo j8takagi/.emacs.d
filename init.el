@@ -508,7 +508,7 @@
 (mmm-add-mode-ext-class nil "\\.html?\\'" 'html-javascript)
 
 ;; image-mode
-(setq image-file-name-extensions '("png" "jpeg" "jpg" "gif" "tiff" "tif"))
+(setq image-file-name-extensions '("svg" "png" "jpeg" "jpg" "gif" "tiff" "tif"))
 
 ;; css-mode
 (autoload 'css-mode "css-mode")
