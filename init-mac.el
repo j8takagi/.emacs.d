@@ -16,6 +16,9 @@
 ;; 環境変数LANGの設定
 (setenv "LANG" "en_US.UTF-8")
 
+;; 環境変数EDITORの設定
+(setenv "EDITOR" "emacsclient")
+
 ;; Emacs Server
 (require 'server)
 (unless (server-running-p)
