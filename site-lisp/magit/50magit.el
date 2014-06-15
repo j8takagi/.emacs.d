@@ -150,7 +150,7 @@ running 'man git-rebase' at the command line) for details.
 ;;;***
 
 ;;;### (autoloads nil nil ("magit-bisect.el" "magit-key-mode.el"
-;;;;;;  "magit-pkg.el") (21400 64671 235414 0))
+;;;;;;  "magit-pkg.el") (21405 2824 879313 0))
 
 ;;;***
 
