@@ -30,7 +30,7 @@
                '(foreground-color . "black")
                '(background-color . "gray99")
                '(cursor-color . "DarkOliveGreen")
-               '(width . 190)
+               '(width . 180)
                '(height . 55)
                '(top . 0)
                '(left . 0)
