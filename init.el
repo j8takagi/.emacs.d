@@ -336,6 +336,46 @@
 (require 'shell-command)
 (shell-command-completion-mode 1)
 
+;; カレントディレクトリでシェルバッファを開く
+(defun shell-current-directory ()
+   "If shell buffer exists, shell directory is changed to
+    default directory of current buffer.
+    If not exists, new shell buffer of current directory
+    is generated."
+   (interactive)
+   (let* (
+       (shell-buffer (get-buffer "*shell*"))
+       (proc (get-buffer-process shell-buffer))
+       (curbuf (current-buffer))
+       (curdir default-directory)
+       (cd-command (concat "cd " curdir)))
+     (if shell-buffer
+         (progn
+           (set-buffer shell-buffer)
+           (goto-char (point-max))
+           (insert (concat cd-command "\n"))
+           (funcall comint-input-sender proc cd-command)
+           (comint-send-input)
+           (setq default-directory curdir))
+       (shell))))
+
+;; 現在のバッファを、カレントディレクトリーのシェルバッファに切り替える
+(defun switch-to-shell-current-directory ()
+   "Open shell buffer of current directory and
+    switch current buffer to the shell buffer."
+   (interactive)
+   (shell-current-directory)
+   (switch-to-buffer (get-buffer "*shell*")))
+
+;; "Buffer has a runnig process.; kill it?"のプロンプト表示を抑制
+(defun set-process-not-running-child-noquery-on-exit ()
+  (let ((proc (get-buffer-process (current-buffer))))
+    (if (and proc (string= (process-name proc) "shell"))
+        (set-process-query-on-exit-flag proc (process-running-child-p proc)))))
+
+(defadvice kill-buffer (before my-set-process-query activate)
+  (set-process-not-running-child-noquery-on-exit))
+
 ;; dired
 (add-hook 'dired-load-hook
           (lambda ()
