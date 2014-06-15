@@ -480,15 +480,6 @@
       'mew-draft-kill
       'mew-send-hook))
 
-;; navi-2ch
-(autoload 'navi2ch "navi2ch" "Navigator for 2ch for Emacs" t)
-(setq navi2ch-list-bbstable-url "http://menu.2ch.net/bbsmenu.html")
-
-;; w3m
-;(require 'w3m-load)
-;(setq w3m-default-display-inline-images t)
-;(setq mew-use-w3m-minor-mode 1)
-
 ;; web-mode
 (require 'web-mode)
 (add-to-list 'magic-mode-alist '("<![Dd][Oo][Cc][Tt][Yy][Pp][Ee] [Hh][Tt][Mm][Ll]" . web-mode))
