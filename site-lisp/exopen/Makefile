@@ -10,7 +10,7 @@ EMACS := emacs
 COMPILE.el := $(EMACS) -batch -f batch-byte-compile
 INSTALL := install
 
-$(addsuffix c,$(TARGETS)):
+all: $(addsuffix c,$(TARGETS))
 
 install: $(TARGETS) $(addsuffix c,$(TARGETS))
 	$(INSTALL) -d $(installdir)
