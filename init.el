@@ -367,14 +367,20 @@
    (shell-current-directory)
    (switch-to-buffer (get-buffer "*shell*")))
 
-;; "Buffer has a runnig process.; kill it?"のプロンプト表示を抑制
-(defun set-process-not-running-child-noquery-on-exit ()
-  (let ((proc (get-buffer-process (current-buffer))))
-    (if (and proc (string= (process-name proc) "shell"))
-        (set-process-query-on-exit-flag proc (process-running-child-p proc)))))
+;; 引数で指定されたプロセスの名前が shell で子プロセスがない場合は、
+;; process-query-on-exit-flag を nil に設定し、
+;; "Buffer has a runnig process.; kill it?"
+;; のプロンプト表示を抑制する。
+(defun set-process-not-running-child-noquery-on-exit (proc)
+  (if (and proc (string= (process-name proc) "shell"))
+      (set-process-query-on-exit-flag proc (process-running-child-p proc))))
 
 (defadvice kill-buffer (before my-set-process-query activate)
-  (set-process-not-running-child-noquery-on-exit))
+  (set-process-not-running-child-noquery-on-exit (get-buffer-process (current-buffer))))
+
+(defadvice save-buffers-kill-terminal (before my-set-process-query activate)
+  (dolist (proc (process-list))
+    (set-process-not-running-child-noquery-on-exit proc)))
 
 ;; dired
 (add-hook 'dired-load-hook
