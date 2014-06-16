@@ -279,35 +279,43 @@
   (interactive "*fInsert file name: ")
   (insert filename))
 
+(define-key global-map "\C-\\" (make-sparse-keymap))     ; C-\ をプリフィックスキーに
+
+(global-set-key "\C-\\f" 'wctl-frame-resize)             ; フレームの対話式サイズ調整
+(global-set-key "\C-\\w" 'wctl-window-resize)            ; ウィンドウの対話式サイズ調整
 (global-set-key "\C-c\C-c" 'comment-region)              ; コメントを付ける
-(global-set-key "\C-xve" 'ediff-vc-latest-current)       ; 最新版と現在のファイルでEdiff
-(global-set-key "\C-xvf" 'find-file-revision)            ; ファイル旧版を開く
 (global-set-key "\C-c\C-u" 'uncomment-region)            ; コメントを外す
-(global-set-key "\C-ct" 'switch-to-temp-buffer)          ; テンポラリバッファを開く
 (global-set-key "\C-c\C-v" 'view-mode)                   ; View mode
 (global-set-key "\C-cc" 'compile)                        ; make
 (global-set-key "\C-cg" 'magit-status)                   ; magit
-(global-set-key "\C-cww" 'whitespace-mode)               ; whitespace-mode
+(global-set-key "\C-ci" 'my-insert-filename)             ; ファイル名を挿入する
+(global-set-key "\C-ct" 'switch-to-temp-buffer)          ; テンポラリバッファを開く
 (global-set-key "\C-cwt" 'whitespace-toggle-options)     ; whitespace-toggle-options
+(global-set-key "\C-cww" 'whitespace-mode)               ; whitespace-mode
 (global-set-key "\C-m" 'newline-and-indent)              ; インデント
+(global-set-key "\C-x'" 'just-one-space)
 (global-set-key "\C-x4K" 'my-kill-next-buffer-window)    ; 隣のバッファとウィンドウを削除
 (global-set-key "\C-x4k" 'my-kill-next-buffer)           ; 隣のバッファを削除
+(global-set-key "\C-x4s" 'split-shell-current-directory) ; フレームを2分割し、カレントディレクトリのシェルバッファを開く
 (global-set-key "\C-xK" 'kill-buffer-and-window)         ; 現在のバッファとウィンドウを削除
 (global-set-key "\C-x\C-\M-k" 'my-kill-current-next-buffer)    ; 隣のバッファとウィンドウと現在のバッファを削除
 (global-set-key "\C-x\C-e" 'electric-buffer-list)        ; バッファ一覧
 (global-set-key "\C-xm" 'man)                            ; man
 (global-set-key "\C-xp" 'call-last-kbd-macro)            ; マクロ
+(global-set-key "\C-xve" 'ediff-vc-latest-current)       ; 最新版と現在のファイルでEdiff
+(global-set-key "\C-xvf" 'find-file-revision)            ; ファイル旧版を開く
 (global-set-key "\M-?" 'help)                            ; ヘルプ
 (global-set-key "\M-[" 'backward-paragraph)              ; 前のパラグラフへ移動
 (global-set-key "\M-]" 'forward-paragraph)               ; 次のパラグラフへ移動
 (global-set-key "\M-g" 'goto-line)                       ; 指定行へジャンプ
 (global-set-key "\M-p" 'call-last-kbd-macro)             ; マクロ
 (global-set-key "\M-y" 'browse-yank)                     ; 貼り付け拡張
+(global-set-key (kbd "C-x RET u") 'ucs-normalize-NFC-buffer) ; バッファ全体の濁点分離を直す
 (global-set-key [?\C-,] 'scroll-up-one-line)             ; 1行上へスクロール
 (global-set-key [?\C-.] 'scroll-down-one-line)           ; 1行下へスクロール
-(global-set-key "\C-x'" 'just-one-space)
 (global-set-key [M-return] 'expand-abbrev)
-(global-set-key "\C-ci" 'my-insert-filename)             ; ファイル名を挿入する
+
+(global-unset-key "\C-x\C-d")
 
 ;; Emacs Lisp
 (autoload 'auto-elc-mode "auto-elc-mode")
@@ -338,10 +346,9 @@
 
 ;; カレントディレクトリでシェルバッファを開く
 (defun shell-current-directory ()
-   "If shell buffer exists, shell directory is changed to
-    default directory of current buffer.
-    If not exists, new shell buffer of current directory
-    is generated."
+   "If shell buffer exists, change directory in shell
+    to default directory in current buffer.
+    Otherwise, open new shell buffer of the dafault directory."
    (interactive)
    (let* (
        (shell-buffer (get-buffer "*shell*"))
@@ -352,20 +359,35 @@
      (if shell-buffer
          (progn
            (set-buffer shell-buffer)
-           (goto-char (point-max))
-           (insert (concat cd-command "\n"))
-           (funcall comint-input-sender proc cd-command)
+           (comint-kill-input)
+           (insert cd-command)
            (comint-send-input)
-           (setq default-directory curdir))
+           (setq default-directory curdir)
+           (goto-char (point-max))
+           (recenter 1))
        (shell))))
 
-;; 現在のバッファを、カレントディレクトリーのシェルバッファに切り替える
+;; 現在のバッファを、カレントディレクトリのシェルバッファに切り替える
 (defun switch-to-shell-current-directory ()
-   "Open shell buffer of current directory and
-    switch current buffer to the shell buffer."
+   "Switch current buffer to shell buffer of
+    default directory in current buffer."
    (interactive)
-   (shell-current-directory)
-   (switch-to-buffer (get-buffer "*shell*")))
+   (unless (string= (buffer-name) "*shell*")
+     (progn
+       (shell-current-directory)
+       (switch-to-buffer (get-buffer "*shell*")))))
+
+;; フレームを2分割し、カレントディレクトリのシェルバッファを開く
+(defun split-shell-current-directory ()
+  "Make current buffer fill its frame, then
+   split the selected window into two windows,
+   and switch the above window to
+   default directory in current buffer."
+  (interactive)
+  (progn
+    (delete-other-windows)
+    (split-window-below)
+    (switch-to-shell-current-directory)))
 
 ;; 引数で指定されたプロセスの名前が shell で子プロセスがない場合は、
 ;; process-query-on-exit-flag を nil に設定し、
@@ -625,9 +647,6 @@
 ;; igrep
 (require 'igrep)
 
-;; top-mode
-(require 'top-mode)
-
 ;; svg-clock
 (autoload 'svg-clock "svg-clock" "Start/stop svg-clock" t)
 
@@ -658,9 +677,7 @@
 ;; Riece IRC client
 (autoload 'riece "riece" "Start Riece" t)
 
-;; ucs-normalize-NFC-region で濁点分離を直す
-;; M-x ucs-normalize-NFC-buffer または "C-x RET u" で、
-;; バッファ全体の濁点分離を直します。
+;; 濁点分離を直す
 ;; 参考：
 ;; http://d.hatena.ne.jp/nakamura001/20120529/1338305696 
 ;; http://www.sakito.com/2010/05/mac-os-x-normalization.html
@@ -672,12 +689,9 @@
 
 (defun ucs-normalize-NFC-buffer ()
   (interactive)
-  (ucs-normalize-NFC-region (point-min) (point-max))
-  )
+  (ucs-normalize-NFC-region (point-min) (point-max)))
 
-(global-set-key (kbd "C-x RET u") 'ucs-normalize-NFC-buffer)
-
-;; Windowシステムごとの設定
+; Windowシステムごとの設定
 (if (eq window-system 'ns) (load "init-mac"))
 (if (eq window-system 'x) (load "init-x"))
 (if (eq window-system 'w32) (load "init-w32"))
@@ -696,8 +710,10 @@
 ;;
 ;; from: window-resizer - http://d.hatena.ne.jp/khiker/20100119/window_resize
 (defun wctl-window-resize ()
-  "Control window size and position."
-  (interactive)
+    "Control window size and position."
+    (interactive)
+    (if (one-window-p)
+      (error "One window. cannot resize the window."))
     (let
         ((thiswindow (selected-window))
         (start-width (window-width))
@@ -711,8 +727,8 @@
         (setq action
            (read-key-sequence-vector
               (format
-                "Window Size current:[%dx%d]; start:[%dx%d]; type q to quit."
-                (frame-width) (frame-height) start-width start-height)))
+                "Window size current:[%dx%d]; s)tart:[%dx%d] h)-x j)+y k)-y l)+x; q)uit."
+                (window-width) (window-height) start-width start-height)))
         (setq c (aref action 0))
         (cond
           ((= c ?l)
@@ -725,11 +741,11 @@
             (shrink-window dy))
           ((= c ?s)
             (progn
-              (set-frame-width thiswindow start-width)
-              (set-frame-height thiswindow start-height)))
+              (shrink-window-horizontally (- (window-width) start-width))
+              (shrink-window (- (window-height) start-height))))
           ((= c ?q)
             (progn
-              (message "Window Resize: quit")
+              (message "Window resize: quit")
               (throw 'end-flag t))))))))
 
 (defun wctl-frame-resize ()
@@ -748,7 +764,7 @@
         (setq action
            (read-key-sequence-vector
               (format
-                "Frame Size current:[%dx%d]; start:[%dx%d]; default:[%dx%d]; type q to quit."
+                "Frame Size current:[%dx%d]; s)tart:[%dx%d]; d)efault:[%dx%d]; h)-x j)+y k)-y l)+x; q)uit."
                 (frame-width) (frame-height)
                 start-width start-height default-width default-height)))
         (setq c (aref action 0))
@@ -773,16 +789,6 @@
             (progn
               (message "Frame Resize: quit")
               (throw 'end-flag t))))))))
-
-;; C-\ をプリフィックスキー化
-(define-key global-map "\C-\\" (make-sparse-keymap))
-
-;; C-\ wで、window-control
-(global-set-key "\C-\\w" 'wctl-window-resize)
-
-;; C-\ fで、frame-control
-(global-set-key "\C-\\f" 'wctl-frame-resize)
-
 
 (add-hook 'before-make-frame-hook 'frame-shift-right)
 

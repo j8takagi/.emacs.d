@@ -16,3 +16,6 @@
 
 ;; 環境変数LANGの設定
 ;(setenv "LANG" "en_US.UTF-8")
+
+;; top-mode
+(require 'top-mode)

@@ -29,7 +29,8 @@
 ;; ツールバーを表示しない
 (tool-bar-mode 0)
 
-(global-unset-key "\C-\\")
-
 (set-fontset-font t 'japanese-jisx0208
                   (font-spec :family "IPAGothic"))
+
+;; svg-clock
+(autoload 'svg-clock "svg-clock" "Start/stop svg-clock" t)
