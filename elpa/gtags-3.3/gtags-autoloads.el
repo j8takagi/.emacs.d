@@ -3,7 +3,7 @@
 ;;; Code:
 
 
-;;;### (autoloads (gtags-mode) "gtags" "gtags.el" (20747 998))
+;;;### (autoloads (gtags-mode) "gtags" "gtags.el" (20793 17636))
 ;;; Generated autoloads from gtags.el
 
 (autoload 'gtags-mode "gtags" "\
@@ -45,7 +45,7 @@ with no args, if that value is non-nil.
 
 ;;;***
 
-;;;### (autoloads nil nil ("gtags-pkg.el") (20747 998 667783))
+;;;### (autoloads nil nil ("gtags-pkg.el") (20793 17636 595182))
 
 ;;;***
 

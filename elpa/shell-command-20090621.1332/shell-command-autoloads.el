@@ -4,7 +4,7 @@
 
 
 ;;;### (autoloads (shell-command-completion-mode) "shell-command"
-;;;;;;  "shell-command.el" (20747 1248))
+;;;;;;  "shell-command.el" (20793 17595))
 ;;; Generated autoloads from shell-command.el
 
 (autoload 'shell-command-completion-mode "shell-command" "\
@@ -16,7 +16,7 @@ The commands are `shell-command', `shell-command-on-region', `grep',
 
 ;;;***
 
-;;;### (autoloads nil nil ("shell-command-pkg.el") (20747 1249 37422))
+;;;### (autoloads nil nil ("shell-command-pkg.el") (20793 17595 274622))
 
 ;;;***
 
