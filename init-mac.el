@@ -58,7 +58,6 @@
 (setq Info-default-directory-list
       (append
          '("/usr/local/share/info/ja"
-           "~/.emacs.d/share/info"
            "~/share/info")
          Info-default-directory-list))
 

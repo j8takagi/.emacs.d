@@ -48,7 +48,7 @@
 ;; 重複する履歴は削除
 (setq history-delete-duplicates 1)
 
-;; エラー時は画面をフラッシュ
+;; エラー時、音が鳴るのではなく、画面が点滅するように
 (setq visible-bell t)
 
 ;; メジャーモードに合わせた色を付ける font-lock-mode
@@ -369,13 +369,13 @@
 
 ;; 現在のバッファを、カレントディレクトリのシェルバッファに切り替える
 (defun switch-to-shell-current-directory ()
-   "Switch current buffer to shell buffer of
-    default directory in current buffer."
-   (interactive)
-   (unless (string= (buffer-name) "*shell*")
-     (progn
-       (shell-current-directory)
-       (switch-to-buffer (get-buffer "*shell*")))))
+  "Switch current buffer to shell buffer of
+   default directory in current buffer."
+  (interactive)
+  (unless (string= (buffer-name) "*shell*")
+    (progn
+      (shell-current-directory)
+      (switch-to-buffer (get-buffer "*shell*")))))
 
 ;; フレームを2分割し、カレントディレクトリのシェルバッファを開く
 (defun split-shell-current-directory ()
@@ -384,10 +384,11 @@
    and switch the above window to
    default directory in current buffer."
   (interactive)
-  (progn
-    (delete-other-windows)
-    (split-window-below)
-    (switch-to-shell-current-directory)))
+  (unless (string= (buffer-name) "*shell*")
+    (progn
+      (delete-other-windows)
+      (split-window-below)
+      (switch-to-shell-current-directory))))
 
 ;; 引数で指定されたプロセスの名前が shell で子プロセスがない場合は、
 ;; process-query-on-exit-flag を nil に設定し、
