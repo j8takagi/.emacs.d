@@ -34,6 +34,9 @@ install-init:
 install-site-lisp:
 	$(MAKE) -C site-lisp install
 
+install-elpa:
+	$(RSYNC) $(RSYNCFLAG) elpa/* $(init-dir)/elpa/
+
 clean: clean-init
 	$(MAKE) -C site-lisp clean
 	$(MAKE) -C src clean
