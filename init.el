@@ -1,15 +1,14 @@
 ;;;-*-Emacs-Lisp-*-
-;; for emacs 24.2
-;; 関連パッケージは、次のとおり
-;;   site-lispディレクトリ
-;;   ARCHIVEディレクトリ（mew, ess）
-;;   packagesで管理（csv-mode, edit-server, gtags, igrep, mediawiki, melpa, session, shell-command）
+;; for emacs 24.3
+;;
+;; パッケージは、~/.emacs.dディレクトリーのelpaとsite-lispで管理
 
 ;; load-pathを追加
 (add-to-list 'load-path "~/.emacs.d/")
 
 ;; site-lispディレクトリーを~/.emacs.d/site-lispに
 (defvar site-lisp-dir (expand-file-name "~/.emacs.d/site-lisp"))
+
 (add-to-list 'load-path site-lisp-dir)
 (let ((default-directory site-lisp-dir))
       (load (expand-file-name "subdirs")))
@@ -221,6 +220,7 @@
       (ediff-vc-internal "" ""))))
 
 (require 'vc)
+
 (defun find-file-revision (&optional file revision)
   "find-file FILE REVISION.
   Input FILE first, REVISION then.
@@ -279,41 +279,43 @@
   (interactive "*fInsert file name: ")
   (insert filename))
 
-(define-key global-map "\C-\\" (make-sparse-keymap))     ; C-\ をプリフィックスキーに
+(require 'window-resize)
 
-(global-set-key "\C-\\f" 'wctl-frame-resize)             ; フレームの対話式サイズ調整
-(global-set-key "\C-\\w" 'wctl-window-resize)            ; ウィンドウの対話式サイズ調整
-(global-set-key "\C-c\C-c" 'comment-region)              ; コメントを付ける
-(global-set-key "\C-c\C-u" 'uncomment-region)            ; コメントを外す
-(global-set-key "\C-c\C-v" 'view-mode)                   ; View mode
-(global-set-key "\C-cc" 'compile)                        ; make
-(global-set-key "\C-cg" 'magit-status)                   ; magit
-(global-set-key "\C-ci" 'my-insert-filename)             ; ファイル名を挿入する
-(global-set-key "\C-ct" 'switch-to-temp-buffer)          ; テンポラリバッファを開く
-(global-set-key "\C-cwt" 'whitespace-toggle-options)     ; whitespace-toggle-options
-(global-set-key "\C-cww" 'whitespace-mode)               ; whitespace-mode
-(global-set-key "\C-m" 'newline-and-indent)              ; インデント
-(global-set-key "\C-x'" 'just-one-space)
-(global-set-key "\C-x4K" 'my-kill-next-buffer-window)    ; 隣のバッファとウィンドウを削除
-(global-set-key "\C-x4k" 'my-kill-next-buffer)           ; 隣のバッファを削除
-(global-set-key "\C-x4s" 'split-shell-current-directory) ; フレームを2分割し、カレントディレクトリのシェルバッファを開く
-(global-set-key "\C-xK" 'kill-buffer-and-window)         ; 現在のバッファとウィンドウを削除
-(global-set-key "\C-x\C-\M-k" 'my-kill-current-next-buffer)    ; 隣のバッファとウィンドウと現在のバッファを削除
-(global-set-key "\C-x\C-e" 'electric-buffer-list)        ; バッファ一覧
-(global-set-key "\C-xm" 'man)                            ; man
-(global-set-key "\C-xp" 'call-last-kbd-macro)            ; マクロ
-(global-set-key "\C-xve" 'ediff-vc-latest-current)       ; 最新版と現在のファイルでEdiff
-(global-set-key "\C-xvf" 'find-file-revision)            ; ファイル旧版を開く
-(global-set-key "\M-?" 'help)                            ; ヘルプ
-(global-set-key "\M-[" 'backward-paragraph)              ; 前のパラグラフへ移動
-(global-set-key "\M-]" 'forward-paragraph)               ; 次のパラグラフへ移動
-(global-set-key "\M-g" 'goto-line)                       ; 指定行へジャンプ
-(global-set-key "\M-p" 'call-last-kbd-macro)             ; マクロ
-(global-set-key "\M-y" 'browse-yank)                     ; 貼り付け拡張
-(global-set-key (kbd "C-x RET u") 'ucs-normalize-NFC-buffer) ; バッファ全体の濁点分離を直す
-(global-set-key [?\C-,] 'scroll-up-one-line)             ; 1行上へスクロール
-(global-set-key [?\C-.] 'scroll-down-one-line)           ; 1行下へスクロール
-(global-set-key [M-return] 'expand-abbrev)
+(global-set-key (kbd "C-c C-c") 'comment-region)              ; コメントを付ける
+(global-set-key (kbd "C-c C-u") 'uncomment-region)            ; コメントを外す
+(global-set-key (kbd "C-c C-v") 'view-mode)                   ; View mode
+(global-set-key (kbd "C-c c") 'compile)                       ; make
+(global-set-key (kbd "C-c g") 'magit-status)                  ; magit
+(global-set-key (kbd "C-c i") 'my-insert-filename)            ; ファイル名を挿入する
+(global-set-key (kbd "C-c t") 'switch-to-temp-buffer)         ; テンポラリバッファを開く
+(global-set-key (kbd "C-c w t") 'whitespace-toggle-options)   ; whitespace-toggle-options
+(global-set-key (kbd "C-c w w") 'whitespace-mode)             ; whitespace-mode
+(global-set-key (kbd "RET") 'newline-and-indent)              ; RETで、インデント付き改行
+(global-set-key (kbd "C-j") 'newline)                         ; C-jで、インデントなし改行
+(global-set-key (kbd "C-x '") 'just-one-space)                ; 複数のスペースを1つに
+(global-set-key (kbd "C-x 4 K") 'my-kill-next-buffer-window)  ; 隣のバッファとウィンドウを削除
+(global-set-key (kbd "C-x 4 k") 'my-kill-next-buffer)         ; 隣のバッファを削除
+(global-set-key (kbd "C-x 4 s") 'split-shell-current-directory) ; フレームを2分割し、カレントディレクトリのシェルバッファを開く
+(global-set-key (kbd "C-x K") 'kill-buffer-and-window)        ; 現在のバッファとウィンドウを削除
+(global-set-key (kbd "C-x C-M-k") 'my-kill-current-next-buffer) ; 隣のバッファとウィンドウと現在のバッファを削除
+(global-set-key (kbd "C-x C-e") 'electric-buffer-list)        ; バッファ一覧
+(global-set-key (kbd "C-x m") 'man)                           ; man
+(global-set-key (kbd "C-x p") 'call-last-kbd-macro)           ; マクロ
+(global-set-key (kbd "C-x v e") 'ediff-vc-latest-current)     ; 最新版と現在のファイルでEdiff
+(global-set-key (kbd "C-x v f") 'find-file-revision)          ; ファイル旧版を開く
+(global-set-key (kbd "M-?") 'help)                            ; ヘルプ
+(global-set-key (kbd "M-[") 'backward-paragraph)              ; 前のパラグラフへ移動
+(global-set-key (kbd "M-]") 'forward-paragraph)               ; 次のパラグラフへ移動
+(global-set-key (kbd "M-g") 'goto-line)                       ; 指定行へジャンプ
+(global-set-key (kbd "M-p") 'call-last-kbd-macro)             ; マクロ
+(global-set-key (kbd "C-c <C-down>")  'windmove-down)         ; ウィンドウ移動
+(global-set-key (kbd "C-c <C-left>")  'windmove-left)         ; ウィンドウ移動
+(global-set-key (kbd "C-c <C-right>") 'windmove-right)        ; ウィンドウ移動
+(global-set-key (kbd "C-c <C-up>")    'windmove-up)           ; ウィンドウ移動
+(global-set-key (kbd "C-x RET u") 'ucs-normalize-NFC-buffer)  ; バッファ全体の濁点分離を直す
+(global-set-key (kbd "C-,") 'scroll-up-one-line)              ; 1行上へスクロール
+(global-set-key (kbd "C-.") 'scroll-down-one-line)            ; 1行下へスクロール
+(global-set-key (kbd "<M-return>") 'expand-abbrev)
 
 (global-unset-key "\C-x\C-d")
 
