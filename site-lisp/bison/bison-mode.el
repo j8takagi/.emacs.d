@@ -88,6 +88,11 @@
 ;(require 'flex-mode)			;; for flex-mode derivation
 ;(require 'make-regexp)			;; make-regexp
 (require 'cc-fonts)
+(require 'cc-mode)
+(require 'font-lock)
+
+(make-variable-buffer-local 'c-basic-offset)
+(make-variable-buffer-local 'c-offsets-alist)
 
 ;; *************** internal vars ***************
 
@@ -171,10 +176,10 @@ key's electric variable")
 
 ;; *************** utilities ***************
 
-(defun copy-list (ls)
+(defun cp-list (ls)
   "return a new list with the same elements as LS"
   (cond ((null ls) '())
-	(t (cons (car ls) (copy-list (cdr ls))))))
+	(t (cons (car ls) (cp-list (cdr ls))))))
 
 (defun same-line-p (pt1 pt2 &optional bol eol)
   (let ((bol (or bol (save-excursion (beginning-of-line) (point))))
@@ -242,14 +247,11 @@ and \(point\)"
 "
   ;; try to set the indentation correctly
   (setq-default c-basic-offset 4)
-  (make-variable-buffer-local 'c-basic-offset)
 
   (c-set-offset 'knr-argdecl-intro 0)
-  (make-variable-buffer-local 'c-offsets-alist)
-  
   ;; remove auto and hungry anything
   (c-toggle-auto-hungry-state -1)
-  (c-toggle-auto-state -1)
+  (c-toggle-auto-newline -1)
   (c-toggle-hungry-state -1)
 
   (use-local-map bison-mode-map)
@@ -290,7 +292,7 @@ and \(point\)"
   "Return the section that user is currently in"
   (save-excursion
     (let ((bound (point)))
-      (beginning-of-buffer)
+      (goto-char (point-min))
       (bison--section-p-helper bound))))
 
 (defun bison--section-p-helper (bound)
@@ -427,7 +429,7 @@ found."
   (let ((point (or point (point)))
 	(in-p nil))
     (save-excursion
-      (beginning-of-buffer)
+      (goto-char (point-min))
 
       (while (re-search-forward "[^\\]\"" point t)
 	(setq in-p (not in-p)))
@@ -511,7 +513,7 @@ save excursion is done higher up, so i dont concern myself here.
   (save-excursion
     (goto-char bol)
     (re-search-forward
-     (concat "^" (make-regexp (copy-list bison--declarers))) eol t)))
+     (concat "^" (make-regexp (cp-list bison--declarers))) eol t)))
 
 (defun bison--production-opener-p (bol eol)
   "return t if the current line is a line that introduces a new production"
