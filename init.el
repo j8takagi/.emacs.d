@@ -259,8 +259,8 @@
 (require 'lcomp)
 (lcomp-install)
 
-;; browse-yank
-(load "browse-yank")
+;; kill-ring
+(setq yank-pop-change-selection t)
 
 ;; 同一ファイル名のバッファ名を分かりやすく: uniquify
 ;; http://www.bookshelf.jp/cgi-bin/goto.cgi?file=meadow&node=uniquify
