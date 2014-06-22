@@ -1,6 +1,6 @@
 INSTALL = install
 RSYNC := rsync
-RSYNCFLAG := -az --delete
+RSYNCFLAG := -avz --delete
 RMR := $(RM) -R
 ECHO := echo
 FIND := find
@@ -34,6 +34,9 @@ install-init:
 install-site-lisp:
 	$(MAKE) -C site-lisp install
 
+get-elpa:
+	$(RSYNC) $(RSYNCFLAG) $(init-dir)/elpa/* elpa/
+
 install-elpa:
 	$(RSYNC) $(RSYNCFLAG) elpa/* $(init-dir)/elpa/
 
@@ -43,3 +46,5 @@ clean: clean-init
 
 clean-init:
 	$(RM) *.elc
+
+include emacslisp.mk
