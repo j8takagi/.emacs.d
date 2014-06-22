@@ -52,8 +52,6 @@
 
 (setq default-input-method "MacOSX")
 
-(global-unset-key "\C-\\")
-
 ;; Info
 (setq Info-default-directory-list
       (append
