@@ -18,7 +18,7 @@ init-dir := ~/.emacs.d
 
 .PHONY: all init site-lisp install-init install-site-lisp
 
-all: init site-lisp src
+all: init site-lisp
 
 init: $(addsuffix c,$(init-files))
 
@@ -42,7 +42,6 @@ install-elpa:
 
 clean: clean-init
 	$(MAKE) -C site-lisp clean
-	$(MAKE) -C src clean
 
 clean-init:
 	$(RM) *.elc
