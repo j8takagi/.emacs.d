@@ -32,7 +32,7 @@
                '(cursor-color . "DarkOliveGreen")
                '(width . 180)
                '(height . 55)
-               '(top . 0)
+               '(top . 22)
                '(left . 0)
                '(cursor-type . box))
               default-frame-alist))

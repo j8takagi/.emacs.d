@@ -254,11 +254,6 @@
 ;; kill-lineのとき、改行も含めて切り取り
 (setq kill-whole-line t)
 
-;; lcomp
-;; 補完ウィンドウを補完完了時に消す
-(require 'lcomp)
-(lcomp-install)
-
 ;; kill-ring
 (setq yank-pop-change-selection t)
 
@@ -296,6 +291,7 @@
 (global-set-key (kbd "C-x 4 K") 'my-kill-next-buffer-window)  ; 隣のバッファとウィンドウを削除
 (global-set-key (kbd "C-x 4 k") 'my-kill-next-buffer)         ; 隣のバッファを削除
 (global-set-key (kbd "C-x 4 s") 'split-shell-current-directory) ; フレームを2分割し、カレントディレクトリのシェルバッファを開く
+(global-set-key (kbd "C-x 5 s") 'new-frame-shell-current-directory) ; 新フレームを作成し、カレントディレクトリのシェルバッファを開く
 (global-set-key (kbd "C-x K") 'kill-buffer-and-window)        ; 現在のバッファとウィンドウを削除
 (global-set-key (kbd "C-x C-M-k") 'my-kill-current-next-buffer) ; 隣のバッファとウィンドウと現在のバッファを削除
 (global-set-key (kbd "C-x C-e") 'electric-buffer-list)        ; バッファ一覧
@@ -379,17 +375,27 @@
       (shell-current-directory)
       (switch-to-buffer (get-buffer "*shell*")))))
 
-;; フレームを2分割し、カレントディレクトリのシェルバッファを開く
+;; フレームを2分割にし、カレントディレクトリのシェルバッファを開く
 (defun split-shell-current-directory ()
   "Make current buffer fill its frame, then
-   split the selected window into two windows,
-   and switch the above window to
-   default directory in current buffer."
+   split the selected window, and switch
+   the above window to shell of default
+   directory in current buffer."
   (interactive)
   (unless (string= (buffer-name) "*shell*")
     (progn
       (delete-other-windows)
       (split-window-below)
+      (switch-to-shell-current-directory))))
+
+;; フレームを2分割し、カレントディレクトリのシェルバッファを開く
+(defun new-frame-shell-current-directory ()
+  "Make a new frame, and switch the new frame window
+    to shell of default directory in current buffer."
+  (interactive)
+  (unless (string= (buffer-name) "*shell*")
+    (progn
+      (make-frame-command)
       (switch-to-shell-current-directory))))
 
 ;; 引数で指定されたプロセスの名前が shell で子プロセスがない場合は、
@@ -610,15 +616,6 @@
 (autoload 'csv-mode "csv-mode" "Major mode for editing comma-separated value files." t)
 (add-to-list 'auto-mode-alist '("\\.[Cc][Ss][Vv]\\'" . csv-mode))
 
-; Maxima
-; http://emacswiki.org/emacs/MaximaMode
-(add-to-list 'load-path "/usr/local/share/maxima/5.29.1/emacs/")
-(autoload 'maxima-mode "maxima" "Maxima mode" t)
-(autoload 'imaxima "imaxima" "Frontend for maxima with Image support" t)
-(autoload 'maxima "maxima" "Maxima interaction" t)
-(autoload 'imath-mode "imath" "Imath mode for math formula input" t)
-(setq imaxima-use-maxima-mode-flag t)
-
 ;; Mediawiki
 (require 'mediawiki)
 (add-to-list 'auto-mode-alist '("\\.wiki$" . mediawiki-mode))
@@ -684,7 +681,6 @@
 ;; 参考：
 ;; http://d.hatena.ne.jp/nakamura001/20120529/1338305696 
 ;; http://www.sakito.com/2010/05/mac-os-x-normalization.html
-
 (require 'ucs-normalize)
 (prefer-coding-system 'utf-8-hfs)
 (setq file-name-coding-system 'utf-8-hfs)
@@ -708,3 +704,7 @@
           (lambda ()
             (setq Info-additional-directory-list Info-default-directory-list)
             ))
+
+;; flex-autopair
+(require 'flex-autopair)
+(flex-autopair-mode 1)
