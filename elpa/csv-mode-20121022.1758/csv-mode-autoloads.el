@@ -48,7 +48,8 @@ CSV mode provides the following specific keyboard key bindings:
 
 ;;;***
 
-;;;### (autoloads nil nil ("csv-mode-pkg.el") (20793 17639 338899))
+;;;### (autoloads nil nil ("csv-mode-pkg.el") (21415 40555 736360
+;;;;;;  0))
 
 ;;;***
 

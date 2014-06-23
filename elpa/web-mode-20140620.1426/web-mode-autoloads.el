@@ -14,8 +14,8 @@ Major mode for editing web templates (HTML documents with embedded parts and blo
 
 ;;;***
 
-;;;### (autoloads nil nil ("web-mode-pkg.el" "wfs-mode.el") (21413
-;;;;;;  46450 893628 0))
+;;;### (autoloads nil nil ("web-mode-pkg.el" "wfs-mode.el") (21415
+;;;;;;  40615 542836 0))
 
 ;;;***
 

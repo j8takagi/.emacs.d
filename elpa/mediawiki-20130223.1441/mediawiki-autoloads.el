@@ -30,7 +30,8 @@ mediawiki-draft-data-file.
 
 ;;;***
 
-;;;### (autoloads nil nil ("mediawiki-pkg.el") (20793 17596 183585))
+;;;### (autoloads nil nil ("mediawiki-pkg.el") (21415 40606 601950
+;;;;;;  0))
 
 ;;;***
 

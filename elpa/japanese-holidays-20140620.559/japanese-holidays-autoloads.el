@@ -4,7 +4,7 @@
 
 
 ;;;### (autoloads nil nil ("japanese-holidays-pkg.el" "japanese-holidays.el")
-;;;;;;  (21414 23773 117461 0))
+;;;;;;  (21415 40596 307265 0))
 
 ;;;***
 

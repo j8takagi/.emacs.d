@@ -30,7 +30,7 @@ wget-web-page downlod whole Web page from it following relative link.
 ;;;***
 
 ;;;### (autoloads nil nil ("lpath.el" "w3-wget.el" "w3m-wget.el"
-;;;;;;  "wget-pkg.el" "wget-sysdep.el") (21413 46300 745647 0))
+;;;;;;  "wget-pkg.el" "wget-sysdep.el") (21415 40620 755858 0))
 
 ;;;***
 

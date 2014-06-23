@@ -16,7 +16,8 @@ The commands are `shell-command', `shell-command-on-region', `grep',
 
 ;;;***
 
-;;;### (autoloads nil nil ("shell-command-pkg.el") (20793 17595 274622))
+;;;### (autoloads nil nil ("shell-command-pkg.el") (21415 40615 141804
+;;;;;;  0))
 
 ;;;***
 

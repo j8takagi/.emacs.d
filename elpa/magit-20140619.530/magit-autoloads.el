@@ -585,7 +585,7 @@ See `magit-wip-save-mode' for more information on Magit-Wip-Save mode.
 
 ;;;***
 
-;;;### (autoloads nil nil ("magit-pkg.el") (21414 23049 626986 0))
+;;;### (autoloads nil nil ("magit-pkg.el") (21415 40596 925666 0))
 
 ;;;***
 

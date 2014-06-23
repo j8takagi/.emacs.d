@@ -82,7 +82,7 @@ Run racksh, custom console.rb, or just IRB, in DIR.
 
 ;;;***
 
-;;;### (autoloads nil nil ("inf-ruby-pkg.el") (21414 23774 104807
+;;;### (autoloads nil nil ("inf-ruby-pkg.el") (21415 40595 388217
 ;;;;;;  0))
 
 ;;;***

@@ -34,7 +34,7 @@ Add the submode classes CLASSES to `mmm-classes-alist'.
 ;;;;;;  "mmm-compat.el" "mmm-cweb.el" "mmm-defaults.el" "mmm-mason.el"
 ;;;;;;  "mmm-mode-pkg.el" "mmm-mode.el" "mmm-myghty.el" "mmm-noweb.el"
 ;;;;;;  "mmm-region.el" "mmm-rpm.el" "mmm-sample.el" "mmm-univ.el"
-;;;;;;  "mmm-utils.el") (21365 53721 374836 0))
+;;;;;;  "mmm-utils.el") (21415 40608 958669 0))
 
 ;;;***
 

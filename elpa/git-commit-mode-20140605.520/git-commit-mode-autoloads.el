@@ -20,8 +20,8 @@ basic structure of and errors in git commit messages.
 
 ;;;***
 
-;;;### (autoloads nil nil ("git-commit-mode-pkg.el") (21414 23045
-;;;;;;  181577 0))
+;;;### (autoloads nil nil ("git-commit-mode-pkg.el") (21415 40590
+;;;;;;  625143 0))
 
 ;;;***
 

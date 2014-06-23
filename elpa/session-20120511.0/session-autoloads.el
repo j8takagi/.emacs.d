@@ -32,7 +32,7 @@ this function to `after-init-hook'.
 
 ;;;***
 
-;;;### (autoloads nil nil ("session-pkg.el") (20793 15998 474371))
+;;;### (autoloads nil nil ("session-pkg.el") (21415 40614 72285 0))
 
 ;;;***
 

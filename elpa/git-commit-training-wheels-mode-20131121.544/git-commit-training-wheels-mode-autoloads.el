@@ -15,7 +15,7 @@ Helps you craft well formed commit messages with `git-commit-mode'.
 ;;;***
 
 ;;;### (autoloads nil nil ("git-commit-training-wheels-mode-pkg.el")
-;;;;;;  (21414 23775 825714 0))
+;;;;;;  (21415 40591 494554 0))
 
 ;;;***
 

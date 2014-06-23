@@ -60,7 +60,7 @@ Filter packages in the associated list for `archive' in
 
 ;;;***
 
-;;;### (autoloads nil nil ("melpa-pkg.el") (20793 17595 604577))
+;;;### (autoloads nil nil ("melpa-pkg.el") (21415 40608 690769 0))
 
 ;;;***
 

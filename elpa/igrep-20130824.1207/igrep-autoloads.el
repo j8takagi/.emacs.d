@@ -79,7 +79,7 @@ See `\\[igrep]' for a description of PROGRAM, REGEX, and OPTIONS.
 
 ;;;***
 
-;;;### (autoloads nil nil ("igrep-pkg.el") (21413 46456 824420 0))
+;;;### (autoloads nil nil ("igrep-pkg.el") (21415 40593 967581 0))
 
 ;;;***
 

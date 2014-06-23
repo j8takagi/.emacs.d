@@ -21,8 +21,8 @@ running 'man git-rebase' at the command line) for details.
 
 ;;;***
 
-;;;### (autoloads nil nil ("git-rebase-mode-pkg.el") (21414 23046
-;;;;;;  417657 0))
+;;;### (autoloads nil nil ("git-rebase-mode-pkg.el") (21415 40591
+;;;;;;  745025 0))
 
 ;;;***
 
