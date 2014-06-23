@@ -30,7 +30,7 @@ $(emacs-dir):
 	$(INSTALL) -d $(emacs-dir)
 
 get-elpa:
-	$(RSYNC) $(RSYNCFLAG) $(emacs-dir)/elpa/* elpa/
+	$(RSYNC) $(RSYNCFLAG) $(emacs-dir)/elpa/ elpa/
 
 elpa:
 	$(EMACS) -batch -l recompile-elpa.el
