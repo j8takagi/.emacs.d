@@ -1,5 +1,5 @@
 ;;; -*- Emacs-Lisp -*-
-;;; 16¿Ê¿ô¤Ç¤Î¿§°ìÍ÷É½¼¨¤È¿§°ìÍ÷¤«¤é¤Î¥³¡¼¥ÉÁŞÆş
+;;; 16é€²æ•°ã§ã®è‰²ä¸€è¦§è¡¨ç¤ºã¨è‰²ä¸€è¦§ã‹ã‚‰ã®ã‚³ãƒ¼ãƒ‰æŒ¿å…¥
 
 ;; *Installation
 ;;   [~/.emacs]
@@ -18,7 +18,7 @@
     (define-key map "\C-m" 'color-selection-list-choose-color)
     (setq color-selection-list-mode-map map)))
 
-;; ¿§¤ÎÌ¾Á°¤òÁŞÆş¤¹¤ë¤È¤­¤Ë¤Ä¤±¤ë prefix
+;; è‰²ã®åå‰ã‚’æŒ¿å…¥ã™ã‚‹ã¨ãã«ã¤ã‘ã‚‹ prefix
 ;; [example]
 ;;     "#"  => #rrggbb
 ;;     "0x" => 0xrrggbb
@@ -28,8 +28,8 @@
 (defvar color-selection-list-increment 32
   "*Increment of each color element.")
 
-;; ¿§°ìÍ÷¥Ğ¥Ã¥Õ¥¡¤«¤é¿§¤òÁª¤Ö
-;; ¤â¤È¤â¤È¤¤¤¿¥Ğ¥Ã¥Õ¥¡¤Ë¿§¤ÎÌ¾Á°¤ÎÊ¸»úÎó¤òÁŞÆş¤¹¤ë
+;; è‰²ä¸€è¦§ãƒãƒƒãƒ•ã‚¡ã‹ã‚‰è‰²ã‚’é¸ã¶
+;; ã‚‚ã¨ã‚‚ã¨ã„ãŸãƒãƒƒãƒ•ã‚¡ã«è‰²ã®åå‰ã®æ–‡å­—åˆ—ã‚’æŒ¿å…¥ã™ã‚‹
 (defun color-selection-list-choose-color ()
   "Choose the color that point is in."
   (interactive)
@@ -41,8 +41,8 @@
     (set-buffer color-selection-list-original-buffer)
     (insert color-name)))
 
-;; ¥ê¥¹¥È¤Ë´Ş¤Ş¤ì¤ë¿§¤Î°ìÍ÷¤òÉ½¼¨¤¹¤ë
-;; list: ¿§¤ÎÌ¾Á°¤ÎÊ¸»úÎó¤Î¥ê¥¹¥È
+;; ãƒªã‚¹ãƒˆã«å«ã¾ã‚Œã‚‹è‰²ã®ä¸€è¦§ã‚’è¡¨ç¤ºã™ã‚‹
+;; list: è‰²ã®åå‰ã®æ–‡å­—åˆ—ã®ãƒªã‚¹ãƒˆ
 (defun color-selection-list-colors-display (list)
   (if (and (get-buffer "*ColorSelection*")
            (buffer-live-p (get-buffer "*ColorSelection*")))
@@ -68,7 +68,7 @@
     (color-selection-list-mode)
     (switch-to-buffer "*ColorSelection*"))
 
-;; 16 ¿Ê¿ô¤Î¿§°ìÍ÷¤òÉ½¼¨¤¹¤ë
+;; 16 é€²æ•°ã®è‰²ä¸€è¦§ã‚’è¡¨ç¤ºã™ã‚‹
 (defun list-hexadecimal-colors-display ()
   (interactive)
   (let ((r 0)
