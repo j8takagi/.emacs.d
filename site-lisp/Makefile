@@ -2,6 +2,7 @@ sitelisp-dir ?= ~/.emacs.d/site-lisp
 
 EMACS := emacs
 RSYNC := rsync
+RSYNCFLAG := -avz
 
 SITELISPS := $(shell sh -c "ls -F | grep /")
 
@@ -11,7 +12,7 @@ all: subdirs.elc
 	for dir in $(SITELISPS); do $(MAKE) -C $$dir all; done
 
 install:
-	$(RSYNC) -az --exclude "Makefile*" --delete ./ $(sitelisp-dir)/
+	$(RSYNC) $(RSYNCFLAG) --exclude "Makefile*" --delete ./ $(sitelisp-dir)/
 
 clean:
 	for dir in $(SITELISPS); do $(MAKE) -C $$dir clean; done 
