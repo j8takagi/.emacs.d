@@ -22,7 +22,7 @@
 
 ;;; Commentary:
 
-;; Emacs Lispファイルを自動的にコンパイルするマイナーモード。
+;; Emcasのフレームとウィンドウを制御する。
 
 ;; ■動作環境
 ;; Emacs 24.3で動作を確認
@@ -42,7 +42,7 @@
 ;;
 ;; from: window-resizer - http://d.hatena.ne.jp/khiker/20100119/window_resize
 (defun wctl-window-resize ()
-    "Control window size and position."
+    "Resize window."
     (interactive)
     (if (one-window-p)
       (error "One window. cannot resize the window."))
@@ -81,7 +81,7 @@
               (throw 'end-flag t))))))))
 
 (defun wctl-frame-resize ()
-   "frame size and position control."
+   "Resize frame"
    (interactive)
      (let
          ((thisframe (selected-frame))
@@ -122,6 +122,48 @@
               (message "Frame Resize: quit")
               (throw 'end-flag t))))))))
 
+(defun wctl-frame-move ()
+   "Move frame."
+   (interactive)
+     (let
+         ((thisframe (selected-frame))
+         (start-top (frame-parameter nil 'top))
+         (start-left (frame-parameter nil 'left))
+         (default-top (cdr (assoc 'top default-frame-alist)))
+         (default-left (cdr (assoc 'left default-frame-alist)))
+         action
+         c)
+       (catch 'end-flag
+       (while t
+        (setq action
+           (read-key-sequence-vector
+              (format
+                "Frame move current:[%d, %d]; s)tart:[%d, %d]; d)efault:[%d, %d]; h)-x j)+y k)-y l)+x; q)uit."
+                (frame-parameter nil 'left) (frame-parameter nil 'top)
+                start-left start-top default-left default-top)))
+        (setq c (aref action 0))
+        (cond
+          ((= c ?l)
+           (modify-frame-parameters nil (list (cons 'left (+ (frame-parameter nil 'left) 10)))))
+          ((= c ?h)
+           (modify-frame-parameters nil (list (cons 'left (- (frame-parameter nil 'left) 10)))))
+          ((= c ?j)
+           (modify-frame-parameters nil (list (cons 'top (+ (frame-parameter nil 'top) 10)))))
+          ((= c ?k)
+           (modify-frame-parameters nil (list (cons 'top (- (frame-parameter nil 'top) 10)))))
+          ((= c ?d)
+            (progn
+              (modify-frame-parameters nil (list (cons 'left default-left)))
+              (modify-frame-parameters nil (list (cons 'top default-top)))))
+          ((= c ?s)
+            (progn
+              (modify-frame-parameters nil (list (cons 'left start-left)))
+              (modify-frame-parameters nil (list (cons 'top start-top)))))
+          ((= c ?q)
+            (progn
+              (message "Frame Move: quit")
+              (throw 'end-flag t))))))))
+
 (add-hook 'before-make-frame-hook 'frame-shift-right)
 
 (add-hook 'delete-frame-functions
@@ -148,8 +190,9 @@
 
 (define-key global-map "\C-\\" (make-sparse-keymap))     ; C-\ をプリフィックスキーに
 
-(global-set-key "\C-\\f" 'wctl-frame-resize)             ; フレームの対話式サイズ調整
 (global-set-key "\C-\\w" 'wctl-window-resize)            ; ウィンドウの対話式サイズ調整
+(global-set-key "\C-\\f" 'wctl-frame-resize)             ; フレームの対話式サイズ調整
+(global-set-key "\C-\\m" 'wctl-frame-move)               ; フレームの対話式移動
 
 (provide 'window-resize)
 ;;; window-resize.el ends here
