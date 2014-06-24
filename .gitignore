@@ -5,3 +5,4 @@ src/navi2ch*
 src/emacs-w3m*
 .DS_Store
 *~
+elpa/*/*-autoloads.el
