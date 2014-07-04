@@ -45,15 +45,10 @@
 
 ;; マイナーモードの定義
 (define-minor-mode exopen-mode
-"Toggle exopen-mode.
-With a prefix argument ARG, enable Auto Composition mode if ARG
-is positive, and disable it otherwise.  If called from Lisp,
-enable the mode if ARG is omitted or nil.
-
-open file in external program."
-(display-graphic-p)                     ; Windowシステムかどうかの判定
-nil                                     ; モード行に何も表示しない
-'(("\C-x\C-\M-f" . exopen-find-file)))  ; キーバインド
+  "Open file by external program."
+  (display-graphic-p)                           ; Windowシステムかどうかの判定
+  nil                                           ; モード行に何も表示しない
+  `((,(kbd "C-x C-M-f") . exopen-find-file)))    ; キーバインド
 
 ;; exopen-std-cmd: OSやWindowで設定された関連付けをもとに
 ;; ファイルを開くプログラムコマンドとオプション
