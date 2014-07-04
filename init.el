@@ -3,27 +3,34 @@
 ;;
 ;; パッケージは、~/.emacs.dディレクトリーのelpaとsite-lispで管理
 
+;;; load-pathを追加する関数を定義
+(defun add-to-load-path (&rest paths)
+  (let (path)
+    (dolist (path paths paths)
+     (let ((default-directory (expand-file-name path)))
+        (add-to-list 'load-path default-directory)
+         (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
+             (normal-top-level-add-subdirs-to-load-path))))))
+
 ;; load-pathを追加
-(add-to-list 'load-path "~/.emacs.d/")
+(add-to-load-path "~/.emacs.d/")
 
 ;; site-lispディレクトリーを~/.emacs.d/site-lispに
 (defvar site-lisp-dir (expand-file-name "~/.emacs.d/site-lisp"))
 
-(add-to-list 'load-path site-lisp-dir)
-(let ((default-directory site-lisp-dir))
-      (load (expand-file-name "subdirs")))
+(add-to-load-path site-lisp-dir)
+(load (expand-file-name (concat site-lisp-dir "/subdirs")))
 
-;; パッケージを使う（Emacs24）
+;; パッケージを使う
 (require 'package)
 
-; パッケージアーカイブ
 (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
 
 ; パッケージ初期化
 (package-initialize)
 
-; melpa.el
+; パッケージシステムmelpaを使う
 (require 'melpa)
 
 ;; 日本語環境
@@ -143,7 +150,8 @@
       (setq backup-directory-alist `(("." . ,backup-dir)))
       (setq make-backup-files t)
       (setq version-control t)
-      (setq delete-old-versions t)))
+      (setq delete-old-versions t))
+  (message "backup-dir %s is not exist." backup-dir))
 
 ;; 隣のバッファファイルを閉じる。ウィンドウはそのまま
 (defun my-kill-next-buffer ()
@@ -276,6 +284,13 @@
 
 (require 'window-resize)
 
+(global-set-key (kbd "<M-down>")  'windmove-down)             ; ウィンドウ移動
+(global-set-key (kbd "<M-left>")  'windmove-left)             ; ウィンドウ移動
+(global-set-key (kbd "<M-return>") 'expand-abbrev)
+(global-set-key (kbd "<M-right>") 'windmove-right)            ; ウィンドウ移動
+(global-set-key (kbd "<M-up>")    'windmove-up)               ; ウィンドウ移動
+(global-set-key (kbd "C-,") 'scroll-up-one-line)              ; 1行上へスクロール
+(global-set-key (kbd "C-.") 'scroll-down-one-line)            ; 1行下へスクロール
 (global-set-key (kbd "C-c C-c") 'comment-region)              ; コメントを付ける
 (global-set-key (kbd "C-c C-u") 'uncomment-region)            ; コメントを外す
 (global-set-key (kbd "C-c C-v") 'view-mode)                   ; View mode
@@ -285,16 +300,17 @@
 (global-set-key (kbd "C-c t") 'switch-to-temp-buffer)         ; テンポラリバッファを開く
 (global-set-key (kbd "C-c w t") 'whitespace-toggle-options)   ; whitespace-toggle-options
 (global-set-key (kbd "C-c w w") 'whitespace-mode)             ; whitespace-mode
-(global-set-key (kbd "RET") 'newline-and-indent)              ; RETで、インデント付き改行
+(global-set-key (kbd "C-h TAB") 'info-lookup-symbol)          ; SYMBOLのInfoを表示
 (global-set-key (kbd "C-j") 'newline)                         ; C-jで、インデントなし改行
 (global-set-key (kbd "C-x '") 'just-one-space)                ; 複数のスペースを1つに
 (global-set-key (kbd "C-x 4 K") 'my-kill-next-buffer-window)  ; 隣のバッファとウィンドウを削除
 (global-set-key (kbd "C-x 4 k") 'my-kill-next-buffer)         ; 隣のバッファを削除
 (global-set-key (kbd "C-x 4 s") 'split-shell-current-directory) ; フレームを2分割し、カレントディレクトリのシェルバッファを開く
 (global-set-key (kbd "C-x 5 s") 'new-frame-shell-current-directory) ; 新フレームを作成し、カレントディレクトリのシェルバッファを開く
-(global-set-key (kbd "C-x K") 'kill-buffer-and-window)        ; 現在のバッファとウィンドウを削除
 (global-set-key (kbd "C-x C-M-k") 'my-kill-current-next-buffer) ; 隣のバッファとウィンドウと現在のバッファを削除
 (global-set-key (kbd "C-x C-e") 'electric-buffer-list)        ; バッファ一覧
+(global-set-key (kbd "C-x K") 'kill-buffer-and-window)        ; 現在のバッファとウィンドウを削除
+(global-set-key (kbd "C-x RET u") 'ucs-normalize-NFC-buffer)  ; バッファ全体の濁点分離を直す
 (global-set-key (kbd "C-x m") 'man)                           ; man
 (global-set-key (kbd "C-x p") 'call-last-kbd-macro)           ; マクロ
 (global-set-key (kbd "C-x v e") 'ediff-vc-latest-current)     ; 最新版と現在のファイルでEdiff
@@ -304,14 +320,7 @@
 (global-set-key (kbd "M-]") 'forward-paragraph)               ; 次のパラグラフへ移動
 (global-set-key (kbd "M-g") 'goto-line)                       ; 指定行へジャンプ
 (global-set-key (kbd "M-p") 'call-last-kbd-macro)             ; マクロ
-(global-set-key (kbd "C-c <C-down>")  'windmove-down)         ; ウィンドウ移動
-(global-set-key (kbd "C-c <C-left>")  'windmove-left)         ; ウィンドウ移動
-(global-set-key (kbd "C-c <C-right>") 'windmove-right)        ; ウィンドウ移動
-(global-set-key (kbd "C-c <C-up>")    'windmove-up)           ; ウィンドウ移動
-(global-set-key (kbd "C-x RET u") 'ucs-normalize-NFC-buffer)  ; バッファ全体の濁点分離を直す
-(global-set-key (kbd "C-,") 'scroll-up-one-line)              ; 1行上へスクロール
-(global-set-key (kbd "C-.") 'scroll-down-one-line)            ; 1行下へスクロール
-(global-set-key (kbd "<M-return>") 'expand-abbrev)
+(global-set-key (kbd "RET") 'newline-and-indent)              ; RETで、インデント付き改行
 
 (global-unset-key "\C-x\C-d")
 
@@ -342,6 +351,17 @@
 (require 'shell-command)
 (shell-command-completion-mode 1)
 
+;; シェルにカレントディレクトリへのcdコマンドを送る
+(defun shell-send-cd (directory)
+  (interactive)
+  (setq default-directory directory)
+  (goto-char (point-max))
+  (comint-kill-input)
+  (insert (concat "cd '" (expand-file-name directory) "'"))
+  (comint-send-input)
+  (recenter 1)
+  (goto-char (point-max)))
+
 ;; カレントディレクトリでシェルバッファを開く
 (defun shell-current-directory ()
    "If shell buffer exists, change directory in shell
@@ -355,14 +375,11 @@
        (curdir default-directory)
        (cd-command (concat "cd " curdir)))
      (if shell-buffer
-         (progn
-           (set-buffer shell-buffer)
-           (comint-kill-input)
-           (insert cd-command)
-           (comint-send-input)
-           (setq default-directory curdir)
-           (goto-char (point-max))
-           (recenter 1))
+         (if (process-running-child-p proc)
+             (message "Child process is running in the shell.")
+           (progn
+             (set-buffer shell-buffer)
+             (shell-send-cd curdir)))
        (shell))))
 
 ;; 現在のバッファを、カレントディレクトリのシェルバッファに切り替える
@@ -388,7 +405,7 @@
       (split-window-below)
       (switch-to-shell-current-directory))))
 
-;; フレームを2分割し、カレントディレクトリのシェルバッファを開く
+;; 新しいフレームに、カレントディレクトリのシェルバッファを開く
 (defun new-frame-shell-current-directory ()
   "Make a new frame, and switch the new frame window
     to shell of default directory in current buffer."
@@ -521,7 +538,7 @@
 (require 'web-mode)
 (add-to-list 'magic-mode-alist '("<![Dd][Oo][Cc][Tt][Yy][Pp][Ee] [Hh][Tt][Mm][Ll]" . web-mode))
 
-(add-to-list 'auto-mode-alist '("\\.html$" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.html?$" . web-mode))
 
 (custom-set-variables '(web-mode-indent-style 1))
 
@@ -708,3 +725,11 @@
 ;; flex-autopair
 (require 'flex-autopair)
 (flex-autopair-mode 1)
+
+;; javadoc-style-comment-mode
+(require 'javadoc-style-comment-mode)
+
+;; eukleides.el
+(require 'eukleides)
+(setq auto-mode-alist
+      (append '(("\\.euk$" . eukleides-mode)) auto-mode-alist))
