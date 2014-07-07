@@ -155,27 +155,6 @@
       (setq delete-old-versions t))
   (message "backup-dir %s is not exist." backup-dir))
 
-;; 隣のバッファファイルを閉じる。ウィンドウはそのまま
-(defun my-kill-next-buffer ()
-  (interactive)
-  (if (one-window-p)
-      (message "one-window-p")
-    (kill-buffer (window-buffer (next-window)))))
-
-;; 現在のバッファファイルと隣のバッファファイルを閉じる。ウィンドウはそのまま
-(defun my-kill-current-next-buffer ()
-  (interactive)
-  (my-kill-next-buffer-window)
-  (kill-buffer (current-buffer)))
-
-;; 隣のバッファファイルを閉じ、ウィンドウも閉じる
-(defun my-kill-next-buffer-window ()
-  (interactive)
-  (if (one-window-p)
-      (message "one-window-p")
-    (kill-buffer (window-buffer (next-window)))
-    (delete-window (next-window))))
-
 ;; インデント
 (setq indent-line-function 'indent-relative-maybe)
 
@@ -280,11 +259,17 @@
 ;; (require 'git)
 ;; (require 'git-blame)
 
-(defun my-insert-filename (filename)
+(defun insert-file-name (filename)
   (interactive "*fInsert file name: ")
   (insert filename))
 
-(require 'window-resize)
+(defun insert-file-name-abs (filename)
+  (interactive "*fInsert file name: ")
+  (insert (expand-file-name filename)))
+
+(require 'window-control)
+
+(require 'other-windows-plus)
 
 (global-set-key (kbd "<M-down>")  'windmove-down)             ; ウィンドウ移動
 (global-set-key (kbd "<M-left>")  'windmove-left)             ; ウィンドウ移動
@@ -298,18 +283,14 @@
 (global-set-key (kbd "C-c C-v") 'view-mode)                   ; View mode
 (global-set-key (kbd "C-c c") 'compile)                       ; make
 (global-set-key (kbd "C-c g") 'magit-status)                  ; magit
-(global-set-key (kbd "C-c i") 'my-insert-filename)            ; ファイル名を挿入する
+(global-set-key (kbd "C-c i") 'insert-file-name)              ; ファイル名を挿入する
+(global-set-key (kbd "C-c I") 'insert-file-name-abs)          ; ファイルのフルパスを挿入する
 (global-set-key (kbd "C-c t") 'switch-to-temp-buffer)         ; テンポラリバッファを開く
 (global-set-key (kbd "C-c w t") 'whitespace-toggle-options)   ; whitespace-toggle-options
 (global-set-key (kbd "C-c w w") 'whitespace-mode)             ; whitespace-mode
 (global-set-key (kbd "C-h TAB") 'info-lookup-symbol)          ; SYMBOLのInfoを表示
 (global-set-key (kbd "C-j") 'newline)                         ; C-jで、インデントなし改行
 (global-set-key (kbd "C-x '") 'just-one-space)                ; 複数のスペースを1つに
-(global-set-key (kbd "C-x 4 K") 'my-kill-next-buffer-window)  ; 隣のバッファとウィンドウを削除
-(global-set-key (kbd "C-x 4 k") 'my-kill-next-buffer)         ; 隣のバッファを削除
-(global-set-key (kbd "C-x 4 s") 'split-shell-current-directory) ; フレームを2分割し、カレントディレクトリのシェルバッファを開く
-(global-set-key (kbd "C-x 5 s") 'new-frame-shell-current-directory) ; 新フレームを作成し、カレントディレクトリのシェルバッファを開く
-(global-set-key (kbd "C-x C-M-k") 'my-kill-current-next-buffer) ; 隣のバッファとウィンドウと現在のバッファを削除
 (global-set-key (kbd "C-x C-e") 'electric-buffer-list)        ; バッファ一覧
 (global-set-key (kbd "C-x K") 'kill-buffer-and-window)        ; 現在のバッファとウィンドウを削除
 (global-set-key (kbd "C-x RET u") 'ucs-normalize-NFC-buffer)  ; バッファ全体の濁点分離を直す
@@ -353,70 +334,6 @@
 (require 'shell-command)
 (shell-command-completion-mode 1)
 
-;; シェルにカレントディレクトリへのcdコマンドを送る
-(defun shell-send-cd (directory)
-  (interactive)
-  (setq default-directory directory)
-  (goto-char (point-max))
-  (comint-kill-input)
-  (insert (concat "cd '" (expand-file-name directory) "'"))
-  (comint-send-input)
-  (recenter 1)
-  (goto-char (point-max)))
-
-;; カレントディレクトリでシェルバッファを開く
-(defun shell-current-directory ()
-   "If shell buffer exists, change directory in shell
-    to default directory in current buffer.
-    Otherwise, open new shell buffer of the dafault directory."
-   (interactive)
-   (let* (
-       (shell-buffer (get-buffer "*shell*"))
-       (proc (get-buffer-process shell-buffer))
-       (curbuf (current-buffer))
-       (curdir default-directory)
-       (cd-command (concat "cd " curdir)))
-     (if shell-buffer
-         (if (process-running-child-p proc)
-             (message "Child process is running in the shell.")
-           (progn
-             (set-buffer shell-buffer)
-             (shell-send-cd curdir)))
-       (shell))))
-
-;; 現在のバッファを、カレントディレクトリのシェルバッファに切り替える
-(defun switch-to-shell-current-directory ()
-  "Switch current buffer to shell buffer of
-   default directory in current buffer."
-  (interactive)
-  (unless (string= (buffer-name) "*shell*")
-    (progn
-      (shell-current-directory)
-      (switch-to-buffer (get-buffer "*shell*")))))
-
-;; フレームを2分割にし、カレントディレクトリのシェルバッファを開く
-(defun split-shell-current-directory ()
-  "Make current buffer fill its frame, then
-   split the selected window, and switch
-   the above window to shell of default
-   directory in current buffer."
-  (interactive)
-  (unless (string= (buffer-name) "*shell*")
-    (progn
-      (delete-other-windows)
-      (split-window-below)
-      (switch-to-shell-current-directory))))
-
-;; 新しいフレームに、カレントディレクトリのシェルバッファを開く
-(defun new-frame-shell-current-directory ()
-  "Make a new frame, and switch the new frame window
-    to shell of default directory in current buffer."
-  (interactive)
-  (unless (string= (buffer-name) "*shell*")
-    (progn
-      (make-frame-command)
-      (switch-to-shell-current-directory))))
-
 ;; 引数で指定されたプロセスの名前が shell で子プロセスがない場合は、
 ;; process-query-on-exit-flag を nil に設定し、
 ;; "Buffer has a runnig process.; kill it?"
@@ -427,7 +344,6 @@
 
 (defadvice kill-buffer (before my-set-process-query activate)
   (set-process-not-running-child-noquery-on-exit (get-buffer-process (current-buffer))))
-
 (defadvice save-buffers-kill-terminal (before my-set-process-query activate)
   (dolist (proc (process-list))
     (set-process-not-running-child-noquery-on-exit proc)))
@@ -542,22 +458,15 @@
 
 (add-to-list 'auto-mode-alist '("\\.html?$" . web-mode))
 
-(custom-set-variables '(web-mode-indent-style 1))
-
 ;; 色の設定
 (custom-set-faces
- '(web-mode-doctype-face
-   ((t (:foreground "#82AE46"))))       ; doctype
- '(web-mode-html-tag-face
-   ((t (:foreground "#E6B422" :weight bold)))) ; タグ
- '(web-mode-html-attr-name-face
-   ((t (:foreground "#C97586"))))       ; 属性名
- '(web-mode-html-attr-value-face
-   ((t (:foreground "#82AE46"))))       ; 属性値
- '(web-mode-comment-face
-   ((t (:foreground "#D9333F"))))       ; コメント
- '(web-mode-server-comment-face
-   ((t (:foreground "#D9333F")))))      ; サーバーコメント
+ '(web-mode-indent-style 1)
+ '(web-mode-comment-face ((t (:foreground "#D9333F"))))
+ '(web-mode-doctype-face ((t (:foreground "#82AE46"))))
+ '(web-mode-html-attr-name-face ((t (:foreground "#C97586"))))
+ '(web-mode-html-attr-value-face ((t (:foreground "#82AE46"))))
+ '(web-mode-html-tag-face ((t (:foreground "#E6B422" :weight bold))))
+ '(web-mode-server-comment-face ((t (:foreground "#D9333F")))))
 
 ;; nxml-mode
 (require 'nxml-mode)
@@ -683,15 +592,6 @@
 
 ;; rubydb - ruby debugger
 (autoload 'rubydb "rubydb3x" "ruby debug" t)
-
-;; set to load inf-ruby and set inf-ruby key definition in ruby-mode.
-(autoload 'run-ruby "inf-ruby"
-  "Run an inferior Ruby process")
-(autoload 'inf-ruby-keys "inf-ruby"
-  "Set local key defs for inf-ruby in ruby-mode")
-(add-hook 'ruby-mode-hook
-          '(lambda ()
-             (inf-ruby-keys)))
 
 ;; Riece IRC client
 (autoload 'riece "riece" "Start Riece" t)
