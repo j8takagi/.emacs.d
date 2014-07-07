@@ -16,22 +16,24 @@
 (add-to-load-path "~/.emacs.d/")
 
 ;; site-lispディレクトリーを~/.emacs.d/site-lispに
-(defvar site-lisp-dir (expand-file-name "~/.emacs.d/site-lisp"))
-
-(add-to-load-path site-lisp-dir)
-(load (expand-file-name (concat site-lisp-dir "/subdirs")))
+(let ((site-lisp-dir (expand-file-name "~/.emacs.d/site-lisp")))
+  (add-to-load-path site-lisp-dir)
+  (let ((default-directory site-lisp-dir))
+    (load "subdirs")))
 
 ;; パッケージを使う
 (require 'package)
-
-(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
-(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
 
 ; パッケージ初期化
 (package-initialize)
 
 ; パッケージシステムmelpaを使う
 (require 'melpa)
+
+(setq package-archives
+      (append
+       '(("marmalade" . "http://marmalade-repo.org/packages/")
+         ("melpa" . "http://melpa.milkbox.net/packages/")) package-archives))
 
 ;; 日本語環境
 (set-language-environment 'Japanese)
