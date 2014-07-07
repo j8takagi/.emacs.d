@@ -1,6 +1,6 @@
-;;; auto-elc-mode.el
+;;; window-control.el
 
-;; Copyright (C) 2013  j8takagi
+;; Copyright (C) 2014  j8takagi
 
 ;; Author: j8takagi <j8takagi@nifty.com>
 ;; Keywords: Emacs elisp compile
@@ -32,13 +32,13 @@
 ;;
 ;; 2. Emacsの設定ファイル（~/.emacs.d/init.el など）に以下の行を追加する
 ;;
-;; (require 'window-resize)
+;; (require 'window-control)
 
 ;; ■使い方
 
 ;; ■hook
 
-;; window-resize
+;; window-control
 ;;
 ;; from: window-resizer - http://d.hatena.ne.jp/khiker/20100119/window_resize
 (defun wctl-window-resize ()
@@ -194,5 +194,5 @@
 (global-set-key "\C-\\f" 'wctl-frame-resize)             ; フレームの対話式サイズ調整
 (global-set-key "\C-\\m" 'wctl-frame-move)               ; フレームの対話式移動
 
-(provide 'window-resize)
-;;; window-resize.el ends here
+(provide 'window-control)
+;;; window-control.el ends here
