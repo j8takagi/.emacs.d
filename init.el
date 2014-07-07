@@ -3,23 +3,12 @@
 ;;
 ;; パッケージは、~/.emacs.dディレクトリーのelpaとsite-lispで管理
 
-;;; load-pathを追加する関数を定義
-(defun add-to-load-path (&rest paths)
-  (let (path)
-    (dolist (path paths paths)
-     (let ((default-directory (expand-file-name path)))
-        (add-to-list 'load-path default-directory)
-         (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
-             (normal-top-level-add-subdirs-to-load-path))))))
-
-;; load-pathを追加
-(add-to-load-path "~/.emacs.d/")
-
-;; site-lispディレクトリーを~/.emacs.d/site-lispに
-(let ((site-lisp-dir (expand-file-name "~/.emacs.d/site-lisp")))
-  (add-to-load-path site-lisp-dir)
-  (let ((default-directory site-lisp-dir))
-    (load "subdirs")))
+;; load-pathを追加し、subdirs.elがある場合は読み込む
+(dolist (path '("~/.emacs.d" "~/.emacs.d/site-lisp"))
+  (let ((default-directory (expand-file-name path)))
+    (add-to-list 'load-path default-directory)
+    (if (file-exists-p "subdirs.el")
+        (load-library "subdirs"))))
 
 ;; パッケージを使う
 (require 'package)
@@ -30,10 +19,11 @@
 ; パッケージシステムmelpaを使う
 (require 'melpa)
 
-(setq package-archives
-      (append
-       '(("marmalade" . "http://marmalade-repo.org/packages/")
-         ("melpa" . "http://melpa.milkbox.net/packages/")) package-archives))
+(dolist
+    (pack
+     '(("marmalade" . "http://marmalade-repo.org/packages/")
+       ("melpa" . "http://melpa.milkbox.net/packages/")))
+    (add-to-list 'package-archives pack))
 
 ;; 日本語環境
 (set-language-environment 'Japanese)
@@ -255,10 +245,6 @@
 ;; magit-mode
 (autoload 'magit-status "magit" nil t)
 
-;; git
-;; (require 'git)
-;; (require 'git-blame)
-
 (defun insert-file-name (filename)
   (interactive "*fInsert file name: ")
   (insert filename))
@@ -271,6 +257,310 @@
 
 (require 'other-windows-plus)
 
+;; auto-elc
+(autoload 'auto-elc-mode "auto-elc-mode")
+(add-hook 'emacs-lisp-mode-hook
+          '(lambda ()
+             (auto-elc-mode 1)))
+
+;; *compilation*バッファをスクロールして表示
+(setq compilation-scroll-output 1)
+
+;; lisp-interaction-mode, emacs-lisp-mode
+;; M-<return> でLisp補完
+(define-key lisp-interaction-mode-map (kbd "<M-return>") 'lisp-complete-symbol)
+(define-key emacs-lisp-mode-map (kbd "<M-return>") 'lisp-complete-symbol)
+
+;; shell-mode
+(add-hook 'shell-mode-hook
+ '(lambda ()
+    (setq shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ")
+    (setq tab-width 4)))
+
+;; 引数で指定されたプロセスの名前が shell で子プロセスがない場合は、
+;; process-query-on-exit-flag を nil に設定し、
+;; "Buffer has a runnig process.; kill it?"
+;; のプロンプト表示を抑制する。
+(defun set-process-not-running-child-noquery-on-exit (proc)
+  (if (and proc (string= (process-name proc) "shell"))
+      (set-process-query-on-exit-flag proc (process-running-child-p proc))))
+
+(defadvice kill-buffer (before my-set-process-query activate)
+  (set-process-not-running-child-noquery-on-exit (get-buffer-process (current-buffer))))
+
+(defadvice save-buffers-kill-terminal (before my-set-process-query activate)
+  (dolist (proc (process-list))
+    (set-process-not-running-child-noquery-on-exit proc)))
+
+
+;; dired
+(add-hook
+ 'dired-load-hook
+ (lambda ()
+   ;; 確認なしにディレクトリーを再帰的にコピーする
+   (setq dired-recursive-copies 'always)
+   ;; sorter - diredでのソート
+   (load "sorter")
+   ;; dired-x - diredの拡張機能
+   (load "dired-x")
+   ;; wdired - ファイル名の編集を可能にする
+   (require 'wdired)
+   ;;
+   (put 'dired-find-alternate-file 'disabled nil)
+   ;; ediff
+   (defun dired-ediff-vc-latest-current ()
+     "Run Ediff of file named on this line by comparing the latest version and current."
+     (interactive)
+     (let ((find-file-run-dired nil))
+       (find-file (dired-get-file-for-visit))
+       (ediff-vc-latest-current)))
+   ;; image-dired
+   (require 'image-dired)
+   ;; ediff-revison
+   (define-key dired-mode-map "\C-cw" 'wdired-change-to-wdired-mode)
+   (define-key dired-mode-map "E" 'dired-ediff-vc-latest-current)
+   (define-key dired-mode-map "\C-ce" 'ediff-revision)))
+
+(dolist
+    (ext
+     '(".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" ".aux_prev"
+       ".toc_prev" ".lot_prev" ".lof_prev" ".bbl_prev" ".out_prev"
+       ".idx" ".ind" ".idx_prev" ".ind_prev" ".ilg"))
+     (add-to-list 'completion-ignored-extensions ext))
+
+;;; CC-Mode
+(add-hook 'c-mode-common-hook
+          '(lambda ()
+             (setq c-default-style "k&r")
+             (setq c-basic-offset 4)
+             (setq indent-tab-mode nil)
+             (gtags-mode 1)))
+
+;; find documentation on GNU MP functions in programing C
+(eval-after-load "info-look"
+  '(let ((mode-value (assoc 'c-mode (assoc 'symbol info-lookup-alist))))
+     (setcar (nthcdr 3 mode-value)
+             (cons '("(gmp)Function Index" nil "^ -.* " "\\>")
+                   (nth 3 mode-value)))))
+
+;; gtags-mode: GNU GLOBAL
+(autoload 'gtags-mode "gtags" "" t)
+
+;; bison-mode
+(autoload 'bison-mode "bison-mode")
+
+(add-hook 'bison-mode-hook
+          '(lambda ()
+             (setq bison-decl-token-column 0)
+             (setq bison-rule-enumeration-column 8)))
+
+;; flex-mode
+(autoload 'flex-mode "flex-mode")
+
+;; Mew
+(autoload 'mew "mew" nil t)
+(autoload 'mew-send "mew" nil t)
+;(eval-after-load "mew" '(require 'mew-browse))
+
+(declare-function mew-path-to-folder "mew-func" (PATH))
+(declare-function mew-summary-visit-folder "mew-summary4" (FOLDER &optional GOEND NO-LS))
+(declare-function mew-summary-move-and-display "mew-exec" (MSG &optional REDISPLAY))
+
+;; mewメッセージファイルの開き方
+;; Spotlightから.mewファイルを開けるようにする
+(defun mew-open-mesg ()
+  (interactive)
+  (let ((mew-auto-get nil)
+        (fld (mew-path-to-folder
+              (directory-file-name (file-name-directory (buffer-file-name)))))
+        (mes (file-name-sans-extension
+              (file-name-nondirectory (buffer-file-name)))))
+    (mew)
+    (mew-summary-visit-folder fld)
+    (mew-summary-move-and-display mes)))
+
+(if (boundp 'read-mail-command)
+    (setq read-mail-command 'mew))
+
+(autoload 'mew-user-agent-compose "mew" nil t)
+
+(if (boundp 'mail-user-agent)
+    (setq mail-user-agent 'mew-user-agent))
+
+(if (fboundp 'define-mail-user-agent)
+    (define-mail-user-agent
+      'mew-user-agent
+      'mew-user-agent-compose
+      'mew-draft-send-message
+      'mew-draft-kill
+      'mew-send-hook))
+
+;; web-mode
+(require 'web-mode)
+
+;; 色の設定
+(custom-set-faces
+ '(web-mode-indent-style 1)
+ '(web-mode-comment-face ((t (:foreground "#D9333F"))))
+ '(web-mode-doctype-face ((t (:foreground "#82AE46"))))
+ '(web-mode-html-attr-name-face ((t (:foreground "#C97586"))))
+ '(web-mode-html-attr-value-face ((t (:foreground "#82AE46"))))
+ '(web-mode-html-tag-face ((t (:foreground "#E6B422" :weight bold))))
+ '(web-mode-server-comment-face ((t (:foreground "#D9333F")))))
+
+;; nxml-mode
+(require 'nxml-mode)
+
+;; mmm-mode
+(load-library "mmm-mode")
+
+(require 'mmm-auto)
+
+(setq mmm-global-mode 'maybe)
+(setq mmm-submode-decoration-level 3)
+
+(set-face-background 'mmm-default-submode-face "#f0f0ff")
+
+(mmm-add-classes
+ '((embedded-css
+    :submode css-mode
+    :front "<style[^>]*>\n"
+    :back "\n?[ \t]+</style>")))
+(mmm-add-mode-ext-class nil "\\.html?\\'" 'embedded-css)
+
+(mmm-add-classes
+ '((html-javascript
+    :submode javascript-mode
+    :front "<script[^>]*>\n"
+    :back "[ \t]+</script>")))
+(mmm-add-mode-ext-class nil "\\.html?\\'" 'html-javascript)
+
+;; image-mode
+(setq image-file-name-extensions '("svg" "png" "jpeg" "jpg" "gif" "tiff" "tif"))
+
+;; css-mode
+(autoload 'css-mode "css-mode")
+(setq cssm-indent-function #'cssm-c-style-indenter)
+
+;; ChangeLog
+(setq user-full-name "高木和人")
+(setq user-mail-address "j8takagi@nifty.com")
+(setq change-log-default-name "~/ChangeLog")
+
+;; graphviz mode
+(load "graphviz-dot-mode")
+
+;; ESS
+(require 'ess-site)
+(autoload 'R-mode "ess-site" "Emacs Speaks Statistics mode" t)
+;; R起動時にワーキングディレクトリを訊ねない
+(setq ess-ask-for-ess-directory nil)
+
+;; CSV mode
+(autoload 'csv-mode "csv-mode" "Major mode for editing comma-separated value files." t)
+
+;; Mediawiki
+(require 'mediawiki)
+(add-hook 'mediawiki-mode-hook
+          '(lambda ()
+             (define-key mediawiki-mode-map "\C-x\C-s" 'save-buffer)))
+
+;; exopen-mode 外部プログラムでファイルを開く
+(require 'exopen-mode)
+
+;; tex-mode
+(add-hook 'tex-mode-hook
+          '(lambda ()
+             (setq skeleton-pair 1)
+             (define-key latex-mode-map "\C-cpp" 'exopen-buffer-pdffile)
+             (define-key latex-mode-map "\C-cpd" 'exopen-buffer-dvifile)))
+
+(add-hook 'latex-mode-hook 'turn-on-reftex)
+
+;; color-selection
+(autoload 'list-hexadecimal-colors-display "color-selection"
+  "Display hexadecimal color codes, and show what they look like." t)
+(defalias 'color-selection 'list-hexadecimal-colors-display)
+
+;; igrep
+(require 'igrep)
+
+;; svg-clock
+(autoload 'svg-clock "svg-clock" "Start/stop svg-clock" t)
+
+;; ruby-mode
+(autoload 'ruby-mode "ruby-mode"
+  "Mode for editing ruby source files" t)
+
+(add-to-list 'interpreter-mode-alist '("ruby" . ruby-mode))
+
+(load "inf-ruby")
+
+;; rubydb - ruby debugger
+(autoload 'rubydb "rubydb3x" "ruby debug" t)
+
+;; Riece IRC client
+(autoload 'riece "riece" "Start Riece" t)
+
+;; 濁点分離を直す
+;; 参考：
+;; http://d.hatena.ne.jp/nakamura001/20120529/1338305696 
+;; http://www.sakito.com/2010/05/mac-os-x-normalization.html
+(require 'ucs-normalize)
+(prefer-coding-system 'utf-8-hfs)
+(setq file-name-coding-system 'utf-8-hfs)
+(setq locale-coding-system 'utf-8-hfs)
+
+(defun ucs-normalize-NFC-buffer ()
+  (interactive)
+  (ucs-normalize-NFC-region (point-min) (point-max)))
+
+;; text-modeで<M-tab>でのispell起動を無効に
+(add-hook 'text-mode-hook
+          (lambda ()
+            (local-unset-key (kbd "C-M-i"))))
+
+(add-hook 'Info-mode-hook       ; After Info-mode has started
+          (lambda ()
+            (setq Info-additional-directory-list Info-default-directory-list)
+            ))
+
+;; flex-autopair
+(require 'flex-autopair)
+(flex-autopair-mode 1)
+
+;; javadoc-style-comment-mode
+(require 'javadoc-style-comment-mode)
+
+;; eukleides.el
+(require 'eukleides)
+
+;; magic-mode-alist
+(add-to-list 'magic-mode-alist '("<![Dd][Oo][Cc][Tt][Yy][Pp][Ee] [Hh][Tt][Mm][Ll]" . web-mode))
+(add-to-list 'magic-mode-alist '("<\\?xml " . nxml-mode))
+
+;; auto-mode-alist
+(add-to-list 'auto-mode-alist '("[Mm]akefile$". makefile-gmake-mode))
+(add-to-list 'auto-mode-alist '("\.d$". makefile-gmake-mode))
+(add-to-list 'auto-mode-alist '("\.mk$". makefile-gmake-mode))
+(add-to-list 'auto-mode-alist '("\\.[Cc][Ss][Vv]\\'" . csv-mode))
+(add-to-list 'auto-mode-alist '("\\.[rR]$" . R-mode))
+(add-to-list 'auto-mode-alist '("\\.casl?$" . asm-mode))
+(add-to-list 'auto-mode-alist '("\\.css$" . css-mode))
+(add-to-list 'auto-mode-alist '("\\.euk$" . eukleides-mode))
+(add-to-list 'auto-mode-alist '("\\.gv$" . graphviz-dot-mode))
+(add-to-list 'auto-mode-alist '("\\.html?$" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.js$" . js-mode))
+(add-to-list 'auto-mode-alist '("\\.ll?$" . flex-mode))
+(add-to-list 'auto-mode-alist '("\\.mew$" . mew-open-mesg))
+(add-to-list 'auto-mode-alist '("\\.svg$" . nxml-mode))
+(add-to-list 'auto-mode-alist '("\\.wiki$" . mediawiki-mode))
+(add-to-list 'auto-mode-alist '("\\.xml$" . nxml-mode))
+(add-to-list 'auto-mode-alist '("\\.y?rb$" . ruby-mode))
+(add-to-list 'auto-mode-alist '("\\.yy?$" . bison-mode))
+(add-to-list 'auto-mode-alist '("^ja.wikipedia.org/w/index.php" . mediawiki-mode))
+
+;; global-key
 (global-set-key (kbd "<M-down>")  'windmove-down)             ; ウィンドウ移動
 (global-set-key (kbd "<M-left>")  'windmove-left)             ; ウィンドウ移動
 (global-set-key (kbd "<M-return>") 'expand-abbrev)
@@ -305,333 +595,10 @@
 (global-set-key (kbd "M-p") 'call-last-kbd-macro)             ; マクロ
 (global-set-key (kbd "RET") 'newline-and-indent)              ; RETで、インデント付き改行
 
-(global-unset-key "\C-x\C-d")
-
-;; Emacs Lisp
-(autoload 'auto-elc-mode "auto-elc-mode")
-(add-hook 'emacs-lisp-mode-hook (lambda () (auto-elc-mode 1)))
-
-;; Make
-(setq auto-mode-alist
-      (append
-       '(("[Mm]akefile$". makefile-gmake-mode)
-         ("\.mk$". makefile-gmake-mode)
-         ("\.d$". makefile-gmake-mode))
-       auto-mode-alist))
-(setq compilation-scroll-output 1)
-
-;; lisp-interaction-mode
-;; M-[space] でLisp補完
-(define-key lisp-interaction-mode-map [M-return] 'lisp-complete-symbol)
-
-;; shell-mode
-(add-hook 'shell-mode-hook
- '(lambda ()
-    (setq shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ")
-    (setq tab-width 4)))
-
-;; shell-commandでコマンド入力に補完が効くようにする
-(require 'shell-command)
-(shell-command-completion-mode 1)
-
-;; 引数で指定されたプロセスの名前が shell で子プロセスがない場合は、
-;; process-query-on-exit-flag を nil に設定し、
-;; "Buffer has a runnig process.; kill it?"
-;; のプロンプト表示を抑制する。
-(defun set-process-not-running-child-noquery-on-exit (proc)
-  (if (and proc (string= (process-name proc) "shell"))
-      (set-process-query-on-exit-flag proc (process-running-child-p proc))))
-
-(defadvice kill-buffer (before my-set-process-query activate)
-  (set-process-not-running-child-noquery-on-exit (get-buffer-process (current-buffer))))
-(defadvice save-buffers-kill-terminal (before my-set-process-query activate)
-  (dolist (proc (process-list))
-    (set-process-not-running-child-noquery-on-exit proc)))
-
-;; dired
-(add-hook 'dired-load-hook
-          (lambda ()
-            ;; 確認なしにディレクトリーを再帰的にコピーする
-            (setq dired-recursive-copies 'always)
-            ;; sorter - diredでのソート
-            (load "sorter")
-            ;; dired-x - diredの拡張機能
-            (load "dired-x")
-            ;; wdired - ファイル名の編集を可能にする
-            (require 'wdired)
-            ;;
-            (put 'dired-find-alternate-file 'disabled nil)
-            ;; ediff
-            (defun dired-ediff-vc-latest-current ()
-              "Run Ediff of file named on this line by comparing the latest version and current."
-              (interactive)
-              (let ((find-file-run-dired nil))
-                (find-file (dired-get-file-for-visit))
-                (ediff-vc-latest-current)))
-            ;; image-dired
-            (require 'image-dired)
-            ;; ediff-revison
-            (define-key dired-mode-map "\C-cw" 'wdired-change-to-wdired-mode)
-            (define-key dired-mode-map "E" 'dired-ediff-vc-latest-current)
-            (define-key dired-mode-map "\C-ce" 'ediff-revision)))
-
-(setq completion-ignored-extensions
-      (append completion-ignored-extensions
-              '(".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" ".aux_prev"
-                ".toc_prev" ".lot_prev" ".lof_prev" ".bbl_prev" ".out_prev"
-                ".idx" ".ind" ".idx_prev" ".ind_prev" ".ilg")))
-
-;;; CC-Mode
-(add-hook 'c-mode-common-hook
-          '(lambda ()
-             (setq c-default-style "k&r")
-             (setq c-basic-offset 4)
-             (setq indent-tab-mode nil)
-             (gtags-mode 1)))
-
-;; find documentation on GNU MP functions in programing C
-(eval-after-load "info-look"
-  '(let ((mode-value (assoc 'c-mode (assoc 'symbol info-lookup-alist))))
-     (setcar (nthcdr 3 mode-value)
-             (cons '("(gmp)Function Index" nil "^ -.* " "\\>")
-                   (nth 3 mode-value)))))
-
-;; gtags-mode: GNU GLOBAL
-(autoload 'gtags-mode "gtags" "" t)
-
-;; bison-mode
-(autoload 'bison-mode "bison-mode")
-
-(add-hook 'bison-mode-hook
-          '(lambda ()
-             (setq bison-decl-token-column 0)
-             (setq bison-rule-enumeration-column 8)))
-
-(add-to-list 'auto-mode-alist '("\\.yy?$" . bison-mode))
-
-;; flex-mode
-(autoload 'flex-mode "flex-mode")
-(add-to-list 'auto-mode-alist '("\\.ll?$" . flex-mode))
-
-;; Mew
-(autoload 'mew "mew" nil t)
-(autoload 'mew-send "mew" nil t)
-;(eval-after-load "mew" '(require 'mew-browse))
-
-(declare-function mew-path-to-folder "mew-func" (PATH))
-(declare-function mew-summary-visit-folder "mew-summary4" (FOLDER &optional GOEND NO-LS))
-(declare-function mew-summary-move-and-display "mew-exec" (MSG &optional REDISPLAY))
-
-;; mewメッセージファイルの開き方
-;; Spotlightから.mewファイルを開けるようにする
-(defun mew-open-mesg ()
-  (interactive)
-  (let ((mew-auto-get nil)
-        (fld (mew-path-to-folder
-              (directory-file-name (file-name-directory (buffer-file-name)))))
-        (mes (file-name-sans-extension
-              (file-name-nondirectory (buffer-file-name)))))
-    (mew)
-    (mew-summary-visit-folder fld)
-    (mew-summary-move-and-display mes)))
-(add-to-list 'auto-mode-alist '("\\.mew$" . mew-open-mesg))
-
-(if (boundp 'read-mail-command)
-    (setq read-mail-command 'mew))
-
-(autoload 'mew-user-agent-compose "mew" nil t)
-
-(if (boundp 'mail-user-agent)
-    (setq mail-user-agent 'mew-user-agent))
-
-(if (fboundp 'define-mail-user-agent)
-    (define-mail-user-agent
-      'mew-user-agent
-      'mew-user-agent-compose
-      'mew-draft-send-message
-      'mew-draft-kill
-      'mew-send-hook))
-
-;; web-mode
-(require 'web-mode)
-(add-to-list 'magic-mode-alist '("<![Dd][Oo][Cc][Tt][Yy][Pp][Ee] [Hh][Tt][Mm][Ll]" . web-mode))
-
-(add-to-list 'auto-mode-alist '("\\.html?$" . web-mode))
-
-;; 色の設定
-(custom-set-faces
- '(web-mode-indent-style 1)
- '(web-mode-comment-face ((t (:foreground "#D9333F"))))
- '(web-mode-doctype-face ((t (:foreground "#82AE46"))))
- '(web-mode-html-attr-name-face ((t (:foreground "#C97586"))))
- '(web-mode-html-attr-value-face ((t (:foreground "#82AE46"))))
- '(web-mode-html-tag-face ((t (:foreground "#E6B422" :weight bold))))
- '(web-mode-server-comment-face ((t (:foreground "#D9333F")))))
-
-;; nxml-mode
-(require 'nxml-mode)
-(add-to-list 'magic-mode-alist '("<\\?xml " . nxml-mode))
-
-(add-to-list 'auto-mode-alist '("\\.xml$" . nxml-mode))
-(add-to-list 'auto-mode-alist '("\\.svg$" . nxml-mode))
-
-;; js-mode
-(add-to-list 'auto-mode-alist '("\\.js$" . js-mode))
-
-;; mmm-mode
-(load-library "mmm-mode")
-
-(require 'mmm-auto)
-
-(setq mmm-global-mode 'maybe)
-(setq mmm-submode-decoration-level 3)
-;(setq mmm-font-lock-available-p t)
-
-(set-face-background 'mmm-default-submode-face "#f0f0ff")
-
-(mmm-add-classes
- '((embedded-css
-    :submode css-mode
-    :front "<style[^>]*>\n"
-    :back "\n?[ \t]+</style>")))
-(mmm-add-mode-ext-class nil "\\.html?\\'" 'embedded-css)
-
-(mmm-add-classes
- '((html-javascript
-    :submode javascript-mode
-    :front "<script[^>]*>\n"
-    :back "[ \t]+</script>")))
-(mmm-add-mode-ext-class nil "\\.html?\\'" 'html-javascript)
-
-;; image-mode
-(setq image-file-name-extensions '("svg" "png" "jpeg" "jpg" "gif" "tiff" "tif"))
-
-;; css-mode
-(autoload 'css-mode "css-mode")
-(add-to-list 'auto-mode-alist '("\\.css$" . css-mode))
-(setq cssm-indent-function #'cssm-c-style-indenter)
-
-;; ChangeLog
-(setq user-full-name "高木和人")
-(setq user-mail-address "j8takagi@nifty.com")
-(setq change-log-default-name "~/ChangeLog")
-
-;; pukiwiki-mode
-;; (load-library "pukiwiki-mode")
-
-;; (setq pukiwiki-site-list
-;;        '(("kanka" "http://plusone.ath.cx/pukiwiki/index.php" nil euc-jp)
-;;          ("bookshelf" "http://www.bookshelf.jp/pukiwiki/pukiwiki" nil euc-jp)
-;;          ("macemacs" "http://macemacsjp.sourceforge.jp/index.php" nil euc-jp)
-;;          ("pukiwiki" "http://pukiwiki.org/index.php" nil utf-8)
-;;          ))
-
-;; CASL II
-(add-to-list 'auto-mode-alist '("\\.casl?$" . asm-mode))
-
-;; graphviz mode
-(load "graphviz-dot-mode")
-(add-to-list 'auto-mode-alist '("\\.gv$" . graphviz-dot-mode))
-
-;; ESS
-(require 'ess-site)
-(add-to-list 'auto-mode-alist '("\\.[rR]$" . R-mode))
-(autoload 'R-mode "ess-site" "Emacs Speaks Statistics mode" t)
-;; R起動時にワーキングディレクトリを訊ねない
-(setq ess-ask-for-ess-directory nil)
-
-;; CSV mode
-(autoload 'csv-mode "csv-mode" "Major mode for editing comma-separated value files." t)
-(add-to-list 'auto-mode-alist '("\\.[Cc][Ss][Vv]\\'" . csv-mode))
-
-;; Mediawiki
-(require 'mediawiki)
-(add-to-list 'auto-mode-alist '("\\.wiki$" . mediawiki-mode))
-(add-to-list 'auto-mode-alist '("^ja.wikipedia.org/w/index.php" . mediawiki-mode))
-(add-hook 'mediawiki-mode-hook
-          '(lambda ()
-             (define-key mediawiki-mode-map "\C-x\C-s" 'save-buffer)))
-
-;; exopen-mode 外部プログラムでファイルを開く
-(require 'exopen-mode)
-(add-hook 'exopen-mode-hook
-          '(lambda ()
-          (setq exopen-suffix-cmd '((".dvi" . "pxdvi")))))
-
-;; tex-mode
-(add-hook 'tex-mode-hook
-          '(lambda ()
-             (setq skeleton-pair 1)
-             (define-key latex-mode-map "\C-cpp" 'exopen-buffer-pdffile)
-             (define-key latex-mode-map "\C-cpd" 'exopen-buffer-dvifile)))
-
-(add-hook 'latex-mode-hook 'turn-on-reftex)
-
-;; color-selection
-(autoload 'list-hexadecimal-colors-display "color-selection"
-  "Display hexadecimal color codes, and show what they look like." t)
-(defalias 'color-selection 'list-hexadecimal-colors-display)
-
-;; igrep
-(require 'igrep)
-
-;; svg-clock
-(autoload 'svg-clock "svg-clock" "Start/stop svg-clock" t)
-
-;; ruby-mode
-(autoload 'ruby-mode "ruby-mode"
-  "Mode for editing ruby source files" t)
-
-(setq auto-mode-alist
-      (append '(("\\.y?rb$" . ruby-mode)) auto-mode-alist))
-
-(setq interpreter-mode-alist (append '(("ruby" . ruby-mode))
-                                     interpreter-mode-alist))
-
-(load "inf-ruby")
-
-;; rubydb - ruby debugger
-(autoload 'rubydb "rubydb3x" "ruby debug" t)
-
-;; Riece IRC client
-(autoload 'riece "riece" "Start Riece" t)
-
-;; 濁点分離を直す
-;; 参考：
-;; http://d.hatena.ne.jp/nakamura001/20120529/1338305696 
-;; http://www.sakito.com/2010/05/mac-os-x-normalization.html
-(require 'ucs-normalize)
-(prefer-coding-system 'utf-8-hfs)
-(setq file-name-coding-system 'utf-8-hfs)
-(setq locale-coding-system 'utf-8-hfs)
-
-(defun ucs-normalize-NFC-buffer ()
-  (interactive)
-  (ucs-normalize-NFC-region (point-min) (point-max)))
+(global-unset-key (kbd "C-x C-d"))
+(global-unset-key (kbd "C-x 4 0"))
 
 ; Windowシステムごとの設定
 (if (eq window-system 'ns) (load "init-mac"))
 (if (eq window-system 'x) (load "init-x"))
 (if (eq window-system 'w32) (load "init-w32"))
-
-;; text-modeで<M-tab>でのispell起動を無効に
-(add-hook 'text-mode-hook
-          (lambda ()
-            (local-unset-key (kbd "C-M-i"))))
-
-(add-hook 'Info-mode-hook       ; After Info-mode has started
-          (lambda ()
-            (setq Info-additional-directory-list Info-default-directory-list)
-            ))
-
-;; flex-autopair
-(require 'flex-autopair)
-(flex-autopair-mode 1)
-
-;; javadoc-style-comment-mode
-(require 'javadoc-style-comment-mode)
-
-;; eukleides.el
-(require 'eukleides)
-(setq auto-mode-alist
-      (append '(("\\.euk$" . eukleides-mode)) auto-mode-alist))
