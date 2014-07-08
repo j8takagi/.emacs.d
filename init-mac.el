@@ -79,3 +79,5 @@
    (buffer-list)))
 
 (add-hook 'after-init-hook 'cd-to-homedir-all-buffers)
+
+(provide 'init-mac)

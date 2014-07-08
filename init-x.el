@@ -34,3 +34,5 @@
 
 ;; svg-clock
 (autoload 'svg-clock "svg-clock" "Start/stop svg-clock" t)
+
+(provide 'init-x)

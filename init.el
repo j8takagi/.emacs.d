@@ -4,32 +4,55 @@
 ;; パッケージは、~/.emacs.dディレクトリーのelpaとsite-lispで管理
 
 ;; load-pathを追加し、subdirs.elがある場合は読み込む
-(dolist (path '("~/.emacs.d" "~/.emacs.d/site-lisp"))
+(dolist
+    (path
+     '(
+       "~/.emacs.d"
+       "~/.emacs.d/site-lisp"
+       ))
   (let ((default-directory (expand-file-name path)))
     (add-to-list 'load-path default-directory)
-    (if (file-exists-p "subdirs.el")
+    (when (file-exists-p "subdirs.el")
         (load-library "subdirs"))))
+
+;; ライブラリ読み込み
+(dolist
+    (feat
+     '(
+       ;; /usr/local/share/emacs/24.3/lisp
+       ediff nxml-mode uniquify vc whitespace
+       ;; ~/.emacs.d/site-lisp
+       eukleides exopen-mode flex-autopair graphviz-dot-mode
+       javadoc-style-comment-mode other-windows-plus
+       ucs-normalize uniq window-control
+       ))
+  (if (not (locate-library (symbol-name feat)))
+      (message "%s: not found." feat)
+    (require feat)))
 
 ;; パッケージを使う
 (require 'package)
 
+;; パッケージアーカイブ追加
+(dolist
+    (pack
+     '(
+       ("marmalade" . "http://marmalade-repo.org/packages/")
+       ("melpa" . "http://melpa.milkbox.net/packages/")
+       ))
+    (add-to-list 'package-archives pack))
+
 ; パッケージ初期化
 (package-initialize)
 
-; パッケージシステムmelpaを使う
-(require 'melpa)
+;; session
+(add-hook 'after-init-hook 'session-initialize)
 
-(dolist
-    (pack
-     '(("marmalade" . "http://marmalade-repo.org/packages/")
-       ("melpa" . "http://melpa.milkbox.net/packages/")))
-    (add-to-list 'package-archives pack))
+;; ffap-bindings
+(ffap-bindings)
 
 ;; 日本語環境
 (set-language-environment 'Japanese)
-
-;; OSごとの設定
-(if (eq system-type 'gnu/linux) (load "init-linux"))
 
 ;; 起動時の画面を表示しない
 (setq inhibit-startup-message t)
@@ -47,7 +70,7 @@
 (setq history-delete-duplicates 1)
 
 ;; エラー時、音が鳴るのではなく、画面が点滅するように
-(setq visible-bell t)
+(setq visible-bell 1)
 
 ;; メジャーモードに合わせた色を付ける font-lock-mode
 (global-font-lock-mode 1)
@@ -62,38 +85,17 @@
 ;; タブをスペースに展開
 (setq-default indent-tabs-mode nil)
 
-;; whitespace
-(require 'whitespace)
-
-(setq whitespace-style '(face tabs spaces trailing)) ;  タブ
-(setq whitespace-space-regexp "\\(　\\)")     ;　全角スペース
-(setq whitespace-trailing-regexp "\\( +$\\)") ;行末の空白    
-
-(set-face-attribute whitespace-tab nil :box "navy" :background (background-color-at-point))
-(set-face-attribute whitespace-space nil :box "orange" :background (background-color-at-point))
-(set-face-attribute whitespace-trailing nil
-                    :foreground "navy" :background (background-color-at-point) :underline "navy")
-
-;; whitespaceを無効にするメジャーモード
-(defvar whitespace-disabled-major-mode-list)
-(setq whitespace-disabled-major-mode-list
-      '(mew-summary-mode completion-list-mode help-mode
-        magit-mode tetris-mode w3m-mode mew-message-mode))
-
-;; メジャーモード設定後、バッファーが読み取り専用でない場合はwhitespaceを有効にする
-(add-hook 'after-change-major-mode-hook
-          '(lambda ()
-             (unless (or buffer-read-only (member major-mode whitespace-disabled-major-mode-list))
-               (whitespace-mode 1))))
-
 ;; 再帰的なミニバッファ
-(setq enable-recursive-minibuffers t)
+(setq enable-recursive-minibuffers 1)
 
 ;; ファイル末尾で、end of bufferエラーなしで改行
 (setq next-line-add-newlines nil)
 
 ;; 行番号を表示
-(line-number-mode t)
+(line-number-mode 1)
+
+;; 列番号を表示
+(column-number-mode 1)
 
 ;; narrow-to-regionを可能にする
 (put 'narrow-to-region 'disabled nil)
@@ -131,22 +133,35 @@
 ;; 1行ずつスクロール
 (setq scroll-conservatively 1)
 
-;; 行番号を表示
-(column-number-mode 1)
-
 ;; バックアップファイルは、~/backupに格納
 (setq backup-dir (expand-file-name "~/backup"))
 
-(if (file-exists-p backup-dir)
-    (progn
-      (setq backup-directory-alist `(("." . ,backup-dir)))
-      (setq make-backup-files t)
-      (setq version-control t)
-      (setq delete-old-versions t))
-  (message "backup-dir %s is not exist." backup-dir))
+(if (not (file-exists-p backup-dir))
+    (message "backup-dir %s is not exist." backup-dir)
+  (setq backup-directory-alist `(("." . ,backup-dir)))
+  (setq make-backup-files t)
+  (setq version-control t)
+  (setq delete-old-versions t))
 
 ;; インデント
-(setq indent-line-function 'indent-relative-maybe)
+(setq indent-line-function 'tab-to-tab-stop)
+
+;; 圧縮されたファイルを直接編集する
+(auto-compression-mode)
+
+;; kill-lineのとき、改行も含めて切り取り
+(setq kill-whole-line t)
+
+;; kill-ring
+(setq yank-pop-change-selection t)
+
+(defun insert-file-name (filename)
+  (interactive "*fInsert file name: ")
+  (insert filename))
+
+(defun insert-file-name-abs (filename)
+  (interactive "*fInsert file name: ")
+  (insert (expand-file-name filename)))
 
 ;; 1行上へスクロール
 (defun scroll-up-one-line ()
@@ -173,95 +188,85 @@
     (concat "*" (replace-regexp-in-string " +" "_" (current-time-string)) "*"))
   (setq buffer-offer-save nil)))
 
-;; uniq
-(load "uniq")
+;; whitespace
+(when (featurep 'whitespace)
+  (setq whitespace-style '(face tabs spaces trailing)) ;  タブ
+  (setq whitespace-space-regexp "\\(　\\)")     ;　全角スペース
+  (setq whitespace-trailing-regexp "\\( +$\\)") ;行末の空白    
 
-;; session
-(require 'session)
-(add-hook 'after-init-hook 'session-initialize)
+  (set-face-attribute whitespace-tab nil :box "navy" :background (background-color-at-point))
+  (set-face-attribute whitespace-space nil :box "orange" :background (background-color-at-point))
+  (set-face-attribute whitespace-trailing nil
+    :foreground "navy" :background (background-color-at-point) :underline "navy")
+
+  ;; whitespaceを無効にするメジャーモード
+  (defvar whitespace-disabled-major-mode-list)
+  (setq whitespace-disabled-major-mode-list
+    '(mew-summary-mode completion-list-mode help-mode
+    magit-mode tetris-mode w3m-mode mew-message-mode))
+
+  ;; メジャーモード設定後、バッファーが読み取り専用でない場合はwhitespaceを有効にする
+  (add-hook 'after-change-major-mode-hook
+    '(lambda ()
+      (unless (or buffer-read-only (member major-mode whitespace-disabled-major-mode-list))
+        (whitespace-mode 1)))))
 
 ;; Ediff
-(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+(if (not (featurep 'ediff))
+    (message "ediff is not loaded.")
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
 
-(require 'ediff)
-(declare-function ediff-vc-internal "ediff-vers" (REV1 REV2 &optional STARTUP-HOOKS))
-(defun ediff-vc-latest-current ()
-  "Run Ediff of buffer file by comparing the latest and current."
-  (interactive)
-  (let ((file) (state))
-    (setq file (buffer-file-name))
-    (unless file
-      (error "buffer not visiting file"))
-    (setq state (vc-state file))
-    (if (member state '(up-to-date added))
-        (message "%s: %s" file state)
-      (ediff-load-version-control)
-      (ediff-vc-internal "" ""))))
+  (declare-function ediff-vc-internal "ediff-vers" (REV1 REV2 &optional STARTUP-HOOKS))
 
-(require 'vc)
+  (defun ediff-vc-latest-current ()
+    "Run Ediff of buffer file by comparing the latest and current."
+    (interactive)
+    (let ((file) (state))
+      (setq file (buffer-file-name))
+      (unless file
+        (error "buffer not visiting file"))
+      (setq state (vc-state file))
+      (if (member state '(up-to-date added))
+          (message "%s: %s" file state)
+        (ediff-load-version-control)
+        (ediff-vc-internal "" "")))))
 
-(defun find-file-revision (&optional file revision)
-  "find-file FILE REVISION.
-  Input FILE first, REVISION then.
-  Or, input FILE as 'FILE.~REVISON~' and FILE and REVISION is specified."
-  (interactive "P")
-  (if (not (stringp file))
-    (setq file (expand-file-name (read-file-name "Find version controled file: "))))
-  ;; find-file FILE REVISION by 'FILE.~REVISION~'."
-  (if (string-match "\\(.+\\)\\.~\\(.+\\)~$" file)
-      (progn
-        (setq revision (substring file (match-beginning 2) (match-end 2)))
-        (setq file (substring file (match-beginning 1) (match-end 1)))))
-  (unless (vc-backend file)
-    (error (format "%s is not under version control." file)))
-  (unless (stringp revision)
-    (setq revision
-          (vc-read-revision
-           (format
-            "Revision (default %s's working revision): " (file-name-nondirectory file))
-           (list file))))
-  (if (string= revision "") (setq revision nil))
-  (set-buffer (find-file-noselect file))
-  (switch-to-buffer (vc-find-revision file revision)))
-
-;; 圧縮されたファイルを直接編集する
-(auto-compression-mode)
-
-;; URLをC-xC-fで開く
-(ffap-bindings)
-
-;; kill-lineのとき、改行も含めて切り取り
-(setq kill-whole-line t)
-
-;; kill-ring
-(setq yank-pop-change-selection t)
-
-;; 同一ファイル名のバッファ名を分かりやすく: uniquify
-;; http://www.bookshelf.jp/cgi-bin/goto.cgi?file=meadow&node=uniquify
-(require 'uniquify)
-(setq uniquify-buffer-name-style 'post-forward-angle-brackets)
-(setq uniquify-ignore-buffers-re "*[^*]+*")
+  (defun find-file-revision (&optional file revision)
+    "find-file FILE REVISION.
+Input FILE first, REVISION then.
+Or, input FILE as 'FILE.~REVISON~' and FILE and REVISION is specified."
+    (interactive "P")
+    (unless (stringp file)
+      (setq file (expand-file-name (read-file-name "Find version controled file: "))))
+    ;; find-file FILE REVISION by 'FILE.~REVISION~'."
+    (when (string-match "\\(.+\\)\\.~\\(.+\\)~$" file)
+      (setq revision (substring file (match-beginning 2) (match-end 2)))
+      (setq file (substring file (match-beginning 1) (match-end 1))))
+    (unless (vc-backend file)
+      (error (format "%s is not under version control." file)))
+    (unless (stringp revision)
+      (setq revision
+            (vc-read-revision
+             (format
+              "Revision (default %s's working revision): " (file-name-nondirectory file))
+             (list file))))
+    (when (string= revision "")
+      (setq revision nil))
+    (set-buffer (find-file-noselect file))
+    (switch-to-buffer (vc-find-revision file revision)))
 
 ;; magit-mode
 (autoload 'magit-status "magit" nil t)
 
-(defun insert-file-name (filename)
-  (interactive "*fInsert file name: ")
-  (insert filename))
-
-(defun insert-file-name-abs (filename)
-  (interactive "*fInsert file name: ")
-  (insert (expand-file-name filename)))
-
-(require 'window-control)
-
-(require 'other-windows-plus)
+;; uniquify
+(when (featurep 'uniquify)
+  (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
+  (setq uniquify-ignore-buffers-re "*[^*]+*"))
 
 ;; auto-elc
 (autoload 'auto-elc-mode "auto-elc-mode")
 (add-hook 'emacs-lisp-mode-hook
-          '(lambda ()
-             (auto-elc-mode 1)))
+  '(lambda () (auto-elc-mode 1)))
 
 ;; *compilation*バッファをスクロールして表示
 (setq compilation-scroll-output 1)
@@ -282,7 +287,7 @@
 ;; "Buffer has a runnig process.; kill it?"
 ;; のプロンプト表示を抑制する。
 (defun set-process-not-running-child-noquery-on-exit (proc)
-  (if (and proc (string= (process-name proc) "shell"))
+  (when (and proc (string= (process-name proc) "shell"))
       (set-process-query-on-exit-flag proc (process-running-child-p proc))))
 
 (defadvice kill-buffer (before my-set-process-query activate)
@@ -292,14 +297,13 @@
   (dolist (proc (process-list))
     (set-process-not-running-child-noquery-on-exit proc)))
 
-
 ;; dired
 (add-hook
  'dired-load-hook
  (lambda ()
    ;; 確認なしにディレクトリーを再帰的にコピーする
    (setq dired-recursive-copies 'always)
-   ;; sorter - diredでのソート
+   ;; sorter - diredでのソートo
    (load "sorter")
    ;; dired-x - diredの拡張機能
    (load "dired-x")
@@ -350,53 +354,12 @@
 (autoload 'bison-mode "bison-mode")
 
 (add-hook 'bison-mode-hook
-          '(lambda ()
-             (setq bison-decl-token-column 0)
-             (setq bison-rule-enumeration-column 8)))
+  '(lambda ()
+     (setq bison-decl-token-column 0)
+     (setq bison-rule-enumeration-column 8)))
 
 ;; flex-mode
 (autoload 'flex-mode "flex-mode")
-
-;; Mew
-(autoload 'mew "mew" nil t)
-(autoload 'mew-send "mew" nil t)
-;(eval-after-load "mew" '(require 'mew-browse))
-
-(declare-function mew-path-to-folder "mew-func" (PATH))
-(declare-function mew-summary-visit-folder "mew-summary4" (FOLDER &optional GOEND NO-LS))
-(declare-function mew-summary-move-and-display "mew-exec" (MSG &optional REDISPLAY))
-
-;; mewメッセージファイルの開き方
-;; Spotlightから.mewファイルを開けるようにする
-(defun mew-open-mesg ()
-  (interactive)
-  (let ((mew-auto-get nil)
-        (fld (mew-path-to-folder
-              (directory-file-name (file-name-directory (buffer-file-name)))))
-        (mes (file-name-sans-extension
-              (file-name-nondirectory (buffer-file-name)))))
-    (mew)
-    (mew-summary-visit-folder fld)
-    (mew-summary-move-and-display mes)))
-
-(if (boundp 'read-mail-command)
-    (setq read-mail-command 'mew))
-
-(autoload 'mew-user-agent-compose "mew" nil t)
-
-(if (boundp 'mail-user-agent)
-    (setq mail-user-agent 'mew-user-agent))
-
-(if (fboundp 'define-mail-user-agent)
-    (define-mail-user-agent
-      'mew-user-agent
-      'mew-user-agent-compose
-      'mew-draft-send-message
-      'mew-draft-kill
-      'mew-send-hook))
-
-;; web-mode
-(require 'web-mode)
 
 ;; 色の設定
 (custom-set-faces
@@ -408,31 +371,32 @@
  '(web-mode-html-tag-face ((t (:foreground "#E6B422" :weight bold))))
  '(web-mode-server-comment-face ((t (:foreground "#D9333F")))))
 
-;; nxml-mode
-(require 'nxml-mode)
-
 ;; mmm-mode
-(load-library "mmm-mode")
-
 (require 'mmm-auto)
 
 (setq mmm-global-mode 'maybe)
+
 (setq mmm-submode-decoration-level 3)
 
 (set-face-background 'mmm-default-submode-face "#f0f0ff")
 
+;;
 (mmm-add-classes
  '((embedded-css
     :submode css-mode
     :front "<style[^>]*>\n"
     :back "\n?[ \t]+</style>")))
+
+;;
 (mmm-add-mode-ext-class nil "\\.html?\\'" 'embedded-css)
 
+;;
 (mmm-add-classes
  '((html-javascript
     :submode javascript-mode
     :front "<script[^>]*>\n"
     :back "[ \t]+</script>")))
+
 (mmm-add-mode-ext-class nil "\\.html?\\'" 'html-javascript)
 
 ;; image-mode
@@ -447,26 +411,18 @@
 (setq user-mail-address "j8takagi@nifty.com")
 (setq change-log-default-name "~/ChangeLog")
 
-;; graphviz mode
-(load "graphviz-dot-mode")
-
-;; ESS
-(require 'ess-site)
 (autoload 'R-mode "ess-site" "Emacs Speaks Statistics mode" t)
+
 ;; R起動時にワーキングディレクトリを訊ねない
 (setq ess-ask-for-ess-directory nil)
 
 ;; CSV mode
 (autoload 'csv-mode "csv-mode" "Major mode for editing comma-separated value files." t)
 
-;; Mediawiki
-(require 'mediawiki)
 (add-hook 'mediawiki-mode-hook
           '(lambda ()
              (define-key mediawiki-mode-map "\C-x\C-s" 'save-buffer)))
 
-;; exopen-mode 外部プログラムでファイルを開く
-(require 'exopen-mode)
 
 ;; tex-mode
 (add-hook 'tex-mode-hook
@@ -482,9 +438,6 @@
   "Display hexadecimal color codes, and show what they look like." t)
 (defalias 'color-selection 'list-hexadecimal-colors-display)
 
-;; igrep
-(require 'igrep)
-
 ;; svg-clock
 (autoload 'svg-clock "svg-clock" "Start/stop svg-clock" t)
 
@@ -494,19 +447,12 @@
 
 (add-to-list 'interpreter-mode-alist '("ruby" . ruby-mode))
 
-(load "inf-ruby")
-
 ;; rubydb - ruby debugger
 (autoload 'rubydb "rubydb3x" "ruby debug" t)
 
 ;; Riece IRC client
 (autoload 'riece "riece" "Start Riece" t)
 
-;; 濁点分離を直す
-;; 参考：
-;; http://d.hatena.ne.jp/nakamura001/20120529/1338305696 
-;; http://www.sakito.com/2010/05/mac-os-x-normalization.html
-(require 'ucs-normalize)
 (prefer-coding-system 'utf-8-hfs)
 (setq file-name-coding-system 'utf-8-hfs)
 (setq locale-coding-system 'utf-8-hfs)
@@ -524,16 +470,6 @@
           (lambda ()
             (setq Info-additional-directory-list Info-default-directory-list)
             ))
-
-;; flex-autopair
-(require 'flex-autopair)
-(flex-autopair-mode 1)
-
-;; javadoc-style-comment-mode
-(require 'javadoc-style-comment-mode)
-
-;; eukleides.el
-(require 'eukleides)
 
 ;; magic-mode-alist
 (add-to-list 'magic-mode-alist '("<![Dd][Oo][Cc][Tt][Yy][Pp][Ee] [Hh][Tt][Mm][Ll]" . web-mode))
@@ -598,7 +534,12 @@
 (global-unset-key (kbd "C-x C-d"))
 (global-unset-key (kbd "C-x 4 0"))
 
+;; OSごとの設定
+(case system-type
+  ('gnu/linux (require 'init-linux)))
+
 ; Windowシステムごとの設定
-(if (eq window-system 'ns) (load "init-mac"))
-(if (eq window-system 'x) (load "init-x"))
-(if (eq window-system 'w32) (load "init-w32"))
+(case window-system
+  ('ns (require 'init-mac))
+  ('x (require 'init-x))
+  ('w32 (require 'init-w32)))

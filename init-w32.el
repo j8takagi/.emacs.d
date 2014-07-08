@@ -39,3 +39,5 @@
 
 ;; 日本語ファイル名を正常に処理するための設定
 (setq default-file-name-coding-system 'shift_jis)
+
+(provide 'init-w32)

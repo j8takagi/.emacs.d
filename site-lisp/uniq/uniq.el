@@ -74,3 +74,5 @@
             (funcall add-line (thing-at-point 'line))
             (forward-line))))
       (widen))))
+
+(provide 'uniq)

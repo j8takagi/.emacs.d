@@ -1,6 +1,5 @@
 ;;;-*-Emacs-Lisp-*-
 ;;; Linuxの設定
-(provide 'init-linux)
 
 ;; Emacs変数exec-pathに、環境変数PATHの内容を設定
 (setq exec-path nil)
@@ -21,4 +20,4 @@
 ;; ターミナルの文字コード UTF-8
 (set-terminal-coding-system 'utf-8)
 
-(global-unset-key "\C-\\")
+(provide 'init-linux)
