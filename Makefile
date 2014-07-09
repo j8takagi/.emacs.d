@@ -1,33 +1,28 @@
-INSTALL = install
-RSYNC := rsync
-RSYNCFLAG := -avz --delete
-RMR := $(RM) -R
 ECHO := echo
 EMACS := emacs
 FIND := find
-
-KERNEL := $(shell uname)
-
-ifeq ($(KERNEL),Linux)
-  init-files := init.el init-linux.el init-x.el
-endif
-ifeq ($(KERNEL),Darwin)
-  init-files := init.el init-mac.el
-endif
+INSTALL = install
+MKDIR := mkdir
+RMR := $(RM) -R
+RSYNC := rsync
+RSYNCFLAG := -avz --delete
 
 emacs-dir := ~/.emacs.d
 
-.PHONY: all init site-lisp install-init install-site-lisp
+.PHONY: all init site-lisp install install-init.d install-init.sys.d install-site-lisp
 
-all: init site-lisp
+all: init init.d init.sys.d site-lisp
 
-init: $(addsuffix c,$(init-files))
+init: init.elc
+
+init.d:
+	$(MAKE) -C $@
+
+init.sys.d:
+	$(MAKE) -C $@
 
 site-lisp:
-	$(MAKE) -C site-lisp
-
-$(emacs-dir):
-	$(INSTALL) -d $(emacs-dir)
+	$(MAKE) -C $@
 
 get-elpa:
 	$(RSYNC) $(RSYNCFLAG) $(emacs-dir)/elpa/ elpa/
@@ -35,21 +30,38 @@ get-elpa:
 elpa:
 	$(EMACS) -batch -l recompile-elpa.el
 
-install: install-init install-site-lisp
+install: install-init install-init.d install-init.sys.d install-site-lisp
 
-install-init: ~/.emacs.d
-	$(RSYNC) $(RSYNCFLAG) $(init-files) $(addsuffix c,$(init-files)) $(emacs-dir)/
+install-init: ~/.emacs.d init
+	$(RSYNC) $(RSYNCFLAG) init.el init.elc $(emacs-dir)/
 
-install-site-lisp: ~/.emacs.d
+install-init.d: init.d
+	$(MAKE) -C init.d install
+
+install-init.sys.d: init.sys.d
+	$(MAKE) -C init.sys.d install
+
+install-site-lisp: ~/.emacs.d/site-lisp
 	$(MAKE) -C site-lisp install
 
-install-elpa: elpa ~/.emacs.d
+install-elpa: elpa ~/.emacs.d/elpa
 	$(RSYNC) $(RSYNCFLAG) elpa/* $(emacs-dir)/elpa/
 
-clean: clean-init
-	$(MAKE) -C site-lisp clean
+$(emacs-dir):
+	$(MKDIR) $@
+
+clean: clean-init clean-init.d clean-init.sys.d clean-site-lisp
 
 clean-init:
 	$(RM) *.elc
+
+clean-init.d:
+	$(MAKE) -C init.d clean
+
+clean-init.sys.d:
+	$(MAKE) -C init.sys.d clean
+
+clean-site-lisp:
+	$(MAKE) -C site-lisp clean
 
 include emacslisp.mk

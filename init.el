@@ -1,49 +1,86 @@
 ;;;-*-Emacs-Lisp-*-
 ;; for emacs 24.3
-;;
-;; パッケージは、~/.emacs.dディレクトリーのelpaとsite-lispで管理
 
 ;; load-pathを追加し、subdirs.elがある場合は読み込む
 (dolist
     (path
      '(
        "~/.emacs.d"
+       "~/.emacs.d/init.d"
+       "~/.emacs.d/init.sys.d"
        "~/.emacs.d/site-lisp"
        ))
   (let ((default-directory (expand-file-name path)))
     (add-to-list 'load-path default-directory)
     (when (file-exists-p "subdirs.el")
-        (load-library "subdirs"))))
+      (load-library "subdirs"))))
 
-;; ライブラリ読み込み
+;; ライブラリを読み込む
 (dolist
     (feat
      '(
        ;; /usr/local/share/emacs/24.3/lisp
-       ediff nxml-mode uniquify vc whitespace
+       ediff
+       uniquify
+       vc
+       whitespace
        ;; ~/.emacs.d/site-lisp
-       eukleides exopen-mode flex-autopair graphviz-dot-mode
-       javadoc-style-comment-mode other-windows-plus
-       ucs-normalize uniq window-control
+       auto-elc-mode
+       count-japanese
+       exopen-mode
+       flex-autopair
+       insert-file-name
+       javadoc-style-comment-mode
+       mediawiki
+       other-windows-plus
+       scroll-one-line
+       temp-buffer
+       ucs-normalize
+       uniq
+       window-control
+       ;; package
+       package
        ))
   (if (not (locate-library (symbol-name feat)))
       (message "%s: not found." feat)
     (require feat)))
 
-;; パッケージを使う
-(require 'package)
+(eval-after-load "package"
+  '(progn
+     ;; パッケージアーカイブ追加
+    (dolist
+        (pack
+         '(
+           ("marmalade" . "http://marmalade-repo.org/packages/")
+           ("melpa" . "http://melpa.milkbox.net/packages/")
+           ))
+      (add-to-list 'package-archives pack))
+    ;; パッケージ初期化
+    (package-initialize)))
 
-;; パッケージアーカイブ追加
+;; autoloadの設定
 (dolist
-    (pack
+    (list
      '(
-       ("marmalade" . "http://marmalade-repo.org/packages/")
-       ("melpa" . "http://melpa.milkbox.net/packages/")
+       (R-mode "ess-site" "Emacs Speaks Statistics mode")
+       (bison-mode "bison-mode" "Major mode for editing bison/yacc files")
+       (css-mode "css-mode" "Cascading Style Sheets (CSS) editing mode")
+       (csv-mode "csv-mode" "Major mode for editing comma-separated value files.")
+       (eukleides-mode "eukleides" "Major mode for editing Eukleides files")
+       (flex-mode "flex-mode" "Major mode for editing flex files")
+       (graphviz-dot-mode "graphviz-dot-mode" "Major mode for the dot language")
+       (gtags-mode "gtags" "Toggle Gtags mode, a minor mode for browsing source code using GLOBAL.")
+       (list-hexadecimal-colors-display "color-selection" "Display hexadecimal color codes, and show what they look like.")
+       (magit-status "magit" "Interface to the version control system Git")
+       (nxml-mode "nxml-mode" "Major mode for editing XML")
+       (ruby-mode "ruby-mode" "Mode for editing ruby source files")
+       (rubydb "rubydb3x" "ruby debug")
+       (svg-clock "svg-clock" "Start/stop svg-clock")
        ))
-    (add-to-list 'package-archives pack))
-
-; パッケージ初期化
-(package-initialize)
+  (let ((func (car list)) (file (nth 1 list)) (doc (nth 2 list)))
+    (if (not (locate-library file))
+        (message "%s: not found." file)
+      (autoload func file doc t))))
 
 ;; session
 (add-hook 'after-init-hook 'session-initialize)
@@ -133,18 +170,25 @@
 ;; 1行ずつスクロール
 (setq scroll-conservatively 1)
 
-;; バックアップファイルは、~/backupに格納
-(setq backup-dir (expand-file-name "~/backup"))
+;; バックアップファイルを作成する
+(setq make-backup-files 1)
 
-(if (not (file-exists-p backup-dir))
-    (message "backup-dir %s is not exist." backup-dir)
-  (setq backup-directory-alist `(("." . ,backup-dir)))
-  (setq make-backup-files t)
-  (setq version-control t)
-  (setq delete-old-versions t))
+;; バックアップファイルは、~/backupに格納
+(let ((dir
+       "~/backup"
+       ))
+  (if (not (file-exists-p (expand-file-name dir)))
+      (message "backup directory %s is not exist." dir)
+    (setq backup-directory-alist `(("." . ,dir)))))
+
+;; バックアップファイルにバージョン番号を付ける
+(setq version-control 1)
+
+;; 古いバックアップファイルを自動的に削除する
+(setq delete-old-versions 1)
 
 ;; インデント
-(setq indent-line-function 'tab-to-tab-stop)
+(setq-default indent-line-function 'tab-to-tab-stop)
 
 ;; 圧縮されたファイルを直接編集する
 (auto-compression-mode)
@@ -152,394 +196,235 @@
 ;; kill-lineのとき、改行も含めて切り取り
 (setq kill-whole-line t)
 
-;; kill-ring
+;; yank-popを有効にする
 (setq yank-pop-change-selection t)
 
-(defun insert-file-name (filename)
-  (interactive "*fInsert file name: ")
-  (insert filename))
-
-(defun insert-file-name-abs (filename)
-  (interactive "*fInsert file name: ")
-  (insert (expand-file-name filename)))
-
-;; 1行上へスクロール
-(defun scroll-up-one-line ()
-  (interactive)
-  (scroll-up 1))
-
-;; 1行下へスクロール
-(defun scroll-down-one-line ()
-  (interactive)
-  (scroll-down 1))
-
-;; 日本語を数える
-(defun count-japanese ()
-  (interactive)
-  (message "日本語の文字数: %d字" (how-many "\\cj" (point-min) (point-max))))
-
-;; テンポラリバッファを開く
-(defun switch-to-temp-buffer ()
-  "Create temporary buffer."
-  (interactive)
-  ;; バッファ名は現在の日時
-  (switch-to-buffer
-   (generate-new-buffer
-    (concat "*" (replace-regexp-in-string " +" "_" (current-time-string)) "*"))
-  (setq buffer-offer-save nil)))
-
 ;; whitespace
-(when (featurep 'whitespace)
-  (setq whitespace-style '(face tabs spaces trailing)) ;  タブ
-  (setq whitespace-space-regexp "\\(　\\)")     ;　全角スペース
-  (setq whitespace-trailing-regexp "\\( +$\\)") ;行末の空白    
+(eval-after-load "whitespace"
+  '(load-library "init-whitespace"))
 
-  (set-face-attribute whitespace-tab nil :box "navy" :background (background-color-at-point))
-  (set-face-attribute whitespace-space nil :box "orange" :background (background-color-at-point))
-  (set-face-attribute whitespace-trailing nil
-    :foreground "navy" :background (background-color-at-point) :underline "navy")
-
-  ;; whitespaceを無効にするメジャーモード
-  (defvar whitespace-disabled-major-mode-list)
-  (setq whitespace-disabled-major-mode-list
-    '(mew-summary-mode completion-list-mode help-mode
-    magit-mode tetris-mode w3m-mode mew-message-mode))
-
-  ;; メジャーモード設定後、バッファーが読み取り専用でない場合はwhitespaceを有効にする
-  (add-hook 'after-change-major-mode-hook
-    '(lambda ()
-      (unless (or buffer-read-only (member major-mode whitespace-disabled-major-mode-list))
-        (whitespace-mode 1)))))
+;; バッファ全体の濁点分離を直す
+(eval-after-load "ucs-normalize"
+  '(load-library "init-nfc"))
 
 ;; Ediff
-(if (not (featurep 'ediff))
-    (message "ediff is not loaded.")
-  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
-
-  (declare-function ediff-vc-internal "ediff-vers" (REV1 REV2 &optional STARTUP-HOOKS))
-
-  (defun ediff-vc-latest-current ()
-    "Run Ediff of buffer file by comparing the latest and current."
-    (interactive)
-    (let ((file) (state))
-      (setq file (buffer-file-name))
-      (unless file
-        (error "buffer not visiting file"))
-      (setq state (vc-state file))
-      (if (member state '(up-to-date added))
-          (message "%s: %s" file state)
-        (ediff-load-version-control)
-        (ediff-vc-internal "" "")))))
-
-  (defun find-file-revision (&optional file revision)
-    "find-file FILE REVISION.
-Input FILE first, REVISION then.
-Or, input FILE as 'FILE.~REVISON~' and FILE and REVISION is specified."
-    (interactive "P")
-    (unless (stringp file)
-      (setq file (expand-file-name (read-file-name "Find version controled file: "))))
-    ;; find-file FILE REVISION by 'FILE.~REVISION~'."
-    (when (string-match "\\(.+\\)\\.~\\(.+\\)~$" file)
-      (setq revision (substring file (match-beginning 2) (match-end 2)))
-      (setq file (substring file (match-beginning 1) (match-end 1))))
-    (unless (vc-backend file)
-      (error (format "%s is not under version control." file)))
-    (unless (stringp revision)
-      (setq revision
-            (vc-read-revision
-             (format
-              "Revision (default %s's working revision): " (file-name-nondirectory file))
-             (list file))))
-    (when (string= revision "")
-      (setq revision nil))
-    (set-buffer (find-file-noselect file))
-    (switch-to-buffer (vc-find-revision file revision)))
-
-;; magit-mode
-(autoload 'magit-status "magit" nil t)
+(eval-after-load "ediff"
+  '(load-library "init-ediff"))
 
 ;; uniquify
-(when (featurep 'uniquify)
-  (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
-  (setq uniquify-ignore-buffers-re "*[^*]+*"))
+(eval-after-load "uniquify"
+  '(progn
+     (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
+     (setq uniquify-ignore-buffers-re "*[^*]+*")))
 
 ;; auto-elc
-(autoload 'auto-elc-mode "auto-elc-mode")
-(add-hook 'emacs-lisp-mode-hook
-  '(lambda () (auto-elc-mode 1)))
+(eval-after-load "auto-elc"
+  '(add-hook 'emacs-lisp-mode-hook '(turn-on-auto-elc)))
 
 ;; *compilation*バッファをスクロールして表示
-(setq compilation-scroll-output 1)
+(eval-after-load "compile"
+  '(setq compilation-scroll-output 1))
 
-;; lisp-interaction-mode, emacs-lisp-mode
 ;; M-<return> でLisp補完
-(define-key lisp-interaction-mode-map (kbd "<M-return>") 'lisp-complete-symbol)
-(define-key emacs-lisp-mode-map (kbd "<M-return>") 'lisp-complete-symbol)
+(define-key lisp-mode-shared-map (kbd "<M-return>") 'lisp-complete-symbol)
+
+;; lisp-modeでのタブの設定
+(add-hook 'lisp-mode-hook
+          '(lambda ()
+             (setq indent-line-function 'lisp-indent-line)))
 
 ;; shell-mode
-(add-hook 'shell-mode-hook
- '(lambda ()
-    (setq shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ")
-    (setq tab-width 4)))
-
-;; 引数で指定されたプロセスの名前が shell で子プロセスがない場合は、
-;; process-query-on-exit-flag を nil に設定し、
-;; "Buffer has a runnig process.; kill it?"
-;; のプロンプト表示を抑制する。
-(defun set-process-not-running-child-noquery-on-exit (proc)
-  (when (and proc (string= (process-name proc) "shell"))
-      (set-process-query-on-exit-flag proc (process-running-child-p proc))))
-
-(defadvice kill-buffer (before my-set-process-query activate)
-  (set-process-not-running-child-noquery-on-exit (get-buffer-process (current-buffer))))
-
-(defadvice save-buffers-kill-terminal (before my-set-process-query activate)
-  (dolist (proc (process-list))
-    (set-process-not-running-child-noquery-on-exit proc)))
+(eval-after-load "shell"
+  '(progn
+     (setq shell-prompt-pattern
+           "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ")
+     (load-library "init-shell")))
 
 ;; dired
-(add-hook
- 'dired-load-hook
- (lambda ()
-   ;; 確認なしにディレクトリーを再帰的にコピーする
-   (setq dired-recursive-copies 'always)
-   ;; sorter - diredでのソートo
-   (load "sorter")
-   ;; dired-x - diredの拡張機能
-   (load "dired-x")
-   ;; wdired - ファイル名の編集を可能にする
-   (require 'wdired)
-   ;;
-   (put 'dired-find-alternate-file 'disabled nil)
-   ;; ediff
-   (defun dired-ediff-vc-latest-current ()
-     "Run Ediff of file named on this line by comparing the latest version and current."
-     (interactive)
-     (let ((find-file-run-dired nil))
-       (find-file (dired-get-file-for-visit))
-       (ediff-vc-latest-current)))
-   ;; image-dired
-   (require 'image-dired)
-   ;; ediff-revison
-   (define-key dired-mode-map "\C-cw" 'wdired-change-to-wdired-mode)
-   (define-key dired-mode-map "E" 'dired-ediff-vc-latest-current)
-   (define-key dired-mode-map "\C-ce" 'ediff-revision)))
+(add-hook 'dired-load-hook '(load-library "init-dired"))
 
 (dolist
     (ext
      '(".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" ".aux_prev"
        ".toc_prev" ".lot_prev" ".lof_prev" ".bbl_prev" ".out_prev"
        ".idx" ".ind" ".idx_prev" ".ind_prev" ".ilg"))
-     (add-to-list 'completion-ignored-extensions ext))
+  (add-to-list 'completion-ignored-extensions ext))
 
 ;;; CC-Mode
-(add-hook 'c-mode-common-hook
-          '(lambda ()
-             (setq c-default-style "k&r")
-             (setq c-basic-offset 4)
-             (setq indent-tab-mode nil)
-             (gtags-mode 1)))
-
-;; find documentation on GNU MP functions in programing C
-(eval-after-load "info-look"
-  '(let ((mode-value (assoc 'c-mode (assoc 'symbol info-lookup-alist))))
-     (setcar (nthcdr 3 mode-value)
-             (cons '("(gmp)Function Index" nil "^ -.* " "\\>")
-                   (nth 3 mode-value)))))
-
-;; gtags-mode: GNU GLOBAL
-(autoload 'gtags-mode "gtags" "" t)
+(eval-after-load "cc-mode"
+  '(progn
+     (setq c-default-style "k&r")
+     (setq c-basic-offset 4)
+     (gtags-mode 1)
+     (load-library "gnu-mp")))
 
 ;; bison-mode
-(autoload 'bison-mode "bison-mode")
+(eval-after-load "bison"
+  '(progn
+    (setq bison-decl-token-column 0)
+    (setq bison-rule-enumeration-column 8)))
 
-(add-hook 'bison-mode-hook
-  '(lambda ()
-     (setq bison-decl-token-column 0)
-     (setq bison-rule-enumeration-column 8)))
-
-;; flex-mode
-(autoload 'flex-mode "flex-mode")
-
-;; 色の設定
-(custom-set-faces
- '(web-mode-indent-style 1)
- '(web-mode-comment-face ((t (:foreground "#D9333F"))))
- '(web-mode-doctype-face ((t (:foreground "#82AE46"))))
- '(web-mode-html-attr-name-face ((t (:foreground "#C97586"))))
- '(web-mode-html-attr-value-face ((t (:foreground "#82AE46"))))
- '(web-mode-html-tag-face ((t (:foreground "#E6B422" :weight bold))))
- '(web-mode-server-comment-face ((t (:foreground "#D9333F")))))
+;; web-mode
+(eval-after-load "web-mode"
+  '(load-library "init-web-mode"))
 
 ;; mmm-mode
-(require 'mmm-auto)
-
-(setq mmm-global-mode 'maybe)
-
-(setq mmm-submode-decoration-level 3)
-
-(set-face-background 'mmm-default-submode-face "#f0f0ff")
-
-;;
-(mmm-add-classes
- '((embedded-css
-    :submode css-mode
-    :front "<style[^>]*>\n"
-    :back "\n?[ \t]+</style>")))
-
-;;
-(mmm-add-mode-ext-class nil "\\.html?\\'" 'embedded-css)
-
-;;
-(mmm-add-classes
- '((html-javascript
-    :submode javascript-mode
-    :front "<script[^>]*>\n"
-    :back "[ \t]+</script>")))
-
-(mmm-add-mode-ext-class nil "\\.html?\\'" 'html-javascript)
+(eval-after-load "mmm-auto"
+  '(load-library "init-mmm"))
 
 ;; image-mode
-(setq image-file-name-extensions '("svg" "png" "jpeg" "jpg" "gif" "tiff" "tif"))
+(setq image-file-name-extensions
+      '("svg" "png" "jpeg" "jpg" "gif" "tiff" "tif"))
 
 ;; css-mode
-(autoload 'css-mode "css-mode")
-(setq cssm-indent-function #'cssm-c-style-indenter)
+(eval-after-load "css-mode"
+  '(setq cssm-indent-function #'cssm-c-style-indenter))
 
 ;; ChangeLog
-(setq user-full-name "高木和人")
-(setq user-mail-address "j8takagi@nifty.com")
-(setq change-log-default-name "~/ChangeLog")
+(setq user-full-name "Kazuhito Takagi")
 
-(autoload 'R-mode "ess-site" "Emacs Speaks Statistics mode" t)
+(setq user-mail-address "j8takagi@nifty.com")
+
+(eval-after-load "add-log"
+  '(setq change-log-default-name "~/ChangeLog"))
 
 ;; R起動時にワーキングディレクトリを訊ねない
-(setq ess-ask-for-ess-directory nil)
+(eval-after-load "ess-site"
+  '(setq ess-ask-for-ess-directory nil))
 
-;; CSV mode
-(autoload 'csv-mode "csv-mode" "Major mode for editing comma-separated value files." t)
-
-(add-hook 'mediawiki-mode-hook
-          '(lambda ()
-             (define-key mediawiki-mode-map "\C-x\C-s" 'save-buffer)))
-
+;; mediawiki
+(eval-after-load "mediawiki"
+  '(define-key mediawiki-mode-map (kbd "C-x C-s") 'save-buffer))
 
 ;; tex-mode
-(add-hook 'tex-mode-hook
-          '(lambda ()
-             (setq skeleton-pair 1)
-             (define-key latex-mode-map "\C-cpp" 'exopen-buffer-pdffile)
-             (define-key latex-mode-map "\C-cpd" 'exopen-buffer-dvifile)))
-
-(add-hook 'latex-mode-hook 'turn-on-reftex)
+(eval-after-load "tex-mode"
+  '(progn
+    (define-key latex-mode-map (kbd "C-c p p") 'exopen-buffer-pdffile)
+    (define-key latex-mode-map (kbd "C-c p d") 'exopen-buffer-dvifile)
+    (add-hook 'latex-mode-hook 'turn-on-reftex)))
 
 ;; color-selection
-(autoload 'list-hexadecimal-colors-display "color-selection"
-  "Display hexadecimal color codes, and show what they look like." t)
-(defalias 'color-selection 'list-hexadecimal-colors-display)
+(eval-after-load "color-selection"
+  '(defalias 'color-selection 'list-hexadecimal-colors-display))
 
-;; svg-clock
-(autoload 'svg-clock "svg-clock" "Start/stop svg-clock" t)
-
-;; ruby-mode
-(autoload 'ruby-mode "ruby-mode"
-  "Mode for editing ruby source files" t)
-
-(add-to-list 'interpreter-mode-alist '("ruby" . ruby-mode))
-
-;; rubydb - ruby debugger
-(autoload 'rubydb "rubydb3x" "ruby debug" t)
-
-;; Riece IRC client
-(autoload 'riece "riece" "Start Riece" t)
-
-(prefer-coding-system 'utf-8-hfs)
-(setq file-name-coding-system 'utf-8-hfs)
-(setq locale-coding-system 'utf-8-hfs)
-
-(defun ucs-normalize-NFC-buffer ()
-  (interactive)
-  (ucs-normalize-NFC-region (point-min) (point-max)))
+;; Ruby
+(eval-after-load "ruby-mode"
+  '(add-to-list 'interpreter-mode-alist '("ruby" . ruby-mode)))
 
 ;; text-modeで<M-tab>でのispell起動を無効に
-(add-hook 'text-mode-hook
-          (lambda ()
-            (local-unset-key (kbd "C-M-i"))))
+(eval-after-load "text-mode"
+  '(define-key text-mode-map (kbd "C-M-i") nil))
 
-(add-hook 'Info-mode-hook       ; After Info-mode has started
-          (lambda ()
-            (setq Info-additional-directory-list Info-default-directory-list)
+;; Info
+(eval-after-load "info"
+  '(progn
+     (dolist
+         (path
+          '(
+            "/usr/local/share/info/ja"
+            "~/share/info"
             ))
+       (add-to-list 'Info-default-directory-list (expand-file-name path)))
+     (setq Info-additional-directory-list Info-default-directory-list)))
 
 ;; magic-mode-alist
-(add-to-list 'magic-mode-alist '("<![Dd][Oo][Cc][Tt][Yy][Pp][Ee] [Hh][Tt][Mm][Ll]" . web-mode))
-(add-to-list 'magic-mode-alist '("<\\?xml " . nxml-mode))
+(dolist
+    (alist
+     '(
+       ("<![Dd][Oo][Cc][Tt][Yy][Pp][Ee] [Hh][Tt][Mm][Ll]" . web-mode)
+       ("<\\?xml " . nxml-mode)
+       ))
+  (let ((mode (cdr alist)))
+    (if (not (functionp mode))
+        (message "magic-mode-alist: %s is not defined." mode)
+      (add-to-list 'magic-mode-alist mode))))
 
 ;; auto-mode-alist
-(add-to-list 'auto-mode-alist '("[Mm]akefile$". makefile-gmake-mode))
-(add-to-list 'auto-mode-alist '("\.d$". makefile-gmake-mode))
-(add-to-list 'auto-mode-alist '("\.mk$". makefile-gmake-mode))
-(add-to-list 'auto-mode-alist '("\\.[Cc][Ss][Vv]\\'" . csv-mode))
-(add-to-list 'auto-mode-alist '("\\.[rR]$" . R-mode))
-(add-to-list 'auto-mode-alist '("\\.casl?$" . asm-mode))
-(add-to-list 'auto-mode-alist '("\\.css$" . css-mode))
-(add-to-list 'auto-mode-alist '("\\.euk$" . eukleides-mode))
-(add-to-list 'auto-mode-alist '("\\.gv$" . graphviz-dot-mode))
-(add-to-list 'auto-mode-alist '("\\.html?$" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.js$" . js-mode))
-(add-to-list 'auto-mode-alist '("\\.ll?$" . flex-mode))
-(add-to-list 'auto-mode-alist '("\\.mew$" . mew-open-mesg))
-(add-to-list 'auto-mode-alist '("\\.svg$" . nxml-mode))
-(add-to-list 'auto-mode-alist '("\\.wiki$" . mediawiki-mode))
-(add-to-list 'auto-mode-alist '("\\.xml$" . nxml-mode))
-(add-to-list 'auto-mode-alist '("\\.y?rb$" . ruby-mode))
-(add-to-list 'auto-mode-alist '("\\.yy?$" . bison-mode))
-(add-to-list 'auto-mode-alist '("^ja.wikipedia.org/w/index.php" . mediawiki-mode))
+(dolist
+    (alist
+     '(
+       ("^\(GNU\)?[Mm]akefile". makefile-gmake-mode)
+       ("\.d$". makefile-gmake-mode)
+       ("\.mk$". makefile-gmake-mode)
+       ("\\.[Cc][Ss][Vv]\\'" . csv-mode)
+       ("\\.[rR]$" . R-mode)
+       ("\\.casl?$" . asm-mode)
+       ("\\.css$" . css-mode)
+       ("\\.euk$" . eukleides-mode)
+       ("\\.gv$" . graphviz-dot-mode)
+       ("\\.html?$" . web-mode)
+       ("\\.js$" . js-mode)
+       ("\\.ll?$" . flex-mode)
+       ("\\.svg$" . nxml-mode)
+       ("\\.wiki$" . mediawiki-mode)
+       ("\\.xml$" . nxml-mode)
+       ("\\.y?rb$" . ruby-mode)
+       ("\\.yy?$" . bison-mode)
+       ("^ja.wikipedia.org/w/index.php" . mediawiki-mode)
+       ))
+  (let ((mode (cdr alist)))
+    (if (not (functionp mode))
+        (message "auto-mode-alist: %s is not defined." mode)
+      (add-to-list 'auto-mode-alist alist))))
 
 ;; global-key
-(global-set-key (kbd "<M-down>")  'windmove-down)             ; ウィンドウ移動
-(global-set-key (kbd "<M-left>")  'windmove-left)             ; ウィンドウ移動
-(global-set-key (kbd "<M-return>") 'expand-abbrev)
-(global-set-key (kbd "<M-right>") 'windmove-right)            ; ウィンドウ移動
-(global-set-key (kbd "<M-up>")    'windmove-up)               ; ウィンドウ移動
-(global-set-key (kbd "C-,") 'scroll-up-one-line)              ; 1行上へスクロール
-(global-set-key (kbd "C-.") 'scroll-down-one-line)            ; 1行下へスクロール
-(global-set-key (kbd "C-c C-c") 'comment-region)              ; コメントを付ける
-(global-set-key (kbd "C-c C-u") 'uncomment-region)            ; コメントを外す
-(global-set-key (kbd "C-c C-v") 'view-mode)                   ; View mode
-(global-set-key (kbd "C-c c") 'compile)                       ; make
-(global-set-key (kbd "C-c g") 'magit-status)                  ; magit
-(global-set-key (kbd "C-c i") 'insert-file-name)              ; ファイル名を挿入する
-(global-set-key (kbd "C-c I") 'insert-file-name-abs)          ; ファイルのフルパスを挿入する
-(global-set-key (kbd "C-c t") 'switch-to-temp-buffer)         ; テンポラリバッファを開く
-(global-set-key (kbd "C-c w t") 'whitespace-toggle-options)   ; whitespace-toggle-options
-(global-set-key (kbd "C-c w w") 'whitespace-mode)             ; whitespace-mode
-(global-set-key (kbd "C-h TAB") 'info-lookup-symbol)          ; SYMBOLのInfoを表示
-(global-set-key (kbd "C-j") 'newline)                         ; C-jで、インデントなし改行
-(global-set-key (kbd "C-x '") 'just-one-space)                ; 複数のスペースを1つに
-(global-set-key (kbd "C-x C-e") 'electric-buffer-list)        ; バッファ一覧
-(global-set-key (kbd "C-x K") 'kill-buffer-and-window)        ; 現在のバッファとウィンドウを削除
-(global-set-key (kbd "C-x RET u") 'ucs-normalize-NFC-buffer)  ; バッファ全体の濁点分離を直す
-(global-set-key (kbd "C-x m") 'man)                           ; man
-(global-set-key (kbd "C-x p") 'call-last-kbd-macro)           ; マクロ
-(global-set-key (kbd "C-x v e") 'ediff-vc-latest-current)     ; 最新版と現在のファイルでEdiff
-(global-set-key (kbd "C-x v f") 'find-file-revision)          ; ファイル旧版を開く
-(global-set-key (kbd "M-?") 'help)                            ; ヘルプ
-(global-set-key (kbd "M-[") 'backward-paragraph)              ; 前のパラグラフへ移動
-(global-set-key (kbd "M-]") 'forward-paragraph)               ; 次のパラグラフへ移動
-(global-set-key (kbd "M-g") 'goto-line)                       ; 指定行へジャンプ
-(global-set-key (kbd "M-p") 'call-last-kbd-macro)             ; マクロ
-(global-set-key (kbd "RET") 'newline-and-indent)              ; RETで、インデント付き改行
+(dolist
+    (map
+     '(
+       ("<M-down>" windmove-down)
+       ("<M-left>" windmove-left)
+       ("<M-return>" expand-abbrev)
+       ("<M-right>" windmove-right)
+       ("<M-up>" windmove-up)
+       ("C-," scroll-up-one-line)
+       ("C-." scroll-down-one-line)
+       ("C-c C-c" comment-region)
+       ("C-c C-u" uncomment-region)
+       ("C-c C-v" view-mode)
+       ("C-c I" insert-file-name-abs)
+       ("C-c c" compile)
+       ("C-c g" magit-status)
+       ("C-c i" insert-file-name)
+       ("C-c t" switch-to-temp-buffer)
+       ("C-c w t" whitespace-toggle-options)
+       ("C-c w w" whitespace-mode)
+       ("C-h TAB" info-lookup-symbol)
+       ("C-j" newline)
+       ("C-x '" just-one-space)
+       ("C-x C-e" electric-buffer-list)
+       ("C-x K" kill-buffer-and-window)
+       ("C-x RET u" ucs-normalize-NFC-buffer)
+       ("C-x m" man)
+       ("C-x p" call-last-kbd-macro)
+       ("C-x v e" ediff-vc-latest-current)
+       ("C-x v f" find-file-revision)
+       ("M-?" help)
+       ("M-[" backward-paragraph)
+       ("M-]" forward-paragraph)
+       ("M-g" goto-line)
+       ("M-p" call-last-kbd-macro)
+       ("RET" newline-and-indent)
+       ))
+  (let ((key (car map)) (func (nth 1 map)))
+    (if (not (functionp func))
+        (message "%s is not defined." func)
+      (global-set-key (kbd key) func))))
 
-(global-unset-key (kbd "C-x C-d"))
-(global-unset-key (kbd "C-x 4 0"))
+(dolist
+    (key '("C-x C-d" "C-x 4 0"))
+  (global-unset-key (kbd key)))
 
-;; OSごとの設定
-(case system-type
-  ('gnu/linux (require 'init-linux)))
-
-; Windowシステムごとの設定
-(case window-system
-  ('ns (require 'init-mac))
-  ('x (require 'init-x))
-  ('w32 (require 'init-w32)))
+;; システムごとの設定
+(dolist
+     (list
+     '(
+       (system-type gnu/linux init-linux)
+       (window-system ns init-mac)
+       (window-system x init-x)
+       (window-system w32 init-w32)
+       ))
+   (let ((target (car list)) (sys (nth 1 list)) (feat (nth 2 list)))
+     (when (equal (eval target) sys)
+       (if (not (locate-library (symbol-name feat)))
+           (message "%s: not found." feat)
+         (require feat)))))

@@ -41,7 +41,7 @@
 ;; マイナーモードの定義
 (define-minor-mode auto-elc-mode
 "Toggle auto-elc-mode.
-With a prefix argument ARG, enable Auto Composition mode if ARG
+With a prefix argument ARG, enable Auto elc mode if ARG
 is positive, and disable it otherwise.  If called from Lisp,
 enable the mode if ARG is omitted or nil.
 
@@ -59,6 +59,14 @@ nil " elc" nil
   (interactive)
   (if (equal (file-name-extension (buffer-file-name)) "el")
         (byte-compile-file buffer-file-name auto-elc-load-p)))
+
+(defun turn-on-auto-elc ()
+  "Unconditionally turn on Auto elc mode."
+  (auto-elc-mode 1))
+
+(defun turn-off-auto-elc ()
+  "Unconditionally turn off Auto elc mode."
+  (auto-elc-mode -1))
 
 (provide 'auto-elc-mode)
 ;;; auto-elc-mode.el ends here

@@ -8,6 +8,7 @@
 
 ;; Emacs変数exec-pathに、環境変数PATHの内容を設定
 (setq exec-path nil)
+
 (dolist
     (adir (split-string (getenv "PATH") "[:\n]"))
   (when (and (not (member adir exec-path)) (file-exists-p adir))
@@ -25,24 +26,35 @@
     (server-start))
 
 ;; フレームの設定
-(setq default-frame-alist
-      (append (list
-               '(foreground-color . "black")
-               '(background-color . "gray99")
-               '(cursor-color . "DarkOliveGreen")
-               '(width . 180)
-               '(height . 55)
-               '(top . 22)
-               '(left . 0)
-               '(cursor-type . box))
-              default-frame-alist))
+(dolist
+    (val
+     '(
+       (foreground-color . "black")
+       (background-color . "gray99")
+       (cursor-color . "DarkOliveGreen")
+       (width . 180)
+       (height . 55)
+       (top . 22)
+       (left . 0)
+       (cursor-type . box)
+       ))
+  (add-to-list 'default-frame-alist val))
 
 ;; ツールバーを表示しない
 (tool-bar-mode 0)
 
 ;; 文字コードのデフォルトはUTF-8
 (set-default-coding-systems 'utf-8)
-(prefer-coding-system 'utf-8-unix)
+
+(require 'ucs-normalize)
+
+(defun ucs-normalize-NFC-buffer ()
+  (interactive)
+  (ucs-normalize-NFC-region (point-min) (point-max)))
+
+(setq file-name-coding-system 'utf-8-hfs)
+
+(setq locale-coding-system 'utf-8-hfs)
 
 ;; ターミナルの文字コード UTF-8
 (set-terminal-coding-system 'utf-8)
@@ -52,18 +64,9 @@
 
 (setq default-input-method "MacOSX")
 
-;; Info
-(setq Info-default-directory-list
-      (append
-         '("/usr/local/share/info/ja"
-           "~/share/info")
-         Info-default-directory-list))
-
 ;; commandキーをEmacsのMetaキーに
 (setq mac-command-modifier 'meta)
 
-;; optionキーはEmacsでは使わない
-;; (setq mac-option-modifier nil)
 
 ;; Mac OS Xのアプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする
 (global-set-key [M-f1] 'other-frame)
@@ -72,12 +75,13 @@
 (defun cd-to-homedir-all-buffers ()
   "Change every current directory of all buffers to the home directory."
   (mapc
-   (lambda
-     (buf)
+   (lambda (buf)
      (set-buffer buf)
      (cd (expand-file-name "~")))
    (buffer-list)))
 
 (add-hook 'after-init-hook 'cd-to-homedir-all-buffers)
+
+(global-set-key (kbd "C-x RET u") 'ucs-normalize-NFC-buffer)  ; バッファ全体の濁点分離を直す
 
 (provide 'init-mac)

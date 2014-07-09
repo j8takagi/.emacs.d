@@ -78,8 +78,8 @@
     (if exopen-suffix-cmd
         (setq cmd (cdr(assoc (file-name-extension file 1) exopen-suffix-cmd))))
     (unless cmd
-        (setq cmd exopen-std-cmd)
-        (setq cmdargs exopen-std-cmdargs))
+      (setq cmd exopen-std-cmd)
+      (setq cmdargs exopen-std-cmdargs))
     (setq cmdstr (concat cmd " " cmdargs " " file))
     (start-process-shell-command "exopen" nil cmdstr)
     (message
@@ -99,7 +99,7 @@
   "open buffer file of other extension in external program"
   (let (afile)
     (unless buffer-file-name
-        (error "This buffer is not visiting a file"))
+      (error "This buffer is not visiting a file"))
     (setq afile (concat (file-name-sans-extension (buffer-file-name)) suffix))
     (if (file-exists-p afile)
         (exopen-file afile)
@@ -107,26 +107,26 @@
 
 ;;; 指定したファイルと同名のPDFファイルを外部プログラムでオープン
 (defun exopen-buffer-pdffile ()
-  "open pdf file in external program"
+  "Open PDF file in external program."
   (interactive)
   (exopen-buffer-file-suffix ".pdf"))
 
 ;;; バッファファイルと同名のDVIファイルを外部プログラムでオープン
 (defun exopen-buffer-dvifile ()
-  "open dvi file in external program"
+  "Open DVI file in external program."
   (interactive)
   (exopen-buffer-file-suffix ".dvi"))
 
 ;;; バッファファイルと同名のHTMLファイルを外部プログラムでオープン
 (defun exopen-buffer-htmlfile ()
-  "open html file in external program"
+  "Open HTML file in external program."
   (interactive)
   (exopen-buffer-file-suffix ".html"))
 
 ;;; find-or-bufferがnilの場合はプロンプトで指定したファイル、
 ;;; nil以外の場合はバッファのファイルを外部プログラムでオープン
 (defun exopen-find-file (&optional buffer-file)
-  "open buffer file or find-file in external program"
+  "Open buffer file or find-file in external program."
   (interactive "P")
   (if buffer-file
       (exopen-buffer-file)
@@ -134,25 +134,27 @@
 
 ;;; dired-modeからファイルやディレクトリーを開く
 (require 'dired)
-(add-hook 'dired-mode-hook
-          (function
-           (lambda ()
-             ;; カーソル下のファイルやディレクトリーを外部プログラムで開く
-             (defun dired-exopen-file ()
-               "Open file mentioned on this line in external program"
-               (interactive)
-               (exopen-file (dired-get-filename)))
 
-             ;; 現在のディレクトリーを外部プログラムで開く
-             (defun dired-exopen-curdir ()
-               "Open current directory in external program"
-               (interactive)
-               (exopen-file (expand-file-name dired-directory)))
+(add-hook
+ 'dired-mode-hook
+ (function
+  (lambda ()
+    ;; カーソル下のファイルやディレクトリーを外部プログラムで開く
+    (defun dired-exopen-file ()
+      "Open file mentioned on this line in external program"
+      (interactive)
+      (exopen-file (dired-get-filename)))
 
-             ;; キーバインド
-             (define-key dired-mode-map "r" 'dired-exopen-file)
-             (define-key dired-mode-map "\C-cr" 'dired-exopen-file)
-             (define-key dired-mode-map "\C-c." 'dired-exopen-curdir))))
+    ;; 現在のディレクトリーを外部プログラムで開く
+    (defun dired-exopen-curdir ()
+      "Open current directory in external program"
+      (interactive)
+      (exopen-file (expand-file-name dired-directory)))
+
+    ;; キーバインド
+    (define-key dired-mode-map "r" 'dired-exopen-file)
+    (define-key dired-mode-map "\C-cr" 'dired-exopen-file)
+    (define-key dired-mode-map "\C-c." 'dired-exopen-curdir))))
 
 (provide 'exopen-mode)
 ;;; exopen-mode.el ends here
