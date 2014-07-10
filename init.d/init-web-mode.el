@@ -1,3 +1,5 @@
+(require 'web-mode)
+
 ;; web-modeの色設定
 (custom-set-faces
  '(web-mode-indent-style 1)

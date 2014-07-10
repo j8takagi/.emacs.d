@@ -1,3 +1,5 @@
+(require 'whitespace)
+
 (setq whitespace-style '(face tabs spaces trailing)) ;  タブ
 
 (setq whitespace-space-regexp "\\(　\\)")     ;　全角スペース

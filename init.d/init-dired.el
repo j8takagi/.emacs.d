@@ -1,7 +1,9 @@
-;; 確認なしにディレクトリーを再帰的にコピーする
+(require 'dired)
+
+;; 確認なしにディレクトリーを再帰的にコピーする
 (setq dired-recursive-copies 'always)
 
-;; sorter - diredでのソートo
+;; sorter - diredでのソート
 (load "sorter")
 
 ;; dired-x - diredの拡張機能

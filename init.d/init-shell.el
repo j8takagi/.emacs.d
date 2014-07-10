@@ -1,3 +1,5 @@
+(require 'shell)
+
 ;; 引数で指定されたプロセスの名前が shell で子プロセスがない場合は、
 ;; process-query-on-exit-flag を nil に設定し、
 ;; "Buffer has a runnig process.; kill it?"
