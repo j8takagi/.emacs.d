@@ -43,7 +43,8 @@
        ))
   (if (not (locate-library (symbol-name feat)))
       (message "%s: not found." feat)
-    (require feat)))
+    (if (require feat)
+        (message "%s is loaded." feat))))
 
 (eval-after-load "package"
   '(progn
@@ -80,10 +81,22 @@
   (let ((func (car list)) (file (nth 1 list)) (doc (nth 2 list)))
     (if (not (locate-library file))
         (message "%s: not found." file)
-      (autoload func file doc t))))
+      (if (autoload func file doc 1)
+          (message "%s is defined to autoload from file %s." func file)))))
 
 ;; session
 (add-hook 'after-init-hook 'session-initialize)
+
+;; フレームの設定
+(dolist
+    (val
+     '(
+       (foreground-color . "black")
+       (background-color . "gray99")
+       (cursor-color . "DarkOliveGreen")
+       (cursor-type . box)
+       ))
+  (add-to-list 'default-frame-alist val))
 
 ;; ffap-bindings
 (ffap-bindings)
@@ -95,7 +108,7 @@
 (setq inhibit-startup-message t)
 
 ;; メニューバーを表示しない
-(menu-bar-mode nil)
+(menu-bar-mode 0)
 
 ;; カーソルは点滅しない
 (blink-cursor-mode 0)
@@ -217,9 +230,9 @@
      (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
      (setq uniquify-ignore-buffers-re "*[^*]+*")))
 
-;; auto-elc
-(eval-after-load "auto-elc"
-  '(add-hook 'emacs-lisp-mode-hook '(turn-on-auto-elc)))
+;; auto-elc-mode
+(eval-after-load "auto-elc-mode"
+  '(add-hook 'emacs-lisp-mode-hook 'turn-on-auto-elc))
 
 ;; *compilation*バッファをスクロールして表示
 (eval-after-load "compile"
@@ -241,7 +254,9 @@
      (load-library "init-shell")))
 
 ;; dired
-(add-hook 'dired-load-hook '(load-library "init-dired"))
+(eval-after-load "dired"
+  '(load-library "init-dired")
+  )
 
 (dolist
     (ext

@@ -1,6 +1,5 @@
 ;;;-*-Emacs-Lisp-*-
 ;;; Mac OS X用の設定
-(provide 'init-mac)
 
 ;; OSのpath_helperでPATHを取得し、あらためてPATHとして設定
 (let ((shell-file-name "/bin/bash"))
@@ -10,9 +9,9 @@
 (setq exec-path nil)
 
 (dolist
-    (adir (split-string (getenv "PATH") "[:\n]"))
-  (when (and (not (member adir exec-path)) (file-exists-p adir))
-    (add-to-list 'exec-path adir t)))
+    (dir (split-string (getenv "PATH") "[:\n]"))
+  (when (and (not (member dir exec-path)) (file-exists-p dir))
+    (add-to-list 'exec-path dir t)))
 
 ;; 環境変数LANGの設定
 (setenv "LANG" "en_US.UTF-8")
@@ -22,6 +21,7 @@
 
 ;; Emacs Server
 (require 'server)
+
 (unless (server-running-p)
     (server-start))
 
@@ -29,14 +29,10 @@
 (dolist
     (val
      '(
-       (foreground-color . "black")
-       (background-color . "gray99")
-       (cursor-color . "DarkOliveGreen")
        (width . 180)
        (height . 55)
        (top . 22)
        (left . 0)
-       (cursor-type . box)
        ))
   (add-to-list 'default-frame-alist val))
 
