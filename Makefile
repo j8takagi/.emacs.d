@@ -7,6 +7,8 @@ RMR := $(RM) -R
 RSYNC := rsync
 RSYNCFLAG := -avz --delete
 
+COMPILE.el := $(EMACS) -batch -l set-load-path.el -l init.el -f batch-byte-compile
+
 emacs-dir := ~/.emacs.d
 
 .PHONY: all init site-lisp install install-init.d install-init.sys.d install-site-lisp
@@ -50,6 +52,9 @@ install-elpa: elpa ~/.emacs.d/elpa
 $(emacs-dir):
 	$(MKDIR) $@
 
+%.elc: %.el
+	$(COMPILE.el) $<
+
 clean: clean-init clean-init.d clean-init.sys.d clean-site-lisp
 
 clean-init:
@@ -63,5 +68,3 @@ clean-init.sys.d:
 
 clean-site-lisp:
 	$(MAKE) -C site-lisp clean
-
-include emacslisp.mk

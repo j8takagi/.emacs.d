@@ -3,7 +3,7 @@ RSYNC := rsync
 MAKEDIR := mkdir
 
 RSYNCFLAG := -avz --delete
-COMPILE.el := $(EMACS) -batch -f batch-byte-compile
+COMPILE.el := $(EMACS) -batch -l set-load-path.el -f batch-byte-compile
 
 ELFILES := $(wildcard *.el)
 ELCFILES := $(addsuffix c,$(ELFILES))

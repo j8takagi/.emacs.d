@@ -3,7 +3,7 @@ RSYNC := rsync
 MKDIR := mkdir
 
 RSYNCFLAG := -avz --delete
-COMPILE.el := $(EMACS) -batch -f batch-byte-compile
+COMPILE.el := $(EMACS) -batch -l set-load-path.el -f batch-byte-compile
 
 emacs-dir := ~/.emacs.d
 
