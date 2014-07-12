@@ -12,7 +12,7 @@ COMPILE.el := $(EMACS) -batch -l set-load-path.el -l init.el -f batch-byte-compi
 
 emacs-dir := ~/.emacs.d
 
-.PHONY: all init site-lisp install install-init.d install-init.sys.d install-site-lisp
+.PHONY: all init elpa site-lisp install install-init.d install-init.sys.d install-site-lisp install-elpa
 
 all: init init.d init.sys.d site-lisp
 
