@@ -1,4 +1,4 @@
-;;; other-windows-plus.el
+;;; other-window-bindings.el
 
 ;; Copyright (C) 2014  j8takagi
 
@@ -32,24 +32,22 @@
 ;;
 ;; 2. Emacsの設定ファイル（~/.emacs.d/init.el など）に以下の行を追加する
 ;;
-;; (require 'other-windows-plus)
+;; (require 'other-window-bindings)
 
 ;; ■使い方
 
 ;; ■hook
 
-;; 現在および隣のウィンドウのバッファを削除する。
-;; 隣のウィンドウは閉じ、現在のウィンドウはそのまま
-(defun kill-current-next-window-buffer ()
-  "kill current buffer and the buffer of next window.
-And, delete current and next window."
+;; 隣のウィンドウのバッファを削除する。ウィンドウはそのまま
+(defun kill-next-window-buffer ()
+  "Kill next window buffer. The window is not deleted."
   (interactive)
-  (kill-next-window-buffer nil)
-  (kill-buffer (current-buffer)))
+  (delete-kill-next-window-buffer 1))
 
-;; 隣のウィンドウのバッファを削除し、ウィンドウも閉じる
-(defun kill-next-window-buffer (kill-buffer-only-p)
-  "kill the current buffer and the buffer of the next window.
+;; 隣のウィンドウのバッファを削除する。
+;; 引数kill-buffer-only-pがnon-nilの場合、ウィンドウも閉じる
+(defun delete-kill-next-window-buffer (kill-buffer-only-p)
+  "kill next window buffer.
 If KILL-BUFFER-ONLY-P is non nil, delete the next window.
 Otherwise, the next window is not deleted."
   (interactive "P")
@@ -61,6 +59,15 @@ Otherwise, the next window is not deleted."
         (kill-buffer buf))
       (unless kill-buffer-only-p
           (delete-window win)))))
+
+;; 現在および隣のウィンドウのバッファを削除する。
+;; 隣のウィンドウは閉じ、現在のウィンドウはそのまま
+(defun delete-kill-current-next-window-buffer ()
+  "Kill current buffer and the buffer of next window.
+And, delete the next window."
+  (interactive)
+  (delete-kill-next-window-buffer nil)
+  (kill-buffer (current-buffer)))
 
 ;; 隣のウィンドウの分割方法を、横と縦で切り替える
 (defun toggle-window-split ()
@@ -157,13 +164,62 @@ to shell of default directory in current buffer."
       (make-frame-command)
       (switch-to-shell-current-directory))))
 
-(define-key ctl-x-4-map (kbd "k") 'kill-next-window-buffer)
-(define-key ctl-x-4-map (kbd "K") 'kill-current-next-window-buffer)
-(define-key ctl-x-4-map (kbd "q") 'quit-next-window)
-(define-key ctl-x-4-map (kbd "s") 'split-shell-current-directory)
-(define-key ctl-x-4-map (kbd "t") 'toggle-window-split)
-(define-key ctl-x-5-map (kbd "s") 'new-frame-shell-current-directory)
-(global-set-key (kbd "C-x C-M-k") 'kill-current-next-window-buffer)
+(defun toggle-split-next-window ()
+  "Toggle split between selected window and next window.
+If selected window and next window is splitted vertically, split them horizontally.
+If splitted horizontally, vice versa."
+  (interactive)
+  (let ((selected-edges (window-edges (selected-window)))
+        (next-edges (window-edges (next-window)))
+        (next-buf (window-buffer (next-window))))
+    (cond
+     ((one-window-p) (message "One window, cannot toggle split."))
+     ((and
+       (= (nth 0 selected-edges) (nth 0 next-edges))
+       (= (nth 2 selected-edges) (nth 2 next-edges)))
+      (delete-window (next-window))
+      (set-window-buffer (split-window-horizontally) next-buf))
+     ((and
+       (= (nth 1 selected-edges) (nth 1 next-edges))
+       (= (nth 3 selected-edges) (nth 3 next-edges)))
+      (delete-window (next-window))
+      (set-window-buffer (split-window-vertically) next-buf)))))
 
-(provide 'other-windows-plus)
-;;; other-windows-plus.el ends here
+;; 隣のウインドウとバッファを交換する
+(defun swap-buffer-next-window ()
+  (interactive)
+  "Swap buffers bettween selected window and next window."
+  (let ((next-buf (window-buffer (next-window))))
+    (set-window-buffer (next-window) (window-buffer (selected-window)))
+    (set-window-buffer (selected-window) next-buf)))
+
+
+;;; Offer default global bindings
+
+(defvar other-window-bindings
+  '(
+    ("C-x 4 k" kill-next-window-buffer)
+    ("C-x 4 K" delete-kill-next-window-buffer)
+    ("C-x 4 q" quit-next-window)
+    ("C-x 4 s" split-shell-current-directory)
+    ("C-x 4 w t" toggle-split-next-window)
+    ("C-x 4 w s" swap-buffer-next-window)
+    ("C-x 5 s" new-frame-shell-current-directory)
+    ("C-x C-M-k" delete-kill-current-next-window-buffer)
+    )
+  "List of binding forms (KEY FUNCTION) evaluated by function `other-windows-bindings'."
+)
+
+;;;###autoload
+(defun other-window-bindings ()
+  "Bind functions of other windows."
+  (interactive)
+  (dolist
+      (list other-window-bindings)
+    (let ((key (car list)) (func (nth 1 list)))
+      (if (not (functionp func))
+          (message "function %s is not defined." func)
+        (global-set-key (kbd key) func)))))
+
+(provide 'other-window-bindings)
+;;; other-window-bindings.el ends here
