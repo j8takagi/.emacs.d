@@ -2,7 +2,7 @@
 
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
 
-;; (declare-function ediff-vc-internal "ediff-vers" (REV1 REV2 &optional STARTUP-HOOKS))
+(declare-function ediff-vc-internal "ediff-vers" (REV1 REV2 &optional STARTUP-HOOKS))
 
 (defun ediff-vc-latest-current ()
   "Run Ediff of buffer file by comparing the latest and current."

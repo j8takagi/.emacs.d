@@ -1,9 +1,11 @@
-;;;-*-Emacs-Lisp-*-
-;;; Mac OS X用の設定
+;; -*- mode: Emacs-Lisp; -*-
+;; Mac OS X用の設定
 
 ;; OSのpath_helperでPATHを取得し、あらためてPATHとして設定
 (let ((shell-file-name "/bin/bash"))
-    (setenv "PATH" (shell-command-to-string "eval $(/usr/libexec/path_helper -s) && printf $PATH")))
+    (setenv "PATH"
+            (shell-command-to-string
+             "eval $(/usr/libexec/path_helper -s) && printf $PATH")))
 
 ;; Emacs変数exec-pathに、環境変数PATHの内容を設定
 (setq exec-path nil)
@@ -13,17 +15,21 @@
   (when (and (not (member dir exec-path)) (file-exists-p dir))
     (add-to-list 'exec-path dir t)))
 
-;; 環境変数LANGの設定
-(setenv "LANG" "en_US.UTF-8")
+;; 環境変数の設定
+(dolist
+    (list
+     '(
+       ("LANG" "en_US.UTF-8")
+       ("EDITOR" "emacsclient")
+       ("VISUAL" "emacsclient")
+       ))
+  (let ((var (car list)) (val (nth 1 list)))
+    (setenv var val)))
 
-;; 環境変数EDITORの設定
-(setenv "EDITOR" "emacsclient")
+;; Mac OS X用の文字コード指定
+(set-file-name-coding-system 'utf-8-hfs)
 
-;; Emacs Server
-(require 'server)
-
-(unless (server-running-p)
-    (server-start))
+(setq locale-coding-system 'utf-8-hfs)
 
 ;; フレームの設定
 (dolist
@@ -36,25 +42,6 @@
        ))
   (add-to-list 'default-frame-alist val))
 
-;; ツールバーを表示しない
-(tool-bar-mode 0)
-
-;; 文字コードのデフォルトはUTF-8
-(set-default-coding-systems 'utf-8)
-
-(require 'ucs-normalize)
-
-(defun ucs-normalize-NFC-buffer ()
-  (interactive)
-  (ucs-normalize-NFC-region (point-min) (point-max)))
-
-(setq file-name-coding-system 'utf-8-hfs)
-
-(setq locale-coding-system 'utf-8-hfs)
-
-;; ターミナルの文字コード UTF-8
-(set-terminal-coding-system 'utf-8)
-
 (set-fontset-font t 'japanese-jisx0208
                   (font-spec :family "Hiragino Kaku Gothic ProN"))
 
@@ -63,21 +50,20 @@
 ;; commandキーをEmacsのMetaキーに
 (setq mac-command-modifier 'meta)
 
+(dolist
+    (map
+     '(
+       ("C-x RET u" ucs-normalize-NFC-buffer)
+       ("<M-f1>" other-frame)    ; Mac OS Xの他アプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする
+       ))
+  (let ((key (car map)) (func (nth 1 map)))
+    (if (not (functionp func))
+        (message "%s is not defined." func)
+      (global-set-key (kbd key) func))))
 
-;; Mac OS Xのアプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする
-(global-set-key [M-f1] 'other-frame)
+;; emacsclientを使えるように
+(eval-after-load "server" '(server-start))
 
-;; 起動時のカレントディレクトリが"/"になってしまう件への対応
-(defun cd-to-homedir-all-buffers ()
-  "Change every current directory of all buffers to the home directory."
-  (mapc
-   (lambda (buf)
-     (set-buffer buf)
-     (cd (expand-file-name "~")))
-   (buffer-list)))
-
-(add-hook 'after-init-hook 'cd-to-homedir-all-buffers)
-
-(global-set-key (kbd "C-x RET u") 'ucs-normalize-NFC-buffer)  ; バッファ全体の濁点分離を直す
+(cd "~")
 
 (provide 'init-mac)

@@ -1,6 +1,9 @@
 ;;;-*-Emacs-Lisp-*-
 ;; for emacs 24.3
 
+;; 日本語環境
+(set-language-environment "Japanese")
+
 ;; load-pathを追加し、subdirs.elがある場合は読み込む
 (dolist
     (path
@@ -21,6 +24,9 @@
      '(
        ;; /usr/local/share/emacs/24.3/lisp
        ediff
+       info
+       server
+       reftex
        uniquify
        vc
        whitespace
@@ -32,7 +38,7 @@
        insert-file-name
        javadoc-style-comment-mode
        mediawiki
-       other-windows-plus
+       other-window-bindings
        scroll-one-line
        temp-buffer
        ucs-normalize
@@ -42,7 +48,7 @@
        package
        ))
   (if (not (locate-library (symbol-name feat)))
-      (message "%s: not found." feat)
+      (message "Warn: %s is not found." feat)
     (if (require feat)
         (message "%s is loaded." feat))))
 
@@ -80,12 +86,9 @@
        ))
   (let ((func (car list)) (file (nth 1 list)) (doc (nth 2 list)))
     (if (not (locate-library file))
-        (message "%s: not found." file)
+        (message "Warn: %s is not found." file)
       (if (autoload func file doc 1)
           (message "%s is defined to autoload from file %s." func file)))))
-
-;; session
-(add-hook 'after-init-hook 'session-initialize)
 
 ;; フレームの設定
 (dolist
@@ -98,17 +101,17 @@
        ))
   (add-to-list 'default-frame-alist val))
 
-;; ffap-bindings
-(ffap-bindings)
-
 ;; 日本語環境
 (set-language-environment 'Japanese)
 
 ;; 起動時の画面を表示しない
-(setq inhibit-startup-message t)
+(setq inhibit-startup-message 1)
 
 ;; メニューバーを表示しない
 (menu-bar-mode 0)
+
+;; ツールバーを表示しない
+(tool-bar-mode 0)
 
 ;; カーソルは点滅しない
 (blink-cursor-mode 0)
@@ -127,6 +130,7 @@
 
 ;; ダイアログボックスは使わない
 (setq use-dialog-box nil)
+
 (defalias 'message-box 'message)
 
 ;; タブの幅は、4
@@ -138,7 +142,7 @@
 ;; 再帰的なミニバッファ
 (setq enable-recursive-minibuffers 1)
 
-;; ファイル末尾で、end of bufferエラーなしで改行
+;; ファイル末尾での改行で、end of bufferエラーが発生しないように
 (setq next-line-add-newlines nil)
 
 ;; 行番号を表示
@@ -158,6 +162,7 @@
 
 ;; upcase-region, downcase-regionを可能にする
 (put 'upcase-region 'disabled nil)
+
 (put 'downcase-region 'disabled nil)
 
 ;; set-goal-columnを可能にする
@@ -165,10 +170,11 @@
 
 ;; truncate
 (setq truncate-lines nil)
+
 (setq truncate-partial-width-windows nil)
 
 ;; kill-lineのとき、改行も含めて切り取り
-(setq kill-whole-line t)
+(setq kill-whole-line 1)
 
 ;; 置換時に大文字小文字を区別しない
 (setq case-replace nil)
@@ -204,13 +210,16 @@
 (setq-default indent-line-function 'tab-to-tab-stop)
 
 ;; 圧縮されたファイルを直接編集する
-(auto-compression-mode)
+(auto-compression-mode 1)
 
 ;; kill-lineのとき、改行も含めて切り取り
-(setq kill-whole-line t)
+(setq kill-whole-line 1)
 
 ;; yank-popを有効にする
-(setq yank-pop-change-selection t)
+(setq yank-pop-change-selection 1)
+
+;;; evalした結果を全部表示
+(setq eval-expression-print-length nil)
 
 ;; whitespace
 (eval-after-load "whitespace"
@@ -236,15 +245,13 @@
 
 ;; *compilation*バッファをスクロールして表示
 (eval-after-load "compile"
-  '(setq compilation-scroll-output 1))
-
-;; M-<return> でLisp補完
-(define-key lisp-mode-shared-map (kbd "<M-return>") 'lisp-complete-symbol)
+  '(setq compilation-scroll-output `first-error))
 
 ;; lisp-modeでのタブの設定
-(add-hook 'lisp-mode-hook
-          '(lambda ()
-             (setq indent-line-function 'lisp-indent-line)))
+(defun indent-lisp-indent-line ()
+  (setq indent-line-function 'lisp-indent-line))
+
+(add-hook 'emacs-lisp-mode-hook 'indent-lisp-indent-line)
 
 ;; shell-mode
 (eval-after-load "shell"
@@ -265,6 +272,9 @@
        ".idx" ".ind" ".idx_prev" ".ind_prev" ".ilg"))
   (add-to-list 'completion-ignored-extensions ext))
 
+;; *scratch* と *Messages* のバッファを削除しない
+(load "add-kill-buffer-query-functions")
+
 ;;; CC-Mode
 (eval-after-load "cc-mode"
   '(progn
@@ -276,8 +286,12 @@
 ;; bison-mode
 (eval-after-load "bison"
   '(progn
-    (setq bison-decl-token-column 0)
-    (setq bison-rule-enumeration-column 8)))
+     (setq bison-decl-token-column 0)
+     (setq bison-rule-enumeration-column 8)))
+
+;; tex-mode
+(eval-after-load "tex-mode"
+  '(add-hook 'latex-mode-hook 'turn-on-reftex))
 
 ;; web-mode
 (eval-after-load "web-mode"
@@ -303,20 +317,9 @@
 (eval-after-load "add-log"
   '(setq change-log-default-name "~/ChangeLog"))
 
-;; R起動時にワーキングディレクトリを訊ねない
+;; ess-site > R
 (eval-after-load "ess-site"
   '(setq ess-ask-for-ess-directory nil))
-
-;; mediawiki
-(eval-after-load "mediawiki"
-  '(define-key mediawiki-mode-map (kbd "C-x C-s") 'save-buffer))
-
-;; tex-mode
-(eval-after-load "tex-mode"
-  '(progn
-    (define-key latex-mode-map (kbd "C-c p p") 'exopen-buffer-pdffile)
-    (define-key latex-mode-map (kbd "C-c p d") 'exopen-buffer-dvifile)
-    (add-hook 'latex-mode-hook 'turn-on-reftex)))
 
 ;; color-selection
 (eval-after-load "color-selection"
@@ -326,21 +329,27 @@
 (eval-after-load "ruby-mode"
   '(add-to-list 'interpreter-mode-alist '("ruby" . ruby-mode)))
 
-;; text-modeで<M-tab>でのispell起動を無効に
-(eval-after-load "text-mode"
-  '(define-key text-mode-map (kbd "C-M-i") nil))
-
 ;; Info
 (eval-after-load "info"
   '(progn
+     (setq Info-directory-list (reverse Info-directory-list))
      (dolist
-         (path
-          '(
-            "/usr/local/share/info/ja"
-            "~/share/info"
-            ))
-       (add-to-list 'Info-default-directory-list (expand-file-name path)))
-     (setq Info-additional-directory-list Info-default-directory-list)))
+       (path
+        '(
+          "/usr/local/share/info/ja"
+          "~/share/info/ja"
+          "~/share/info"
+          ))
+     (let ((fullpath (expand-file-name path)))
+       (if (not (car (file-attributes fullpath)))
+           (message "info: %s is not exist or not directory." path)
+         (add-to-list 'Info-directory-list fullpath 1)
+         )))))
+
+;; vc-follow-linkを無効にする
+;; 参考: http://d.hatena.ne.jp/a_bicky/20140607/1402131090
+(eval-after-load "vc-hooks"
+  '(setq vc-follow-symlinks nil))
 
 ;; magic-mode-alist
 (dolist
@@ -351,36 +360,45 @@
        ))
   (let ((mode (cdr alist)))
     (if (not (functionp mode))
-        (message "magic-mode-alist: %s is not defined." mode)
-      (add-to-list 'magic-mode-alist mode))))
+        (message "magic-mode-alist: function %s is not defined." mode)
+      (add-to-list 'magic-mode-alist alist 1))))
 
 ;; auto-mode-alist
 (dolist
     (alist
      '(
-       ("^\(GNU\)?[Mm]akefile". makefile-gmake-mode)
-       ("\.d$". makefile-gmake-mode)
-       ("\.mk$". makefile-gmake-mode)
+       ("\\.bat\\'" . dos-mode)
        ("\\.[Cc][Ss][Vv]\\'" . csv-mode)
-       ("\\.[rR]$" . R-mode)
-       ("\\.casl?$" . asm-mode)
-       ("\\.css$" . css-mode)
-       ("\\.euk$" . eukleides-mode)
-       ("\\.gv$" . graphviz-dot-mode)
-       ("\\.html?$" . web-mode)
-       ("\\.js$" . js-mode)
-       ("\\.ll?$" . flex-mode)
-       ("\\.svg$" . nxml-mode)
-       ("\\.wiki$" . mediawiki-mode)
-       ("\\.xml$" . nxml-mode)
-       ("\\.y?rb$" . ruby-mode)
-       ("\\.yy?$" . bison-mode)
+       ("\\.[rR]\\'" . R-mode)
+       ("\\.casl?\\'" . asm-mode)
+       ("\\.css\\'" . css-mode)
+       ("\\.d\\'". makefile-gmake-mode)
+       ("\\.euk\\'" . eukleides-mode)
+       ("\\.gv\\'" . graphviz-dot-mode)
+       ("\\.html?\\'" . web-mode)
+       ("\\.js\\'" . js-mode)
+       ("\\.ll?\\'" . flex-mode)
+       ("\\.mk\\'". makefile-gmake-mode)
+       ("\\.svg\\'" . nxml-mode)
+       ("\\.wiki\\'" . mediawiki-mode)
+       ("\\.xml\\'" . nxml-mode)
+       ("\\.y?rb\\'" . ruby-mode)
+       ("\\.yy?\\'" . bison-mode)
        ("^ja.wikipedia.org/w/index.php" . mediawiki-mode)
        ))
   (let ((mode (cdr alist)))
     (if (not (functionp mode))
-        (message "auto-mode-alist: %s is not defined." mode)
-      (add-to-list 'auto-mode-alist alist))))
+        (message "auto-mode-alist: function %s is not defined." mode)
+      (add-to-list 'auto-mode-alist alist 1))))
+
+(setcdr (assoc "[Mm]akefile\\'" auto-mode-alist) 'makefile-gmake-mode)
+
+;; ffap（find file at point）のキーバインド
+(ffap-bindings)
+
+;; ウィンドウやバッファに関するキーバインド
+(eval-after-load "other-window-bindings"
+  '(other-window-bindings))
 
 ;; global-key
 (dolist
@@ -411,6 +429,7 @@
        ("C-x RET u" ucs-normalize-NFC-buffer)
        ("C-x m" man)
        ("C-x p" call-last-kbd-macro)
+       ("C-x q" bury-buffer)
        ("C-x v e" ediff-vc-latest-current)
        ("C-x v f" find-file-revision)
        ("M-?" help)
@@ -426,8 +445,34 @@
       (global-set-key (kbd key) func))))
 
 (dolist
-    (key '("C-x C-d" "C-x 4 0"))
+    (key '
+     ("C-x C-d"                         ; ffap-list-directory を無効に
+      "C-x 4 0"                         ; kill-buffer-and-window を無効に
+      ))
   (global-unset-key (kbd key)))
+
+(dolist
+    (list
+     '(
+       ("text-mode" text-mode-hook text-mode-map
+        (("C-M-i" dabbrev-expand))) ; ispell 起動を無効にし、dabbrev-expand を設定
+       ("tex-mode" latex-mode-hook latex-mode-map
+        (("C-c p p" exopen-buffer-pdffile)
+         ("C-c p d" exopen-buffer-dvifile)))
+       ("lisp-mode" emacs-lisp-mode-hook lisp-mode-shared-map
+        (("<M-return>" lisp-complete-symbol)))
+       ("mediawiki" mediawiki-mode-hook mediawiki-mode-map
+        (("C-x C-s" save-buffer)))
+       ))
+  (let ((lib (car list)) (hook (nth 1 list))
+        (mode (nth 2 list)) (maps (nth 3 list)))
+    (eval-after-load lib
+      (dolist (keymap maps)
+        (let ((key (car keymap)) (func (nth 1 keymap)))
+          (if (not (functionp func))
+              (message "function %s is not defined." func)
+            (add-hook hook
+                      `(lambda () (define-key ,mode (kbd ,key) ',func)))))))))
 
 ;; システムごとの設定
 (dolist
@@ -441,5 +486,13 @@
    (let ((target (car list)) (sys (nth 1 list)) (feat (nth 2 list)))
      (when (equal (eval target) sys)
        (if (not (locate-library (symbol-name feat)))
-           (message "%s: not found." feat)
+           (message "file %s is not found." feat)
          (require feat)))))
+
+;; 文字コードのデフォルトはUTF-8
+(prefer-coding-system 'utf-8)
+
+;; session
+(if (not (locate-library "session"))
+      (message "file 'session' is not found.")
+  (add-hook 'after-init-hook 'session-initialize))
