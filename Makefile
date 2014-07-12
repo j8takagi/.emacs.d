@@ -1,3 +1,4 @@
+CP := cp
 ECHO := echo
 EMACS := emacs
 FIND := find
@@ -34,8 +35,11 @@ elpa:
 
 install: install-init install-init.d install-init.sys.d install-site-lisp
 
-install-init: ~/.emacs.d init
+install-init: $(emacs-dir) $(emacs-dir)/init.el~ init
 	$(RSYNC) $(RSYNCFLAG) init.el init.elc $(emacs-dir)/
+
+$(emacs-dir)/init.el~: $(emacs-dir)/init.el
+	$(CP) $< $@
 
 install-init.d: init.d
 	$(MAKE) -C init.d install
@@ -43,10 +47,10 @@ install-init.d: init.d
 install-init.sys.d: init.sys.d
 	$(MAKE) -C init.sys.d install
 
-install-site-lisp: ~/.emacs.d/site-lisp
+install-site-lisp: $(emacs-dir)/site-lisp
 	$(MAKE) -C site-lisp install
 
-install-elpa: elpa ~/.emacs.d/elpa
+install-elpa: elpa $(emacs-dir)/elpa
 	$(RSYNC) $(RSYNCFLAG) elpa/* $(emacs-dir)/elpa/
 
 $(emacs-dir):
