@@ -470,15 +470,16 @@
   (let* ((lib (car list)) (hook (nth 1 list))
          (modemap (nth 2 list)) (maps (nth 3 list))
          (func-init-add (read (concat (symbol-name modemap) "-init-add"))))
-    (fset func-init-add
-          `(lambda ()
-             (dolist (keymap ',maps)
-               (let ((key (car keymap)) (func (nth 1 keymap)))
-                 (if (not (functionp func))
-                     (message "function %s is not defined." func)
-                   (define-key ,modemap (kbd key) func))))))
     (eval-after-load lib
-      `(add-hook ',hook ',func-init-add))))
+      (progn
+        (fset func-init-add
+              `(lambda ()
+                 (dolist (keymap ',maps)
+                   (let ((key (car keymap)) (func (nth 1 keymap)))
+                     (if (not (functionp func))
+                         (message "function %s is not defined." func)
+                       (define-key ,modemap (kbd key) func))))))
+        `(add-hook ',hook ',func-init-add)))))
 
 ;; システムごとの設定
 (dolist
