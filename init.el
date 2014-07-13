@@ -450,6 +450,10 @@
       ))
   (global-unset-key (kbd key)))
 
+;; リストで定義されたキーバインドを設定する関数 <modemap>-init-add を
+;; 定義し、mode-hookに追加する
+;; リストの形式は、
+;; ((lib mode-hook mode-map (keymaps)))
 (dolist
     (list
      '(
@@ -463,15 +467,18 @@
        ("mediawiki" mediawiki-mode-hook mediawiki-mode-map
         (("C-x C-s" save-buffer)))
        ))
-  (let ((lib (car list)) (hook (nth 1 list))
-        (mode (nth 2 list)) (maps (nth 3 list)))
+  (let* ((lib (car list)) (hook (nth 1 list))
+         (modemap (nth 2 list)) (maps (nth 3 list))
+         (func-init-add (read (concat (symbol-name modemap) "-init-add"))))
+    (fset func-init-add
+          `(lambda ()
+             (dolist (keymap ',maps)
+               (let ((key (car keymap)) (func (nth 1 keymap)))
+                 (if (not (functionp func))
+                     (message "function %s is not defined." func)
+                   (define-key ,modemap (kbd key) func))))))
     (eval-after-load lib
-      (dolist (keymap maps)
-        (let ((key (car keymap)) (func (nth 1 keymap)))
-          (if (not (functionp func))
-              (message "function %s is not defined." func)
-            (add-hook hook
-                      `(lambda () (define-key ,mode (kbd ,key) ',func)))))))))
+      `(add-hook ',hook ',func-init-add))))
 
 ;; システムごとの設定
 (dolist
