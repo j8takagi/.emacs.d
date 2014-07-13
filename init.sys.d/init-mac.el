@@ -12,7 +12,7 @@
 
 (dolist
     (dir (split-string (getenv "PATH") "[:\n]"))
-  (when (and (not (member dir exec-path)) (file-exists-p dir))
+  (when (file-directory-p dir)
     (add-to-list 'exec-path dir t)))
 
 ;; 環境変数の設定

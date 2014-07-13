@@ -196,7 +196,7 @@
 (let ((dir
        "~/backup"
        ))
-  (if (not (file-exists-p (expand-file-name dir)))
+  (if (not (file-directory-p (expand-file-name dir)))
       (message "backup directory %s is not exist." dir)
     (setq backup-directory-alist `(("." . ,dir)))))
 
@@ -493,13 +493,14 @@
    (let ((target (car list)) (sys (nth 1 list)) (feat (nth 2 list)))
      (when (equal (eval target) sys)
        (if (not (locate-library (symbol-name feat)))
-           (message "file %s is not found." feat)
-         (require feat)))))
+           (message "Warn: library '%s' is not found." feat)
+         (if (require feat)
+             (message "%s is loaded." feat))))))
 
 ;; 文字コードのデフォルトはUTF-8
 (prefer-coding-system 'utf-8)
 
 ;; session
 (if (not (locate-library "session"))
-      (message "file 'session' is not found.")
+      (message "Warn: library 'session' is not found.")
   (add-hook 'after-init-hook 'session-initialize))
