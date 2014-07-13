@@ -187,24 +187,49 @@ If splitted horizontally, vice versa."
 
 ;; 隣のウインドウとバッファを交換する
 (defun swap-buffer-next-window ()
-  (interactive)
   "Swap buffers bettween selected window and next window."
+  (interactive)
   (let ((next-buf (window-buffer (next-window))))
     (set-window-buffer (next-window) (window-buffer (selected-window)))
     (set-window-buffer (selected-window) next-buf)))
+
+(defun scratch-other-window ()
+  "Open scratch buffer in next window."
+  (interactive)
+  (switch-to-buffer-other-window (get-buffer "*scratch*")))
+
+(defun scratch-other-frame ()
+  "Open scratch buffer in next window."
+  (interactive)
+  (switch-to-buffer-other-frame (get-buffer "*scratch*")))
+
+(defun message-other-window ()
+  "Open Message buffer in next window."
+  (interactive)
+  (switch-to-buffer-other-window (get-buffer "*Messages*")))
+
+(defun message-other-frame ()
+  "Open Message buffer in next window."
+  (interactive)
+  (switch-to-buffer-other-frame (get-buffer "*Messages*")))
 
 
 ;;; Offer default global bindings
 
 (defvar other-window-bindings
   '(
-    ("C-x 4 k" kill-next-window-buffer)
     ("C-x 4 K" delete-kill-next-window-buffer)
+    ("C-x 4 S" scratch-other-window)
+    ("C-x 4 k" kill-next-window-buffer)
+    ("C-x 4 m" message-other-window)
     ("C-x 4 q" quit-next-window)
+    ("C-x 4 s" scratch-other-window)
     ("C-x 4 s" split-shell-current-directory)
     ("C-x 4 w t" toggle-split-next-window)
     ("C-x 4 w s" swap-buffer-next-window)
+    ("C-x 5 m" message-other-frame)
     ("C-x 5 s" new-frame-shell-current-directory)
+    ("C-x 5 s" scratch-other-frame)
     ("C-x C-M-k" delete-kill-current-next-window-buffer)
     )
   "List of binding forms (KEY FUNCTION) evaluated by function `other-windows-bindings'."
