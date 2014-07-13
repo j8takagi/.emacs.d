@@ -322,8 +322,7 @@
   '(setq ess-ask-for-ess-directory nil))
 
 ;; color-selection
-(eval-after-load "color-selection"
-  '(defalias 'color-selection 'list-hexadecimal-colors-display))
+(defalias 'color-selection 'list-hexadecimal-colors-display)
 
 ;; Ruby
 (eval-after-load "ruby-mode"
