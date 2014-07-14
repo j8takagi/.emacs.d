@@ -23,10 +23,12 @@
     (feat
      '(
        ;; /usr/local/share/emacs/24.3/lisp
+       autoinsert
        ediff
        info
        server
        reftex
+       skeleton
        uniquify
        vc
        view
@@ -351,6 +353,25 @@
 (eval-after-load "vc-hooks"
   '(setq vc-follow-symlinks nil))
 
+;; auto-insert
+;; http://www.math.s.chiba-u.ac.jp/~matsu/emacs/emacs21/autoinsert.html
+
+(eval-after-load "autoinsert"
+  '(progn
+     (add-hook 'find-file-hook 'auto-insert)
+     (setq auto-insert-directory (expand-file-name "~/.emacs.d/insert/"))
+     (setq auto-insert-query nil)
+     (setq auto-insert-alist nil)
+     (dolist
+         (alist
+          '(
+            (latex-mode . "latex-template.tex")
+            (web-mode . "html-template.html")
+            (graphviz-dot-mode . "graphviz-dot-template.gv")
+            ))
+       (add-to-list 'auto-insert-alist alist))
+     ))
+
 ;; magic-mode-alist
 (dolist
     (alist
@@ -364,6 +385,22 @@
       (add-to-list 'magic-mode-alist alist 1))))
 
 ;; auto-mode-alist
+;; 既存のモード設定を上書きする
+(dolist
+    (list
+     '(
+       (makefile-gmake-mode makefile-bsdmake-mode)
+       (web-mode html-mode)
+       ))
+  (let ((newmode (car list)) (oldmode (nth 1 list)))
+    (if (not (functionp newmode))
+        (message "auto-mode-alist: function %s is not defined." newmode)
+      (while
+          (let ((alist (rassoc oldmode auto-mode-alist)))
+            (if alist
+                (setcdr alist newmode)))))))
+
+;; 新しいモード設定を追加する
 (dolist
     (alist
      '(
@@ -375,9 +412,10 @@
        ("\\.d\\'". makefile-gmake-mode)
        ("\\.euk\\'" . eukleides-mode)
        ("\\.gv\\'" . graphviz-dot-mode)
-       ("\\.html?\\'" . web-mode)
+       ("\\.[sx]?html?\\(\\.[a-zA-Z_]+\\)?\\'" . web-mode)
        ("\\.js\\'" . js-mode)
        ("\\.ll?\\'" . flex-mode)
+       ("[Mm]akefile\\'". makefile-gmake-mode)
        ("\\.mk\\'". makefile-gmake-mode)
        ("\\.svg\\'" . nxml-mode)
        ("\\.wiki\\'" . mediawiki-mode)
@@ -389,9 +427,7 @@
   (let ((mode (cdr alist)))
     (if (not (functionp mode))
         (message "auto-mode-alist: function %s is not defined." mode)
-      (add-to-list 'auto-mode-alist alist 1))))
-
-(setcdr (assoc "[Mm]akefile\\'" auto-mode-alist) 'makefile-gmake-mode)
+      (add-to-list 'auto-mode-alist alist))))
 
 ;; ffap（find file at point）のキーバインド
 (ffap-bindings)

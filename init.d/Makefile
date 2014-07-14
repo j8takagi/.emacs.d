@@ -15,7 +15,7 @@ emacs-dir := ~/.emacs.d
 all: $(ELCFILES)
 
 install: all $(emacs-dir)/init.d
-	$(RSYNC) $(RSYNCFLAG) $(ELFILES) $(ELCFILES) $(emacs-dir)/init.d/
+	$(RSYNC) $(RSYNCFLAG) --exclude='set-load-path.el*' $(ELFILES) $(ELCFILES) $(emacs-dir)/init.d/
 
 $(emacs-dir)/init.d:
 	$(MKDIR) $@

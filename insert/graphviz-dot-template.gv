@@ -1,0 +1,6 @@
+digraph  {
+    node [shape="" style="" color="" fillcolor="" fontname="sans-serif" fontsize="12" width="2"];
+    edge [fontname="" fontsize=""];
+
+     ->  [fontname="" label=""];
+}

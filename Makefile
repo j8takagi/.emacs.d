@@ -33,7 +33,7 @@ get-elpa:
 elpa:
 	$(EMACS) -batch -l recompile-elpa.el
 
-install: install-init install-init.d install-init.sys.d install-site-lisp
+install: install-init install-init.d install-init.sys.d install-site-lisp install-insert
 
 install-init: $(emacs-dir) $(emacs-dir)/init.el~ init
 	$(RSYNC) $(RSYNCFLAG) init.el init.elc $(emacs-dir)/
@@ -50,10 +50,16 @@ install-init.sys.d: init.sys.d
 install-site-lisp: $(emacs-dir)/site-lisp
 	$(MAKE) -C site-lisp install
 
+install-insert: $(emacs-dir)/insert
+	$(RSYNC) $(RSYNCFLAG) insert/* $(emacs-dir)/insert/
+
 install-elpa: elpa $(emacs-dir)/elpa
 	$(RSYNC) $(RSYNCFLAG) elpa/* $(emacs-dir)/elpa/
 
 $(emacs-dir):
+	$(MKDIR) $@
+
+$(emacs-dir)/insert:
 	$(MKDIR) $@
 
 %.elc: %.el
