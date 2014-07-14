@@ -27,3 +27,5 @@
           '(lambda ()
              (unless (or buffer-read-only (member major-mode whitespace-disabled-major-mode-list))
                (whitespace-mode 1))))
+
+(provide 'init-whitespace)

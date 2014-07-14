@@ -6,3 +6,5 @@
   "Normalize current buffer by the Unicode NFC."
   (interactive)
   (ucs-normalize-NFC-region (point-min) (point-max)))
+
+(provide 'init-nfc)

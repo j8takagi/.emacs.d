@@ -24,3 +24,5 @@
     :back "[ \t]+</script>")))
 
 (mmm-add-mode-ext-class nil "\\.html?\\'" 'html-javascript)
+
+(provide 'init-mmm)

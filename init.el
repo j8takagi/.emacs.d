@@ -224,15 +224,15 @@
 
 ;; whitespace
 (eval-after-load "whitespace"
-  '(load-library "init-whitespace"))
+  '(require 'init-whitespace))
 
 ;; バッファ全体の濁点分離を直す
 (eval-after-load "ucs-normalize"
-  '(load-library "init-nfc"))
+  '(require 'init-nfc))
 
 ;; Ediff
 (eval-after-load "ediff"
-  '(load-library "init-ediff"))
+  '(require 'init-ediff))
 
 ;; uniquify
 (eval-after-load "uniquify"
@@ -259,11 +259,11 @@
   '(progn
      (setq shell-prompt-pattern
            "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ")
-     (load-library "init-shell")))
+     (require 'init-shell)))
 
 ;; dired
 (eval-after-load "dired"
-  '(load-library "init-dired")
+  '(require 'init-dired)
   )
 
 (dolist
@@ -274,7 +274,7 @@
   (add-to-list 'completion-ignored-extensions ext))
 
 ;; *scratch* と *Messages* のバッファを削除しない
-(load "add-kill-buffer-query-functions")
+(require 'init-scratch-messages)
 
 ;;; CC-Mode
 (eval-after-load "cc-mode"
@@ -282,7 +282,7 @@
      (setq c-default-style "k&r")
      (setq c-basic-offset 4)
      (gtags-mode 1)
-     (load-library "gnu-mp")))
+     (require 'gnu-mp)))
 
 ;; bison-mode
 (eval-after-load "bison"
@@ -296,11 +296,11 @@
 
 ;; web-mode
 (eval-after-load "web-mode"
-  '(load-library "init-web-mode"))
+  '(require 'init-web-mode))
 
 ;; mmm-mode
 (eval-after-load "mmm-auto"
-  '(load-library "init-mmm"))
+  '(require init-mmm))
 
 ;; image-mode
 (setq image-file-name-extensions

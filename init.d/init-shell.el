@@ -14,3 +14,5 @@
 (defadvice save-buffers-kill-terminal (before my-set-process-query activate)
   (dolist (proc (process-list))
     (set-process-not-running-child-noquery-on-exit proc)))
+
+(provide 'init-shell)

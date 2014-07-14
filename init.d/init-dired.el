@@ -30,3 +30,5 @@
 (define-key dired-mode-map "\C-cw" 'wdired-change-to-wdired-mode)
 (define-key dired-mode-map "E" 'dired-ediff-vc-latest-current)
 (define-key dired-mode-map "\C-ce" 'ediff-revision)
+
+(provide 'init-dired)

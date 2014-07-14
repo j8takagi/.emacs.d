@@ -40,3 +40,5 @@ Or, input FILE as 'FILE.~REVISON~' and FILE and REVISION is specified."
     (setq revision nil))
   (set-buffer (find-file-noselect file))
   (switch-to-buffer (vc-find-revision file revision)))
+
+(provide 'init-ediff)
