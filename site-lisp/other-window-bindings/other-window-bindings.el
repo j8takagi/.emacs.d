@@ -3,7 +3,7 @@
 ;; Copyright (C) 2014  j8takagi
 
 ;; Author: j8takagi <j8takagi@nifty.com>
-;; Keywords: Emacs elisp compile
+;; Keywords: Emacs elisp window buffer bindings
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -193,21 +193,25 @@ If splitted horizontally, vice versa."
     (set-window-buffer (next-window) (window-buffer (selected-window)))
     (set-window-buffer (selected-window) next-buf)))
 
+;; 隣のウインドウを *scratch* バッファにする
 (defun scratch-other-window ()
   "Open scratch buffer in next window."
   (interactive)
   (switch-to-buffer-other-window (get-buffer "*scratch*")))
 
+;; 新しいフレームを開き、*scratch*バッファにする
 (defun scratch-other-frame ()
   "Open scratch buffer in next window."
   (interactive)
   (switch-to-buffer-other-frame (get-buffer "*scratch*")))
 
+;; 隣のウインドウを *Messages* バッファにする
 (defun message-other-window ()
   "Open Message buffer in next window."
   (interactive)
   (switch-to-buffer-other-window (get-buffer "*Messages*")))
 
+;; 新しいフレームを開き、*Messages*バッファにする
 (defun message-other-frame ()
   "Open Message buffer in next window."
   (interactive)
@@ -218,8 +222,8 @@ If splitted horizontally, vice versa."
 
 (defvar other-window-bindings
   '(
-    ("C-x 4 K" delete-kill-next-window-buffer)
-    ("C-x 4 S" scratch-other-window)
+    ("C-x 4 C-k" delete-kill-next-window-buffer)
+    ("C-x 4 C-s" scratch-other-window)
     ("C-x 4 k" kill-next-window-buffer)
     ("C-x 4 m" message-other-window)
     ("C-x 4 q" quit-next-window)
