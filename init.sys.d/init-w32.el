@@ -1,5 +1,5 @@
 ;; -*- mode: Emacs-Lisp; -*-
-;;; MS-Windowsの設定
+;; MS-Windowsの設定
 
 ;; フレームの設定
 (dolist
@@ -7,18 +7,31 @@
      '(
        (width . 120)
        (height . 34)
-       (top . 22)
+       (top . 0)
        (left . 0)
-       )))
+       ))
+  (add-to-list 'default-frame-alist val))
 
-;; 英語フォントの設定
+;; フォントサイズと英語フォントの設定
 (set-face-attribute 'default nil
-                     :family "Consolas"
-                     :height 120)
+                    :height 120
+                    :family "Consolas")
 
 ;; 日本語フォントの設定
-(set-fontset-font t 'japanese-jisx0208
-                  (font-spec :family "Meiryo"))
+(dolist
+    (list
+     '(
+       (jisx0201 "ＭＳ ゴシック")
+       (japanese-jisx0213.2004-1 "メイリオ")
+       ))
+  (let ((charset (car list))
+        (fontfamily (nth 1 list)))
+    (cond
+     ((not (member charset charset-list))
+        (message "Character set '%s' is not found." charset))
+     ((not (member fontfamily (font-family-list)))
+        (message "Font family '%s' is not found." fontfamily))
+     ((set-fontset-font t charset (font-spec :family fontfamily))))))
 
 ;; 文字コードのデフォルトはUTF-8
 (prefer-coding-system 'utf-8-dos)
@@ -27,7 +40,8 @@
 (setq default-file-name-coding-system 'shift_jis)
 
 ;; emacsclientを使えるように
-(eval-after-load "server" '(server-start))
+(eval-after-load "server"
+  '(unless (server-running-p) (server-start)))
 
 ;; 環境変数EDITORの設定
 (setenv "EDITOR" "emacsclient")
