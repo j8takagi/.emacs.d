@@ -444,10 +444,10 @@
       (global-set-key (kbd key) func))))
 
 (dolist
-    (key '
-     ("C-x C-d"                         ; ffap-list-directory を無効に
-      "C-x 4 0"                         ; kill-buffer-and-window を無効に
-      ))
+    (key
+     '("C-x C-d"                         ; ffap-list-directory を無効に
+       "C-x 4 0"                         ; kill-buffer-and-window を無効に
+       ))
   (global-unset-key (kbd key)))
 
 ;; リストで定義されたキーバインドを設定する関数 <modemap>-init-add を
@@ -458,14 +458,22 @@
     (list
      '(
        ("text-mode" text-mode-hook text-mode-map
-        (("C-M-i" dabbrev-expand))) ; ispell 起動を無効にし、dabbrev-expand を設定
+        (
+         ("C-M-i" dabbrev-expand) ; ispell 起動を無効にし、dabbrev-expand を設定
+         ))
        ("tex-mode" latex-mode-hook latex-mode-map
-        (("C-c p p" exopen-buffer-pdffile)
-         ("C-c p d" exopen-buffer-dvifile)))
+        (
+         ("C-c p p" exopen-buffer-pdffile)
+         ("C-c p d" exopen-buffer-dvifile)
+         ("C-c C-c" comment-region)     ; tex-compileを無効にし、comment-region を設定
+         ))
        ("lisp-mode" emacs-lisp-mode-hook lisp-mode-shared-map
-        (("<M-return>" lisp-complete-symbol)))
+        (("<M-return>" lisp-complete-symbol)
+         ))
        ("mediawiki" mediawiki-mode-hook mediawiki-mode-map
-        (("C-x C-s" save-buffer)))
+        (
+         ("C-x C-s" save-buffer)
+         ))
        ))
   (let* ((lib (car list)) (hook (nth 1 list))
          (modemap (nth 2 list)) (maps (nth 3 list))
