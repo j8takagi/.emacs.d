@@ -20,3 +20,5 @@ when the buffer-kill is evaluted.")
     (progn
       (set-buffer "*Messages*")
       (view-mode-enable))))
+
+(provide 'init-scratch-messages)
