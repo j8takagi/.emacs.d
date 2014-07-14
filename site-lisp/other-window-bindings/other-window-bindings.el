@@ -200,8 +200,8 @@ If splitted horizontally, vice versa."
   (switch-to-buffer-other-window (get-buffer "*scratch*")))
 
 ;; 新しいフレームを開き、*scratch*バッファにする
-(defun scratch-other-frame ()
-  "Open scratch buffer in next window."
+(defun new-frame-scratch ()
+  "Open scratch buffer in new frame."
   (interactive)
   (switch-to-buffer-other-frame (get-buffer "*scratch*")))
 
@@ -212,8 +212,8 @@ If splitted horizontally, vice versa."
   (switch-to-buffer-other-window (get-buffer "*Messages*")))
 
 ;; 新しいフレームを開き、*Messages*バッファにする
-(defun message-other-frame ()
-  "Open Message buffer in next window."
+(defun new-frame-messages ()
+  "Open Message buffer in new frame."
   (interactive)
   (switch-to-buffer-other-frame (get-buffer "*Messages*")))
 
@@ -231,9 +231,9 @@ If splitted horizontally, vice versa."
     ("C-x 4 s" split-shell-current-directory)
     ("C-x 4 |" toggle-split-next-window)
     ("C-x 4 ~" swap-buffer-next-window)
-    ("C-x 5 m" message-other-frame)
+    ("C-x 5 m" new-frame-messages)
     ("C-x 5 s" new-frame-shell-current-directory)
-    ("C-x 5 s" scratch-other-frame)
+    ("C-x 5 C-s" new-frame-scratch)
     ("C-x C-M-k" delete-kill-current-next-window-buffer)
     )
   "List of binding forms (KEY FUNCTION) evaluated by function `other-windows-bindings'."
