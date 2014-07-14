@@ -13,3 +13,10 @@ when the buffer-kill is evaluted.")
       nil)))
 
 (add-hook 'kill-buffer-query-functions 'not-kill-but-bury-buffer)
+
+;; *Messages* バッファーを view-mode に
+(eval-after-load "view"
+  (save-current-buffer
+    (progn
+      (set-buffer "*Messages*")
+      (view-mode-enable))))

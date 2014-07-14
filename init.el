@@ -29,6 +29,7 @@
        reftex
        uniquify
        vc
+       view
        whitespace
        ;; ~/.emacs.d/site-lisp
        auto-elc-mode
