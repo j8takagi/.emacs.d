@@ -423,7 +423,7 @@
        ("C-h TAB" info-lookup-symbol)
        ("C-j" newline)
        ("C-x '" just-one-space)
-       ("C-x C-e" electric-buffer-list)
+       ("C-x C-M-b" electric-buffer-list)
        ("C-x K" kill-buffer-and-window)
        ("C-x RET u" ucs-normalize-NFC-buffer)
        ("C-x m" man)
