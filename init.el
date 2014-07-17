@@ -36,6 +36,7 @@
        whitespace
        ;; ~/.emacs.d/site-lisp
        auto-elc-mode
+       byte-compile-buffer-file
        count-japanese
        exopen-mode
        insert-file-name
