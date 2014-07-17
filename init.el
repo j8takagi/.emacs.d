@@ -111,6 +111,9 @@
 ;; 起動時の画面を表示しない
 (setq inhibit-startup-message 1)
 
+;; *scratch*のメッセージを表示しない
+(setq initial-scratch-message nil)
+
 ;; メニューバーを表示しない
 (menu-bar-mode 0)
 
