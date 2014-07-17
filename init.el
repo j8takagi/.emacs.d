@@ -12,6 +12,7 @@
        "~/.emacs.d/init.d"
        "~/.emacs.d/init.sys.d"
        "~/.emacs.d/site-lisp"
+       "~/.emacs.d/insert"
        ))
   (let ((default-directory (expand-file-name path)))
     (add-to-list 'load-path default-directory)
@@ -37,9 +38,7 @@
        auto-elc-mode
        count-japanese
        exopen-mode
-       flex-autopair
        insert-file-name
-       javadoc-style-comment-mode
        mediawiki
        other-window-bindings
        scroll-one-line
@@ -80,6 +79,7 @@
        (flex-mode "flex-mode" "Major mode for editing flex files")
        (graphviz-dot-mode "graphviz-dot-mode" "Major mode for the dot language")
        (gtags-mode "gtags" "Toggle Gtags mode, a minor mode for browsing source code using GLOBAL.")
+       (js-mode "js-mode" "Major mode for editing JavaScript.")
        (list-hexadecimal-colors-display "color-selection" "Display hexadecimal color codes, and show what they look like.")
        (magit-status "magit" "Interface to the version control system Git")
        (nxml-mode "nxml-mode" "Major mode for editing XML")
@@ -182,6 +182,11 @@
 ;; 置換時に大文字小文字を区別しない
 (setq case-replace nil)
 
+;; Abbrevs
+(setq abbrev-mode 1)
+
+(setq abbrev-file-name (expand-file-name "~/.emacs.d/.abbrev_defs"))
+
 ;; リージョンをハイライト
 (transient-mark-mode 1)
 
@@ -248,7 +253,7 @@
 
 ;; *compilation*バッファをスクロールして表示
 (eval-after-load "compile"
-  '(setq compilation-scroll-output `first-error))
+  '(setq compilation-scroll-output 'first-error))
 
 ;; lisp-modeでのタブの設定
 (defun indent-lisp-indent-line ()
@@ -315,6 +320,8 @@
 ;; ChangeLog
 (setq user-full-name "Kazuhito Takagi")
 
+(setq user-login-name "j8takagi")
+
 (setq user-mail-address "j8takagi@nifty.com")
 
 (eval-after-load "add-log"
@@ -362,6 +369,15 @@
      (setq auto-insert-directory (expand-file-name "~/.emacs.d/insert/"))
      (setq auto-insert-query nil)
      (setq auto-insert-alist nil)
+     (require 'prog-mode-skeletons)
+     (dolist
+         (list
+          '(
+            ("cc-mode" c-skeletons)
+            ("lisp-mode" emacs-lisp-skeletons)
+            ))
+       (eval-after-load (car list)
+         `(require ',(nth 1 list))))
      (dolist
          (alist
           '(
@@ -369,8 +385,7 @@
             (web-mode . "html-template.html")
             (graphviz-dot-mode . "graphviz-dot-template.gv")
             ))
-       (add-to-list 'auto-insert-alist alist))
-     ))
+       (add-to-list 'auto-insert-alist alist))))
 
 ;; magic-mode-alist
 (dolist
@@ -404,25 +419,26 @@
 (dolist
     (alist
      '(
-       ("\\.bat\\'" . dos-mode)
+       ("[Mm]akefile\\'". makefile-gmake-mode)
        ("\\.[Cc][Ss][Vv]\\'" . csv-mode)
        ("\\.[rR]\\'" . R-mode)
+       ("\\.[sx]?html?\\(\\.[a-zA-Z_]+\\)?\\'" . web-mode)
+       ("\\.bat\\'" . dos-mode)
        ("\\.casl?\\'" . asm-mode)
        ("\\.css\\'" . css-mode)
        ("\\.d\\'". makefile-gmake-mode)
        ("\\.euk\\'" . eukleides-mode)
        ("\\.gv\\'" . graphviz-dot-mode)
-       ("\\.[sx]?html?\\(\\.[a-zA-Z_]+\\)?\\'" . web-mode)
        ("\\.js\\'" . js-mode)
        ("\\.ll?\\'" . flex-mode)
-       ("[Mm]akefile\\'". makefile-gmake-mode)
        ("\\.mk\\'". makefile-gmake-mode)
        ("\\.svg\\'" . nxml-mode)
        ("\\.wiki\\'" . mediawiki-mode)
        ("\\.xml\\'" . nxml-mode)
        ("\\.y?rb\\'" . ruby-mode)
        ("\\.yy?\\'" . bison-mode)
-       ("^ja.wikipedia.org/w/index.php" . mediawiki-mode)
+       (".abbrev_defs" . emacs-lisp-mode)
+       ("\\`ja.wikipedia.org/w/index.php" . mediawiki-mode)
        ))
   (let ((mode (cdr alist)))
     (if (not (functionp mode))
@@ -479,6 +495,14 @@
     (if (not (functionp func))
         (message "%s is not defined." func)
       (global-set-key (kbd key) func))))
+
+;; skeleton-pairによる括弧挿入の自動化
+(eval-after-load "skeleton"
+  (progn
+    (setq skeleton-pair 1)
+    (dolist
+        (key '("(" "\"" "{" "["))
+      (global-set-key (kbd key) 'skeleton-pair-insert-maybe))))
 
 (dolist
     (key
