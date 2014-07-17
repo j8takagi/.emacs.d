@@ -132,7 +132,7 @@
 ;; エラー時、音が鳴るのではなく、画面が点滅するように
 (setq visible-bell 1)
 
-;; メジャーモードに合わせた色を付ける font-lock-mode
+;; font-lock-mode を有効にし、メジャーモードに合わせた色を付ける
 (global-font-lock-mode 1)
 
 ;; ダイアログボックスは使わない
@@ -465,12 +465,17 @@
        ("<M-return>" expand-abbrev)
        ("<M-right>" windmove-right)
        ("<M-up>" windmove-up)
+       ("C-' h" windmove-left)
+       ("C-' j" windmove-down)
+       ("C-' k" windmove-up)
+       ("C-' l" windmove-right)
        ("C-," scroll-up-one-line)
        ("C-." scroll-down-one-line)
+       ("C-`" expand-abbrev)
        ("C-c C-c" comment-region)
+       ("C-c C-i" insert-file-name-abs)
        ("C-c C-u" uncomment-region)
        ("C-c C-v" view-mode)
-       ("C-c I" insert-file-name-abs)
        ("C-c c" compile)
        ("C-c g" magit-status)
        ("C-c i" insert-file-name)
