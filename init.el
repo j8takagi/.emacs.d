@@ -221,6 +221,11 @@
 ;; インデント
 (setq-default indent-line-function 'tab-to-tab-stop)
 
+;; read-onlyファイルをview-modeで開く
+(setq view-read-only 1)
+
+(require 'init-view-mode)
+
 ;; 圧縮されたファイルを直接編集する
 (auto-compression-mode 1)
 
