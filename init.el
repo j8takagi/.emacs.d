@@ -452,6 +452,9 @@
 ;; ffap（find file at point）のキーバインド
 (ffap-bindings)
 
+;; view-modeでviのキーバインド
+(require 'view-mode-vi-bindings)
+
 ;; ウィンドウやバッファに関するキーバインド
 (eval-after-load "other-window-bindings"
   '(other-window-bindings))
