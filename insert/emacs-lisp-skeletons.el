@@ -45,7 +45,9 @@
          list
          '(
            ("dolist" emacs-lisp-dolist)
+           ("(dolist)" emacs-lisp-dolist)
            ("defun" emacs-lisp-defun)
+           ("(defun)" emacs-lisp-defun)
            ("template" emacs-lisp-template)
            ))
   (define-abbrev emacs-lisp-mode-abbrev-table (car list) "" (nth 1 list)))
