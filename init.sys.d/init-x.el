@@ -17,6 +17,7 @@
     (list
      '(
        (japanese-jisx0213.2004-1 "IPAexゴシック")
+       (japanese-jisx0213-2 "IPAexゴシック")
        ))
   (let ((charset (car list))
         (fontfamily (nth 1 list)))

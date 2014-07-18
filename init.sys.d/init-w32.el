@@ -23,6 +23,7 @@
      '(
        (jisx0201 "ＭＳ ゴシック")
        (japanese-jisx0213.2004-1 "メイリオ")
+       (japanese-jisx0213-2 "メイリオ")
        ))
   (let ((charset (car list))
         (fontfamily (nth 1 list)))
