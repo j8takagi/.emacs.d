@@ -1,13 +1,20 @@
-emacs -batch -l recompile-elpa.el
+C:\opt\emacs\bin\emacs -batch -l recompile-elpa.el
 set EMACSDIR=%HOME%\.emacs.d
 copy %EMACSDIR%\init.el %EMACSDIR%\init.el~
 copy init.el %EMACSDIR%\init.el
+copy init.elc %EMACSDIR%\init.elc
 rmdir /S /Q %EMACSDIR%\init.d
-xcopy /s /EXCLUDE:setup-exclude.txt "init.d" "%EMACSDIR%\init.d"
+mkdir %EMACSDIR%\init.d
+xcopy /D /S /EXCLUDE:setup-exclude.txt init.d\* "%EMACSDIR%\init.d"
 rmdir /S /Q %EMACSDIR%\init.sys.d
 mkdir %EMACSDIR%\init.sys.d
-copy init-w32.el %EMACSDIR%\init.sys.d\init-w32.el
+copy init.sys.d\init-w32.el %EMACSDIR%\init.sys.d\init-w32.el
 rmdir /S /Q %EMACSDIR%\site-lisp
-xcopy /s /EXCLUDE:setup-exclude.txt "site-lisp" "%EMACSDIR%\site-lisp"
+mkdir %EMACSDIR%\site-lisp
+xcopy /D /S /EXCLUDE:setup-exclude.txt site-lisp\* "%EMACSDIR%\site-lisp"
+rmdir /S /Q %EMACSDIR%\elpa
 mkdir %EMACSDIR%\elpa
-xcopy /s "elpa" "%EMACSDIR%\elpa"
+xcopy /D /S /Y elpa\* "%EMACSDIR%\elpa"
+rmdir /S /Q %EMACSDIR%\insert
+mkdir %EMACSDIR%\insert
+xcopy /D /S /Y insert\* "%EMACSDIR%\insert"
