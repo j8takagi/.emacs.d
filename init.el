@@ -384,17 +384,13 @@
           '(
             ("cc-mode" c-skeletons)
             ("lisp-mode" emacs-lisp-skeletons)
+            ("tex-mode" latex-skeletons)
+            ("web-mode" web-skeletons)
+            ("graphviz-dot-mode" graphviz-dot-skeletons)
             ))
-       (eval-after-load (car list)
-         `(require ',(nth 1 list))))
-     (dolist
-         (alist
-          '(
-            (latex-mode . "latex-template.tex")
-            (web-mode . "html-template.html")
-            (graphviz-dot-mode . "graphviz-dot-template.gv")
-            ))
-       (add-to-list 'auto-insert-alist alist))))
+       (let ((lib (car list)) (skel (nth 1 list)))
+         (eval-after-load lib
+           `(require ',skel))))))
 
 ;; magic-mode-alist
 (dolist
@@ -428,10 +424,8 @@
 (dolist
     (alist
      '(
-       ("[Mm]akefile\\'". makefile-gmake-mode)
        ("\\.[Cc][Ss][Vv]\\'" . csv-mode)
        ("\\.[rR]\\'" . R-mode)
-       ("\\.[sx]?html?\\(\\.[a-zA-Z_]+\\)?\\'" . web-mode)
        ("\\.bat\\'" . dos-mode)
        ("\\.casl?\\'" . asm-mode)
        ("\\.css\\'" . css-mode)
