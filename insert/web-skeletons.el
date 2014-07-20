@@ -6,9 +6,9 @@
   "<!DOCTYPE html>" n
   "<html>" n
   "<head>" n
-  "<meta charset=\"utf-8\">" n
+  "<meta charset=\"utf-8\" />" n
   "<title></title>" n
-  "<link rel=stylesheet href=\"style.css\">" n
+  "<link rel=\"stylesheet\" href=\"style.css\" />" n
   "</head>" n
   _ n
   n
@@ -23,25 +23,35 @@
   nil
   > "<title>" _ "</title>")
 
-(define-skeleton html-tag-base
+(define-skeleton html-tag-base-href
   "HTML tag base"
   nil
-  > "<base" _ ">")
+  > "<base href=\"" _ "\" />")
+
+(define-skeleton html-tag-base-target
+  "HTML tag base"
+  nil
+  > "<base target=\"" _ "\" />")
 
 (define-skeleton html-tag-link
   "HTML tag link"
   nil
-  > "<link" _ ">")
+  > "<link rel=\"" _ "\" href=\"\" />")
 
-(define-skeleton html-tag-meta
-  "HTML tag meta"
+(define-skeleton html-tag-meta-name
+  "HTML tag meta with attribute name."
   nil
-  > "<meta" _ ">")
+  > "<meta name=\"" _ "\" content=\"\" />")
+
+(define-skeleton html-tag-meta-http
+  "HTML tag meta with attribute http-equiv."
+  nil
+  > "<meta http-equiv=\"" _ "\" content=\"\" />")
 
 (define-skeleton html-tag-style-inline
   "HTML tag style"
   nil
-  > "<style" _ ">")
+  > "<style" _ " />")
 
 (define-skeleton html-tag-style-block
   "HTML tag style"
@@ -53,7 +63,7 @@
 (define-skeleton html-tag-script-inline
   "HTML tag script"
   nil
-  > "<script" _ ">")
+  > "<script" _ " />")
 
 (define-skeleton html-tag-script-block
   "HTML tag script"
@@ -361,12 +371,12 @@
 (define-skeleton html-tag-br
   "HTML tag br"
   nil
-  > "<br" _ ">")
+  > "<br" _ " />")
 
 (define-skeleton html-tag-wbr
   "HTML tag wbr"
   nil
-  > "<wbr" _ ">")
+  > "<wbr" _ " />")
 
 (define-skeleton html-tag-ins
   "HTML tag ins"
@@ -381,12 +391,12 @@
 (define-skeleton html-tag-img
   "HTML tag img"
   nil
-  > "<img" _ ">")
+  > "<img src=\"" _ "\" alt=\"\" />")
 
 (define-skeleton html-tag-iframe-single
   "HTML tag iframe"
   nil
-  > "<iframe" _ ">")
+  > "<iframe" _ " />")
 
 (define-skeleton html-tag-iframe-pair
   "HTML tag iframe"
@@ -396,12 +406,12 @@
 (define-skeleton html-tag-embed
   "HTML tag embed"
   nil
-  > "<embed" _ ">")
+  > "<embed" _ " />")
 
 (define-skeleton html-tag-object-single
   "HTML tag object"
   nil
-  > "<object" _ ">")
+  > "<object" _ " />")
 
 (define-skeleton html-tag-object-pair
   "HTML tag object"
@@ -418,12 +428,12 @@
 (define-skeleton html-tag-param
   "HTML tag param"
   nil
-  > "<param" _ ">")
+  > "<param" _ " />")
 
 (define-skeleton html-tag-video-single
   "HTML tag video"
   nil
-  > "<video" _ ">")
+  > "<video" _ " />")
 
 (define-skeleton html-tag-video-pair
   "HTML tag video"
@@ -440,7 +450,7 @@
 (define-skeleton html-tag-audio-single
   "HTML tag audio"
   nil
-  > "<audio" _ ">")
+  > "<audio" _ " />")
 
 (define-skeleton html-tag-audio-pair
   "HTML tag audio"
@@ -457,12 +467,12 @@
 (define-skeleton html-tag-source
   "HTML tag source"
   nil
-  > "<source" _ ">")
+  > "<source" _ " />")
 
 (define-skeleton html-tag-track
   "HTML tag track"
   nil
-  > "<track" _ ">")
+  > "<track" _ " />")
 
 (define-skeleton html-tag-canvas-single
   "HTML tag canvas"
@@ -491,7 +501,7 @@
 (define-skeleton html-tag-area
   "HTML tag area"
   nil
-  > "<area" _ ">")
+  > "<area" _ " />")
 
 (define-skeleton html-tag-table
   "HTML tag table"
@@ -515,7 +525,7 @@
 (define-skeleton html-tag-col
   "HTML tag col"
   nil
-  > "<col" _ ">")
+  > "<col" _ " />")
 
 (define-skeleton html-tag-tbody
   "HTML tag tbody"
@@ -581,107 +591,109 @@
 (dolist (
          list
          '(
-           ("<title" html-tag-title)
-           ("<base" html-tag-base)
-           ("<link" html-tag-link)
-           ("<meta" html-tag-meta)
-           ("<style" html-tag-style-inline)
-           ("<style" html-tag-style-block)
-           ("<script" html-tag-script-inline)
-           ("<script" html-tag-script-block)
-           ("<noscript" html-tag-noscript-inline)
-           ("<noscript" html-tag-noscript-block)
-           ("<section" html-tag-section)
-           ("<nav" html-tag-nav)
-           ("<article" html-tag-article)
-           ("<aside" html-tag-aside)
-           ("<h1" html-tag-h1)
-           ("<h2" html-tag-h2)
-           ("<h3" html-tag-h3)
-           ("<h4" html-tag-h4)
-           ("<h5" html-tag-h5)
-           ("<h6" html-tag-h6)
-           ("<header" html-tag-header)
-           ("<footer" html-tag-footer)
-           ("<address" html-tag-address)
-           ("<p" html-tag-p-block)
-           ("<p" html-tag-p-inline)
-           ("<hr" html-tag-hr)
-           ("<pre" html-tag-pre)
-           ("<blockquote" html-tag-blockquote)
-           ("<ol" html-tag-ol)
-           ("<ul" html-tag-ul)
-           ("<li" html-tag-li)
-           ("<dl" html-tag-dl)
-           ("<dt" html-tag-dt)
-           ("<dd" html-tag-dd)
-           ("<figure" html-tag-figure)
-           ("<figcaption" html-tag-figcaption)
-           ("<div" html-tag-div)
-           ("<a" html-tag-a)
-           ("<em" html-tag-em)
-           ("<strong" html-tag-strong)
-           ("<small" html-tag-small)
-           ("<s" html-tag-s)
-           ("<cite" html-tag-cite)
-           ("<q" html-tag-q)
-           ("<dfn" html-tag-dfn)
-           ("<abbr" html-tag-abbr)
-           ("<time" html-tag-time)
-           ("<code" html-tag-code)
-           ("<var" html-tag-var)
-           ("<samp" html-tag-samp)
-           ("<kbd" html-tag-kbd)
-           ("<sub" html-tag-sub)
-           ("<sup" html-tag-sup)
-           ("<i" html-tag-i)
-           ("<b" html-tag-b)
-           ("<u" html-tag-u)
-           ("<mark" html-tag-mark)
-           ("<ruby" html-tag-ruby)
-           ("<rt" html-tag-rt)
-           ("<rp" html-tag-rp)
-           ("<bdi" html-tag-bdi)
-           ("<bdo" html-tag-bdo)
-           ("<span" html-tag-span)
-           ("<br" html-tag-br)
-           ("<wbr" html-tag-wbr)
-           ("<ins" html-tag-ins)
-           ("<del" html-tag-del)
-           ("<img" html-tag-img)
-           ("<iframe" html-tag-iframe-single)
-           ("<iframe" html-tag-iframe-pair)
-           ("<embed" html-tag-embed)
-           ("<object" html-tag-object-single)
-           ("<object" html-tag-object-pair)
-           ("<object" html-tag-object-block)
-           ("<param" html-tag-param)
-           ("<video" html-tag-video-single)
-           ("<video" html-tag-video-pair)
-           ("<video" html-tag-video-block)
-           ("<audio" html-tag-audio-sigle)
-           ("<audio" html-tag-audio-pair)
-           ("<audio" html-tag-audio-block)
-           ("<source" html-tag-source)
-           ("<track" html-tag-track)
-           ("<canvas" html-tag-canvas-single)
-           ("<canvas" html-tag-canvas-pair)
-           ("<canvas" html-tag-canvas-block)
-           ("<map" html-tag-map)
-           ("<area" html-tag-area)
-           ("<table" html-tag-table)
-           ("<caption" html-tag-caption)
-           ("<colgroup" html-tag-colgroup)
-           ("<col" html-tag-col)
-           ("<tbody" html-tag-tbody)
-           ("<thead" html-tag-thead)
-           ("<tfoot" html-tag-tfoot)
-           ("<tr" html-tag-tr-inline)
-           ("<tr" html-tag-tr-block)
-           ("<td" html-tag-td-inline)
-           ("<td" html-tag-td-block)
-           ("<th" html-tag-th-inline)
-           ("<th" html-tag-th-block)
+           ("title" html-tag-title)
+           ("base" html-tag-base-href)
+           ("base" html-tag-base-target)
+           ("link" html-tag-link)
+           ("meta" html-tag-meta-name)
+           ("meta" html-tag-meta-http)
+           ("style" html-tag-style-inline)
+           ("style" html-tag-style-block)
+           ("script" html-tag-script-inline)
+           ("script" html-tag-script-block)
+           ("noscript" html-tag-noscript-inline)
+           ("noscript" html-tag-noscript-block)
+           ("section" html-tag-section)
+           ("nav" html-tag-nav)
+           ("article" html-tag-article)
+           ("aside" html-tag-aside)
+           ("h1" html-tag-h1)
+           ("h2" html-tag-h2)
+           ("h3" html-tag-h3)
+           ("h4" html-tag-h4)
+           ("h5" html-tag-h5)
+           ("h6" html-tag-h6)
+           ("header" html-tag-header)
+           ("footer" html-tag-footer)
+           ("address" html-tag-address)
+           ("p" html-tag-p-block)
+           ("p" html-tag-p-inline)
+           ("hr" html-tag-hr)
+           ("pre" html-tag-pre)
+           ("blockquote" html-tag-blockquote)
+           ("ol" html-tag-ol)
+           ("ul" html-tag-ul)
+           ("li" html-tag-li)
+           ("dl" html-tag-dl)
+           ("dt" html-tag-dt)
+           ("dd" html-tag-dd)
+           ("figure" html-tag-figure)
+           ("figcaption" html-tag-figcaption)
+           ("div" html-tag-div)
+           ("a" html-tag-a)
+           ("em" html-tag-em)
+           ("strong" html-tag-strong)
+           ("small" html-tag-small)
+           ("s" html-tag-s)
+           ("cite" html-tag-cite)
+           ("q" html-tag-q)
+           ("dfn" html-tag-dfn)
+           ("abbr" html-tag-abbr)
+           ("time" html-tag-time)
+           ("code" html-tag-code)
+           ("var" html-tag-var)
+           ("samp" html-tag-samp)
+           ("kbd" html-tag-kbd)
+           ("sub" html-tag-sub)
+           ("sup" html-tag-sup)
+           ("i" html-tag-i)
+           ("b" html-tag-b)
+           ("u" html-tag-u)
+           ("mark" html-tag-mark)
+           ("ruby" html-tag-ruby)
+           ("rt" html-tag-rt)
+           ("rp" html-tag-rp)
+           ("bdi" html-tag-bdi)
+           ("bdo" html-tag-bdo)
+           ("span" html-tag-span)
+           ("br" html-tag-br)
+           ("wbr" html-tag-wbr)
+           ("ins" html-tag-ins)
+           ("del" html-tag-del)
+           ("img" html-tag-img)
+           ("iframe" html-tag-iframe-single)
+           ("iframe" html-tag-iframe-pair)
+           ("embed" html-tag-embed)
+           ("object" html-tag-object-single)
+           ("object" html-tag-object-pair)
+           ("object" html-tag-object-block)
+           ("param" html-tag-param)
+           ("video" html-tag-video-single)
+           ("video" html-tag-video-pair)
+           ("video" html-tag-video-block)
+           ("audio" html-tag-audio-sigle)
+           ("audio" html-tag-audio-pair)
+           ("audio" html-tag-audio-block)
+           ("source" html-tag-source)
+           ("track" html-tag-track)
+           ("canvas" html-tag-canvas-single)
+           ("canvas" html-tag-canvas-pair)
+           ("canvas" html-tag-canvas-block)
+           ("map" html-tag-map)
+           ("area" html-tag-area)
+           ("table" html-tag-table)
+           ("caption" html-tag-caption)
+           ("colgroup" html-tag-colgroup)
+           ("col" html-tag-col)
+           ("tbody" html-tag-tbody)
+           ("thead" html-tag-thead)
+           ("tfoot" html-tag-tfoot)
+           ("tr" html-tag-tr-inline)
+           ("tr" html-tag-tr-block)
+           ("td" html-tag-td-inline)
+           ("td" html-tag-td-block)
+           ("th" html-tag-th-inline)
+           ("th" html-tag-th-block)
            ))
   (define-abbrev web-mode-abbrev-table (car list) "" (nth 1 list)))
 
