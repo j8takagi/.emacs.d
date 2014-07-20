@@ -24,6 +24,7 @@
   '(
     "~/201[4-9]_[01][0-9]"
     "~/.emacs.d/elpa"
+    "/tmp"
     )
   "Directories pattern to set buffer read-only."
   )
