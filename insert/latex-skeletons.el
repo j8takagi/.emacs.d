@@ -41,7 +41,7 @@
   "\end{table}" n)
 
 ;; Autoinserting
-(define-auto-insert 'latex-mode [latex-template])
+(define-auto-insert 'latex-mode 'latex-template)
 
 ;; Skeletons as Abbrev Expansions
 (dolist (

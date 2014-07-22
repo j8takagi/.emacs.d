@@ -39,7 +39,6 @@
        byte-compile-buffer-file
        count-japanese
        exopen-mode
-       insert-file-name
        mediawiki
        other-window-bindings
        scroll-one-line
@@ -90,7 +89,7 @@
        ))
   (let ((func (car list)) (file (nth 1 list)) (doc (nth 2 list)))
     (if (not (locate-library file))
-        (message "Warn: %s is not found." file)
+        (message "Warn: %s is not found as library file." file)
       (if (autoload func file doc 1)
           (message "%s is defined to autoload from file %s." func file)))))
 
@@ -378,11 +377,12 @@
      (setq auto-insert-directory (expand-file-name "~/.emacs.d/insert/"))
      (setq auto-insert-query nil)
      (setq auto-insert-alist nil)
-     (require 'prog-mode-skeletons)
+     (require 'global-skeletons)
      (dolist
          (list
           '(
             ("cc-mode" c-skeletons)
+            ("cc-mode" h-skeletons)
             ("lisp-mode" emacs-lisp-skeletons)
             ("tex-mode" latex-skeletons)
             ("web-mode" web-skeletons)

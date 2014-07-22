@@ -1,5 +1,15 @@
+;;; emacs-lisp-skeletons.el --- 
+
+;; Copyright (C) 2014 by j8takagi
+
+;; Authors:Kazuhito Takagi
+;; Keywords:
+
+;;; Commentary:
+
+;;; Code:
 (define-skeleton emacs-lisp-template
-  "template of emacs lisp file."
+  "Template of emacs lisp file."
   nil
   ";;; " (file-name-nondirectory (buffer-file-name)) " --- " ?\n
   ?\n
@@ -38,19 +48,20 @@
   )
 
 ;; Autoinserting
-(define-auto-insert "\\.el\\'" [emacs-lisp-template])
+(define-auto-insert "\\.el\\'" 'emacs-lisp-template)
 
 ;; Skeletons as Abbrev Expansions
-(dolist (
-         list
-         '(
-           ("dolist" emacs-lisp-dolist)
-           ("(dolist)" emacs-lisp-dolist)
-           ("defun" emacs-lisp-defun)
-           ("(defun)" emacs-lisp-defun)
-           ("template" emacs-lisp-template)
-           ))
-  (define-abbrev emacs-lisp-mode-abbrev-table (car list) "" (nth 1 list)))
+(dolist
+    (list
+     '(
+       ("dolist" emacs-lisp-dolist)
+       ("(dolist)" emacs-lisp-dolist)
+       ("defun" emacs-lisp-defun)
+       ("(defun)" emacs-lisp-defun)
+       ("template" emacs-lisp-template)
+       ))
+  (let ((name (car list)) (hook (nth 1 list)))
+    (define-abbrev emacs-lisp-mode-abbrev-table name "" hook)))
 
 (provide 'emacs-lisp-skeletons)
 ;;; emacs-lisp-skeletons.el ends here
