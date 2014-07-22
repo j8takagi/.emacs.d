@@ -430,6 +430,7 @@
        ("\\.casl?\\'" . asm-mode)
        ("\\.css\\'" . css-mode)
        ("\\.d\\'". makefile-gmake-mode)
+       ("Makefile\\.?.*". makefile-gmake-mode)
        ("\\.euk\\'" . eukleides-mode)
        ("\\.gv\\'" . graphviz-dot-mode)
        ("\\.js\\'" . js-mode)
