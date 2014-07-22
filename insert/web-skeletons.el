@@ -39,7 +39,7 @@
   > "<link rel=\"" _ "\" href=\"\" />")
 
 (define-skeleton html-tag-meta-name
-  "HTML tag meta with attribute name."
+  "HTML tag `meta' with attribute `name'."
   nil
   > "<meta name=\"" _ "\" content=\"\" />")
 
@@ -248,7 +248,12 @@
   _ n
   "</div>" n)
 
-(define-skeleton html-tag-a
+(define-skeleton html-tag-a-href
+  "HTML tag `a' with attribute `href'"
+  nil
+  > "<a href=\"" _ "\">" @ "</a>")
+
+(define-skeleton html-tag-a-name
   "HTML tag a"
   nil
   > "<a>" _ "</a>")
@@ -630,7 +635,8 @@
            ("figure" html-tag-figure)
            ("figcaption" html-tag-figcaption)
            ("div" html-tag-div)
-           ("a" html-tag-a)
+           ("<a" html-tag-a-href)
+           ("a" html-tag-a-href)
            ("em" html-tag-em)
            ("strong" html-tag-strong)
            ("small" html-tag-small)
