@@ -1,7 +1,7 @@
 CP := cp
 ECHO := echo
 EMACS := emacs
-FIND := find
+GREPV := grep -v
 INSTALL = install
 MKDIR := mkdir
 RMR := $(RM) -R
@@ -9,12 +9,12 @@ RSYNC := rsync
 RSYNCFLAG := -avz --delete
 
 COMPILE.el := $(EMACS) -batch -l set-load-path.el -l init.el -f batch-byte-compile
-
+CLEAN.rsync := $(GREPV) "^\(sent\)\|\(total\)\|\(sending\)"
 emacs-dir := ~/.emacs.d
 
 .PHONY: all init elpa site-lisp install install-init.d install-init.sys.d install-site-lisp install-elpa
 
-all: init init.d init.sys.d site-lisp
+all: init init.d init.sys.d insert site-lisp
 
 init: init.elc
 
@@ -24,11 +24,14 @@ init.d:
 init.sys.d:
 	$(MAKE) -C $@
 
-site-lisp:
+insert:
 	$(MAKE) -C $@
 
+site-lisp:
+	$(MAKE) -sC $@
+
 get-elpa:
-	$(RSYNC) $(RSYNCFLAG) $(emacs-dir)/elpa/ elpa/
+	$(RSYNC) $(RSYNCFLAG) $(emacs-dir)/elpa/ elpa/ | $(CLEAN.rsync)
 
 elpa:
 	$(EMACS) -batch -l recompile-elpa.el
@@ -36,10 +39,10 @@ elpa:
 install: install-init install-abbrev install-init.d install-init.sys.d install-site-lisp install-insert
 
 install-init: $(emacs-dir) $(emacs-dir)/init.el~ init
-	$(RSYNC) $(RSYNCFLAG) init.el init.elc $(emacs-dir)/
+	$(RSYNC) $(RSYNCFLAG) init.el init.elc $(emacs-dir)/ | $(CLEAN.rsync)
 
 install-abbrev: $(emacs-dir)
-	$(RSYNC) $(RSYNCFLAG) .abbrev_defs $(emacs-dir)/
+	$(RSYNC) $(RSYNCFLAG) .abbrev_defs $(emacs-dir)/ | $(CLEAN.rsync)
 
 $(emacs-dir)/init.el~: $(emacs-dir)/init.el
 	$(CP) $< $@
@@ -53,22 +56,19 @@ install-init.sys.d: init.sys.d
 install-site-lisp: $(emacs-dir)/site-lisp
 	$(MAKE) -C site-lisp install
 
-install-insert: $(emacs-dir)/insert
-	$(RSYNC) $(RSYNCFLAG) insert/* $(emacs-dir)/insert/
+install-insert:
+	$(MAKE) -C insert install
 
 install-elpa: elpa $(emacs-dir)/elpa
-	$(RSYNC) $(RSYNCFLAG) elpa/* $(emacs-dir)/elpa/
+	$(RSYNC) $(RSYNCFLAG) elpa/* $(emacs-dir)/elpa/ | $(CLEAN.rsync)
 
 $(emacs-dir):
-	$(MKDIR) $@
-
-$(emacs-dir)/insert:
 	$(MKDIR) $@
 
 %.elc: %.el
 	$(COMPILE.el) $<
 
-clean: clean-init clean-init.d clean-init.sys.d clean-site-lisp
+clean: clean-init clean-init.d clean-init.sys.d clean-insert clean-site-lisp
 
 clean-init:
 	$(RM) *.elc
@@ -78,6 +78,9 @@ clean-init.d:
 
 clean-init.sys.d:
 	$(MAKE) -C init.sys.d clean
+
+clean-insert:
+	$(MAKE) -C insert clean
 
 clean-site-lisp:
 	$(MAKE) -C site-lisp clean
