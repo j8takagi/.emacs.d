@@ -80,7 +80,7 @@
        (flex-mode "flex-mode" "Major mode for editing flex files")
        (graphviz-dot-mode "graphviz-dot-mode" "Major mode for the dot language")
        (gtags-mode "gtags" "Toggle Gtags mode, a minor mode for browsing source code using GLOBAL.")
-       (js-mode "js-mode" "Major mode for editing JavaScript.")
+       (js-mode "js" "Major mode for editing JavaScript.")
        (list-hexadecimal-colors-display "color-selection" "Display hexadecimal color codes, and show what they look like.")
        (magit-status "magit" "Interface to the version control system Git")
        (nxml-mode "nxml-mode" "Major mode for editing XML")
