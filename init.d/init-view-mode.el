@@ -54,6 +54,7 @@
     "dired-.*-?mode"
     "magit-.*-?mode"
     "package-.*-?mode"
+    "Info-mode"
     )
   "Major mode patterns exclude from setting buffers read-only."
   )
