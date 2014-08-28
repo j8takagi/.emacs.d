@@ -36,6 +36,9 @@ get-elpa:
 elpa:
 	$(EMACS) -batch -l recompile-elpa.el
 
+get-abbrev:
+	$(RSYNC) $(RSYNCFLAG) $(emacs-dir)/.abbrev_defs ./
+
 install: install-init install-abbrev install-init.d install-init.sys.d install-site-lisp install-insert
 
 install-init: $(emacs-dir) $(emacs-dir)/init.el~ init
