@@ -285,7 +285,7 @@
     (ext
      '(".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" ".aux_prev"
        ".toc_prev" ".lot_prev" ".lof_prev" ".bbl_prev" ".out_prev"
-       ".idx" ".ind" ".idx_prev" ".ind_prev" ".ilg" ".DS_Store"))
+       ".idx" ".ind" ".idx_prev" ".ind_prev" ".ilg" "tmp" ".DS_Store"))
   (add-to-list 'completion-ignored-extensions ext))
 
 ;; *scratch* と *Messages* のバッファを削除しない
