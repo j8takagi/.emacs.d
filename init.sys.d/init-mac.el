@@ -1,7 +1,7 @@
 ;; -*- mode: Emacs-Lisp; -*-
 ;; Mac OS X用の設定
 
-;; OSのpath_helperでPATHを取得し、あらためてPATHとして設定
+;; Mac OS Xのpath_helperでPATHを取得し、あらためてPATHとして設定
 (let ((shell-file-name "/bin/bash"))
     (setenv "PATH"
             (shell-command-to-string
@@ -20,6 +20,8 @@
     (list
      '(
        ("LANG" "en_US.UTF-8")
+       ("PAGER" "cat")
+       ("MANPAGER" "cat")
        ("EDITOR" "emacsclient")
        ("VISUAL" "emacsclient")
        ))
@@ -42,6 +44,12 @@
        ))
   (add-to-list 'default-frame-alist val))
 
+;; 標準のフォントサイズとフォントファミリーの設定
+(set-face-attribute 'default nil
+                    :height 120
+                    :family "Menlo")
+
+;; Character setごとにフォントファミリーを設定
 (dolist
     (list
      '(
@@ -58,11 +66,13 @@
         (message "Font family %s is not found." fontfamily))
      ((set-fontset-font t charset (font-spec :family fontfamily))))))
 
+;; Mac OS XのIME設定
 (setq default-input-method "MacOSX")
 
 ;; commandキーをEmacsのMetaキーに
 (setq mac-command-modifier 'meta)
 
+;; Mac OS Xのキー設定
 (dolist
     (map
      '(

@@ -21,25 +21,17 @@
 
 (define-skeleton c-elseif
   "else if statement in c-mode."
-  > "else if(" _ ") {" n
-  n "}")
+  > "else if(" _ ") {" ?\n
+  > ?\n
+  "}" ?\n
+  )
 
 (define-skeleton c-else
   "else statement in c-mode."
-  > "else {" n
-  _ n "}")
-
-(dolist
-    (
-     list
-     '(
-       ("/**" comment-javadoc-style)
-       ("if" c-if)
-       ("elseif" c-elseif)
-       ("else" c-else)
-       ))
-  (let ((name (car list)) (hook (nth 1 list)))
-    (define-abbrev c-mode-abbrev-table name "" hook)))
+  > "else {" ?\n
+  > _ ?\n
+  > "}" ?\n
+  )
 
 (provide 'c-skeletons)
 ;;; c-skeletons.el ends here

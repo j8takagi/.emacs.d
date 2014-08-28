@@ -12,7 +12,7 @@
        ))
   (add-to-list 'default-frame-alist val))
 
-;; フォントサイズと英語フォントの設定
+;; 標準のフォントサイズとフォントファミリーの設定
 (set-face-attribute 'default nil
                     :height 120
                     :family "Consolas")

@@ -26,7 +26,8 @@
 (define-skeleton html-tag-base-href
   "HTML tag base"
   nil
-  > "<base href=\"" _ "\" />")
+  > "<base href=\"" _ "\" />"
+  )
 
 (define-skeleton html-tag-base-target
   "HTML tag base"
@@ -252,11 +253,6 @@
   "HTML tag `a' with attribute `href'"
   nil
   > "<a href=\"" _ "\">" @ "</a>")
-
-(define-skeleton html-tag-a-name
-  "HTML tag a"
-  nil
-  > "<a>" _ "</a>")
 
 (define-skeleton html-tag-em
   "HTML tag em"
@@ -590,119 +586,7 @@
   "</th>" n)
 
 ;; Autoinserting
-(define-auto-insert "\\.[sx]?html?\\(\\.[a-zA-Z_]+\\)?\\'" [web-template])
-
-;; Skeletons as Abbrev Expansions
-(dolist (
-         list
-         '(
-           ("title" html-tag-title)
-           ("base" html-tag-base-href)
-           ("base" html-tag-base-target)
-           ("link" html-tag-link)
-           ("meta" html-tag-meta-name)
-           ("meta" html-tag-meta-http)
-           ("style" html-tag-style-inline)
-           ("style" html-tag-style-block)
-           ("script" html-tag-script-inline)
-           ("script" html-tag-script-block)
-           ("noscript" html-tag-noscript-inline)
-           ("noscript" html-tag-noscript-block)
-           ("section" html-tag-section)
-           ("nav" html-tag-nav)
-           ("article" html-tag-article)
-           ("aside" html-tag-aside)
-           ("h1" html-tag-h1)
-           ("h2" html-tag-h2)
-           ("h3" html-tag-h3)
-           ("h4" html-tag-h4)
-           ("h5" html-tag-h5)
-           ("h6" html-tag-h6)
-           ("header" html-tag-header)
-           ("footer" html-tag-footer)
-           ("address" html-tag-address)
-           ("p" html-tag-p-block)
-           ("p" html-tag-p-inline)
-           ("hr" html-tag-hr)
-           ("pre" html-tag-pre)
-           ("blockquote" html-tag-blockquote)
-           ("ol" html-tag-ol)
-           ("ul" html-tag-ul)
-           ("li" html-tag-li)
-           ("dl" html-tag-dl)
-           ("dt" html-tag-dt)
-           ("dd" html-tag-dd)
-           ("figure" html-tag-figure)
-           ("figcaption" html-tag-figcaption)
-           ("div" html-tag-div)
-           ("<a" html-tag-a-href)
-           ("a" html-tag-a-href)
-           ("em" html-tag-em)
-           ("strong" html-tag-strong)
-           ("small" html-tag-small)
-           ("s" html-tag-s)
-           ("cite" html-tag-cite)
-           ("q" html-tag-q)
-           ("dfn" html-tag-dfn)
-           ("abbr" html-tag-abbr)
-           ("time" html-tag-time)
-           ("code" html-tag-code)
-           ("var" html-tag-var)
-           ("samp" html-tag-samp)
-           ("kbd" html-tag-kbd)
-           ("sub" html-tag-sub)
-           ("sup" html-tag-sup)
-           ("i" html-tag-i)
-           ("b" html-tag-b)
-           ("u" html-tag-u)
-           ("mark" html-tag-mark)
-           ("ruby" html-tag-ruby)
-           ("rt" html-tag-rt)
-           ("rp" html-tag-rp)
-           ("bdi" html-tag-bdi)
-           ("bdo" html-tag-bdo)
-           ("span" html-tag-span)
-           ("br" html-tag-br)
-           ("wbr" html-tag-wbr)
-           ("ins" html-tag-ins)
-           ("del" html-tag-del)
-           ("img" html-tag-img)
-           ("iframe" html-tag-iframe-single)
-           ("iframe" html-tag-iframe-pair)
-           ("embed" html-tag-embed)
-           ("object" html-tag-object-single)
-           ("object" html-tag-object-pair)
-           ("object" html-tag-object-block)
-           ("param" html-tag-param)
-           ("video" html-tag-video-single)
-           ("video" html-tag-video-pair)
-           ("video" html-tag-video-block)
-           ("audio" html-tag-audio-sigle)
-           ("audio" html-tag-audio-pair)
-           ("audio" html-tag-audio-block)
-           ("source" html-tag-source)
-           ("track" html-tag-track)
-           ("canvas" html-tag-canvas-single)
-           ("canvas" html-tag-canvas-pair)
-           ("canvas" html-tag-canvas-block)
-           ("map" html-tag-map)
-           ("area" html-tag-area)
-           ("table" html-tag-table)
-           ("caption" html-tag-caption)
-           ("colgroup" html-tag-colgroup)
-           ("col" html-tag-col)
-           ("tbody" html-tag-tbody)
-           ("thead" html-tag-thead)
-           ("tfoot" html-tag-tfoot)
-           ("tr" html-tag-tr-inline)
-           ("tr" html-tag-tr-block)
-           ("td" html-tag-td-inline)
-           ("td" html-tag-td-block)
-           ("th" html-tag-th-inline)
-           ("th" html-tag-th-block)
-           ))
-  (define-abbrev web-mode-abbrev-table (car list) "" (nth 1 list)))
-
+(define-auto-insert "\\.[sx]?html?\\(\\.[a-zA-Z_]+\\)?\\'" 'web-template)
 
 (provide 'web-skeletons)
 ;;; web-skeletons.el ends here
