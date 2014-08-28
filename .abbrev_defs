@@ -49,7 +49,6 @@
 
 (define-abbrev-table 'emacs-lisp-mode-abbrev-table
   '(
-    ("header" "" emacs-lisp-dolist 0)
     ("dolist" "" emacs-lisp-dolist 0)
    ))
 
