@@ -583,6 +583,15 @@
 ;; 文字コードのデフォルトはUTF-8
 (prefer-coding-system 'utf-8)
 
+(defun message-startup-time ()
+  (message
+   "Emacs loaded in %dms"
+   (/ (- (+ (nth 2 after-init-time) (* 1000000 (nth 1 after-init-time)))
+         (+ (nth 2 before-init-time) (* 1000000 (nth 1 before-init-time))))
+      1000)))
+
+(add-hook 'after-init-hook 'message-startup-time)
+
 ;; session
 (if (not (locate-library "session"))
       (message "Warn: library 'session' is not found.")
