@@ -478,12 +478,10 @@
        ("C-." scroll-down-one-line)
        ("C-`" expand-abbrev)
        ("C-c C-c" comment-region)
-       ("C-c C-i" insert-file-name-abs)
        ("C-c C-u" uncomment-region)
        ("C-c C-v" view-mode)
        ("C-c c" compile)
        ("C-c g" magit-status)
-       ("C-c i" insert-file-name)
        ("C-c t" switch-to-temp-buffer)
        ("C-c w t" whitespace-toggle-options)
        ("C-c w w" whitespace-mode)
@@ -522,6 +520,7 @@
     (key
      '("C-x C-d"                         ; ffap-list-directory を無効に
        "C-x 4 0"                         ; kill-buffer-and-window を無効に
+       "M-`"                             ; tmm-menubar を無効に
        ))
   (global-unset-key (kbd key)))
 
@@ -538,6 +537,7 @@
          ))
        ("tex-mode" latex-mode-hook latex-mode-map
         (
+         ("<M-return>" latex-insert-item) ; latex-insert-itemを再設定
          ("C-c p p" exopen-buffer-pdffile)
          ("C-c p d" exopen-buffer-dvifile)
          ("C-c C-c" comment-region)     ; tex-compileを無効にし、comment-region を設定
