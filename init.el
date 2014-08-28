@@ -390,7 +390,9 @@
             ))
        (let ((lib (car list)) (skel (nth 1 list)))
          (eval-after-load lib
-           `(require ',skel))))))
+           `(require ',skel))))
+     (require 'define_abbrevs)
+     ))
 
 ;; magic-mode-alist
 (dolist
