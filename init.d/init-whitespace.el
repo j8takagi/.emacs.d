@@ -1,18 +1,18 @@
 (require 'whitespace)
 
-(setq whitespace-style '(face tabs spaces trailing)) ;  タブ
+(setq whitespace-style '(face tabs spaces trailing)) ;	タブ
 
 (setq whitespace-space-regexp "\\(　\\)")     ;　全角スペース
 
 (setq whitespace-trailing-regexp "\\( +$\\)") ;行末の空白    
 
 
-(set-face-attribute whitespace-tab nil :box "navy" :background (background-color-at-point))
+(set-face-attribute whitespace-tab nil :box "navy" :background "gray99")
 
-(set-face-attribute whitespace-space nil :box "orange" :background (background-color-at-point))
+(set-face-attribute whitespace-space nil :box "orange" :background "gray99")
 
 (set-face-attribute whitespace-trailing nil
-                    :foreground "navy" :background (background-color-at-point) :underline "navy")
+                    :foreground "navy" :background "gray99" :underline "navy")
 
 ;; whitespaceを無効にするメジャーモード
 (defvar whitespace-disabled-major-mode-list
