@@ -47,6 +47,12 @@
 ;; 環境変数EDITORの設定
 (setenv "EDITOR" "emacsclient")
 
+;; Shell-modeの文字コード設定
+(add-hook
+ 'shell-mode-hook
+ '(lambda ()
+    (set-buffer-process-coding-system 'sjis 'sjis)))
+
 (cd "~")
 
 (provide 'init-w32)
