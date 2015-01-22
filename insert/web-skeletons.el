@@ -7,10 +7,9 @@
   "<html>" n
   "<head>" n
   "<meta charset=\"utf-8\" />" n
-  "<title></title>" n
+  "<title>" _ "</title>" n
   "<link rel=\"stylesheet\" href=\"style.css\" />" n
   "</head>" n
-  _ n
   n
   "<body>" n
   "<h1></h1>" n
