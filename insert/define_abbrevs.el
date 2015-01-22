@@ -1,4 +1,4 @@
-;;; define_abbrevs.el --- 
+;;; define_abbrevs.el ---
 
 ;; Copyright (C) 2014 by j8takagi
 
