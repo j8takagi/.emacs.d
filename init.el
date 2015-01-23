@@ -426,7 +426,7 @@
 (dolist
     (alist
      '(
-       ("\\.[Cc][Ss][Vv]\\'" . csv-mode)
+       ("\\.[CcTt][Ss][Vv]\\'" . csv-mode)
        ("\\.[rR]\\'" . R-mode)
        ("\\.bat\\'" . dos-mode)
        ("\\.casl?\\'" . asm-mode)
