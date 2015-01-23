@@ -8,7 +8,6 @@
 (dolist
     (path
      '(
-       "~/.emacs.d"
        "~/.emacs.d/init.d"
        "~/.emacs.d/init.sys.d"
        "~/.emacs.d/site-lisp"
