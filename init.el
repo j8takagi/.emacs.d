@@ -571,7 +571,7 @@
      (list
      '(
        (system-type gnu/linux init-linux)
-       (window-system ns init-mac)
+       (window-system mac init-mac)
        (window-system x init-x)
        (window-system w32 init-w32)
        ))
