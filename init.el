@@ -46,6 +46,7 @@
        ucs-normalize
        uniq
        window-control
+       ;; abbrev-complete
        ;; package
        package
        ))
@@ -86,6 +87,9 @@
        (ruby-mode "ruby-mode" "Mode for editing ruby source files")
        (rubydb "rubydb3x" "ruby debug")
        (svg-clock "svg-clock" "Start/stop svg-clock")
+       (mew "mew" nil)
+       (mew-send "mew" nil)
+       (mew-user-agent-compose "mew" nil)
        ))
   (let ((func (car list)) (file (nth 1 list)) (doc (nth 2 list)))
     (if (not (locate-library file))
@@ -391,7 +395,6 @@
        (let ((lib (car list)) (skel (nth 1 list)))
          (eval-after-load lib
            `(require ',skel))))
-     (require 'define_abbrevs)
      ))
 
 ;; magic-mode-alist
