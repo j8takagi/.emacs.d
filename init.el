@@ -590,6 +590,19 @@
          (+ (nth 2 before-init-time) (* 1000000 (nth 1 before-init-time))))
       1000)))
 
+;; Mew Settings
+(setq read-mail-command 'mew)
+
+(if (boundp 'mail-user-agent)
+    (setq mail-user-agent 'mew-user-agent))
+(if (fboundp 'define-mail-user-agent)
+    (define-mail-user-agent
+      'mew-user-agent
+      'mew-user-agent-compose
+      'mew-draft-send-message
+      'mew-draft-kill
+      'mew-send-hook))
+
 (add-hook 'after-init-hook 'message-startup-time)
 
 ;; session
