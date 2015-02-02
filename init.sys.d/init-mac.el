@@ -72,8 +72,6 @@
 ;; commandキーをEmacsのMetaキーに
 (setq mac-command-modifier 'meta)
 
-(setq mac-option-modifier 'meta)
-
 ;; Mac OS Xのキー設定
 (dolist
     (map
