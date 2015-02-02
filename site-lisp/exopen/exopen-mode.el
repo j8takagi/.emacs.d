@@ -60,6 +60,7 @@
       (cond
        ((eq window-system 'x) "xdg-open")
        ((eq window-system 'ns) "open")
+       ((eq window-system 'mac) "open")
        ((eq window-system 'w32) "cmd.exe")))
 
 ;; Window別にexopen-std-cmdargsを設定する
