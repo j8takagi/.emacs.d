@@ -447,6 +447,7 @@
        ("\\.yy?\\'" . bison-mode)
        (".abbrev_defs" . emacs-lisp-mode)
        ("\\`ja.wikipedia.org/w/index.php" . mediawiki-mode)
+       ("cmd" . shell-script-mode)
        ))
   (let ((mode (cdr alist)))
     (if (not (functionp mode))
