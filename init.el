@@ -1,5 +1,5 @@
 ;;;-*-Emacs-Lisp-*-
-;; for emacs 24.3
+;; for emacs 24.4
 
 ;; 日本語環境
 (set-language-environment "Japanese")
@@ -22,7 +22,7 @@
 (dolist
     (feat
      '(
-       ;; /usr/local/share/emacs/24.3/lisp
+       ;; /usr/local/share/emacs/24.4/lisp
        autoinsert
        ediff
        info
@@ -222,6 +222,9 @@
 
 ;; インデント
 (setq-default indent-line-function 'tab-to-tab-stop)
+
+;; 改行時の自動インデントを無効に（Emacs24から、初期値が有効になった）
+(electric-indent-mode -1)
 
 ;; read-onlyファイルをview-modeで開く
 (setq view-read-only 1)
