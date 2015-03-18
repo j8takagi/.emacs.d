@@ -616,3 +616,6 @@
 (if (not (locate-library "session"))
       (message "Warn: library 'session' is not found.")
   (add-hook 'after-init-hook 'session-initialize))
+
+;; magit
+(setq magit-status-buffer-switch-function 'switch-to-buffer)
