@@ -332,6 +332,11 @@
 (eval-after-load "css-mode"
   '(setq cssm-indent-function #'cssm-c-style-indenter))
 
+;; graphviz-dot-mode
+(eval-after-load "graphviz-dot-mode"
+  '(add-hook 'graphviz-dot-mode-hook
+             (lambda () (set (make-local-variable 'compile-command) "make -k "))))
+
 ;; ChangeLog
 (setq user-full-name "Kazuhito Takagi")
 
