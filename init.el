@@ -367,9 +367,6 @@
 
 ;; image-mode
 (setq image-file-name-extensions
-;; css-mode
-(eval-after-load "css-mode"
-  '(setq cssm-indent-function #'cssm-c-style-indenter))
       '(
         "svg" "png" "jpeg" "jpg" "gif" "tiff" "tif"
         ))
