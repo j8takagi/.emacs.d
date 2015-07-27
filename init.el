@@ -27,8 +27,8 @@
        autoinsert
        ediff
        info
-       server
        reftex
+       server
        skeleton
        uniquify
        vc
@@ -113,13 +113,13 @@
        (js-mode "js" "Major mode for editing JavaScript.")
        (list-hexadecimal-colors-display "color-selection" "Display hexadecimal color codes, and show what they look like.")
        (magit-status "magit" "Interface to the version control system Git")
+       (mew "mew" nil)
+       (mew-send "mew" nil)
+       (mew-user-agent-compose "mew" nil)
        (nxml-mode "nxml-mode" "Major mode for editing XML")
        (ruby-mode "ruby-mode" "Mode for editing ruby source files")
        (rubydb "rubydb3x" "ruby debug")
        (svg-clock "svg-clock" "Start/stop svg-clock")
-       (mew "mew" nil)
-       (mew-send "mew" nil)
-       (mew-user-agent-compose "mew" nil)
        ))
   (let ((func (car list)) (file (nth 1 list)) (doc (nth 2 list)))
     (if (not (locate-library file))
@@ -367,11 +367,12 @@
 
 ;; image-mode
 (setq image-file-name-extensions
-      '("svg" "png" "jpeg" "jpg" "gif" "tiff" "tif"))
-
 ;; css-mode
 (eval-after-load "css-mode"
   '(setq cssm-indent-function #'cssm-c-style-indenter))
+      '(
+        "svg" "png" "jpeg" "jpg" "gif" "tiff" "tif"
+        ))
 
 ;; graphviz-dot-mode
 (eval-when-compile (load "graphviz-dot-mode"))
