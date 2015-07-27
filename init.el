@@ -670,5 +670,5 @@
 
 ;; session
 (if (not (locate-library "session"))
-      (message "Warn: library 'session' is not found.")
+      (message "Warning: library 'session' is not found.")
   (add-hook 'after-init-hook 'session-initialize))
