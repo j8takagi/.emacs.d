@@ -46,53 +46,57 @@
        ucs-normalize
        uniq
        window-control
-       ;; abbrev-complete
-       package
        ))
   (if (not (locate-library (symbol-name feat)))
-      (message "Warn: %s is not found." feat)
+      (message "Warning: feature `%s' is NOT found." feat)
     (if (require feat)
-        (message "%s is loaded." feat))))
+        (message "Feature `%s' is loaded." feat))))
 
-(eval-after-load "package"
-  '(progn
-     ;; パッケージアーカイブ追加
-    (dolist
-        (arch
-         '(
-           ("marmalade" . "http://marmalade-repo.org/packages/")
-           ("melpa" . "http://melpa.milkbox.net/packages/")
-           ))
-      (add-to-list 'package-archives arch))
-    ;; パッケージ初期化
-    (package-initialize)
-    ;; インストールするパッケージ
-    (dolist
-        (pack
-         '(
-           csv-mode
-           dos
-           edit-server
-           ess
-           git-commit-mode
-           git-rebase-mode
-           gitignore-mode
-           gnuplot-mode
-           gtags
-           igrep
-           inf-ruby
-           japanese-holidays
-           magit
-           mmm-mode
-           session
-           undo-tree
-           web-mode
-           wget
-           xpm))
-      (if (package-installed-p pack)
-          (message "Package %s is installed." pack)
-        (message "Package %s is NOT installed." pack)
-        (package-install pack)))))
+(load "package")
+
+;; パッケージアーカイブ追加
+(dolist
+    (arch
+     '(
+       ("marmalade" . "http://marmalade-repo.org/packages/")
+       ("melpa" . "http://melpa.milkbox.net/packages/")
+       ("melpa-stable" . "http://stable.melpa.org/packages/")
+       ))
+  (add-to-list 'package-archives arch))
+
+;; パッケージ初期化
+(package-initialize)
+
+;; インストールするパッケージ
+(dolist
+    (pack
+     '(
+       csv-mode
+       dos
+       edit-server
+       ess
+       git-commit
+       gitignore-mode
+       gnuplot-mode
+       gtags
+       igrep
+       inf-ruby
+       japanese-holidays
+       magit
+       mmm-mode
+       session
+       undo-tree
+       web-mode
+       wget
+       with-editor
+       xpm
+       ))
+  (if (package-installed-p pack)
+      (message "Package `%s' is installed." pack)
+    (if (not (assq pack package-alist))
+        (message "Warning: package `%s' is NOT installed and NOT found on archives." pack)
+      (message "Package `%s' is NOT installed. Installation begins." pack)
+      (package-install pack))))
 
 ;; autoloadの設定
 (dolist
