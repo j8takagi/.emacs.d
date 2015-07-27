@@ -38,7 +38,7 @@
 (prefer-coding-system 'utf-8-dos)
 
 ;; 日本語ファイル名を正常に処理するための設定
-(setq default-file-name-coding-system 'shift_jis)
+(setq default-file-name-coding-system 'cp932)
 
 ;; emacsclientを使えるように
 (eval-after-load "server"
@@ -51,7 +51,7 @@
 (add-hook
  'shell-mode-hook
  '(lambda ()
-    (set-buffer-process-coding-system 'sjis 'sjis)))
+    (set-buffer-process-coding-system 'cp932 'cp932)))
 
 (cd "~")
 
