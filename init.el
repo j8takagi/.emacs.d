@@ -123,9 +123,9 @@
        ))
   (let ((func (car list)) (file (nth 1 list)) (doc (nth 2 list)))
     (if (not (locate-library file))
-        (message "Warn: %s is not found as library file." file)
+        (message "Warning: library file `%s' is not found." file)
       (if (autoload func file doc 1)
-          (message "%s is defined to autoload from file %s." func file)))))
+          (message "Function `%s' is autoloaded from library file %s." func file)))))
 
 ;; フレームの設定
 (dolist
@@ -242,7 +242,7 @@
        "~/backup"
        ))
   (if (not (file-directory-p (expand-file-name dir)))
-      (message "backup directory %s is not exist." dir)
+      (message "Warning: backup directory `%s' is NOT exist." dir)
     (setq backup-directory-alist `(("." . ,dir)))))
 
 ;; バックアップファイルにバージョン番号を付ける
@@ -402,7 +402,7 @@
           ))
      (let ((fullpath (expand-file-name path)))
        (if (not (car (file-attributes fullpath)))
-           (message "info: %s is not exist or not directory." path)
+           (message "Warning: path `%s' is not exist or not directory." path)
          (add-to-list 'Info-directory-list fullpath 1)
          )))))
 
@@ -445,7 +445,7 @@
        ))
   (let ((mode (cdr alist)))
     (if (not (functionp mode))
-        (message "magic-mode-alist: function %s is not defined." mode)
+        (message "Warning (magic-mode-alist): function `%s' is not defined." mode)
       (add-to-list 'magic-mode-alist alist 1))))
 
 ;; auto-mode-alist
@@ -458,7 +458,7 @@
        ))
   (let ((newmode (car list)) (oldmode (nth 1 list)))
     (if (not (functionp newmode))
-        (message "auto-mode-alist: function %s is not defined." newmode)
+        (message "Warning (auto-mode-alist): function `%s' is not defined." newmode)
       (while
           (let ((alist (rassoc oldmode auto-mode-alist)))
             (if alist
@@ -491,7 +491,7 @@
        ))
   (let ((mode (cdr alist)))
     (if (not (functionp mode))
-        (message "auto-mode-alist: function %s is not defined." mode)
+        (message "Warning (auto-mode-alist): function `%s' is not defined." mode)
       (add-to-list 'auto-mode-alist alist))))
 
 ;; ffap（find file at point）のキーバインド
@@ -548,7 +548,7 @@
        ))
   (let ((key (car map)) (func (nth 1 map)))
     (if (not (functionp func))
-        (message "%s is not defined." func)
+        (message "Warning: function `%s' is NOT defined." func)
       (global-set-key (kbd key) func))))
 
 ;; skeleton-pairによる括弧挿入の自動化
@@ -603,7 +603,7 @@
                  (dolist (keymap ',maps)
                    (let ((key (car keymap)) (func (nth 1 keymap)))
                      (if (not (functionp func))
-                         (message "function %s is not defined." func)
+                         (message "Warning: function `%s' is not defined." func)
                        (define-key ,modemap (kbd key) func))))))
         `(add-hook ',hook ',func-init-add)))))
 
@@ -619,9 +619,9 @@
    (let ((target (car list)) (sys (nth 1 list)) (feat (nth 2 list)))
      (when (equal (eval target) sys)
        (if (not (locate-library (symbol-name feat)))
-           (message "Warn: library '%s' is not found." feat)
+           (message "Warning: library `%s' is not found." feat)
          (if (require feat)
-             (message "%s is loaded." feat))))))
+             (message "Library `%s' is loaded." feat))))))
 
 ;; Mew Settings
 (setq read-mail-command 'mew)
@@ -646,7 +646,7 @@
 ;; Emacs開始にかかった時間をメッセージに表示
 (defun message-startup-time ()
   (message
-   "Emacs loaded in %dms"
+   "Emacs loaded in %d ms"
    (/ (- (+ (nth 2 after-init-time) (* 1000000 (nth 1 after-init-time)))
          (+ (nth 2 before-init-time) (* 1000000 (nth 1 before-init-time))))
       1000)))
