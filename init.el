@@ -17,6 +17,7 @@
     (add-to-list 'load-path default-directory)
     (when (file-exists-p "subdirs.el")
       (load-library "subdirs"))))
+(message "load-path: %s" load-path)
 
 ;; ライブラリを読み込む
 (dolist
