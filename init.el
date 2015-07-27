@@ -297,6 +297,7 @@
   '(add-hook 'emacs-lisp-mode-hook 'turn-on-auto-elc))
 
 ;; *compilation*バッファをスクロールして表示
+(eval-when-compile (load "compile"))
 (eval-after-load "compile"
   '(setq compilation-scroll-output 'first-error))
 
@@ -307,6 +308,7 @@
 (add-hook 'emacs-lisp-mode-hook 'indent-lisp-indent-line)
 
 ;; shell-mode
+(eval-when-compile (load "shell"))
 (eval-after-load "shell"
   '(progn
      (setq shell-prompt-pattern
@@ -314,22 +316,26 @@
      (require 'init-shell)))
 
 ;; dired
+(eval-when-compile (load "dired"))
 (eval-after-load "dired"
   '(require 'init-dired)
   )
 
 (dolist
     (ext
-     '(".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" ".aux_prev"
+     '(
+       ".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" ".aux_prev"
        ".toc_prev" ".lot_prev" ".lof_prev" ".bbl_prev" ".out_prev"
        ".idx" ".ind" ".idx_prev" ".ind_prev" ".ilg" "tmp" ".synctex.gz" ".DS_Store"
-       "dplg" "dslg"))
+       "dplg" "dslg"
+       ))
   (add-to-list 'completion-ignored-extensions ext))
 
 ;; *scratch* と *Messages* のバッファを削除しない
 (require 'init-scratch-messages)
 
 ;;; CC-Mode
+(eval-when-compile (load "cc-mode"))
 (eval-after-load "cc-mode"
   '(progn
      (setq c-default-style "k&r")
@@ -338,22 +344,26 @@
      (require 'gnu-mp)))
 
 ;; bison-mode
-(eval-after-load "bison"
+(eval-when-compile (load "bison-mode"))
+(eval-after-load "bison-mode"
   '(progn
      (setq bison-decl-token-column 0)
      (setq bison-rule-enumeration-column 8)))
 
 ;; tex-mode
+(eval-when-compile (load "tex-mode"))
 (eval-after-load "tex-mode"
   '(add-hook 'latex-mode-hook 'turn-on-reftex))
 
 ;; web-mode
+(eval-when-compile (load "web-mode"))
 (eval-after-load "web-mode"
   '(require 'init-web-mode))
 
 ;; mmm-mode
+(eval-when-compile (load "mmm-auto"))
 (eval-after-load "mmm-auto"
-  '(require init-mmm))
+  '(require 'init-mmm))
 
 ;; image-mode
 (setq image-file-name-extensions
@@ -364,6 +374,7 @@
   '(setq cssm-indent-function #'cssm-c-style-indenter))
 
 ;; graphviz-dot-mode
+(eval-when-compile (load "graphviz-dot-mode"))
 (eval-after-load "graphviz-dot-mode"
   '(add-hook 'graphviz-dot-mode-hook
              (lambda () (set (make-local-variable 'compile-command) "make -k "))))
@@ -375,10 +386,12 @@
 
 (setq user-mail-address "j8takagi@nifty.com")
 
+(eval-when-compile (load "add-log"))
 (eval-after-load "add-log"
   '(setq change-log-default-name "~/ChangeLog"))
 
 ;; ess-site > R
+(eval-when-compile (load "ess-site"))
 (eval-after-load "ess-site"
   '(setq ess-ask-for-ess-directory nil))
 
@@ -386,10 +399,12 @@
 (defalias 'color-selection 'list-hexadecimal-colors-display)
 
 ;; Ruby
+(eval-when-compile (load "ruby-mode"))
 (eval-after-load "ruby-mode"
   '(add-to-list 'interpreter-mode-alist '("ruby" . ruby-mode)))
 
 ;; Info
+(eval-when-compile (load "info"))
 (eval-after-load "info"
   '(progn
      (setq Info-directory-list (reverse Info-directory-list))
@@ -408,12 +423,13 @@
 
 ;; vc-follow-linkを無効にする
 ;; 参考: http://d.hatena.ne.jp/a_bicky/20140607/1402131090
+(eval-when-compile (load "vc-hooks"))
 (eval-after-load "vc-hooks"
   '(setq vc-follow-symlinks nil))
 
 ;; auto-insert
 ;; http://www.math.s.chiba-u.ac.jp/~matsu/emacs/emacs21/autoinsert.html
-
+(eval-when-compile (load "autoinsert"))
 (eval-after-load "autoinsert"
   '(progn
      (add-hook 'find-file-hook 'auto-insert)
@@ -552,6 +568,7 @@
       (global-set-key (kbd key) func))))
 
 ;; skeleton-pairによる括弧挿入の自動化
+(eval-when-compile (load "skeleton"))
 (eval-after-load "skeleton"
   (progn
     (setq skeleton-pair 1)
