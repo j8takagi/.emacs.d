@@ -53,6 +53,9 @@
  '(lambda ()
     (set-buffer-process-coding-system 'cp932 'cp932)))
 
+;; IME切り替え時に undefined のエラーメッセージが表示されるのを抑制
+(global-set-key (kbd "<M-kanji>") 'ignore)
+
 (cd "~")
 
 (provide 'init-w32)
