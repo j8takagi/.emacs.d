@@ -46,7 +46,6 @@
        uniq
        window-control
        ;; abbrev-complete
-       ;; package
        package
        ))
   (if (not (locate-library (symbol-name feat)))
@@ -58,14 +57,41 @@
   '(progn
      ;; パッケージアーカイブ追加
     (dolist
-        (pack
+        (arch
          '(
            ("marmalade" . "http://marmalade-repo.org/packages/")
            ("melpa" . "http://melpa.milkbox.net/packages/")
            ))
-      (add-to-list 'package-archives pack))
+      (add-to-list 'package-archives arch))
     ;; パッケージ初期化
-    (package-initialize)))
+    (package-initialize)
+    ;; インストールするパッケージ
+    (dolist
+        (pack
+         '(
+           csv-mode
+           dos
+           edit-server
+           ess
+           git-commit-mode
+           git-rebase-mode
+           gitignore-mode
+           gnuplot-mode
+           gtags
+           igrep
+           inf-ruby
+           japanese-holidays
+           magit
+           mmm-mode
+           session
+           undo-tree
+           web-mode
+           wget
+           xpm))
+      (if (package-installed-p pack)
+          (message "Package %s is installed." pack)
+        (message "Package %s is NOT installed." pack)
+        (package-install pack)))))
 
 ;; autoloadの設定
 (dolist
@@ -592,21 +618,12 @@
          (if (require feat)
              (message "%s is loaded." feat))))))
 
-;; 文字コードのデフォルトはUTF-8
-(prefer-coding-system 'utf-8)
-
-(defun message-startup-time ()
-  (message
-   "Emacs loaded in %dms"
-   (/ (- (+ (nth 2 after-init-time) (* 1000000 (nth 1 after-init-time)))
-         (+ (nth 2 before-init-time) (* 1000000 (nth 1 before-init-time))))
-      1000)))
-
 ;; Mew Settings
 (setq read-mail-command 'mew)
 
 (if (boundp 'mail-user-agent)
     (setq mail-user-agent 'mew-user-agent))
+
 (if (fboundp 'define-mail-user-agent)
     (define-mail-user-agent
       'mew-user-agent
@@ -615,12 +632,23 @@
       'mew-draft-kill
       'mew-send-hook))
 
+;; magit
+(setq magit-status-buffer-switch-function 'switch-to-buffer)
+
+;; 文字コードのデフォルトはUTF-8
+(prefer-coding-system 'utf-8)
+
+;; Emacs開始にかかった時間をメッセージに表示
+(defun message-startup-time ()
+  (message
+   "Emacs loaded in %dms"
+   (/ (- (+ (nth 2 after-init-time) (* 1000000 (nth 1 after-init-time)))
+         (+ (nth 2 before-init-time) (* 1000000 (nth 1 before-init-time))))
+      1000)))
+
 (add-hook 'after-init-hook 'message-startup-time)
 
 ;; session
 (if (not (locate-library "session"))
       (message "Warn: library 'session' is not found.")
   (add-hook 'after-init-hook 'session-initialize))
-
-;; magit
-(setq magit-status-buffer-switch-function 'switch-to-buffer)
