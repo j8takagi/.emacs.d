@@ -47,33 +47,37 @@
   (if (one-window-p)
       (error "One window. cannot resize the window."))
   (let
-      ((thiswindow (selected-window))
+      (
+       (thiswindow (selected-window))
        (start-width (window-width))
        (start-height (window-height))
        (dx (if (= (nth 0 (window-edges)) 0) 1 -1))
        (dy (if (= (nth 1 (window-edges)) 0) 1 -1))
-       key)
+       key
+       )
     (catch 'end-flag
       (while t
         (setq key
-              (read-key-sequence
-               (format
-                "Window size current:[%dx%d]; s)tart:[%dx%d] h)-x j)+y k)-y l)+x; q)uit."
-                (window-width) (window-height) start-width start-height)))
+              (aref
+               (read-key-sequence-vector
+                (format
+                 "Window size current:[%dx%d]; s)tart:[%dx%d] h)-x j)+y k)-y l)+x; q)uit."
+                 (window-width) (window-height) start-width start-height))
+               0))
         (cond
-         ((member key '("l" [right]))
+         ((member key '(?l right))
           (enlarge-window-horizontally dx))
-         ((member key '("h" [left]))
+         ((member key '(?h left))
           (shrink-window-horizontally dx))
-         ((member key '("j" [down]))
+         ((member key '(?j up))
           (enlarge-window dy))
-         ((member key '("k" [up]))
+         ((member key '(?k down))
           (shrink-window dy))
-         ((member key '("s"))
+         ((member key '(?s))
           (progn
             (shrink-window-horizontally (- (window-width) start-width))
             (shrink-window (- (window-height) start-height))))
-         ((member key '("q"))
+         ((member key '(?q))
           (progn
             (message "Window resize: quit")
             (throw 'end-flag t))))))))
@@ -82,38 +86,42 @@
   "Resize frame"
   (interactive)
   (let
-      ((thisframe (selected-frame))
+      (
+       (thisframe (selected-frame))
        (start-width (frame-width))
        (start-height (frame-height))
        (default-width (cdr (assoc 'width default-frame-alist)))
        (default-height (cdr (assoc 'height default-frame-alist)))
-       key)
+       key
+       )
     (catch 'end-flag
       (while t
         (setq key
-              (read-key-sequence-vector
-               (format
-                "Frame Size current:[%dx%d]; s)tart:[%dx%d]; d)efault:[%dx%d]; h)-x j)+y k)-y l)+x; q)uit."
-                (frame-width) (frame-height)
-                start-width start-height default-width default-height)))
+              (aref
+               (read-key-sequence-vector
+                (format
+                 "Frame Size current:[%dx%d]; s)tart:[%dx%d]; d)efault:[%dx%d]; h)-x j)+y k)-y l)+x; q)uit."
+                 (frame-width) (frame-height)
+                 start-width start-height default-width default-height))
+               0))
         (cond
-         ((member key '("l" [right]))
+         ((member key '(?l right))
           (set-frame-width thisframe (+ (frame-width) 1)))
-         ((member key '("h" [left]))
+         ((member key '(?h left))
           (set-frame-width thisframe (- (frame-width) 1)))
-         ((member key '("j" [down]))
+         ((member key '(?j down))
           (set-frame-height thisframe (+ (frame-height) 1)))
-         ((member key '("k" [up]))
+         ((member key '(?k up))
           (set-frame-height thisframe (- (frame-height) 1)))
-         ((member key '("d"))
+         ((member key '(?d))
           (progn
             (set-frame-width thisframe default-width))
           (set-frame-height thisframe default-height))
-         ((member key '("s"))
+         ((member key '(?s))
           (progn
             (set-frame-width thisframe start-width)
             (set-frame-height thisframe start-height)))
-         ((member key '("q"))
+         ((member key '(?q))
           (progn
             (message "Frame Resize: quit")
             (throw 'end-flag t))))))))
@@ -122,38 +130,42 @@
   "Move frame."
   (interactive)
   (let
-      ((thisframe (selected-frame))
+      (
+       (thisframe (selected-frame))
        (start-top (frame-parameter nil 'top))
        (start-left (frame-parameter nil 'left))
        (default-top (cdr (assoc 'top default-frame-alist)))
        (default-left (cdr (assoc 'left default-frame-alist)))
-       key)
+       key
+       )
     (catch 'end-flag
       (while t
         (setq key
-              (read-key-sequence-vector
-               (format
-                "Frame move current:[%d, %d]; s)tart:[%d, %d]; d)efault:[%d, %d]; h)-x j)+y k)-y l)+x; q)uit."
-                (frame-parameter nil 'left) (frame-parameter nil 'top)
-                start-left start-top default-left default-top)))
+              (aref
+               (read-key-sequence-vector
+                (format
+                 "Frame move current:[%d, %d]; s)tart:[%d, %d]; d)efault:[%d, %d]; h)-x j)+y k)-y l)+x; q)uit."
+                 (frame-parameter nil 'left) (frame-parameter nil 'top)
+                 start-left start-top default-left default-top))
+               0))
         (cond
-         ((member key '("l" [right]))
+         ((member key '(?l right))
           (modify-frame-parameters nil (list (cons 'left (+ (frame-parameter nil 'left) 10)))))
-         ((member key '("h" [left]))
+         ((member key '(?h left))
           (modify-frame-parameters nil (list (cons 'left (- (frame-parameter nil 'left) 10)))))
-         ((member key '("j" [down]))
+         ((member key '(?j down))
           (modify-frame-parameters nil (list (cons 'top (+ (frame-parameter nil 'top) 10)))))
-         ((member key '("k" [up]))
+         ((member key '(?k up))
           (modify-frame-parameters nil (list (cons 'top (- (frame-parameter nil 'top) 10)))))
-         ((member key '("d"))
+         ((member key '(?d))
           (progn
             (modify-frame-parameters nil (list (cons 'left default-left)))
             (modify-frame-parameters nil (list (cons 'top default-top)))))
-         ((member key '("s"))
+         ((member key '(?s))
           (progn
             (modify-frame-parameters nil (list (cons 'left start-left)))
             (modify-frame-parameters nil (list (cons 'top start-top)))))
-         ((member key '("q"))
+         ((member key '(?q))
           (progn
             (message "Frame Move: quit")
             (throw 'end-flag t))))))))
