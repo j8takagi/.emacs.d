@@ -660,11 +660,7 @@
 
 ;; Emacs開始にかかった時間をメッセージに表示
 (defun message-startup-time ()
-  (message
-   "Emacs loaded in %d ms"
-   (/ (- (+ (nth 2 after-init-time) (* 1000000 (nth 1 after-init-time)))
-         (+ (nth 2 before-init-time) (* 1000000 (nth 1 before-init-time))))
-      1000)))
+  (message "Duration of the Emacs initialization: %s" (emacs-init-time)))
 
 (add-hook 'after-init-hook 'message-startup-time)
 
