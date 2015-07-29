@@ -69,40 +69,42 @@
     (when apkgs
       (message "Unexpected installed packages: %s"  (reverse apkgs)))))
 
-;; ライブラリを読み込む
-(let (feats)
-  (dolist
-      (feat
-       '(
-         ;; /usr/local/share/emacs/${VER}/lisp
-         autoinsert
-         ediff
-         info
-         reftex
-         server
-         skeleton
-         uniquify
-         vc
-         view
-         whitespace
-         ;; ~/.emacs.d/site-lisp
-         auto-elc-mode
-         byte-compile-buffer-file
-         count-japanese
-         exopen-mode
-         mediawiki
-         other-window-bindings
-         scroll-one-line
-         temp-buffer
-         ucs-normalize
-         uniq
-         window-control
-         ))
+(defun init-require (feat)
+  (if (require feat nil 1)
+      (message "Feature `%s' is required." feat)
     (if (not (locate-library (symbol-name feat)))
         (message "Warning: required feature `%s' is NOT found." feat)
-      (when (require feat)
-        (add-to-list 'feats feat))))
-  (message "Required features: %s" (reverse feats)))
+      (message "Warning: it fails to require feature `%s'" feat))))
+
+;; ライブラリを読み込む
+(dolist
+    (feat
+     '(
+       ;; /usr/local/share/emacs/${VER}/lisp
+       autoinsert
+       ediff
+       info
+       reftex
+       server
+       skeleton
+       uniquify
+       vc
+       view
+       whitespace
+       ;; ~/.emacs.d/site-lisp
+       auto-elc-mode
+       byte-compile-buffer-file
+       count-japanese
+       exopen-mode
+       mediawiki
+       other-window-bindings
+       scroll-one-line
+       temp-buffer
+       ucs-normalize
+       uniq
+       window-control
+       ))
+  (init-require feat))
 
 ;; autoloadの設定
 (let (funcs)
@@ -180,13 +182,13 @@
 
 (defalias 'message-box 'message)
 
-;; read-onlyファイルをview-modeで開く
-(require 'init-view-mode)
-
-(setq view-read-only 1)
-
-;; view-modeでviのキーバインド
-(require 'view-mode-vi-bindings)
+(eval-after-load "view"
+  '(progn
+     ;; read-onlyファイルをview-modeで開く
+     (init-require 'init-view-mode)
+     (setq view-read-only 1)
+     ;; view-modeでviのキーバインド
+     (init-require 'view-mode-vi-bindings)))
 
 ;; タブの幅は、4
 (setq-default tab-width 4)
@@ -286,7 +288,7 @@
 
 ;; whitespace
 (eval-after-load "whitespace"
-  '(require 'init-whitespace))
+  '(init-require 'init-whitespace))
 
 ;; バッファ全体の濁点分離を直す
 (eval-after-load "ucs-normalize"
@@ -312,10 +314,10 @@
   '(setq compilation-scroll-output 'first-error))
 
 ;; lisp-modeでのタブの設定
-(defun indent-lisp-indent-line ()
+(defun init-indent-lisp-indent-line ()
   (setq indent-line-function 'lisp-indent-line))
 
-(add-hook 'emacs-lisp-mode-hook 'indent-lisp-indent-line)
+(add-hook 'emacs-lisp-mode-hook 'init-indent-lisp-indent-line)
 
 ;; shell-mode
 (eval-when-compile (load "shell"))
@@ -327,7 +329,8 @@
 
 ;; dired
 (eval-when-compile (load "dired"))
-(eval-after-load "dired" '(require 'init-dired))
+(eval-after-load "dired"
+  '(require 'init-dired))
 
 (dolist
     (ext
@@ -345,7 +348,7 @@
 ;;; CC-Mode
 (eval-when-compile (load "cc-mode"))
 
-(defun cc-ggtags-mode-turnon ()
+(defun init-cc-ggtags-mode-turnon ()
   (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
     (ggtags-mode 1)))
 
@@ -353,7 +356,7 @@
   '(progn
      (setq c-default-style "k&r")
      (setq c-basic-offset 4)
-     (add-hook 'c-mode-common-hook 'cc-ggtags-mode-turnon)
+     (add-hook 'c-mode-common-hook 'init-cc-ggtags-mode-turnon)
      (require 'gnu-mp)))
 
 ;; bison-mode
@@ -446,7 +449,7 @@
      (setq auto-insert-directory (expand-file-name "~/.emacs.d/insert/"))
      (setq auto-insert-query nil)
      (setq auto-insert-alist nil)
-     (when (require 'global-skeletons) (message "Feature `%s' is required." 'global-skeletons))
+     (init-require 'global-skeletons)
      (dolist
          (libskel
           '(
@@ -459,7 +462,7 @@
             ))
        (let ((lib (car libskel)) (skel (nth 1 libskel)))
          (eval-after-load lib
-           `(when (require ',skel) (message "Feature `%s' is required." ',skel)))))))
+           `(init-require ',skel))))))
 
 ;; magic-mode-alist
 (dolist
@@ -633,16 +636,16 @@
 
 ;; システムごとの設定
 (dolist
-     (syss
+     (sysfeat
      '(
        (system-type gnu/linux init-linux)
        (window-system mac init-mac)
        (window-system x init-x)
        (window-system w32 init-w32)
        ))
-   (let ((target (car syss)) (sys (nth 1 syss)) (feat (nth 2 syss)))
-     (when (equal (eval target) sys)
-       (when (require feat) (message "Feature `%s' is required." feat)))))
+   (let ((func (car sysfeat)) (sys (nth 1 sysfeat)) (feat (nth 2 sysfeat)))
+     (when (equal (eval func) sys)
+       (init-require feat))))
 
 ;; Mew Settings
 (setq read-mail-command 'mew)
@@ -670,7 +673,7 @@
   (add-hook 'after-init-hook 'session-initialize))
 
 ;; Emacs開始にかかった時間をメッセージに表示
-(defun message-startup-time ()
+(defun init-message-startup-time ()
   (message "Duration of the Emacs initialization: %s" (emacs-init-time)))
 
-(add-hook 'after-init-hook 'message-startup-time)
+(add-hook 'after-init-hook 'init-message-startup-time)
