@@ -440,16 +440,15 @@
 
 ;; auto-insert
 ;; http://www.math.s.chiba-u.ac.jp/~matsu/emacs/emacs21/autoinsert.html
-(eval-when-compile (load "autoinsert"))
 (eval-after-load "autoinsert"
   '(progn
      (add-hook 'find-file-hook 'auto-insert)
      (setq auto-insert-directory (expand-file-name "~/.emacs.d/insert/"))
      (setq auto-insert-query nil)
      (setq auto-insert-alist nil)
-     (require 'global-skeletons)
+     (when (require 'global-skeletons) (message "Feature `%s' is required." 'global-skeletons))
      (dolist
-         (list
+         (libskel
           '(
             ("cc-mode" c-skeletons)
             ("cc-mode" h-skeletons)
@@ -458,10 +457,9 @@
             ("web-mode" web-skeletons)
             ("graphviz-dot-mode" graphviz-dot-skeletons)
             ))
-       (let ((lib (car list)) (skel (nth 1 list)))
+       (let ((lib (car libskel)) (skel (nth 1 libskel)))
          (eval-after-load lib
-           `(require ',skel))))
-     ))
+           `(when (require ',skel) (message "Feature `%s' is required." ',skel)))))))
 
 ;; magic-mode-alist
 (dolist
@@ -646,8 +644,7 @@
      (when (equal (eval target) sys)
        (if (not (locate-library (symbol-name feat)))
            (message "Warning: library file `%s' is not found." feat)
-         (message "Feature `%s' is required." feat)
-         (require feat)))))
+         (when (require feat) (message "Feature `%s' is required." feat))))))
 
 ;; Mew Settings
 (setq read-mail-command 'mew)
