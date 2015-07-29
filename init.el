@@ -612,7 +612,7 @@
          ("C-c C-c" comment-region)     ; tex-compileを無効にし、comment-region を設定
          ))
        ("lisp-mode" emacs-lisp-mode-hook lisp-mode-shared-map
-        (("<M-return>" lisp-complete-symbol)
+        (("<M-return>" completion-at-point)
          ))
        ("mediawiki" mediawiki-mode-hook mediawiki-mode-map
         (
