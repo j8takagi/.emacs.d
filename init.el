@@ -1,8 +1,4 @@
 ;;;-*-Emacs-Lisp-*-
-;; for emacs 24.4
-
-;; 日本語環境
-(set-language-environment "Japanese")
 
 ;; load-pathを追加し、subdirs.elがある場合は読み込む
 (dolist
@@ -13,46 +9,16 @@
        "~/.emacs.d/site-lisp"
        "~/.emacs.d/insert"
        ))
-  (let ((default-directory (expand-file-name path)))
+  (let (
+        (default-directory (expand-file-name path))
+        )
     (add-to-list 'load-path default-directory)
     (when (file-exists-p "subdirs.el")
       (load-library "subdirs"))))
 (message "load-path: %s" load-path)
 
-;; ライブラリを読み込む
-(dolist
-    (feat
-     '(
-       ;; /usr/local/share/emacs/24.4/lisp
-       autoinsert
-       ediff
-       info
-       reftex
-       server
-       skeleton
-       uniquify
-       vc
-       view
-       whitespace
-       ;; ~/.emacs.d/site-lisp
-       auto-elc-mode
-       byte-compile-buffer-file
-       count-japanese
-       exopen-mode
-       mediawiki
-       other-window-bindings
-       scroll-one-line
-       temp-buffer
-       ucs-normalize
-       uniq
-       window-control
-       ))
-  (if (not (locate-library (symbol-name feat)))
-      (message "Warning: feature `%s' is NOT found." feat)
-    (if (require feat)
-        (message "Feature `%s' is loaded." feat))))
-
-(load "package")
+;; パッケージ
+(require 'package)
 
 ;; パッケージアーカイブ追加
 (dolist
@@ -68,64 +34,111 @@
 (package-initialize)
 
 ;; インストールするパッケージ
-(dolist
-    (pack
-     '(
-       csv-mode
-       dos
-       edit-server
-       ess
-       git-commit
-       gitignore-mode
-       gnuplot-mode
-       gtags
-       igrep
-       inf-ruby
-       japanese-holidays
-       magit
-       mmm-mode
-       session
-       undo-tree
-       web-mode
-       wget
-       with-editor
-       xpm
-       ))
-  (if (package-installed-p pack)
-      (message "Package `%s' is installed." pack)
-    (if (not (assq pack package-alist))
-        (message "Warning: package `%s' is NOT installed and NOT found on archives." pack)
-      (message "Package `%s' is NOT installed. Installation begins." pack)
-      (package-install pack))))
+(let (pkgs)
+  (dolist
+      (pkg
+       '(
+         csv-mode
+         dash
+         dos
+         ess
+         git-commit
+         gitignore-mode
+         gnuplot-mode
+         gtags
+         igrep
+         inf-ruby
+         japanese-holidays
+         magit
+         magit-popup
+         mmm-mode
+         session
+         undo-tree
+         web-mode
+         wget
+         with-editor
+         xpm
+         ))
+    (when (not (package-installed-p pkg))
+      (when (not package-archive-contents)
+        (package-refresh-contents))
+      (if (not (assq pkg package-archive-contents))
+          (message "Warning: package `%s' is NOT installed and NOT found on archives." pkg)
+        (message "Package `%s' is NOT installed. Installation begins." pkg)
+        (package-install pkg)))
+    (add-to-list 'pkgs pkg)
+   )
+  (let ((apkgs (mapcar 'car package-alist)))
+    (message "Installed packages: %s" (reverse apkgs))
+    (dolist (pkg pkgs) (setq apkgs (delete pkg apkgs)))
+    (when apkgs
+      (message "Unexpected installed packages: %s"  (reverse apkgs)))))
+
+;; ライブラリを読み込む
+(let (feats)
+  (dolist
+      (feat
+       '(
+         ;; /usr/local/share/emacs/${VER}/lisp
+         autoinsert
+         ediff
+         info
+         reftex
+         server
+         skeleton
+         uniquify
+         vc
+         view
+         whitespace
+         ;; ~/.emacs.d/site-lisp
+         auto-elc-mode
+         byte-compile-buffer-file
+         count-japanese
+         exopen-mode
+         mediawiki
+         other-window-bindings
+         scroll-one-line
+         temp-buffer
+         ucs-normalize
+         uniq
+         window-control
+         ))
+    (if (not (locate-library (symbol-name feat)))
+        (message "Warning: required feature `%s' is NOT found." feat)
+      (when (require feat)
+        (add-to-list 'feats feat))))
+  (message "Required features: %s" (reverse feats)))
 
 ;; autoloadの設定
-(dolist
-    (list
-     '(
-       (R-mode "ess-site" "Emacs Speaks Statistics mode")
-       (bison-mode "bison-mode" "Major mode for editing bison/yacc files")
-       (css-mode "css-mode" "Cascading Style Sheets (CSS) editing mode")
-       (csv-mode "csv-mode" "Major mode for editing comma-separated value files.")
-       (eukleides-mode "eukleides" "Major mode for editing Eukleides files")
-       (flex-mode "flex-mode" "Major mode for editing flex files")
-       (graphviz-dot-mode "graphviz-dot-mode" "Major mode for the dot language")
-       (gtags-mode "gtags" "Toggle Gtags mode, a minor mode for browsing source code using GLOBAL.")
-       (js-mode "js" "Major mode for editing JavaScript.")
-       (list-hexadecimal-colors-display "color-selection" "Display hexadecimal color codes, and show what they look like.")
-       (magit-status "magit" "Interface to the version control system Git")
-       (mew "mew" nil)
-       (mew-send "mew" nil)
-       (mew-user-agent-compose "mew" nil)
-       (nxml-mode "nxml-mode" "Major mode for editing XML")
-       (ruby-mode "ruby-mode" "Mode for editing ruby source files")
-       (rubydb "rubydb3x" "ruby debug")
-       (svg-clock "svg-clock" "Start/stop svg-clock")
-       ))
-  (let ((func (car list)) (file (nth 1 list)) (doc (nth 2 list)))
-    (if (not (locate-library file))
-        (message "Warning: library file `%s' is not found." file)
-      (if (autoload func file doc 1)
-          (message "Function `%s' is autoloaded from library file %s." func file)))))
+(let (funcs)
+  (dolist
+      (list
+       '(
+         (R-mode "ess-site" "Emacs Speaks Statistics mode")
+         (bison-mode "bison-mode" "Major mode for editing bison/yacc files")
+         (css-mode "css-mode" "Cascading Style Sheets (CSS) editing mode")
+         (csv-mode "csv-mode" "Major mode for editing comma-separated value files.")
+         (eukleides-mode "eukleides" "Major mode for editing Eukleides files")
+         (flex-mode "flex-mode" "Major mode for editing flex files")
+         (graphviz-dot-mode "graphviz-dot-mode" "Major mode for the dot language")
+         (gtags-mode "gtags" "Toggle Gtags mode, a minor mode for browsing source code using GLOBAL.")
+         (js-mode "js" "Major mode for editing JavaScript.")
+         (list-hexadecimal-colors-display "color-selection" "Display hexadecimal color codes, and show what they look like.")
+         (magit-status "magit" "Interface to the version control system Git")
+         (mew "mew" nil)
+         (mew-send "mew" nil)
+         (mew-user-agent-compose "mew" nil)
+         (nxml-mode "nxml-mode" "Major mode for editing XML")
+         (ruby-mode "ruby-mode" "Mode for editing ruby source files")
+         (rubydb "rubydb3x" "ruby debug")
+         (svg-clock "svg-clock" "Start/stop svg-clock")
+         ))
+    (let ((func (car list)) (file (nth 1 list)) (doc (nth 2 list)))
+      (if (not (locate-library file))
+          (message "Warning: library file `%s' autoloaded from `%s' is not found." file func))
+      (when (autoload func file doc 1)
+        (add-to-list 'funcs func))))
+  (message "Autoload functions: %s" (reverse funcs)))
 
 ;; フレームの設定
 (dolist
@@ -172,6 +185,14 @@
 (setq use-dialog-box nil)
 
 (defalias 'message-box 'message)
+
+;; read-onlyファイルをview-modeで開く
+(require 'init-view-mode)
+
+(setq view-read-only 1)
+
+;; view-modeでviのキーバインド
+(require 'view-mode-vi-bindings)
 
 ;; タブの幅は、4
 (setq-default tab-width 4)
@@ -238,8 +259,8 @@
 (setq make-backup-files 1)
 
 ;; バックアップファイルは、~/backupに格納
-(let ((dir
-       "~/backup"
+(let (
+      (dir "~/backup"
        ))
   (if (not (file-directory-p (expand-file-name dir)))
       (message "Warning: backup directory `%s' is NOT exist." dir)
@@ -254,13 +275,8 @@
 ;; インデント
 (setq-default indent-line-function 'tab-to-tab-stop)
 
-;; 改行時の自動インデントを無効に（Emacs24から、初期値が有効になった）
+;; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
 (electric-indent-mode -1)
-
-;; read-onlyファイルをview-modeで開く
-(setq view-read-only 1)
-
-(require 'init-view-mode)
 
 ;; 圧縮されたファイルを直接編集する
 (auto-compression-mode 1)
@@ -317,9 +333,7 @@
 
 ;; dired
 (eval-when-compile (load "dired"))
-(eval-after-load "dired"
-  '(require 'init-dired)
-  )
+(eval-after-load "dired" '(require 'init-dired))
 
 (dolist
     (ext
@@ -471,11 +485,11 @@
        (web-mode html-mode)
        ))
   (let ((newmode (car list)) (oldmode (nth 1 list)))
-    (if (not (functionp newmode))
-        (message "Warning (auto-mode-alist): function `%s' is not defined." newmode)
+    (if (not (and (functionp oldmode) (functionp newmode)))
+        (message "Warning (auto-mode-alist): function `%s' or `%s' is not defined." newmode oldmode)
       (while
           (let ((alist (rassoc oldmode auto-mode-alist)))
-            (if alist
+            (when alist
                 (setcdr alist newmode)))))))
 
 ;; 新しいモード設定を追加する
@@ -510,9 +524,6 @@
 
 ;; ffap（find file at point）のキーバインド
 (ffap-bindings)
-
-;; view-modeでviのキーバインド
-(require 'view-mode-vi-bindings)
 
 ;; ウィンドウやバッファに関するキーバインド
 (eval-after-load "other-window-bindings"
@@ -576,7 +587,8 @@
 
 (dolist
     (key
-     '("C-x C-d"                         ; ffap-list-directory を無効に
+     '(
+       "C-x C-d"                         ; ffap-list-directory を無効に
        "C-x 4 0"                         ; kill-buffer-and-window を無効に
        "M-`"                             ; tmm-menubar を無効に
        ))
@@ -615,7 +627,8 @@
       (progn
         (fset func-init-add
               `(lambda ()
-                 (dolist (keymap ',maps)
+                 (dolist
+                     (keymap ',maps)
                    (let ((key (car keymap)) (func (nth 1 keymap)))
                      (if (not (functionp func))
                          (message "Warning: function `%s' is not defined." func)
@@ -634,17 +647,17 @@
    (let ((target (car list)) (sys (nth 1 list)) (feat (nth 2 list)))
      (when (equal (eval target) sys)
        (if (not (locate-library (symbol-name feat)))
-           (message "Warning: library `%s' is not found." feat)
-         (if (require feat)
-             (message "Library `%s' is loaded." feat))))))
+           (message "Warning: library file `%s' is not found." feat)
+         (message "Feature `%s' is required." feat)
+         (require feat)))))
 
 ;; Mew Settings
 (setq read-mail-command 'mew)
 
-(if (boundp 'mail-user-agent)
+(when (boundp 'mail-user-agent)
     (setq mail-user-agent 'mew-user-agent))
 
-(if (fboundp 'define-mail-user-agent)
+(when (fboundp 'define-mail-user-agent)
     (define-mail-user-agent
       'mew-user-agent
       'mew-user-agent-compose
@@ -658,13 +671,13 @@
 ;; 文字コードのデフォルトはUTF-8
 (prefer-coding-system 'utf-8)
 
+;; session
+(if (not (locate-library "session"))
+      (message "Warning: library 'session' is not found.")
+  (add-hook 'after-init-hook 'session-initialize))
+
 ;; Emacs開始にかかった時間をメッセージに表示
 (defun message-startup-time ()
   (message "Duration of the Emacs initialization: %s" (emacs-init-time)))
 
 (add-hook 'after-init-hook 'message-startup-time)
-
-;; session
-(if (not (locate-library "session"))
-      (message "Warning: library 'session' is not found.")
-  (add-hook 'after-init-hook 'session-initialize))
