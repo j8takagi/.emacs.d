@@ -12,7 +12,7 @@ COMPILE.el := $(EMACS) -batch -l set-load-path.el -l init.el -f batch-byte-compi
 CLEAN.rsync := $(GREPV) "^\(sent\)\|\(total\)\|\(sending\)"
 emacs-dir := ~/.emacs.d
 
-.PHONY: all init elpa site-lisp install install-init.d install-init.sys.d install-site-lisp install-elpa
+.PHONY: all init site-lisp install install-init.d install-init.sys.d install-site-lisp
 
 all: init init.d init.sys.d insert site-lisp
 
@@ -29,12 +29,6 @@ insert:
 
 site-lisp:
 	$(MAKE) -sC $@
-
-get-elpa:
-	$(RSYNC) $(RSYNCFLAG) $(emacs-dir)/elpa/ elpa/ | $(CLEAN.rsync)
-
-elpa:
-	$(EMACS) -batch -l recompile-elpa.el
 
 get-abbrev:
 	$(RSYNC) $(RSYNCFLAG) $(emacs-dir)/.abbrev_defs ./
@@ -61,9 +55,6 @@ install-site-lisp: $(emacs-dir)/site-lisp
 
 install-insert:
 	$(MAKE) -C insert install
-
-install-elpa: elpa $(emacs-dir)/elpa
-	$(RSYNC) $(RSYNCFLAG) elpa/* $(emacs-dir)/elpa/ | $(CLEAN.rsync)
 
 $(emacs-dir):
 	$(MKDIR) $@
