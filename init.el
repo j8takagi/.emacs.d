@@ -1,4 +1,6 @@
 ;;;-*-Emacs-Lisp-*-
+;; バージョンを表示
+(message "%s" (version))
 
 ;; load-pathを追加し、subdirs.elがある場合は読み込む
 (dolist
