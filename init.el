@@ -24,8 +24,6 @@
 (dolist
     (arch
      '(
-       ("marmalade" . "http://marmalade-repo.org/packages/")
-       ("melpa" . "http://melpa.milkbox.net/packages/")
        ("melpa-stable" . "http://stable.melpa.org/packages/")
        ))
   (add-to-list 'package-archives arch))
