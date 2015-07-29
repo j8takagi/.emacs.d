@@ -39,22 +39,18 @@
        '(
          csv-mode
          dash
-         dos
          ess
          git-commit
          gitignore-mode
-         gnuplot-mode
-         gtags
-         igrep
+         ggtags
          inf-ruby
-         japanese-holidays
          magit
          magit-popup
+         mew
          mmm-mode
          session
          undo-tree
          web-mode
-         wget
          with-editor
          xpm
          ))
@@ -120,7 +116,6 @@
          (eukleides-mode "eukleides" "Major mode for editing Eukleides files")
          (flex-mode "flex-mode" "Major mode for editing flex files")
          (graphviz-dot-mode "graphviz-dot-mode" "Major mode for the dot language")
-         (gtags-mode "gtags" "Toggle Gtags mode, a minor mode for browsing source code using GLOBAL.")
          (js-mode "js" "Major mode for editing JavaScript.")
          (list-hexadecimal-colors-display "color-selection" "Display hexadecimal color codes, and show what they look like.")
          (magit-status "magit" "Interface to the version control system Git")
@@ -349,11 +344,16 @@
 
 ;;; CC-Mode
 (eval-when-compile (load "cc-mode"))
+
+(defun cc-ggtags-mode-turnon ()
+  (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+    (ggtags-mode 1)))
+
 (eval-after-load "cc-mode"
   '(progn
      (setq c-default-style "k&r")
      (setq c-basic-offset 4)
-     (gtags-mode 1)
+     (add-hook 'c-mode-common-hook 'cc-ggtags-mode-turnon)
      (require 'gnu-mp)))
 
 ;; bison-mode
@@ -497,7 +497,6 @@
      '(
        ("\\.[CcTt][Ss][Vv]\\'" . csv-mode)
        ("\\.[rR]\\'" . R-mode)
-       ("\\.bat\\'" . dos-mode)
        ("\\.casl?\\'" . asm-mode)
        ("\\.css\\'" . css-mode)
        ("\\.d\\'". makefile-gmake-mode)
