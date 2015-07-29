@@ -633,18 +633,16 @@
 
 ;; システムごとの設定
 (dolist
-     (list
+     (syss
      '(
        (system-type gnu/linux init-linux)
        (window-system mac init-mac)
        (window-system x init-x)
        (window-system w32 init-w32)
        ))
-   (let ((target (car list)) (sys (nth 1 list)) (feat (nth 2 list)))
+   (let ((target (car syss)) (sys (nth 1 syss)) (feat (nth 2 syss)))
      (when (equal (eval target) sys)
-       (if (not (locate-library (symbol-name feat)))
-           (message "Warning: library file `%s' is not found." feat)
-         (when (require feat) (message "Feature `%s' is required." feat))))))
+       (when (require feat) (message "Feature `%s' is required." feat)))))
 
 ;; Mew Settings
 (setq read-mail-command 'mew)
