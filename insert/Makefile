@@ -11,7 +11,7 @@ emacs-dir := ~/.emacs.d
 
 all: $(addsuffix c,$(wildcard *.el))
 
-install: $(emacs-dir)/insert
+install: all $(emacs-dir)/insert
 	$(RSYNC) $(RSYNCFLAG) --exclude='set-load-path.el*' --exclude='load-abbrev.el*' *.el *.elc $(emacs-dir)/insert/ | $(CLEAN.rsync)
 
 $(emacs-dir)/insert:

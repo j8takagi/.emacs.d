@@ -14,7 +14,7 @@ SITELISPS := $(shell sh -c "ls -F | grep /")
 all: subdirs.elc
 	for dir in $(SITELISPS); do $(MAKE) -C $$dir all; done
 
-install:
+install: all
 	$(RSYNC) $(RSYNCFLAG) --exclude "Makefile*" --delete ./ $(sitelisp-dir)/ | $(CLEAN.rsync)
 
 clean:
