@@ -4,10 +4,10 @@
 (setq dired-recursive-copies 'always)
 
 ;; sorter - diredでのソート
-(load "sorter")
+(require 'sorter)
 
 ;; dired-x - diredの拡張機能
-(load "dired-x")
+(require 'dired-x)
 
 ;; wdired - ファイル名の編集を可能にする
 (require 'wdired)

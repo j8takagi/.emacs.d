@@ -22,7 +22,7 @@
 ;; Add these lines to your .emacs file and set insert-directory-program
 ;; to point to your GNU ls.
 
-;; (load "sorter" nil t)
+;; (require 'sorter)
 ;; (setq insert-directory-program "~/GNUls"))
 
 (defun dired-toggle-sort ()
@@ -96,3 +96,6 @@
          (substring string1 0 (match-beginning 0))
          (substring string1 (match-end 0)))))))
   string1)
+
+(provide 'sorter)
+;;; sorter.el ends here
