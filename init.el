@@ -40,9 +40,10 @@
          csv-mode
          dash
          ess
+         ggtags
          git-commit
          gitignore-mode
-         ggtags
+         gnuplot
          inf-ruby
          magit
          magit-popup
@@ -496,13 +497,15 @@
 (dolist
     (alist
      '(
+       (".abbrev_defs" . emacs-lisp-mode)
+       ("Makefile\\.?.*". makefile-gmake-mode)
        ("\\.[CcTt][Ss][Vv]\\'" . csv-mode)
        ("\\.[rR]\\'" . R-mode)
        ("\\.casl?\\'" . asm-mode)
        ("\\.css\\'" . css-mode)
        ("\\.d\\'". makefile-gmake-mode)
-       ("Makefile\\.?.*". makefile-gmake-mode)
        ("\\.euk\\'" . eukleides-mode)
+       ("\\.gp\\'" . gnuplot-mode)
        ("\\.gv\\'" . graphviz-dot-mode)
        ("\\.js\\'" . js-mode)
        ("\\.ll?\\'" . flex-mode)
@@ -512,7 +515,6 @@
        ("\\.xml\\'" . nxml-mode)
        ("\\.y?rb\\'" . ruby-mode)
        ("\\.yy?\\'" . bison-mode)
-       (".abbrev_defs" . emacs-lisp-mode)
        ("\\`ja.wikipedia.org/w/index.php" . mediawiki-mode)
        ("cmd" . shell-script-mode)
        ))
