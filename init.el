@@ -61,7 +61,9 @@
       (if (not (assq pkg package-archive-contents))
           (message "Warning: package `%s' is NOT installed and NOT found on archives." pkg)
         (message "Package `%s' is NOT installed. Installation begins." pkg)
-        (package-install pkg)))
+        (condition-case err
+            (package-install pkg)
+          (message "Error: %s" err))))
     (add-to-list 'pkgs pkg)
    )
   (let ((apkgs (mapcar 'car package-alist)))
