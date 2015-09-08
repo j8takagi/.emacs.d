@@ -351,14 +351,13 @@
 ;;; CC-Mode
 (eval-when-compile (load "cc-mode"))
 
-(defun init-cc-ggtags-mode-turnon ()
-  (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-    (ggtags-mode 1)))
-
 (eval-after-load "cc-mode"
   '(progn
      (setq c-default-style "k&r")
      (setq c-basic-offset 4)
+     (defun init-cc-ggtags-mode-turnon ()
+       (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+         (ggtags-mode 1)))
      (add-hook 'c-mode-common-hook 'init-cc-ggtags-mode-turnon)
      (require 'gnu-mp)))
 
@@ -393,8 +392,12 @@
 ;; graphviz-dot-mode
 (eval-when-compile (load "graphviz-dot-mode"))
 (eval-after-load "graphviz-dot-mode"
-  '(add-hook 'graphviz-dot-mode-hook
-             (lambda () (set (make-local-variable 'compile-command) "make -k "))))
+  '(progn
+     (defun init-graphviz-dot-mode-set-make-compile-command ()
+       (make-local-variable 'compile-command)
+       (setq compile-command "make -k"))
+     (add-hook 'graphviz-dot-mode-hook
+             'init-graphviz-dot-mode-set-make-compile-command)))
 
 ;; ChangeLog
 (setq user-full-name "Kazuhito Takagi")
@@ -582,11 +585,11 @@
 ;; skeleton-pairによる括弧挿入の自動化
 (eval-when-compile (load "skeleton"))
 (eval-after-load "skeleton"
-  (progn
-    (setq skeleton-pair 1)
-    (dolist
-        (key '("(" "\"" "{" "["))
-      (global-set-key (kbd key) 'skeleton-pair-insert-maybe))))
+  '(progn
+     (setq skeleton-pair 1)
+     (dolist
+         (key '("(" "\"" "{" "["))
+       (global-set-key (kbd key) 'skeleton-pair-insert-maybe))))
 
 (defvar my-speakers '("芹生" "高木" "高橋" "村杉"))
 (defun insert-speaker ()
