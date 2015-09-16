@@ -137,26 +137,31 @@
 ;;; dired-modeからファイルやディレクトリーを開く
 (require 'dired)
 
-(add-hook
- 'dired-mode-hook
- (function
-  (lambda ()
-    ;; カーソル下のファイルやディレクトリーを外部プログラムで開く
-    (defun dired-exopen-file ()
-      "Open file mentioned on this line in external program"
-      (interactive)
-      (exopen-file (dired-get-filename)))
+(defun exopen-dired ()
+  ;; カーソル下のファイルやディレクトリーを外部プログラムで開く
+  (defun dired-exopen-file ()
+    "Open file mentioned on this line in external program"
+    (interactive)
+    (exopen-file (dired-get-filename)))
+  ;; 現在のディレクトリーを外部プログラムで開く
+  (defun dired-exopen-curdir ()
+    "Open current directory in external program"
+    (interactive)
+    (exopen-file (expand-file-name dired-directory)))
+  ;; キーバインド
+  (dolist
+      (map
+       '(
+         ("r" dired-exopen-file)
+         ("C-c r" dired-exopen-file)
+         ("C-c ." dired-exopen-curdir)
+         ))
+    (let ((key (car map)) (func (nth 1 map)))
+      (if (not (functionp func))
+          (message "Warning: function `%s' is NOT defined." func)
+        (define-key dired-mode-map (kbd key) func)))))
 
-    ;; 現在のディレクトリーを外部プログラムで開く
-    (defun dired-exopen-curdir ()
-      "Open current directory in external program"
-      (interactive)
-      (exopen-file (expand-file-name dired-directory)))
-
-    ;; キーバインド
-    (define-key dired-mode-map "r" 'dired-exopen-file)
-    (define-key dired-mode-map "\C-cr" 'dired-exopen-file)
-    (define-key dired-mode-map "\C-c." 'dired-exopen-curdir))))
+(add-hook 'dired-mode-hook 'exopen-dired)
 
 (provide 'exopen-mode)
 ;;; exopen-mode.el ends here
