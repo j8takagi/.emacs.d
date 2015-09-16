@@ -75,17 +75,18 @@
 ;;; exopen-std-cmdで指定されたプログラムを使用
 (defun exopen-file (file)
   "open file in external program"
-  (let ((process-connection-type nil) (cmd) (cmdargs) (cmdstr))
+  (let ((process-connection-type nil) (cmd) (cmdargs))
     (if exopen-suffix-cmd
         (setq cmd (cdr(assoc (file-name-extension file 1) exopen-suffix-cmd))))
     (unless cmd
       (setq cmd exopen-std-cmd)
       (setq cmdargs exopen-std-cmdargs))
-    (setq cmdstr (concat cmd " " cmdargs " " file))
-    (start-process-shell-command "exopen" nil cmdstr)
-    (message
-     (concat "exopen: " cmdstr " at "
-             (format-time-string "%Y/%m/%d %H:%M:%S" (current-time))))))
+    (let
+        (
+         (cmdstr (concat cmd " " cmdargs " \"" file "\""))
+         (proc (concat "exopen at " (format-time-string "%Y/%m/%d %H:%M:%S" (current-time)))))
+      (message cmdstr)
+      (start-process-shell-command proc "*Messages*" cmdstr))))
 
 ;;; バッファで開いているファイルを外部プログラムでオープン
 (defun exopen-buffer-file ()
