@@ -591,21 +591,6 @@
          (key '("(" "\"" "{" "["))
        (global-set-key (kbd key) 'skeleton-pair-insert-maybe))))
 
-(defvar my-speakers '("芹生" "高木" "高橋" "村杉"))
-(defun insert-speaker ()
-  (interactive)
-  (let ((p (point)) (s "[0:00:00]"))
-    (when (re-search-backward "\\[[0-9:]+\\]" nil t 1)
-      (setq  s (buffer-substring (match-beginning 0) (match-end 0))))
-    (goto-char p)
-    (insert
-     (concat
-      "\n\n"
-      (read-string "時間? " s)
-      " "
-      (completing-read "発言者? " my-speakers)
-      ": "))))
-
 (dolist
     (key
      '(
@@ -614,6 +599,8 @@
        "M-`"                             ; tmm-menubar を無効に
        ))
   (global-unset-key (kbd key)))
+
+(require 'mpv-transcription)
 
 ;; リストで定義されたキーバインドを設定する関数 <modemap>-init-add を
 ;; 定義し、mode-hookに追加する
@@ -625,7 +612,6 @@
        ("text-mode" text-mode-hook text-mode-map
         (
          ("C-M-i" dabbrev-expand) ; ispell 起動を無効にし、dabbrev-expand を設定
-         ("<M-return>" insert-speaker)
          ))
        ("tex-mode" latex-mode-hook latex-mode-map
         (
