@@ -73,12 +73,13 @@
     (when apkgs
       (message "Unexpected installed packages: %s"  (reverse apkgs)))))
 
-(defun init-require (feat)
-  (if (require feat nil 1)
-      (message "Feature `%s' is required." feat)
-    (if (not (locate-library (symbol-name feat)))
-        (message "Warning: required feature `%s' is NOT found." feat)
-      (message "Warning: it fails to require feature `%s'" feat))))
+(defun my-init-require (feature)
+  "Require FEATURE, and the result is written into the `*Messages*' buffer."
+  (if (require feature nil 1)
+      (message "Feature `%s' is required." feature)
+    (if (not (locate-library (symbol-name feature)))
+        (message "Warning: required feature `%s' is NOT found." feature)
+      (message "Warning: it fails to require feature `%s'" feature))))
 
 ;; ライブラリを読み込む
 (dolist
@@ -108,7 +109,7 @@
        uniq
        window-control
        ))
-  (init-require feat))
+  (my-init-require feat))
 
 ;; autoloadの設定
 (let (funcs)
@@ -141,19 +142,11 @@
         (add-to-list 'funcs func))))
   (message "Autoload functions: %s" (reverse funcs)))
 
-;; フレームの設定
-(dolist
-    (val
-     '(
-       (foreground-color . "black")
-       (background-color . "gray99")
-       (cursor-color . "DarkOliveGreen")
-       (cursor-type . box)
-       ))
-  (add-to-list 'default-frame-alist val))
-
 ;; 日本語環境
 (set-language-environment 'Japanese)
+
+;; 文字コードのデフォルトはUTF-8
+(prefer-coding-system 'utf-8)
 
 ;; 起動時の画面を表示しない
 (setq inhibit-startup-message 1)
@@ -319,10 +312,12 @@
   '(setq compilation-scroll-output 'first-error))
 
 ;; lisp-modeでのタブの設定
-(defun init-indent-lisp-indent-line ()
-  (setq indent-line-function 'lisp-indent-line))
-
-(add-hook 'emacs-lisp-mode-hook 'init-indent-lisp-indent-line)
+(eval-when-compile (load "lisp-mode"))
+(eval-after-load "lisp-mode"
+  '(progn
+     (defun my-init-indent-lisp-indent-line ()
+       (setq indent-line-function 'lisp-indent-line))
+     (add-hook 'emacs-lisp-mode-hook 'my-init-indent-lisp-indent-line)))
 
 ;; shell-mode
 (eval-when-compile (load "shell"))
@@ -357,10 +352,10 @@
   '(progn
      (setq c-default-style "k&r")
      (setq c-basic-offset 4)
-     (defun init-cc-ggtags-mode-turnon ()
+     (defun my-init-cc-ggtags-mode-turnon ()
        (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
          (ggtags-mode 1)))
-     (add-hook 'c-mode-common-hook 'init-cc-ggtags-mode-turnon)
+     (add-hook 'c-mode-common-hook 'my-init-cc-ggtags-mode-turnon)
      (require 'gnu-mp)))
 
 ;; bison-mode
@@ -395,11 +390,11 @@
 (eval-when-compile (load "graphviz-dot-mode"))
 (eval-after-load "graphviz-dot-mode"
   '(progn
-     (defun init-graphviz-dot-mode-set-make-compile-command ()
+     (defun my-init-graphviz-dot-mode-set-make-compile-command ()
        (make-local-variable 'compile-command)
        (setq compile-command "make -k"))
      (add-hook 'graphviz-dot-mode-hook
-             'init-graphviz-dot-mode-set-make-compile-command)))
+             'my-init-graphviz-dot-mode-set-make-compile-command)))
 
 ;; ChangeLog
 (setq user-full-name "Kazuhito Takagi")
@@ -457,7 +452,7 @@
      (setq auto-insert-directory (expand-file-name "~/.emacs.d/insert/"))
      (setq auto-insert-query nil)
      (setq auto-insert-alist nil)
-     (init-require 'global-skeletons)
+     (my-init-require 'global-skeletons)
      (dolist
          (libskel
           '(
@@ -470,7 +465,7 @@
             ))
        (let ((lib (car libskel)) (skel (nth 1 libskel)))
          (eval-after-load lib
-           `(init-require ',skel))))))
+           `(my-init-require ',skel))))))
 
 ;; magic-mode-alist
 (dolist
@@ -605,7 +600,7 @@
 
 (require 'mpv-transcription)
 
-;; リストで定義されたキーバインドを設定する関数 <modemap>-init-add を
+;; リストで定義されたキーバインドを設定する関数 my-init-<modemap>-keybind を
 ;; 定義し、mode-hookに追加する
 ;; リストの形式は、
 ;; ((lib mode-hook mode-map (keymaps)))
@@ -624,7 +619,9 @@
          ("C-c C-c" comment-region)     ; tex-compileを無効にし、comment-region を設定
          ))
        ("lisp-mode" emacs-lisp-mode-hook lisp-mode-shared-map
-        (("<M-return>" completion-at-point)
+        (
+         ;; ("<M-return>" noexist)      ; デバッグ用
+         ("<M-return>" completion-at-point)
          ))
        ("mediawiki" mediawiki-mode-hook mediawiki-mode-map
         (
@@ -633,18 +630,20 @@
        ))
   (let* ((lib (car list)) (hook (nth 1 list))
          (modemap (nth 2 list)) (maps (nth 3 list))
-         (func-init-add (read (concat (symbol-name modemap) "-init-add"))))
+         (modemap-name (symbol-name modemap))
+         (func-init-keybind (read (concat "my-init-" modemap-name "-keybind"))))
     (eval-after-load lib
       (progn
-        (fset func-init-add
-              `(lambda ()
-                 (dolist
-                     (keymap ',maps)
-                   (let ((key (car keymap)) (func (nth 1 keymap)))
-                     (if (not (functionp func))
-                         (message "Warning: function `%s' is not defined." func)
-                       (define-key ,modemap (kbd key) func))))))
-        `(add-hook ',hook ',func-init-add)))))
+        (fset
+         func-init-keybind
+         `(lambda ()
+            (dolist
+                (keymap ',maps)
+              (let ((key (car keymap)) (func (nth 1 keymap)))
+                (if (not (functionp func))
+                    (message "Warning: In setting %s, function `%s' is not defined." ,modemap-name func)
+                  (define-key ,modemap (kbd key) func))))))
+        `(add-hook ',hook ',func-init-keybind)))))
 
 ;; システムごとの設定
 (dolist
@@ -655,9 +654,9 @@
        (window-system x init-x)
        (window-system w32 init-w32)
        ))
-   (let ((func (car sysfeat)) (sys (nth 1 sysfeat)) (feat (nth 2 sysfeat)))
+   (let ((func (car condi)) (sys (nth 1 condi)) (feat (nth 2 condi)))
      (when (equal (eval func) sys)
-       (init-require feat))))
+       (my-init-require feat))))
 
 ;; Mew Settings
 (setq read-mail-command 'mew)
@@ -685,7 +684,7 @@
   (add-hook 'after-init-hook 'session-initialize))
 
 ;; Emacs開始にかかった時間をメッセージに表示
-(defun init-message-startup-time ()
+(defun my-init-message-startup-time ()
   (message "Duration of the Emacs initialization: %s" (emacs-init-time)))
 
-(add-hook 'after-init-hook 'init-message-startup-time)
+(add-hook 'after-init-hook 'my-init-message-startup-time)
