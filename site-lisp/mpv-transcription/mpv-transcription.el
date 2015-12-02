@@ -11,13 +11,13 @@
 ;;; Code:
 
 
-(defvar mpv-transcription-default-pace 16)
+(defvar mpv-transcription-default-pace 5)
 
 (defvar mpv-transcription-current-time 0)
 
-(defvar mpv-transcription-speakers '("芹生" "高木" "高橋" "村杉"))
+(defvar mpv-transcription-speakers)
 
-(defvar mpv-transcription-audio-file "/Users/kazubito/2015_09/monogatari_rodo/15.07.24 芹生さん/150724_001（個人ＩＣ）.MP3")
+(defvar mpv-transcription-audio-file)
 
 (defun mpv-transcription-get-previous-time ()
   (let ((sec 0))
@@ -28,8 +28,9 @@
     sec))
 
 (defun mpv-transcription-get-previous-speaker ()
-  (let (speaker)
-    (when (re-search-backward " \\(.+\\):" nil t 1)
+  (let (speaker (p (point)))
+    (move-beginning-of-line 1)
+    (when (re-search-forward " \\([^:]+\\):" nil t 1)
       (setq speaker (buffer-substring (match-beginning 1) (match-end 1))))))
 
 (defun mpv-transcription-insert-speak ()
@@ -45,7 +46,7 @@
     (goto-char p)
     (insert "\n")
     (insert (concat "[" timestr "] " speaker ": "))
-    (mpv-transcription-start timestr)))
+    (mpv-transcription-play mpv-transcription-audio-file timestr mpv-transcription-default-pace)))
 
 (defun mpv-transcription-insert-new-speak ()
   (interactive)
@@ -66,26 +67,34 @@
       " "
       (completing-read "発言者? " mpv-transcription-speakers nil t nil 'mpv-transcription-speakers)
       ": "))
-    (mpv-transcription-start timestr)))
+    (mpv-transcription-play mpv-transcription-audio-file timestr mpv-transcription-default-pace)))
 
 (defun mpv-transcription-play-inline-time ()
   (interactive)
-  (let ((p (point)) timestr)
-    (beginning-of-line)
-    (when (re-search-forward "\\[\\([0-9]\\{1,2\\}:[0-9]\\{1,2\\}:[0-9]\\{1,2\\}\\)\\]" (line-end-position) t 1)
-      (setq timestr (buffer-substring (match-beginning 1) (match-end 1)))
-      (mpv-transcription-start timestr))
-    (goto-char p)))
+  (mpv-transcription-play mpv-transcription-audio-file (mpv-transcription-inline-time) mpv-transcription-default-pace))
 
-(defun mpv-transcription-start (timestr)
+(defun mpv-transcription-inline-time ()
+  (interactive)
+  (let ((p (point)))
+    (save-excursion
+      (beginning-of-line)
+      (when (re-search-forward "\\[\\([0-9]\\{1,2\\}:[0-9]\\{1,2\\}:[0-9]\\{1,2\\}\\)\\]" (line-end-position) t 1)
+        (buffer-substring (match-beginning 1) (match-end 1))))))
+
+(defun mpv-transcription-play (audio-file &optional start sec)
   (interactive)
   (let ((cmdstr) (buf (get-buffer-create "*mpv*")))
-    (setq cmdstr
-          (concat
-           "mpv \"" mpv-transcription-audio-file "\" "
-           "--start=" timestr " "
-           "--length=" (number-to-string mpv-transcription-default-pace)))
+    (setq cmdstr (concat "mpv \"" audio-file "\""))
+    (when start
+      (setq cmdstr (concat cmdstr " --start=" start)))
+    (when (> sec 0)
+      (setq cmdstr (concat cmdstr " --length=" (number-to-string sec))))
     (start-process-shell-command "mpv" buf cmdstr)))
+
+(defun mpv-transcription-insert-unknwon-tag ()
+  (interactive)
+  (insert "【不明:】")
+  (backward-char 1))
 
 (defun mpv-transcription-mode ()
   "This mode is for transcription using mpv."
@@ -96,9 +105,10 @@
   (dolist
       (map
        '(
-         ("<C-return>" mpv-transcription-insert-speak)
-         ("<C-M-return>" mpv-transcription-insert-new-speak)
-         ("S-SPC" mpv-transcription-play-inline-time)
+         ("<S-return>" mpv-transcription-insert-speak)
+         ("<C-S-return>" mpv-transcription-insert-new-speak)
+         ("C-S-SPC" mpv-transcription-play-inline-time)
+         ("C-c u" mpv-transcription-insert-unknwon-tag)
          ))
     (let ((key (car map)) (func (nth 1 map)))
       (if (not (functionp func))
