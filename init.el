@@ -649,13 +649,19 @@
         `(add-hook ',hook ',func-init-keybind)))))
 
 ;; システムごとの設定
+(defvar system-name-simple
+  (replace-regexp-in-string "\\..*\\'" "" (system-name))
+  "The simple host name of the machine Emacs is running on, which is without domain information.")
+
 (dolist
-     (sysfeat
+     (condi
      '(
        (system-type gnu/linux init-linux)
-       (window-system mac init-mac)
+       (system-type darwin init-darwin)
+       (window-system mac init-mac-gui)
        (window-system x init-x)
        (window-system w32 init-w32)
+       (system-name-simple "tiger" init-tiger)
        ))
    (let ((func (car condi)) (sys (nth 1 condi)) (feat (nth 2 condi)))
      (when (equal (eval func) sys)

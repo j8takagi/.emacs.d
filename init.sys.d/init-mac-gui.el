@@ -1,5 +1,5 @@
 ;; -*- mode: Emacs-Lisp; -*-
-;; Mac OS X用の設定
+;; Mac OS X 非terminal 用の設定
 
 ;; Mac OS Xのpath_helperでPATHを取得し、あらためてPATHとして設定
 (let ((shell-file-name "/bin/bash"))
@@ -28,28 +28,12 @@
   (let ((var (car list)) (val (nth 1 list)))
     (setenv var val)))
 
-;; Mac OS X用の文字コード指定
-(set-file-name-coding-system 'utf-8-hfs)
-
-(setq locale-coding-system 'utf-8-hfs)
-
-;; フレームの設定
-(dolist
-    (val
-     '(
-       (width . 180)
-       (height . 55)
-       (top . 22)
-       (left . 0)
-       ))
-  (add-to-list 'default-frame-alist val))
-
 ;; 標準のフォントサイズとフォントファミリーの設定
 (set-face-attribute 'default nil
                     :height 120
                     :family "Menlo")
 
-;; Character setごとにフォントファミリーを設定
+;; キャラクターセットごとにフォントファミリーを設定
 (dolist
     (list
      '(
@@ -66,30 +50,17 @@
         (message "Font family %s is not found." fontfamily))
      ((set-fontset-font t charset (font-spec :family fontfamily))))))
 
-;; Mac OS XのIME設定
-(setq default-input-method "MacOSX")
-
-;; commandキーをEmacsのMetaキーに
-(setq mac-command-modifier 'meta)
-
-;; Mac OS Xのキー設定
+;; フレームの設定
 (dolist
-    (map
+    (val
      '(
-       ("C-x RET u" ucs-normalize-NFC-buffer)
-       ("<M-f1>" other-frame)    ; Mac OS Xの他アプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする
+       (foreground-color . "black")
+       (background-color . "gray99")
+       (cursor-color . "DarkOliveGreen")
+       (cursor-type . box)
        ))
-  (let ((key (car map)) (func (nth 1 map)))
-    (if (not (functionp func))
-        (message "%s is not defined." func)
-      (global-set-key (kbd key) func))))
-
-;; emacsclientを使えるように
-(eval-after-load "server" '(server-start))
-
-;; ミニバッファにカーソルを移動する際、自動的にキーボードをASCIIモードにする
-(mac-auto-ascii-mode 1)
+  (add-to-list 'default-frame-alist val))
 
 (cd "~")
 
-(provide 'init-mac)
+(provide 'init-mac-gui)
