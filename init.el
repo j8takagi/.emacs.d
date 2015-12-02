@@ -47,6 +47,7 @@
          inf-ruby
          magit
          magit-popup
+         markdown-mode
          mew
          mmm-mode
          session
