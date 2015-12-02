@@ -5,8 +5,8 @@
 (dolist
     (val
      '(
-       (width . 120)
-       (height . 34)
+       (width . 150)
+       (height . 40)
        (top . 0)
        (left . 0)
        ))
