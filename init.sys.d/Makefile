@@ -10,22 +10,24 @@ COMPILE.el := $(EMACS) -batch -l set-load-path.el -f batch-byte-compile
 emacs-dir := ~/.emacs.d
 
 KERNEL := $(shell uname)
-
 ifeq ($(KERNEL),Linux)
-  ELFILES := init-linux.el init-x.el
+  OSFILES := $(wildcard init-linux*.el init-x*.el)
 endif
 ifeq ($(KERNEL),Darwin)
-  ELFILES := init-mac.el
+  OSFILES := $(wildcard init-mac*.el init-darwin*.el)
 endif
 
-ELCFILES := $(addsuffix c,$(ELFILES))
+HOST := $(shell hostname -s)
+HOSTFILES := $(wildcard init-$(HOST)*.el)
+
+ELCFILES := $(addsuffix c,$(OSFILES) $(HOSTFILES))
 
 .PHONY: all install clean
 
 all: $(ELCFILES)
 
 install: all $(emacs-dir)/init.sys.d
-	$(RSYNC) $(RSYNCFLAG) $(ELFILES) $(ELCFILES) $(emacs-dir)/init.sys.d/ | $(CLEAN.rsync)
+	$(RSYNC) $(RSYNCFLAG) $(OSFILES) $(HOSTFILES) $(ELCFILES) $(emacs-dir)/init.sys.d/ | $(CLEAN.rsync)
 
 $(emacs-dir)/init.sys.d:
 	$(MKDIR) $@
