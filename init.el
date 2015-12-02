@@ -180,14 +180,6 @@
 
 (defalias 'message-box 'message)
 
-(eval-after-load "view"
-  '(progn
-     ;; read-onlyファイルをview-modeで開く
-     (init-require 'init-view-mode)
-     (setq view-read-only 1)
-     ;; view-modeでviのキーバインド
-     (init-require 'view-mode-vi-bindings)))
-
 ;; タブの幅は、4
 (setq-default tab-width 4)
 
@@ -284,9 +276,37 @@
 ;;; evalした結果を全部表示
 (setq eval-expression-print-length nil)
 
-;; whitespace
+;;; バッファ自動再読み込み
+(global-auto-revert-mode 1)
+
+;; dired
+(eval-when-compile (load "dired"))
+(eval-after-load "dired"
+  '(require 'init-dired))
+
+;; ファイル名の補完入力の対象から外す拡張子。diredで淡色表示される
+(dolist
+    (ext
+     '(
+       ".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" ".aux_prev"
+       ".toc_prev" ".lot_prev" ".lof_prev" ".bbl_prev" ".out_prev"
+       ".idx" ".ind" ".idx_prev" ".ind_prev" ".ilg" "tmp" ".synctex.gz" ".DS_Store"
+       "dplg" "dslg"
+       ))
+  (add-to-list 'completion-ignored-extensions ext))
+
+;; view-modeの設定
+(eval-after-load "view"
+  '(progn
+     ;; read-onlyファイルをview-modeで開く
+     (my-init-require 'init-view-mode)
+     (setq view-read-only 1)
+     ;; view-modeでviのキーバインド
+     (my-init-require 'view-mode-vi-bindings)))
+
+;; whitespaceの設定
 (eval-after-load "whitespace"
-  '(init-require 'init-whitespace))
+  '(my-init-require 'init-whitespace))
 
 ;; バッファ全体の濁点分離を直す
 (eval-after-load "ucs-normalize"
@@ -327,27 +347,11 @@
            "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ")
      (require 'init-shell)))
 
-;; dired
-(eval-when-compile (load "dired"))
-(eval-after-load "dired"
-  '(require 'init-dired))
-
-(dolist
-    (ext
-     '(
-       ".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" ".aux_prev"
-       ".toc_prev" ".lot_prev" ".lof_prev" ".bbl_prev" ".out_prev"
-       ".idx" ".ind" ".idx_prev" ".ind_prev" ".ilg" "tmp" ".synctex.gz" ".DS_Store"
-       "dplg" "dslg"
-       ))
-  (add-to-list 'completion-ignored-extensions ext))
-
 ;; *scratch* と *Messages* のバッファを削除しない
 (require 'init-scratch-messages)
 
 ;;; CC-Mode
 (eval-when-compile (load "cc-mode"))
-
 (eval-after-load "cc-mode"
   '(progn
      (setq c-default-style "k&r")
@@ -674,9 +678,6 @@
 
 ;; magit
 (setq magit-status-buffer-switch-function 'switch-to-buffer)
-
-;; 文字コードのデフォルトはUTF-8
-(prefer-coding-system 'utf-8)
 
 ;; session
 (if (not (locate-library "session"))
