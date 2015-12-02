@@ -575,7 +575,6 @@
        ("M-?" help)
        ("M-[" backward-paragraph)
        ("M-]" forward-paragraph)
-       ("M-g" goto-line)
        ("M-p" call-last-kbd-macro)
        ("RET" newline-and-indent)
        ))
