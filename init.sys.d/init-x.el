@@ -28,7 +28,5 @@
         (message "Font family %s is not found." fontfamily))
      ((set-fontset-font t charset (font-spec :family fontfamily))))))
 
-;; emacsclientを使えるように
-(eval-after-load "session" (server-start))
 
 (provide 'init-x)
