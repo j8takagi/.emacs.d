@@ -57,8 +57,9 @@
     "Info-mode"
     "\\*Buffer List\\*"
     "tetris-mode"
+    "Life-mode"
     )
-  "Major mode patterns exclude from setting buffers read-only."
+  "Major mode patterns exclude from setting view-mode if buffer is read-only."
   )
 
 (defun view-mode-if-buffer-read-only ()
