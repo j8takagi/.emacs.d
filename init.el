@@ -259,7 +259,7 @@
 (setq delete-old-versions 1)
 
 ;; インデント
-(setq-default indent-line-function 'tab-to-tab-stop)
+(setq-default indent-line-function 'indent-to-left-margin)
 
 ;; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
 (electric-indent-mode -1)
