@@ -520,6 +520,7 @@
        ("\\`ja.wikipedia.org/w/index.php" . mediawiki-mode)
        ("cmd" . shell-script-mode)
        ("\\.re\\'" . review-mode)
+       ("\\.md\\'" . markdown-mode)
        ))
   (let ((mode (cdr alist)))
     (if (not (functionp mode))
