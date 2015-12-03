@@ -539,7 +539,7 @@
 
 ;; global-key
 (dolist
-    (map
+    (mapkeys
      '(
        ("<M-down>" windmove-down)
        ("<M-left>" windmove-left)
@@ -578,7 +578,7 @@
        ("M-p" call-last-kbd-macro)
        ("RET" newline-and-indent)
        ))
-  (let ((key (car map)) (func (nth 1 map)))
+  (let ((key (car mapkeys)) (func (nth 1 mapkeys)))
     (if (not (functionp func))
         (message "Warning: function `%s' is NOT defined." func)
       (global-set-key (kbd key) func))))
@@ -606,7 +606,7 @@
 ;; リストで定義されたキーバインドを設定する関数 my-init-<modemap>-keybind を
 ;; 定義し、mode-hookに追加する
 ;; リストの形式は、
-;; ((lib mode-hook mode-map (keymaps)))
+;; (lib hook modemap (key func))
 (dolist
     (list
      '(
@@ -632,7 +632,7 @@
          ))
        ))
   (let* ((lib (car list)) (hook (nth 1 list))
-         (modemap (nth 2 list)) (maps (nth 3 list))
+         (modemap (nth 2 list)) (mapkeys (nth 3 list))
          (modemap-name (symbol-name modemap))
          (func-init-keybind (read (concat "my-init-" modemap-name "-keybind"))))
     (eval-after-load lib
@@ -641,12 +641,31 @@
          func-init-keybind
          `(lambda ()
             (dolist
-                (keymap ',maps)
-              (let ((key (car keymap)) (func (nth 1 keymap)))
+                (map ',mapkeys)
+              (let ((key (car map)) (func (nth 1 map)))
                 (if (not (functionp func))
-                    (message "Warning: In setting %s, function `%s' is not defined." ,modemap-name func)
+                    (message
+                     "Warning: In setting %s, function `%s' is not defined."
+                     ,modemap-name func)
                   (define-key ,modemap (kbd key) func))))))
         `(add-hook ',hook ',func-init-keybind)))))
+
+;; Mew Settings
+(setq read-mail-command 'mew)
+
+(when (boundp 'mail-user-agent)
+    (setq mail-user-agent 'mew-user-agent))
+
+(when (fboundp 'define-mail-user-agent)
+    (define-mail-user-agent
+      'mew-user-agent
+      'mew-user-agent-compose
+      'mew-draft-send-message
+      'mew-draft-kill
+      'mew-send-hook))
+
+;; magit
+(setq magit-status-buffer-switch-function 'switch-to-buffer)
 
 ;; システムごとの設定
 (defvar system-name-simple
@@ -666,23 +685,6 @@
    (let ((func (car condi)) (sys (nth 1 condi)) (feat (nth 2 condi)))
      (when (equal (eval func) sys)
        (my-init-require feat))))
-
-;; Mew Settings
-(setq read-mail-command 'mew)
-
-(when (boundp 'mail-user-agent)
-    (setq mail-user-agent 'mew-user-agent))
-
-(when (fboundp 'define-mail-user-agent)
-    (define-mail-user-agent
-      'mew-user-agent
-      'mew-user-agent-compose
-      'mew-draft-send-message
-      'mew-draft-kill
-      'mew-send-hook))
-
-;; magit
-(setq magit-status-buffer-switch-function 'switch-to-buffer)
 
 ;; session
 (if (not (locate-library "session"))
