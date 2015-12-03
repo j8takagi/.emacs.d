@@ -5,12 +5,16 @@
 (dolist
     (val
      '(
-       (width . 120)
-       (height . 34)
+       (width . 150)
+       (height . 40)
        (top . 0)
        (left . 0)
        ))
   (add-to-list 'default-frame-alist val))
+
+;; 標準のフォントサイズとフォントファミリーの設定
+(set-face-attribute 'default nil
+                    :height 120)
 
 ;; IPAゴシックフォントを使う
 (dolist
@@ -28,7 +32,15 @@
         (message "Font family %s is not found." fontfamily))
      ((set-fontset-font t charset (font-spec :family fontfamily))))))
 
-;; emacsclientを使えるように
-(eval-after-load "session" (server-start))
+;; フレームの設定
+(dolist
+    (val
+     '(
+       (foreground-color . "black")
+       (background-color . "gray99")
+       (cursor-color . "DarkOliveGreen")
+       (cursor-type . box)
+       ))
+  (add-to-list 'default-frame-alist val))
 
 (provide 'init-x)

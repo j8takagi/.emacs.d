@@ -295,6 +295,10 @@
        ))
   (add-to-list 'completion-ignored-extensions ext))
 
+;; emacsclientを使えるように
+(eval-after-load "server"
+  '(server-start))
+
 ;; view-modeの設定
 (eval-after-load "view"
   '(progn
