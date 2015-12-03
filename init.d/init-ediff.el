@@ -1,4 +1,5 @@
 (require 'ediff)
+(require 'vc)
 
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
 

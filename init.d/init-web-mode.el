@@ -1,4 +1,5 @@
 (require 'web-mode)
+(require 'skeleton)
 
 ;; web-modeのface設定
 (custom-set-faces

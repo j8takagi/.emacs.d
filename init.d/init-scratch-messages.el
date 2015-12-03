@@ -1,3 +1,5 @@
+(require 'view)
+
 ;; **scratch* と Messages* バッファーに、not-kill-but-buryを適用
 (defvar not-kill-but-bury-buffer-name-list
   '("*scratch*" "*Messages*")
@@ -19,6 +21,6 @@ when the buffer-kill is evaluted.")
   (save-current-buffer
     (progn
       (set-buffer "*Messages*")
-      (view-mode-enable))))
+      (view-mode))))
 
 (provide 'init-scratch-messages)

@@ -1,4 +1,5 @@
 (require 'dired)
+(require 'init-ediff)
 
 ;; 確認なしにディレクトリーを再帰的にコピーする
 (setq dired-recursive-copies 'always)
