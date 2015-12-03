@@ -304,10 +304,6 @@
      ;; view-modeでviのキーバインド
      (my-init-require 'view-mode-vi-bindings)))
 
-;; whitespaceの設定
-(eval-after-load "whitespace"
-  '(my-init-require 'init-whitespace))
-
 ;; バッファ全体の濁点分離を直す
 (eval-after-load "ucs-normalize"
   '(require 'init-nfc))
@@ -666,6 +662,10 @@
 
 ;; magit
 (setq magit-status-buffer-switch-function 'switch-to-buffer)
+
+;; whitespaceの設定
+(eval-after-load "whitespace"
+  '(my-init-require 'init-whitespace))
 
 ;; システムごとの設定
 (defvar system-name-simple
