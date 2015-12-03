@@ -61,6 +61,26 @@
        ))
   (add-to-list 'default-frame-alist val))
 
+;; Mac OS XのIME設定
+;(setq default-input-method "MacOSX")
+
+;; commandキーをEmacsのMetaキーに
+(setq mac-command-modifier 'meta)
+
+;; ミニバッファにカーソルを移動する際、自動的にキーボードをASCIIモードにする
+(mac-auto-ascii-mode 1)
+
+;; Mac OS Xのキー設定
+(dolist
+    (map
+     '(
+       ("<M-f1>" other-frame)    ; Mac OS Xの他アプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする
+       ))
+  (let ((key (car map)) (func (nth 1 map)))
+    (if (not (functionp func))
+        (message "%s is not defined." func)
+      (global-set-key (kbd key) func))))
+
 (cd "~")
 
 (provide 'init-mac-gui)
