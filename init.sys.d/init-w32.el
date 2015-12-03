@@ -39,12 +39,7 @@
 
 ;; 日本語ファイル名を正常に処理するための設定
 (setq default-file-name-coding-system 'cp932)
-
 (setq default-process-coding-system '(utf-8 . cp932))
-
-;; emacsclientを使えるように
-(eval-after-load "server"
-  '(unless (server-running-p) (server-start)))
 
 ;; 環境変数EDITORの設定
 (setenv "EDITOR" "emacsclient")

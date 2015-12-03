@@ -691,6 +691,11 @@
       (message "Warning: library 'session' is not found.")
   (add-hook 'after-init-hook 'session-initialize))
 
+;; emacsclientを使えるように
+(eval-after-load "server"
+  '(unless (server-running-p)
+     (server-start)))
+
 ;; Emacs開始にかかった時間をメッセージに表示
 (defun my-init-message-startup-time ()
   (message "Duration of the Emacs initialization: %s" (emacs-init-time)))

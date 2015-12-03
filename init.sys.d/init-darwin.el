@@ -26,8 +26,6 @@
         (message "%s is not defined." func)
       (global-set-key (kbd key) func))))
 
-;; emacsclientを使えるように
-(eval-after-load "server" '(server-start))
 
 ;; ミニバッファにカーソルを移動する際、自動的にキーボードをASCIIモードにする
 (mac-auto-ascii-mode 1)
