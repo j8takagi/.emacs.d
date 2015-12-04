@@ -58,6 +58,7 @@
     "\\*Buffer List\\*"
     "tetris-mode"
     "Life-mode"
+    "help-mode"
     )
   "Major mode patterns exclude from setting view-mode if buffer is read-only."
   )
