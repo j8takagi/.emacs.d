@@ -11,9 +11,7 @@
        "~/.emacs.d/site-lisp"
        "~/.emacs.d/insert"
        ))
-  (let (
-        (default-directory (expand-file-name path))
-        )
+  (let ((default-directory (expand-file-name path)))
     (add-to-list 'load-path default-directory)
     (when (file-exists-p "subdirs.el")
       (load-library "subdirs"))))
@@ -590,9 +588,26 @@
   '(progn
      (setq skeleton-pair 1)
      (dolist
-         (key '("(" "\"" "{" "["))
+         (pair
+          '(
+            (?（ _ "）")
+            (?｛ _ "｝")
+            (?「 _ "」")
+            (?『 _ "』")
+            (?〔 _ "〕")
+            (?《 _ "》")
+            (?［ _ "］")
+            (?【 _ "】")
+            (?〈 _ "〉")
+            (?“ _ "”")
+            ))
+       (add-to-list 'skeleton-pair-alist pair))
+     (dolist
+         (key
+          '(
+            "(" "\"" "{" "[" "（" "｛" "「" "『" "〔" "《" "［" "【" "〈" "“"
+            ))
        (global-set-key (kbd key) 'skeleton-pair-insert-maybe))))
-
 (dolist
     (key
      '(
