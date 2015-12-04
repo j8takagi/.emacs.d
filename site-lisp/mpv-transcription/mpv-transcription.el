@@ -84,7 +84,7 @@
 (defun mpv-transcription-play (audio-file &optional start sec)
   (interactive)
   (let ((cmdstr) (buf (get-buffer-create "*mpv*")))
-    (setq cmdstr (concat "mpv \"" audio-file "\""))
+    (setq cmdstr (concat "mpv --vo=null \"" audio-file "\""))
     (when start
       (setq cmdstr (concat cmdstr " --start=" start)))
     (when (> sec 0)
