@@ -57,7 +57,7 @@
            (format-time-string
             "%T"
             (seconds-to-time
-             (+ (mpv-transcription-get-previous-time) mpv-transcription-default-pace)) 1)))
+             (+ (mpv-transcription-get-previous-time) 1)) 1)))
     (goto-char p)
     (when (> p 1)
       (insert "\n\n"))
