@@ -1,1 +1,1 @@
-(load-file "../.abbrev_defs")
+(load-file "../abbrev_defs")
