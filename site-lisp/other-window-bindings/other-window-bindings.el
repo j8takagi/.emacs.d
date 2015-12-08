@@ -38,6 +38,8 @@
 
 ;; ■hook
 
+(require 'shell)
+
 ;; 隣のウィンドウのバッファを削除する。ウィンドウはそのまま
 (defun kill-next-window-buffer ()
   "Kill next window buffer. The window is not deleted."
@@ -225,9 +227,9 @@ If splitted horizontally, vice versa."
     ("C-x 4 C-k" delete-kill-next-window-buffer)
     ("C-x 4 C-s" scratch-other-window)
     ("C-x 4 k" kill-next-window-buffer)
+    ("C-x 4 K" delete-kill-next-window-buffer)
     ("C-x 4 m" message-other-window)
     ("C-x 4 q" quit-next-window)
-    ("C-x 4 s" scratch-other-window)
     ("C-x 4 s" split-shell-current-directory)
     ("C-x 4 |" toggle-split-next-window)
     ("C-x 4 ~" swap-buffer-next-window)
