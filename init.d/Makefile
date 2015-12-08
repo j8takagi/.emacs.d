@@ -6,7 +6,7 @@ GREPV := grep -v
 RSYNCFLAG := -avz --delete
 
 CLEAN.rsync := $(GREPV) "^\(sent\)\|\(total\)\|\(sending\)"
-COMPILE.el := $(EMACS) -batch -l set-load-path.el -f batch-byte-compile
+COMPILE.el := $(EMACS) -batch -l set-compile.el -f batch-byte-compile
 
 ELFILES := $(wildcard *.el)
 ELCFILES := $(addsuffix c,$(ELFILES))
@@ -18,7 +18,7 @@ emacs-dir := ~/.emacs.d
 all: $(ELCFILES)
 
 install: all $(emacs-dir)/init.d
-	$(RSYNC) $(RSYNCFLAG) --exclude='set-load-path.el*' $(ELFILES) $(ELCFILES) $(emacs-dir)/init.d/ | $(CLEAN.rsync)
+	$(RSYNC) $(RSYNCFLAG) --exclude='set-compile.el*' $(ELFILES) $(ELCFILES) $(emacs-dir)/init.d/ | $(CLEAN.rsync)
 
 $(emacs-dir)/init.d:
 	$(MKDIR) $@
