@@ -227,8 +227,6 @@
 ;; Abbrevs
 (setq abbrev-mode 1)
 
-(setq abbrev-file-name (expand-file-name "~/.emacs.d/.abbrev_defs"))
-
 ;; リージョンをハイライト
 (transient-mark-mode 1)
 
