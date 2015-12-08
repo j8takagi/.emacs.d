@@ -1,4 +1,4 @@
-;;; global-skeletons.el --- 
+;;; skeleton-file-name.el --- 
 
 ;; Copyright (C) 2014 by j8takagi
 
@@ -9,6 +9,8 @@
 
 
 ;;; Code:
+(require 'skeleton)
+
 (define-skeleton skeleton-file-name
   "Insert a file name input in prompt."
   (let
@@ -21,9 +23,16 @@
   (read-file-name "Insert absolute file name: ")
   `(expand-file-name ,str))
 
-(global-set-key (kbd "C-c i") 'skeleton-file-name)
+(dolist
+    (mapkeys
+     '(
+       ("C-c i" skeleton-file-name)
+       ("C-c C-i" skeleton-abs-file-name)
+       ))
+  (let ((key (car mapkeys)) (func (nth 1 mapkeys)))
+    (if (not (functionp func))
+        (message "Warning: function `%s' is NOT defined." func)
+      (global-set-key (kbd key) func))))
 
-(global-set-key (kbd "C-c C-i") 'skeleton-abs-file-name)
-
-(provide 'global-skeletons)
-;;; global-skeletons.el ends here
+(provide 'skeleton-file-name)
+;;; skeleton-file-name.el ends here
