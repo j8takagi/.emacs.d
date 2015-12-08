@@ -15,5 +15,3 @@ xcopy /D /S /EXCLUDE:setup-exclude.txt site-lisp\* "%EMACSDIR%\site-lisp"
 rmdir /S /Q %EMACSDIR%\insert
 mkdir %EMACSDIR%\insert
 xcopy /D /S /Y insert\* "%EMACSDIR%\insert"
-rmdir /S /Q %EMACSDIR%\elpa
-mkdir %EMACSDIR%\elpa
