@@ -18,7 +18,7 @@ install: all
 	$(RSYNC) $(RSYNCFLAG) --exclude "Makefile*" --delete ./ $(sitelisp-dir)/ | $(CLEAN.rsync)
 
 clean:
-	for dir in $(SITELISPS); do $(MAKE) -C $$dir clean; done 
+	for dir in $(SITELISPS); do $(MAKE) -C $$dir clean; done
 
 COMPILE.el := $(EMACS) -batch -script ~/.emacs.d/init.el -f batch-byte-compile
 

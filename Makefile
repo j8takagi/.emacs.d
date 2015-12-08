@@ -1,4 +1,4 @@
-CP := cp
+CP := cp -v
 ECHO := echo
 EMACS := emacs
 GREPV := grep -v
@@ -31,30 +31,30 @@ site-lisp:
 	$(MAKE) -sC $@
 
 get-abbrev:
-	$(RSYNC) $(RSYNCFLAG) $(emacs-dir)/.abbrev_defs ./
+	$(RSYNC) $(RSYNCFLAG) $(emacs-dir)/abbrev_defs ./
 
 install: install-init install-abbrev install-init.d install-init.sys.d install-site-lisp install-insert
 
 install-init: $(emacs-dir) $(emacs-dir)/init.el~ init
-	$(RSYNC) $(RSYNCFLAG) init.el init.elc $(emacs-dir)/ | $(CLEAN.rsync)
+	@$(RSYNC) $(RSYNCFLAG) init.el init.elc $(emacs-dir)/ | $(CLEAN.rsync)
 
 install-abbrev: $(emacs-dir)
-	$(RSYNC) $(RSYNCFLAG) .abbrev_defs $(emacs-dir)/ | $(CLEAN.rsync)
+	@$(RSYNC) $(RSYNCFLAG) abbrev_defs $(emacs-dir)/ | $(CLEAN.rsync)
 
 $(emacs-dir)/init.el~: $(emacs-dir)/init.el
-	$(CP) $< $@
+	@$(CP) $< $@
 
 install-init.d: init.d
-	$(MAKE) -C init.d install
+	@$(MAKE) -sC init.d install
 
 install-init.sys.d: init.sys.d
-	$(MAKE) -C init.sys.d install
+	@$(MAKE) -sC init.sys.d install
 
 install-site-lisp: $(emacs-dir)/site-lisp
-	$(MAKE) -C site-lisp install
+	@$(MAKE) -sC site-lisp install
 
 install-insert:
-	$(MAKE) -C insert install
+	@$(MAKE) -sC insert install
 
 $(emacs-dir):
 	$(MKDIR) $@
