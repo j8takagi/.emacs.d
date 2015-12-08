@@ -2,22 +2,25 @@
 ;; バージョンを表示
 (message "%s" (version))
 
+(defun my-init-require (feature)
+  "Require FEATURE, and the result is written into the `*Messages*' buffer."
+  (if (require feature nil 1)
+      (message "Feature `%s' is required." feature)
+    (if (not (locate-library (symbol-name feature)))
+        (message "Warning: required feature `%s' is NOT found." feature)
+      (message "Warning: it fails to require feature `%s'" feature))))
+
 ;; load-pathを追加し、subdirs.elがある場合は読み込む
 (dolist
     (path
      '(
-       "~/.emacs.d/init.d"
-       "~/.emacs.d/init.sys.d"
-       "~/.emacs.d/site-lisp"
-       "~/.emacs.d/insert"
+       "~/.emacs.d"
        ))
   (let ((default-directory (expand-file-name path)))
-    (add-to-list 'load-path default-directory)
-    (when (file-exists-p "subdirs.el")
-      (load-library "subdirs"))))
+    (normal-top-level-add-subdirs-to-load-path)))
 
 ;; パッケージ
-(require 'package)
+(my-init-require 'package)
 
 ;; パッケージアーカイブ追加
 (dolist
@@ -65,25 +68,18 @@
           (message "Error: %s" err))))
     (add-to-list 'pkgs pkg)
    )
-  (let ((apkgs (mapcar 'car package-alist)))
-    (message "Installed packages: %s" (reverse apkgs))
-    (dolist (pkg pkgs) (setq apkgs (delete pkg apkgs)))
-    (when apkgs
-      (message "Unexpected installed packages: %s"  (reverse apkgs)))))
-
-(defun my-init-require (feature)
-  "Require FEATURE, and the result is written into the `*Messages*' buffer."
-  (if (require feature nil 1)
-      (message "Feature `%s' is required." feature)
-    (if (not (locate-library (symbol-name feature)))
-        (message "Warning: required feature `%s' is NOT found." feature)
-      (message "Warning: it fails to require feature `%s'" feature))))
+  (let ((pkglist (mapcar 'car package-alist)))
+    (message "Installed packages: %s" (reverse pkglist))
+    (dolist (pkg pkgs)
+      (setq pkglist (delete pkg pkglist)))
+    (when pkglist
+      (message "Unexpected installed packages: %s"  (reverse pkglist)))))
 
 ;; ライブラリを読み込む
 (dolist
     (feat
      '(
-       ;; /usr/local/share/emacs/${VER}/lisp
+       ;; /usr/local/share/emacs/${VERSION}/lisp
        autoinsert
        ediff
        info
@@ -127,11 +123,12 @@
          (mew "mew" nil)
          (mew-send "mew" nil)
          (mew-user-agent-compose "mew" nil)
+         (mpv-transcription-mode "mpv-transcription" "transcription using mpv")
          (nxml-mode "nxml-mode" "Major mode for editing XML")
+         (review-mode "review-mode" "Re:VIEW text editing mode")
          (ruby-mode "ruby-mode" "Mode for editing ruby source files")
          (rubydb "rubydb3x" "ruby debug")
          (svg-clock "svg-clock" "Start/stop svg-clock")
-         (review-mode "review-mode" "Re:VIEW text editing mode")
          ))
     (let ((func (car list)) (file (nth 1 list)) (doc (nth 2 list)))
       (if (not (locate-library file))
@@ -142,143 +139,111 @@
 
 ;; 日本語環境
 (set-language-environment 'Japanese)
-
 ;; 文字コードのデフォルトはUTF-8
 (prefer-coding-system 'utf-8)
 
-;; 起動時の画面を表示しない
-(setq inhibit-startup-message 1)
-
-;; *scratch*のメッセージを表示しない
-(setq initial-scratch-message nil)
-
-;; メニューバーを表示しない
-(menu-bar-mode 0)
-
-;; ツールバーを表示しない
-(tool-bar-mode 0)
-
-;; カーソルは点滅しない
-(blink-cursor-mode 0)
-
-;; 履歴の数を増やす
-(setq history-length 100)
-
-;; 重複する履歴は削除
-(setq history-delete-duplicates 1)
-
-;; エラー時、音が鳴るのではなく、画面が点滅するように
-(setq visible-bell 1)
-
-;; font-lock-mode を有効にし、メジャーモードに合わせた色を付ける
-(global-font-lock-mode 1)
-
-;; ダイアログボックスは使わない
-(setq use-dialog-box nil)
-
-(defalias 'message-box 'message)
-
-;; タブの幅は、4
-(setq-default tab-width 4)
-
-;; タブをスペースに展開
-(setq-default indent-tabs-mode nil)
-
-;; 再帰的なミニバッファ
-(setq enable-recursive-minibuffers 1)
-
-;; ファイル末尾での改行で、end of bufferエラーが発生しないように
-(setq next-line-add-newlines nil)
-
-;; 行番号を表示
-(line-number-mode 1)
-
-;; 列番号を表示
-(column-number-mode 1)
-
-;; narrow-to-regionを可能にする
-(put 'narrow-to-region 'disabled nil)
-
-;; erase-bufferを可能にする
-(put 'erase-buffer 'disabled nil)
-
-;; eval-expressionを可能にする
-(put 'eval-expression 'disabled nil)
-
-;; upcase-region, downcase-regionを可能にする
-(put 'upcase-region 'disabled nil)
-
-(put 'downcase-region 'disabled nil)
-
-;; set-goal-columnを可能にする
-(put 'set-goal-column 'disabled nil)
-
-;; truncate
-(setq truncate-lines nil)
-
-(setq truncate-partial-width-windows nil)
-
-;; kill-lineのとき、改行も含めて切り取り
-(setq kill-whole-line 1)
-
-;; 置換時に大文字小文字を区別しない
-(setq case-replace nil)
-
-;; Abbrevs
-(setq abbrev-mode 1)
-
+;; Abbrevsを使う
+(abbrev-mode 1)
 ;; リージョンをハイライト
 (transient-mark-mode 1)
-
 ;; 括弧の対応を表示
 (show-paren-mode 1)
+;; 圧縮されたファイルを直接編集する
+(auto-compression-mode 1)
+;; font-lock-mode を有効にし、メジャーモードに合わせた色を付ける
+(global-font-lock-mode 1)
+;; 行番号を表示
+(line-number-mode 1)
+;; 列番号を表示
+(column-number-mode 1)
+;;; バッファ自動再読み込み
+(global-auto-revert-mode 1)
+;; カーソルは点滅しない
+(blink-cursor-mode 0)
+;; ツールバーを表示しない
+(tool-bar-mode 0)
+;; メニューバーを表示しない
+(menu-bar-mode 0)
+;; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
+(electric-indent-mode 0)
 
-;; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、
-;; 1行ずつスクロール
-(setq scroll-conservatively 1)
+;; メッセージダイアログボックスは使わない
+(defalias 'message-box 'message)
 
-;; バックアップファイルを作成する
-(setq make-backup-files 1)
-
-;; バックアップファイルは、~/backupに格納
-(let (
-      (dir "~/backup"
-       ))
-  (if (not (file-directory-p (expand-file-name dir)))
-      (message "Warning: backup directory `%s' is NOT exist." dir)
-    (setq backup-directory-alist `(("." . ,dir)))))
-
-;; バックアップファイルにバージョン番号を付ける
-(setq version-control 1)
-
-;; 古いバックアップファイルを自動的に削除する
-(setq delete-old-versions 1)
+;; カスタムデフォルト値の設定
+(dolist
+    (varval
+     '(
+       (indent-tabs-mode nil)           ;; タブをスペースに展開
+       (tab-width 4))                   ;; タブ幅は4
+       )
+  (let ((var (car varval)) (val (nth 1 varval)))
+    (custom-set-default var val)))
 
 ;; インデント
 (setq-default indent-line-function 'indent-to-left-margin)
 
-;; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
-(electric-indent-mode -1)
+;; カスタム変数の設定
+(custom-set-variables
+ ;; 起動時の画面を表示しない
+ '(inhibit-startup-screen 1)
+ ;; すべてのコマンド（narrow-to-region、erase-bufferなど）の使用制限を解除する
+ '(disabled-command-function nil)
+ ;; 履歴の数を増やす
+ '(history-length t)
+ ;; *scratch* のメッセージを表示しない
+ '(initial-scratch-message nil)
+ ;; 重複する履歴は削除
+ '(history-delete-duplicates 1)
+ ;; エラー時、音が鳴るのではなく、画面が点滅するように
+ '(visible-bell 1)
+ ;; ダイアログボックスは使わない
+ '(use-dialog-box nil)
+ ;; 再帰的なミニバッファ
+ '(enable-recursive-minibuffers 1)
+ ;; ファイル末尾での改行で、end of bufferエラーが発生しないように
+ '(next-line-add-newlines nil)
+ ;; 行の折り返しをしない
+ '(truncate-lines nil)
+ '(truncate-partial-width-windows nil)
+ ;; kill-lineのとき、改行も含めて切り取り
+ '(kill-whole-line 1)
+ ;; 置換時に大文字小文字を区別しない
+ '(case-replace nil)
+ ;; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
+ '(scroll-conservatively 1)
+ ;; バックアップファイルを作成する
+ '(make-backup-files 1)
+ ;; バックアップファイルにバージョン番号を付ける
+ '(version-control 1)
+ ;; 古いバックアップファイルを自動的に削除する
+ '(delete-old-versions 1)
+ ;; kill-lineのとき、改行も含めて切り取り
+ '(kill-whole-line 1)
+ ;; yank-popを有効にする
+ '(yank-pop-change-selection 1)
+ ;; evalした結果を全部表示する
+ '(eval-expression-print-length nil)
+ ;; ChangeLogなどの設定
+ '(user-full-name "Kazuhito Takagi")
+ '(user-login-name "j8takagi")
+ '(user-mail-address "j8takagi@nifty.com")
+)
 
-;; 圧縮されたファイルを直接編集する
-(auto-compression-mode 1)
+;; *scratch* と *Messages* のバッファを削除しない
+(my-init-require 'init-scratch-messages)
 
-;; kill-lineのとき、改行も含めて切り取り
-(setq kill-whole-line 1)
-
-;; yank-popを有効にする
-(setq yank-pop-change-selection 1)
-
-;;; evalした結果を全部表示
-(setq eval-expression-print-length nil)
-
-;;; バッファ自動再読み込み
-(global-auto-revert-mode 1)
-
-;; dired
-(eval-when-compile (load "dired"))
-(eval-after-load "dired"
-  '(require 'init-dired))
+;; フレームの設定
+(unless (equal window-system nil)
+  (dolist
+      (val
+       '(
+         (foreground-color . "black")
+         (background-color . "gray99")
+         (cursor-color . "DarkOliveGreen")
+         (cursor-type . box)
+         ))
+    (add-to-list 'default-frame-alist val)))
 
 ;; ファイル名の補完入力の対象から外す拡張子。diredで淡色表示される
 (dolist
@@ -291,140 +256,22 @@
        ))
   (add-to-list 'completion-ignored-extensions ext))
 
-;; emacsclientを使えるように
-(eval-after-load "server"
-  '(server-start))
-
-;; view-modeの設定
-(eval-after-load "view"
-  '(progn
-     ;; read-onlyファイルをview-modeで開く
-     (my-init-require 'init-view-mode)
-     (setq view-read-only 1)
-     ;; view-modeでviのキーバインド
-     (my-init-require 'view-mode-vi-bindings)))
-
-;; バッファ全体の濁点分離を直す
-(eval-after-load "ucs-normalize"
-  '(require 'init-nfc))
-
-;; Ediff
-(eval-after-load "ediff"
-  '(require 'init-ediff))
-
-;; uniquify
-(eval-after-load "uniquify"
-  '(progn
-     (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
-     (setq uniquify-ignore-buffers-re "*[^*]+*")))
-
-;; auto-elc-mode
-(eval-after-load "auto-elc-mode"
-  '(add-hook 'emacs-lisp-mode-hook 'turn-on-auto-elc))
-
-;; *compilation*バッファをスクロールして表示
-(eval-when-compile (load "compile"))
-(eval-after-load "compile"
-  '(setq compilation-scroll-output 'first-error))
-
-;; lisp-modeでのタブの設定
-(eval-when-compile (load "lisp-mode"))
-(eval-after-load "lisp-mode"
-  '(progn
-     (defun my-init-indent-lisp-indent-line ()
-       (setq indent-line-function 'lisp-indent-line))
-     (add-hook 'emacs-lisp-mode-hook 'my-init-indent-lisp-indent-line)))
-
-;; shell-mode
-(eval-when-compile (load "shell"))
-(eval-after-load "shell"
-  '(progn
-     (setq shell-prompt-pattern
-           "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ")
-     (require 'init-shell)))
-
-;; *scratch* と *Messages* のバッファを削除しない
-(require 'init-scratch-messages)
-
-;;; CC-Mode
-(eval-when-compile (load "cc-mode"))
-(eval-after-load "cc-mode"
-  '(progn
-     (setq c-default-style "k&r")
-     (setq c-basic-offset 4)
-     (defun my-init-cc-ggtags-mode-turnon ()
-       (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-         (ggtags-mode 1)))
-     (add-hook 'c-mode-common-hook 'my-init-cc-ggtags-mode-turnon)
-     (require 'gnu-mp)))
-
-;; bison-mode
-(eval-when-compile (load "bison-mode"))
-(eval-after-load "bison-mode"
-  '(progn
-     (setq bison-decl-token-column 0)
-     (setq bison-rule-enumeration-column 8)))
-
-;; tex-mode
-(eval-when-compile (load "tex-mode"))
-(eval-after-load "tex-mode"
-  '(add-hook 'latex-mode-hook 'turn-on-reftex))
-
-;; web-mode
-(eval-when-compile (load "web-mode"))
-(eval-after-load "web-mode"
-  '(require 'init-web-mode))
-
-;; mmm-mode
-(eval-when-compile (load "mmm-auto"))
-(eval-after-load "mmm-auto"
-  '(require 'init-mmm))
-
-;; image-mode
-(setq image-file-name-extensions
+;; バックアップファイルの保存先
+(dolist
+     (ptndir
       '(
-        "svg" "png" "jpeg" "jpg" "gif" "tiff" "tif"
+        ("." . "~/backup")
         ))
-
-;; graphviz-dot-mode
-(eval-when-compile (load "graphviz-dot-mode"))
-(eval-after-load "graphviz-dot-mode"
-  '(progn
-     (defun my-init-graphviz-dot-mode-set-make-compile-command ()
-       (make-local-variable 'compile-command)
-       (setq compile-command "make -k"))
-     (add-hook 'graphviz-dot-mode-hook
-             'my-init-graphviz-dot-mode-set-make-compile-command)))
-
-;; ChangeLog
-(setq user-full-name "Kazuhito Takagi")
-
-(setq user-login-name "j8takagi")
-
-(setq user-mail-address "j8takagi@nifty.com")
-
-(eval-when-compile (load "add-log"))
-(eval-after-load "add-log"
-  '(setq change-log-default-name "~/ChangeLog"))
-
-;; ess-site > R
-(eval-when-compile (load "ess-site"))
-(eval-after-load "ess-site"
-  '(setq ess-ask-for-ess-directory nil))
-
-;; color-selection
-(defalias 'color-selection 'list-hexadecimal-colors-display)
-
-;; Ruby
-(eval-when-compile (load "ruby-mode"))
-(eval-after-load "ruby-mode"
-  '(add-to-list 'interpreter-mode-alist '("ruby" . ruby-mode)))
+   (let ((dir (expand-file-name (cdr ptndir))))
+     (if (not (file-directory-p dir))
+         (message "Warning: backup directory `%s' is NOT exist." dir)
+       (setcdr ptndir dir)
+       (add-to-list 'backup-directory-alist ptndir))))
 
 ;; Info
-(eval-when-compile (load "info"))
 (eval-after-load "info"
   '(progn
-     (setq Info-directory-list (reverse Info-directory-list))
+     (custom-set-variables '(Info-directory-list (reverse Info-directory-list)))
      (dolist
        (path
         '(
@@ -438,21 +285,61 @@
          (add-to-list 'Info-directory-list fullpath 1)
          )))))
 
-;; vc-follow-linkを無効にする
-;; 参考: http://d.hatena.ne.jp/a_bicky/20140607/1402131090
-(eval-when-compile (load "vc-hooks"))
-(eval-after-load "vc-hooks"
-  '(setq vc-follow-symlinks nil))
+;; dired
+(eval-when-compile (load "dired"))
+(eval-after-load "dired"
+  '(my-init-require 'init-dired)
+  )
 
-;; auto-insert
-;; http://www.math.s.chiba-u.ac.jp/~matsu/emacs/emacs21/autoinsert.html
+;; view-modeの設定
+(eval-after-load "view"
+  '(progn
+     ;; read-onlyファイルをview-modeで開く
+     (my-init-require 'init-view-mode)
+     (custom-set-variables '(view-read-only 1))
+     ;; view-modeでviのキーバインド
+     (my-init-require 'view-mode-vi-bindings)))
+
+;; バッファ全体の濁点分離を直す
+(eval-after-load "ucs-normalize" '(my-init-require 'init-nfc))
+
+;; lisp-mode
+(eval-after-load "lisp-mode"
+  '(progn                               ; タブの設定
+     (defun my-init-indent-lisp-indent-line ()
+       (setq indent-line-function 'lisp-indent-line))
+     (add-hook 'emacs-lisp-mode-hook 'my-init-indent-lisp-indent-line)))
+
+;; auto-elc-mode
+(eval-after-load "auto-elc-mode"
+  '(add-hook 'emacs-lisp-mode-hook 'turn-on-auto-elc))
+
+;; Ediff
+(eval-after-load "ediff"
+  '(my-init-require 'init-ediff))
+
+;; uniquify
+(eval-after-load "uniquify"
+  (custom-set-variables
+   '(uniquify-buffer-name-style 'post-forward-angle-brackets)
+   '(uniquify-ignore-buffers-re "*[^*]+*")))
+
+;; *compilation*バッファをスクロールして表示
+(eval-when-compile (load "compile"))
+(eval-after-load "compile"
+  '(custom-set-variables '(compilation-scroll-output 'first-error)))
+
+;; auto-insertの設定
+;; 参考: http://www.math.s.chiba-u.ac.jp/~matsu/emacs/emacs21/autoinsert.html
 (eval-after-load "autoinsert"
   '(progn
      (add-hook 'find-file-hook 'auto-insert)
-     (setq auto-insert-directory (expand-file-name "~/.emacs.d/insert/"))
-     (setq auto-insert-query nil)
-     (setq auto-insert-alist nil)
-     (my-init-require 'global-skeletons)
+     (custom-set-variables
+      '(auto-insert-directory "~/.emacs.d/insert/")
+      '(auto-insert-query nil)
+      '(auto-insert-alist nil))
+     (my-init-require 'skeleton-file-name)
+     (my-init-require 'skeleton-pair-japanese)
      (dolist
          (libskel
           '(
@@ -466,6 +353,122 @@
        (let ((lib (car libskel)) (skel (nth 1 libskel)))
          (eval-after-load lib
            `(my-init-require ',skel))))))
+
+;; session
+(add-hook 'after-init-hook 'session-initialize)
+
+;; emacsclient
+(eval-after-load "server"
+  '(unless (server-running-p) (server-start)))
+
+;; ChangeLog
+(eval-when-compile (load "add-log"))
+(eval-after-load "add-log"
+  '(custom-set-variables '(change-log-default-name "~/ChangeLog")))
+
+;; vc-follow-linkを無効にする
+;; 参考: http://d.hatena.ne.jp/a_bicky/20140607/1402131090
+(eval-when-compile (load "vc-hooks"))
+(eval-after-load "vc-hooks"
+  '(custom-set-variables '(vc-follow-symlinks nil)))
+
+;; whitespaceの設定
+(eval-after-load "whitespace"
+  '(my-init-require 'init-whitespace))
+
+;; shell-mode
+(eval-when-compile (load "shell"))
+(eval-after-load "shell"
+  '(progn
+     (custom-set-variables              ; プロンプトの表示設定
+      '(shell-prompt-pattern
+        "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ "))
+     (my-init-require 'init-shell)))
+
+;;; CC-Mode
+(eval-when-compile (load "cc-mode"))
+(eval-after-load "cc-mode"
+  '(progn
+     (custom-set-variables '(c-default-style "k&r"))
+     (custom-set-variables '(c-basic-offset 4))
+     (defun my-init-cc-ggtags-mode-turnon ()
+       (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+         (ggtags-mode 1)))
+     (add-hook 'c-mode-common-hook 'my-init-cc-ggtags-mode-turnon)
+     (my-init-require 'gnu-mp)))
+
+;; tex-mode
+(eval-when-compile (load "tex-mode"))
+(eval-after-load "tex-mode"
+  '(add-hook 'latex-mode-hook 'turn-on-reftex))
+
+;; web-mode
+(eval-when-compile (load "web-mode"))
+(eval-after-load "web-mode"
+  '(my-init-require 'init-web-mode))
+
+;; mmm-mode
+(eval-when-compile (load "mmm-auto"))
+(eval-after-load "mmm-auto"
+  '(my-init-require 'init-mmm))
+
+;; image-mode
+(eval-when-compile (load "image-file"))
+(eval-after-load "image-file"
+  (custom-set-variables
+   '(image-file-name-extensions
+     '(
+       "svg" "png" "jpeg" "jpg" "gif" "tiff" "tif"
+       ))))
+
+;; ess-site > R
+(eval-when-compile (load "ess-site"))
+(eval-after-load "ess-site"
+  '(custom-set-variables '(ess-ask-for-ess-directory nil)))
+
+;; bison-mode
+(eval-when-compile (load "bison-mode"))
+(eval-after-load "bison-mode"
+  '(custom-set-variables
+      '(bison-decl-token-column 0)
+      '(bison-rule-enumeration-column 8)))
+
+;; graphviz-dot-mode
+(eval-when-compile (load "graphviz-dot-mode"))
+(eval-after-load "graphviz-dot-mode"
+  '(progn
+     (defun my-init-graphviz-dot-mode-set-make-compile-command ()
+       (make-local-variable 'compile-command)
+       (custom-set-variables '(compile-command "make -k")))
+     (add-hook 'graphviz-dot-mode-hook
+             'my-init-graphviz-dot-mode-set-make-compile-command)))
+
+;; color-selection
+(defalias 'color-selection 'list-hexadecimal-colors-display)
+
+;; magit
+(eval-when-compile (load "magit"))
+(eval-after-load "magit"
+  '(custom-set-variables '(magit-status-buffer-switch-function 'switch-to-buffer)))
+
+;; mew
+(eval-when-compile (load "mew"))
+(custom-set-variables '(read-mail-command 'mew))
+(define-mail-user-agent
+  'mew-user-agent
+  'mew-user-agent-compose
+  'mew-draft-send-message
+  'mew-draft-kill
+  'mew-send-hook)
+
+;; ruby-mode
+(eval-when-compile (load "ruby-mode"))
+(eval-after-load "ruby-mode"
+  '(add-to-list 'interpreter-mode-alist '("ruby" . ruby-mode)))
+
+;;
+;; キーバインド
+;;
 
 ;; magic-mode-alist
 (dolist
@@ -499,7 +502,7 @@
 (dolist
     (alist
      '(
-       (".abbrev_defs" . emacs-lisp-mode)
+       ("abbrev_defs" . emacs-lisp-mode)
        ("Makefile\\.?.*". makefile-gmake-mode)
        ("\\.[CcTt][Ss][Vv]\\'" . csv-mode)
        ("\\.[rR]\\'" . R-mode)
@@ -526,13 +529,6 @@
     (if (not (functionp mode))
         (message "Warning (auto-mode-alist): function `%s' is not defined." mode)
       (add-to-list 'auto-mode-alist alist))))
-
-;; ffap（find file at point）のキーバインド
-(ffap-bindings)
-
-;; ウィンドウやバッファに関するキーバインド
-(eval-after-load "other-window-bindings"
-  '(other-window-bindings))
 
 ;; global-key
 (dolist
@@ -580,32 +576,12 @@
         (message "Warning: function `%s' is NOT defined." func)
       (global-set-key (kbd key) func))))
 
-;; skeleton-pairによる括弧挿入の自動化
-(eval-when-compile (load "skeleton"))
-(eval-after-load "skeleton"
-  '(progn
-     (setq skeleton-pair 1)
-     (dolist
-         (pair
-          '(
-            (?（ _ "）")
-            (?｛ _ "｝")
-            (?「 _ "」")
-            (?『 _ "』")
-            (?〔 _ "〕")
-            (?《 _ "》")
-            (?［ _ "］")
-            (?【 _ "】")
-            (?〈 _ "〉")
-            (?“ _ "”")
-            ))
-       (add-to-list 'skeleton-pair-alist pair))
-     (dolist
-         (key
-          '(
-            "(" "\"" "{" "[" "（" "｛" "「" "『" "〔" "《" "［" "【" "〈" "“"
-            ))
-       (global-set-key (kbd key) 'skeleton-pair-insert-maybe))))
+;; ffap（find file at point）のキーバインド
+(ffap-bindings)
+
+;; ウィンドウやバッファに関するキーバインド
+(other-window-bindings)
+
 (dolist
     (key
      '(
@@ -615,12 +591,9 @@
        ))
   (global-unset-key (kbd key)))
 
-(require 'mpv-transcription)
-
-;; リストで定義されたキーバインドを設定する関数 my-init-<modemap>-keybind を
-;; 定義し、mode-hookに追加する
-;; リストの形式は、
-;; (lib hook modemap (key func))
+;; モードごとのキーバインドを設定
+;; 設定時、関数 my-init-<mode-map-name>-keybind を定義し、フックに追加する
+;; リストの形式: (mode-library mode-hook mode-map-name ((key1 function1) (key2 function2)))
 (dolist
     (list
      '(
@@ -664,28 +637,9 @@
                   (define-key ,modemap (kbd key) func))))))
         `(add-hook ',hook ',func-init-keybind)))))
 
-;; Mew Settings
-(setq read-mail-command 'mew)
-
-(when (boundp 'mail-user-agent)
-    (setq mail-user-agent 'mew-user-agent))
-
-(when (fboundp 'define-mail-user-agent)
-    (define-mail-user-agent
-      'mew-user-agent
-      'mew-user-agent-compose
-      'mew-draft-send-message
-      'mew-draft-kill
-      'mew-send-hook))
-
-;; magit
-(setq magit-status-buffer-switch-function 'switch-to-buffer)
-
-;; whitespaceの設定
-(eval-after-load "whitespace"
-  '(my-init-require 'init-whitespace))
-
+;;
 ;; システムごとの設定
+;;
 (defvar system-name-simple
   (replace-regexp-in-string "\\..*\\'" "" (system-name))
   "The simple host name of the machine Emacs is running on, which is without domain information.")
@@ -704,17 +658,9 @@
      (when (equal (eval func) sys)
        (my-init-require feat))))
 
-;; session
-(if (not (locate-library "session"))
-      (message "Warning: library 'session' is not found.")
-  (add-hook 'after-init-hook 'session-initialize))
-
-;; emacsclientを使えるように
-(eval-after-load "server"
-  '(unless (server-running-p)
-     (server-start)))
-
+;;
 ;; Emacs開始にかかった時間をメッセージに表示
+;;
 (defun my-init-message-startup-time ()
   (message "Duration of the Emacs initialization: %s" (emacs-init-time)))
 

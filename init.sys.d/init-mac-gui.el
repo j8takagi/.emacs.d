@@ -50,20 +50,6 @@
         (message "Font family %s is not found." fontfamily))
      ((set-fontset-font t charset (font-spec :family fontfamily))))))
 
-;; フレームの設定
-(dolist
-    (val
-     '(
-       (foreground-color . "black")
-       (background-color . "gray99")
-       (cursor-color . "DarkOliveGreen")
-       (cursor-type . box)
-       ))
-  (add-to-list 'default-frame-alist val))
-
-;; Mac OS XのIME設定
-;(setq default-input-method "MacOSX")
-
 ;; commandキーをEmacsのMetaキーに
 (setq mac-command-modifier 'meta)
 
