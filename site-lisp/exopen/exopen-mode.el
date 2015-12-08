@@ -83,7 +83,7 @@
       (setq cmdargs exopen-std-cmdargs))
     (let
         (
-         (cmdstr (concat cmd " " cmdargs " \"" file "\""))
+         (cmdstr (concat cmd " " cmdargs " " file))
          (proc (concat "exopen at " (format-time-string "%Y/%m/%d %H:%M:%S" (current-time)))))
       (message cmdstr)
       (start-process-shell-command proc "*Messages*" cmdstr))))
