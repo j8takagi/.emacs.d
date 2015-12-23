@@ -1,6 +1,6 @@
-;;; init-view-mode.el --- 
+;;; init-view-mode.el ---
 
-;; Copyright (C) 2014 by j8takagi
+;; Copyright (C) 2015, 2014 by j8takagi
 
 ;; Authors:Kazuhito Takagi
 ;; Keywords:
@@ -59,6 +59,7 @@
     "tetris-mode"
     "Life-mode"
     "help-mode"
+    "sokoban-mode"
     )
   "Major mode patterns exclude from setting view-mode if buffer is read-only."
   )
