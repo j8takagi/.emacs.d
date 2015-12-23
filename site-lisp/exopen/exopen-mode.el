@@ -61,12 +61,12 @@
        ((eq window-system 'x) "xdg-open")
        ((eq window-system 'ns) "open")
        ((eq window-system 'mac) "open")
-       ((eq window-system 'w32) "cmd.exe")))
+       ((eq window-system 'w32) "start")))
 
 ;; Window別にexopen-std-cmdargsを設定する
 (setq exopen-std-cmdargs
       (cond
-       ((eq window-system 'w32) "/c start")))
+       ((eq window-system 'w32) "\"\"")))
 
 ;; exopen-modeでの拡張子とプログラムの関連付けリスト
 (defvar exopen-suffix-cmd nil)
@@ -83,7 +83,7 @@
       (setq cmdargs exopen-std-cmdargs))
     (let
         (
-         (cmdstr (concat cmd " " cmdargs " " file))
+         (cmdstr (concat cmd " " cmdargs " \"" file "\""))
          (proc (concat "exopen at " (format-time-string "%Y/%m/%d %H:%M:%S" (current-time)))))
       (message cmdstr)
       (start-process-shell-command proc "*Messages*" cmdstr))))
