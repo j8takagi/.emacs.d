@@ -10,16 +10,14 @@
         (message "Warning: required feature `%s' is NOT found." feature)
       (message "Warning: it fails to require feature `%s'" feature))))
 
-;; load-pathを追加し、subdirs.elがある場合は読み込む
-(dolist
-    (path
-     '(
-       "~/.emacs.d"
-       ))
-  (let ((default-directory (expand-file-name path)))
-    (normal-top-level-add-subdirs-to-load-path)))
+;; load-pathの設定
+(let ((default-directory (expand-file-name user-emacs-directory)))
+  (normal-top-level-add-subdirs-to-load-path))
 
-;; パッケージ
+;;;
+;;; パッケージ
+;;;
+
 (my-init-require 'package)
 
 ;; パッケージアーカイブ追加
@@ -52,6 +50,7 @@
          mew
          mmm-mode
          session
+         sokoban
          undo-tree
          web-mode
          with-editor
@@ -66,8 +65,7 @@
         (condition-case err
             (package-install pkg)
           (message "Error: %s" err))))
-    (add-to-list 'pkgs pkg)
-   )
+    (add-to-list 'pkgs pkg))
   (let ((pkglist (mapcar 'car package-alist)))
     (message "Installed packages: %s" (reverse pkglist))
     (dolist (pkg pkgs)
@@ -75,21 +73,18 @@
     (when pkglist
       (message "Unexpected installed packages: %s"  (reverse pkglist)))))
 
-;; ライブラリを読み込む
+;;
+;; ライブラリの読み込み
+;;
+
 (dolist
     (feat
      '(
        ;; /usr/local/share/emacs/${VERSION}/lisp
        autoinsert
-       ediff
-       info
-       reftex
        server
        skeleton
        uniquify
-       vc
-       view
-       whitespace
        ;; ~/.emacs.d/site-lisp
        auto-elc-mode
        byte-compile-buffer-file
@@ -100,7 +95,6 @@
        scroll-one-line
        temp-buffer
        ucs-normalize
-       uniq
        window-control
        ))
   (my-init-require feat))
@@ -112,18 +106,14 @@
        '(
          (R-mode "ess-site" "Emacs Speaks Statistics mode")
          (bison-mode "bison-mode" "Major mode for editing bison/yacc files")
-         (css-mode "css-mode" "Cascading Style Sheets (CSS) editing mode")
-         (csv-mode "csv-mode" "Major mode for editing comma-separated value files.")
+         ;; (css-mode "css-mode" "Cascading Style Sheets (CSS) editing mode")
+         ;; (csv-mode "csv-mode" "Major mode for editing comma-separated value files.")
          (eukleides-mode "eukleides" "Major mode for editing Eukleides files")
          (flex-mode "flex-mode" "Major mode for editing flex files")
          (graphviz-dot-mode "graphviz-dot-mode" "Major mode for the dot language")
-         (js-mode "js" "Major mode for editing JavaScript.")
+         ;; (js-mode "js" "Major mode for editing JavaScript.")
          (list-hexadecimal-colors-display "color-selection" "Display hexadecimal color codes, and show what they look like.")
-         (magit-status "magit" "Interface to the version control system Git")
-         (mew "mew" nil)
-         (mew-send "mew" nil)
-         (mew-user-agent-compose "mew" nil)
-         (mpv-transcription-mode "mpv-transcription" "transcription using mpv")
+         (mpv-ts-mode "mpv-ts" "transcription using mpv")
          (nxml-mode "nxml-mode" "Major mode for editing XML")
          (review-mode "review-mode" "Re:VIEW text editing mode")
          (ruby-mode "ruby-mode" "Mode for editing ruby source files")
@@ -137,10 +127,18 @@
         (add-to-list 'funcs func))))
   (message "Autoload functions: %s" (reverse funcs)))
 
+;;
+;; 文字コードの設定
+;;
+
 ;; 日本語環境
 (set-language-environment 'Japanese)
 ;; 文字コードのデフォルトはUTF-8
 (prefer-coding-system 'utf-8)
+
+;;
+;; 各種設定
+;;
 
 ;; Abbrevsを使う
 (abbrev-mode 1)
@@ -225,8 +223,6 @@
  ;; evalした結果を全部表示する
  '(eval-expression-print-length nil)
  ;; ChangeLogなどの設定
- '(user-full-name "Kazuhito Takagi")
- '(user-login-name "j8takagi")
  '(user-mail-address "j8takagi@nifty.com")
 )
 
@@ -329,7 +325,7 @@
 (eval-after-load "compile"
   '(custom-set-variables '(compilation-scroll-output 'first-error)))
 
-;; auto-insertの設定
+;; autoinsert
 ;; 参考: http://www.math.s.chiba-u.ac.jp/~matsu/emacs/emacs21/autoinsert.html
 (eval-after-load "autoinsert"
   '(progn
@@ -372,7 +368,7 @@
 (eval-after-load "vc-hooks"
   '(custom-set-variables '(vc-follow-symlinks nil)))
 
-;; whitespaceの設定
+;; whitespace
 (eval-after-load "whitespace"
   '(my-init-require 'init-whitespace))
 
@@ -394,8 +390,16 @@
      (defun my-init-cc-ggtags-mode-turnon ()
        (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
          (ggtags-mode 1)))
-     (add-hook 'c-mode-common-hook 'my-init-cc-ggtags-mode-turnon)
-     (my-init-require 'gnu-mp)))
+     (defun my-init-require-gnu-mp ()
+       (when (derived-mode-p 'c-mode 'c++-mode)
+         (my-init-require 'gnu-mp)))
+     (dolist
+         (func
+          '(
+            my-init-cc-ggtags-mode-turnon
+            my-init-require-gnu-mp
+            ))
+       (add-hook 'c-mode-common-hook func))))
 
 ;; tex-mode
 (eval-when-compile (load "tex-mode"))
@@ -467,7 +471,7 @@
   '(add-to-list 'interpreter-mode-alist '("ruby" . ruby-mode)))
 
 ;;
-;; キーバインド
+;; ファイルの自動判定
 ;;
 
 ;; magic-mode-alist
@@ -502,33 +506,36 @@
 (dolist
     (alist
      '(
-       ("abbrev_defs" . emacs-lisp-mode)
        ("Makefile\\.?.*". makefile-gmake-mode)
        ("\\.[CcTt][Ss][Vv]\\'" . csv-mode)
        ("\\.[rR]\\'" . R-mode)
        ("\\.casl?\\'" . asm-mode)
-       ("\\.css\\'" . css-mode)
        ("\\.d\\'". makefile-gmake-mode)
        ("\\.euk\\'" . eukleides-mode)
        ("\\.gp\\'" . gnuplot-mode)
        ("\\.gv\\'" . graphviz-dot-mode)
-       ("\\.js\\'" . js-mode)
        ("\\.ll?\\'" . flex-mode)
+       ("\\.md\\'" . markdown-mode)
        ("\\.mk\\'". makefile-gmake-mode)
+       ("\\.re\\'" . review-mode)
        ("\\.svg\\'" . nxml-mode)
+       ("\\.ts\\'" . mpv-ts-mode)
        ("\\.wiki\\'" . mediawiki-mode)
        ("\\.xml\\'" . nxml-mode)
        ("\\.y?rb\\'" . ruby-mode)
        ("\\.yy?\\'" . bison-mode)
        ("\\`ja.wikipedia.org/w/index.php" . mediawiki-mode)
+       ("abbrev_defs" . emacs-lisp-mode)
        ("cmd" . shell-script-mode)
-       ("\\.re\\'" . review-mode)
-       ("\\.md\\'" . markdown-mode)
        ))
   (let ((mode (cdr alist)))
     (if (not (functionp mode))
         (message "Warning (auto-mode-alist): function `%s' is not defined." mode)
       (add-to-list 'auto-mode-alist alist))))
+
+;;
+;; キーバインド
+;;
 
 ;; global-key
 (dolist
@@ -582,6 +589,7 @@
 ;; ウィンドウやバッファに関するキーバインド
 (other-window-bindings)
 
+;; 無効にするキーバインド
 (dolist
     (key
      '(
