@@ -139,34 +139,28 @@
 ;; 文字コードのデフォルトはUTF-8
 (prefer-coding-system 'utf-8)
 
-;;
-;; 各種設定
-;;
-
-;; Abbrevsを使う
-(abbrev-mode 1)
-;; リージョンをハイライト
-(transient-mark-mode 1)
-;; 括弧の対応を表示
-(show-paren-mode 1)
-;; 圧縮されたファイルを直接編集する
-(auto-compression-mode 1)
-;; font-lock-mode を有効にし、メジャーモードに合わせた色を付ける
-(global-font-lock-mode 1)
-;; 行番号を表示
-(line-number-mode 1)
-;; 列番号を表示
-(column-number-mode 1)
-;;; バッファ自動再読み込み
-(global-auto-revert-mode 1)
-;; カーソルは点滅しない
-(blink-cursor-mode 0)
-;; ツールバーを表示しない
-(tool-bar-mode 0)
-;; メニューバーを表示しない
-(menu-bar-mode 0)
-;; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
-(electric-indent-mode 0)
+;; マイナーモードの設定
+(dolist
+    (mode
+     '(
+       ;; 有効にするマイナーモード
+       (abbrev-mode 1)              ; Abbrevsを使う
+       (auto-compression-mode 1)    ; 圧縮されたファイルを直接編集する
+       (column-number-mode 1)       ; 列番号を表示
+       (global-auto-revert-mode 1) ; ファイルが外部で更新されたとき、バッファ自動再読み込み
+       (global-font-lock-mode 1)  ; メジャーモードに合わせた色を付ける
+       (line-number-mode 1)       ; 行番号を表示
+       (show-paren-mode 1)        ; 括弧の対応を表示
+       (transient-mark-mode 1)    ;リージョンをハイライト
+       ;; 無効にするマイナーモード
+       (blink-cursor-mode 0)        ; カーソルは点滅しない
+       (electric-indent-mode 0) ; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
+       (menu-bar-mode 0)          ; メニューバーを表示しない
+       (tool-bar-mode 0)          ; ツールバーを表示しない
+       ))
+  (if (not (fboundp (car mode)))
+      (message "%s is not defined." (car mode))
+    (eval mode)))
 
 ;; メッセージダイアログボックスは使わない
 (defalias 'message-box 'message)
