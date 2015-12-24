@@ -34,21 +34,43 @@
 ;; パッケージ初期化
 (package-initialize)
 
+
+(defun my-init-install-package (pkg &optional pkg-from)
+  "引数として指定されたパッケージがインストールされているかチェックし、
+未インストールの場合はインストールを実行する。
+パッケージが別パッケージを要求していた場合は、要求されたパッケージも再帰的にチェック・インストールする。
+返り値として、(パッケージ 要求するパッケージ)のリストを返す"
+  (let (pkgs req-pkgs pkg-desc)
+    (unless (package-installed-p pkg)
+      (if pkg-from
+          (message "Package %s is required from %s." pkg pkg-from))
+      (when (not package-archive-contents)
+        (package-refresh-contents))
+      (if (not (assq pkg package-archive-contents))
+          (message "Warning: package `%s' is NOT found on archives." pkg)
+        (message "Package `%s' is NOT installed. Installation begins." pkg)
+        (condition-case err
+              (package-install pkg)
+           (message "Error: %s\nFails to install %s" err pkg))))
+    (when (setq pkg-desc (assoc pkg package-alist))
+      (add-to-list 'pkgs `(,pkg ,pkg-from))
+      (dolist (req-pkg (mapcar 'car (package-desc-reqs (cadr pkg-desc))))
+        (dolist (rp (my-init-install-package req-pkg pkg))
+           (add-to-list 'pkgs rp 1))))
+    pkgs))
+
 ;; インストールするパッケージ
-(let (pkgs)
+(let (pkgs real-pkgs)
   (dolist
       (pkg
        '(
          csv-mode
-         dash
          ess
          ggtags
-         git-commit
          gitignore-mode
          gnuplot
          inf-ruby
          magit
-         magit-popup
          markdown-mode
          mew
          mmm-mode
@@ -56,25 +78,18 @@
          sokoban
          undo-tree
          web-mode
-         with-editor
          xpm
          ))
-    (when (not (package-installed-p pkg))
-      (when (not package-archive-contents)
-        (package-refresh-contents))
-      (if (not (assq pkg package-archive-contents))
-          (message "Warning: package `%s' is NOT installed and NOT found on archives." pkg)
-        (message "Package `%s' is NOT installed. Installation begins." pkg)
-        (condition-case err
-            (package-install pkg)
-          (message "Error: %s" err))))
-    (add-to-list 'pkgs pkg))
-  (let ((pkglist (mapcar 'car package-alist)))
-    (message "Installed packages: %s" (reverse pkglist))
-    (dolist (pkg pkgs)
-      (setq pkglist (delete pkg pkglist)))
-    (when pkglist
-      (message "Unexpected installed packages: %s"  (reverse pkglist)))))
+    (dolist (pkg-all (my-init-install-package pkg))
+      (when (nth 1 pkg-all)
+        (message "Package `%s' is required from `%s'." (car pkg-all) (nth 1 pkg-all)))
+      (add-to-list 'pkgs (car pkg-all))))
+  (setq real-pkgs (mapcar 'car package-alist))
+  (message "Installed packages: %s" (reverse real-pkgs))
+  (dolist (pkg pkgs)
+    (setq real-pkgs (delete pkg real-pkgs)))
+  (when real-pkgs
+    (message "Unexpected installed packages: %s"  (reverse real-pkgs))))
 
 ;;
 ;; ライブラリの読み込み
@@ -170,8 +185,8 @@
     (varval
      '(
        (indent-tabs-mode nil)           ;; タブをスペースに展開
-       (tab-width 4))                   ;; タブ幅は4
-       )
+       (tab-width 4)                    ;; タブ幅は4
+       ))
   (let ((var (car varval)) (val (nth 1 varval)))
     (custom-set-default var val)))
 
@@ -180,47 +195,26 @@
 
 ;; カスタム変数の設定
 (custom-set-variables
- ;; 起動時の画面を表示しない
- '(inhibit-startup-screen 1)
- ;; すべてのコマンド（narrow-to-region、erase-bufferなど）の使用制限を解除する
- '(disabled-command-function nil)
- ;; 履歴の数を増やす
- '(history-length t)
- ;; *scratch* のメッセージを表示しない
- '(initial-scratch-message nil)
- ;; 重複する履歴は削除
- '(history-delete-duplicates 1)
- ;; エラー時、音が鳴るのではなく、画面が点滅するように
- '(visible-bell 1)
- ;; ダイアログボックスは使わない
- '(use-dialog-box nil)
- ;; 再帰的なミニバッファ
- '(enable-recursive-minibuffers 1)
- ;; ファイル末尾での改行で、end of bufferエラーが発生しないように
- '(next-line-add-newlines nil)
- ;; 行の折り返しをしない
- '(truncate-lines nil)
- '(truncate-partial-width-windows nil)
- ;; kill-lineのとき、改行も含めて切り取り
- '(kill-whole-line 1)
- ;; 置換時に大文字小文字を区別しない
- '(case-replace nil)
- ;; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
- '(scroll-conservatively 1)
- ;; バックアップファイルを作成する
- '(make-backup-files 1)
- ;; バックアップファイルにバージョン番号を付ける
- '(version-control 1)
- ;; 古いバックアップファイルを自動的に削除する
- '(delete-old-versions 1)
- ;; kill-lineのとき、改行も含めて切り取り
- '(kill-whole-line 1)
- ;; yank-popを有効にする
- '(yank-pop-change-selection 1)
- ;; evalした結果を全部表示する
- '(eval-expression-print-length nil)
- ;; ChangeLogなどの設定
- '(user-mail-address "j8takagi@nifty.com")
+ '(case-replace nil)           ; 置換時に大文字小文字を区別しない
+ '(delete-old-versions 1) ; 古いバックアップファイルを自動的に削除する
+ '(disabled-command-function nil) ; すべてのコマンドの使用制限を解除する
+ '(enable-recursive-minibuffers 1)      ; 再帰的にミニバッファを使う
+ '(eval-expression-print-length nil)    ; evalした結果を全部表示する
+ '(history-delete-duplicates 1)   ; 重複する履歴は削除
+ '(history-length t)              ; 履歴の数を無制限に
+ '(inhibit-startup-screen 1)            ; 起動時の画面を表示しない
+ '(initial-scratch-message nil)   ; *scratch* にメッセージを表示しない
+ '(kill-whole-line 1)          ; kill-lineのとき、改行も含めて切り取り
+ '(make-backup-files 1)     ; バックアップファイルを作成する
+ '(next-line-add-newlines nil) ; ファイル末尾での改行で、end of bufferエラーが発生しないように
+ '(scroll-conservatively 1) ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
+ '(truncate-lines nil)         ; 継続行を表示しない
+ '(truncate-partial-width-windows nil)  ; 行を切り捨てない
+ '(use-dialog-box nil)                  ; ダイアログボックスは使わない
+ '(user-mail-address "j8takagi@nifty.com") ; ChangeLogなどの設定
+ '(version-control 1)   ; バックアップファイルにバージョン番号を付ける
+ '(visible-bell 1) ; エラー時、音が鳴るのではなく、画面が点滅するように
+ '(yank-pop-change-selection 1)         ; yank-popを有効にする
 )
 
 ;; *scratch* と *Messages* のバッファを削除しない
@@ -242,10 +236,10 @@
 (dolist
     (ext
      '(
-       ".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" ".aux_prev"
+       ".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" "_prev"
        ".toc_prev" ".lot_prev" ".lof_prev" ".bbl_prev" ".out_prev"
-       ".idx" ".ind" ".idx_prev" ".ind_prev" ".ilg" "tmp" ".synctex.gz" ".DS_Store"
-       "dplg" "dslg"
+       ".idx" ".ind" ".ilg" ".tmp" ".synctex.gz" ".dplg" ".dslg"
+       ".dSYM/" ".DS_Store"
        ))
   (add-to-list 'completion-ignored-extensions ext))
 
@@ -262,7 +256,7 @@
        (add-to-list 'backup-directory-alist ptndir))))
 
 ;; Info
-(eval-after-load "info"
+(eval-after-load 'info
   '(progn
      (custom-set-variables '(Info-directory-list (reverse Info-directory-list)))
      (dolist
@@ -279,13 +273,13 @@
          )))))
 
 ;; dired
-(eval-when-compile (load "dired"))
-(eval-after-load "dired"
+(eval-when-compile (require 'dired))
+(eval-after-load 'dired
   '(my-init-require 'init-dired)
   )
 
 ;; view-modeの設定
-(eval-after-load "view"
+(eval-after-load 'view
   '(progn
      ;; read-onlyファイルをview-modeで開く
      (my-init-require 'init-view-mode)
@@ -294,37 +288,37 @@
      (my-init-require 'view-mode-vi-bindings)))
 
 ;; バッファ全体の濁点分離を直す
-(eval-after-load "ucs-normalize" '(my-init-require 'init-nfc))
+(eval-after-load 'ucs-normalize '(my-init-require 'init-nfc))
 
 ;; lisp-mode
-(eval-after-load "lisp-mode"
+(eval-after-load 'lisp-mode
   '(progn                               ; タブの設定
      (defun my-init-indent-lisp-indent-line ()
        (setq indent-line-function 'lisp-indent-line))
      (add-hook 'emacs-lisp-mode-hook 'my-init-indent-lisp-indent-line)))
 
 ;; auto-elc-mode
-(eval-after-load "auto-elc-mode"
+(eval-after-load 'auto-elc-mode
   '(add-hook 'emacs-lisp-mode-hook 'turn-on-auto-elc))
 
 ;; Ediff
-(eval-after-load "ediff"
+(eval-after-load 'ediff
   '(my-init-require 'init-ediff))
 
 ;; uniquify
-(eval-after-load "uniquify"
+(eval-after-load 'uniquify
   (custom-set-variables
    '(uniquify-buffer-name-style 'post-forward-angle-brackets)
    '(uniquify-ignore-buffers-re "*[^*]+*")))
 
 ;; *compilation*バッファをスクロールして表示
-(eval-when-compile (load "compile"))
-(eval-after-load "compile"
+(eval-when-compile (require 'compile))
+(eval-after-load 'compile
   '(custom-set-variables '(compilation-scroll-output 'first-error)))
 
 ;; autoinsert
 ;; 参考: http://www.math.s.chiba-u.ac.jp/~matsu/emacs/emacs21/autoinsert.html
-(eval-after-load "autoinsert"
+(eval-after-load 'autoinsert
   '(progn
      (add-hook 'find-file-hook 'auto-insert)
      (custom-set-variables
@@ -351,27 +345,27 @@
 (add-hook 'after-init-hook 'session-initialize)
 
 ;; emacsclient
-(eval-after-load "server"
+(eval-after-load 'server
   '(unless (server-running-p) (server-start)))
 
 ;; ChangeLog
-(eval-when-compile (load "add-log"))
-(eval-after-load "add-log"
+(eval-when-compile (require 'add-log))
+(eval-after-load 'add-log
   '(custom-set-variables '(change-log-default-name "~/ChangeLog")))
 
 ;; vc-follow-linkを無効にする
 ;; 参考: http://d.hatena.ne.jp/a_bicky/20140607/1402131090
-(eval-when-compile (load "vc-hooks"))
-(eval-after-load "vc-hooks"
+(eval-when-compile (require 'vc-hooks))
+(eval-after-load 'vc-hooks
   '(custom-set-variables '(vc-follow-symlinks nil)))
 
 ;; whitespace
-(eval-after-load "whitespace"
+(eval-after-load 'whitespace
   '(my-init-require 'init-whitespace))
 
 ;; shell-mode
-(eval-when-compile (load "shell"))
-(eval-after-load "shell"
+(eval-when-compile (require 'shell))
+(eval-after-load 'shell
   '(progn
      (custom-set-variables              ; プロンプトの表示設定
       '(shell-prompt-pattern
@@ -379,8 +373,8 @@
      (my-init-require 'init-shell)))
 
 ;;; CC-Mode
-(eval-when-compile (load "cc-mode"))
-(eval-after-load "cc-mode"
+(eval-when-compile (require 'cc-mode))
+(eval-after-load 'cc-mode
   '(progn
      (custom-set-variables '(c-default-style "k&r"))
      (custom-set-variables '(c-basic-offset 4))
@@ -399,23 +393,23 @@
        (add-hook 'c-mode-common-hook func))))
 
 ;; tex-mode
-(eval-when-compile (load "tex-mode"))
-(eval-after-load "tex-mode"
+(eval-when-compile (require 'tex-mode))
+(eval-after-load 'tex-mode
   '(add-hook 'latex-mode-hook 'turn-on-reftex))
 
 ;; web-mode
-(eval-when-compile (load "web-mode"))
-(eval-after-load "web-mode"
+(eval-when-compile (require 'web-mode))
+(eval-after-load 'web-mode
   '(my-init-require 'init-web-mode))
 
 ;; mmm-mode
-(eval-when-compile (load "mmm-auto"))
-(eval-after-load "mmm-auto"
+(eval-when-compile (require 'mmm-auto))
+(eval-after-load 'mmm-auto
   '(my-init-require 'init-mmm))
 
 ;; image-mode
-(eval-when-compile (load "image-file"))
-(eval-after-load "image-file"
+(eval-when-compile (require 'image-file))
+(eval-after-load 'image-file
   (custom-set-variables
    '(image-file-name-extensions
      '(
@@ -423,20 +417,20 @@
        ))))
 
 ;; ess-site > R
-(eval-when-compile (load "ess-site"))
-(eval-after-load "ess-site"
+(eval-when-compile (require 'ess-site))
+(eval-after-load 'ess-site
   '(custom-set-variables '(ess-ask-for-ess-directory nil)))
 
 ;; bison-mode
-(eval-when-compile (load "bison-mode"))
-(eval-after-load "bison-mode"
+(eval-when-compile (require 'bison-mode))
+(eval-after-load 'bison-mode
   '(custom-set-variables
       '(bison-decl-token-column 0)
       '(bison-rule-enumeration-column 8)))
 
 ;; graphviz-dot-mode
-(eval-when-compile (load "graphviz-dot-mode"))
-(eval-after-load "graphviz-dot-mode"
+(eval-when-compile (require 'graphviz-dot-mode))
+(eval-after-load 'graphviz-dot-mode
   '(progn
      (defun my-init-graphviz-dot-mode-set-make-compile-command ()
        (make-local-variable 'compile-command)
@@ -448,12 +442,12 @@
 (defalias 'color-selection 'list-hexadecimal-colors-display)
 
 ;; magit
-(eval-when-compile (load "magit"))
-(eval-after-load "magit"
+(eval-when-compile (require 'magit))
+(eval-after-load 'magit
   '(custom-set-variables '(magit-status-buffer-switch-function 'switch-to-buffer)))
 
 ;; mew
-(eval-when-compile (load "mew"))
+(eval-when-compile (require 'mew))
 (custom-set-variables '(read-mail-command 'mew))
 (define-mail-user-agent
   'mew-user-agent
@@ -463,8 +457,8 @@
   'mew-send-hook)
 
 ;; ruby-mode
-(eval-when-compile (load "ruby-mode"))
-(eval-after-load "ruby-mode"
+(eval-when-compile (require 'ruby-mode))
+(eval-after-load 'ruby-mode
   '(add-to-list 'interpreter-mode-alist '("ruby" . ruby-mode)))
 
 ;;
