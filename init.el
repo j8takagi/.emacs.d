@@ -1,6 +1,9 @@
 ;;;-*-Emacs-Lisp-*-
-;; バージョンを表示
-(message "%s" (version))
+
+(message
+ "Loading init.el: Starting initialization %s at %s"
+ (emacs-version nil)
+ (format-time-string "%Y/%m/%d %T"))
 
 (defun my-init-require (feature)
   "Require FEATURE, and the result is written into the `*Messages*' buffer."
