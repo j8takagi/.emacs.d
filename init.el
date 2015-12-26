@@ -73,7 +73,6 @@
          magit
          markdown-mode
          mew
-         mmm-mode
          session
          sokoban
          undo-tree
@@ -400,12 +399,7 @@
 ;; web-mode
 (eval-when-compile (require 'web-mode))
 (eval-after-load 'web-mode
-  '(my-init-require 'init-web-mode))
-
-;; mmm-mode
-(eval-when-compile (require 'mmm-auto))
-(eval-after-load 'mmm-auto
-  '(my-init-require 'init-mmm))
+     (my-init-require 'init-web-mode))
 
 ;; image-mode
 (eval-when-compile (require 'image-file))
