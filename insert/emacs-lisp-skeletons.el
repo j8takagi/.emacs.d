@@ -1,6 +1,6 @@
 ;;; emacs-lisp-skeletons.el --- 
 
-;; Copyright (C) 2014 by j8takagi
+;; Copyright (C) 2015, 2014 by j8takagi
 
 ;; Authors:Kazuhito Takagi
 ;; Keywords:
@@ -48,11 +48,7 @@
 
 (define-skeleton emacs-lisp-dolist
   "dolist statement in emacs-lisp."
-  > "(dolist" ?\n
-  > "(list" ?\n
-  > "'(" ?\n
-  > _ ?\n
-  > "))" ?\n
+  > "(dolist (elem " _ ")" ?\n
   > "())" ?\n
   )
 
