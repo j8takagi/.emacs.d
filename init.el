@@ -1,17 +1,16 @@
 ;;;-*-Emacs-Lisp-*-
 
-(message
- "Loading init.el: Starting initialization %s at %s"
- (emacs-version nil)
- (format-time-string "%Y/%m/%d %T"))
+(message "Loading init.el: Starting initialization %s at %s"
+         (emacs-version nil)
+         (format-time-string "%Y/%m/%d %T"))
 
 (defun my-init-require (feature)
   "Require FEATURE, and the result is written into the `*Messages*' buffer."
   (if (require feature nil 1)
       (message "Feature `%s' is required." feature)
     (if (not (locate-library (symbol-name feature)))
-        (message "Warning: required feature `%s' is NOT found." feature)
-      (message "Warning: it fails to require feature `%s'" feature))))
+        (message "Warning: Feature `%s' is NOT found." feature)
+      (message "Warning: Feature `%s' is failed to require." feature))))
 
 ;; load-pathの設定
 (let ((default-directory (expand-file-name user-emacs-directory)))
@@ -23,8 +22,7 @@
 
 (my-init-require 'package)
 
-;; パッケージアーカイブ追加
-(dolist
+(dolist                                 ; パッケージアーカイブ
     (arch
      '(
        ("melpa-stable" . "http://stable.melpa.org/packages/")
@@ -47,21 +45,22 @@
       (when (not package-archive-contents)
         (package-refresh-contents))
       (if (not (assq pkg package-archive-contents))
-          (message "Warning: package `%s' is NOT found on archives." pkg)
+          (message "Warning: Package `%s' is NOT found on archives." pkg)
         (message "Package `%s' is NOT installed. Installation begins." pkg)
         (condition-case err
               (package-install pkg)
            (message "Error: %s\nFails to install %s" err pkg))))
-    (when (setq pkg-desc (assoc pkg package-alist))
-      (add-to-list 'pkgs `(,pkg ,pkg-from))
+    (when (setq pkg-desc (assq pkg package-alist))
+      (add-to-list 'pkgs `(,pkg ,pkg-from) 1)
       (dolist (req-pkg (mapcar 'car (package-desc-reqs (cadr pkg-desc))))
         (dolist (rp (my-init-install-package req-pkg pkg))
            (add-to-list 'pkgs rp 1))))
     pkgs))
 
-;; インストールするパッケージ
-(let (pkgs real-pkgs)
-  (dolist
+;; パッケージの設定
+(let (pkgs real-pkgs update-pkgs)
+  ;; 指定したパッケージがインストールされていない場合は、インストール実行
+  (dolist                               ; インストールするパッケージ
       (pkg
        '(
          csv-mode
@@ -83,8 +82,13 @@
       (when (nth 1 pkg-all)
         (message "Package `%s' is required from `%s'." (car pkg-all) (nth 1 pkg-all)))
       (add-to-list 'pkgs (car pkg-all))))
-  (setq real-pkgs (mapcar 'car package-alist))
-  (message "Installed packages: %s" (reverse real-pkgs))
+  (setq real-pkgs (mapcar 'car package-alist)) ; インストールされているパッケージのリストを取得
+  (message "Installed packages: %s" (reverse real-pkgs)) ; インストールされているパッケージを表示
+  ;; アップデートされているパッケージを表示
+  (package-menu--refresh real-pkgs)
+  (dolist (update-pkg (package-menu--find-upgrades))
+    (message "Information: Package %s is updated. Version %s is available." (car update-pkg) (package-desc-version (cdr update-pkg))))
+  ;; インストールされているパッケージで、指定したパッケージ以外のものがあれば表示
   (dolist (pkg pkgs)
     (setq real-pkgs (delete pkg real-pkgs)))
   (when real-pkgs
@@ -93,8 +97,7 @@
 ;;
 ;; ライブラリの読み込み
 ;;
-
-(dolist
+(dolist                                 ; 読み込むライブラリー
     (feat
      '(
        ;; /usr/local/share/emacs/${VERSION}/lisp
@@ -118,18 +121,14 @@
 
 ;; autoloadの設定
 (let (funcs)
-  (dolist
-      (list
+  (dolist                               ; autoloadする関数
+      (funcfile
        '(
          (R-mode "ess-site" "Emacs Speaks Statistics mode")
          (bison-mode "bison-mode" "Major mode for editing bison/yacc files")
-         ;; (css-mode "css-mode" "Cascading Style Sheets (CSS) editing mode")
-         ;; (csv-mode "csv-mode" "Major mode for editing comma-separated value files.")
          (eukleides-mode "eukleides" "Major mode for editing Eukleides files")
          (flex-mode "flex-mode" "Major mode for editing flex files")
          (graphviz-dot-mode "graphviz-dot-mode" "Major mode for the dot language")
-         ;; (js-mode "js" "Major mode for editing JavaScript.")
-         (list-hexadecimal-colors-display "color-selection" "Display hexadecimal color codes, and show what they look like.")
          (mpv-ts-mode "mpv-ts" "transcription using mpv")
          (nxml-mode "nxml-mode" "Major mode for editing XML")
          (review-mode "review-mode" "Re:VIEW text editing mode")
@@ -137,12 +136,12 @@
          (rubydb "rubydb3x" "ruby debug")
          (svg-clock "svg-clock" "Start/stop svg-clock")
          ))
-    (let ((func (car list)) (file (nth 1 list)) (doc (nth 2 list)))
+    (let ((func (car funcfile)) (file (nth 1 funcfile)) (doc (nth 2 funcfile)))
       (if (not (locate-library file))
           (message "Warning: library file `%s' autoloaded from `%s' is not found." file func))
       (when (autoload func file doc 1)
         (add-to-list 'funcs func))))
-  (message "Autoload functions: %s" (reverse funcs)))
+  (message "Autoload functions set in init.el: %s" (reverse funcs)))
 
 ;;
 ;; 文字コードの設定
@@ -154,7 +153,7 @@
 (prefer-coding-system 'utf-8)
 
 ;; マイナーモードの設定
-(dolist
+(dolist                                 ; マイナーモード
     (mode
      '(
        ;; 有効にするマイナーモード
@@ -165,7 +164,9 @@
        (global-font-lock-mode 1)  ; メジャーモードに合わせた色を付ける
        (line-number-mode 1)       ; 行番号を表示
        (show-paren-mode 1)        ; 括弧の対応を表示
-       (transient-mark-mode 1)    ;リージョンをハイライト
+       (transient-mark-mode 1)    ; リージョンをハイライト
+       (whitespace-mode 1)        ; 空白を強調表示
+       (which-function-mode 1)    ; 関数名をモードラインに表示
        ;; 無効にするマイナーモード
        (blink-cursor-mode 0)        ; カーソルは点滅しない
        (electric-indent-mode 0) ; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
@@ -173,24 +174,23 @@
        (tool-bar-mode 0)          ; ツールバーを表示しない
        ))
   (if (not (fboundp (car mode)))
-      (message "%s is not defined." (car mode))
+      (message "Warning: In setting minor mode, function %s is void." (car mode))
     (eval mode)))
 
 ;; メッセージダイアログボックスは使わない
 (defalias 'message-box 'message)
 
-;; カスタムデフォルト値の設定
-(dolist
+;; カスタム変数デフォルト値の設定
+(dolist                                 ; カスタムデフォルト値
     (varval
      '(
-       (indent-tabs-mode nil)           ;; タブをスペースに展開
-       (tab-width 4)                    ;; タブ幅は4
+       (indent-tabs-mode nil)           ; タブをスペースに展開
+       (tab-width 4)                    ; タブ幅は4
        ))
-  (let ((var (car varval)) (val (nth 1 varval)))
-    (custom-set-default var val)))
+    (custom-set-default (car varval) (cadr varval)))
 
-;; インデント
-(setq-default indent-line-function 'indent-to-left-margin)
+;; 変数デフォルト値の設定
+(setq-default indent-line-function 'indent-to-left-margin) ; インデント用のファンクション
 
 ;; カスタム変数の設定
 (custom-set-variables
@@ -221,7 +221,7 @@
 
 ;; フレームの設定
 (unless (equal window-system nil)
-  (dolist
+  (dolist                               ; フレームパラメーター
       (val
        '(
          (foreground-color . "black")
@@ -231,34 +231,33 @@
          ))
     (add-to-list 'default-frame-alist val)))
 
-;; ファイル名の補完入力の対象から外す拡張子。diredで淡色表示される
-(dolist
+;; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
+(dolist                                 ; 補完入力対象外の拡張子
     (ext
      '(
        ".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" "_prev"
-       ".toc_prev" ".lot_prev" ".lof_prev" ".bbl_prev" ".out_prev"
-       ".idx" ".ind" ".ilg" ".tmp" ".synctex.gz" ".dplg" ".dslg"
+        ".idx" ".ind" ".ilg" ".tmp" ".synctex.gz" ".dplg" ".dslg"
        ".dSYM/" ".DS_Store"
        ))
   (add-to-list 'completion-ignored-extensions ext))
 
 ;; バックアップファイルの保存先
-(dolist
+(dolist                                 ; バックアップ保存先
      (ptndir
       '(
         ("." . "~/backup")
         ))
    (let ((dir (expand-file-name (cdr ptndir))))
      (if (not (file-directory-p dir))
-         (message "Warning: backup directory `%s' is NOT exist." dir)
+         (message "Warning: Backup directory `%s' is NOT exist." dir)
        (setcdr ptndir dir)
        (add-to-list 'backup-directory-alist ptndir))))
 
-;; Info
+;; Infoの設定
 (eval-after-load 'info
   '(progn
      (custom-set-variables '(Info-directory-list (reverse Info-directory-list)))
-     (dolist
+     (dolist                            ; Infoのパス
        (path
         '(
           "/usr/local/share/info/ja"
@@ -267,7 +266,7 @@
           ))
      (let ((fullpath (expand-file-name path)))
        (if (not (car (file-attributes fullpath)))
-           (message "Warning: path `%s' is not exist or not directory." path)
+           (message "Warning: Inf path `%s' is not exist or not directory." path)
          (add-to-list 'Info-directory-list fullpath 1)
          )))))
 
@@ -326,7 +325,7 @@
       '(auto-insert-alist nil))
      (my-init-require 'skeleton-file-name)
      (my-init-require 'skeleton-pair-japanese)
-     (dolist
+     (dolist                            ; モードごとのautoinsert設定
          (libskel
           '(
             ("cc-mode" c-skeletons)
@@ -383,7 +382,7 @@
      (defun my-init-require-gnu-mp ()
        (when (derived-mode-p 'c-mode 'c++-mode)
          (my-init-require 'gnu-mp)))
-     (dolist
+     (dolist                            ; c-mode-common-hookに追加する関数
          (func
           '(
             my-init-cc-ggtags-mode-turnon
@@ -432,9 +431,6 @@
      (add-hook 'graphviz-dot-mode-hook
              'my-init-graphviz-dot-mode-set-make-compile-command)))
 
-;; color-selection
-(defalias 'color-selection 'list-hexadecimal-colors-display)
-
 ;; magit
 (eval-when-compile (require 'magit))
 (eval-after-load 'magit
@@ -460,35 +456,35 @@
 ;;
 
 ;; magic-mode-alist
-(dolist
+(dolist                                 ; magic-mode-alistのパターン
     (alist
      '(
        ("<![Dd][Oo][Cc][Tt][Yy][Pp][Ee] [Hh][Tt][Mm][Ll]" . web-mode)
        ("<\\?xml " . nxml-mode)
        ))
   (let ((mode (cdr alist)))
-    (if (not (functionp mode))
-        (message "Warning (magic-mode-alist): function `%s' is not defined." mode)
+    (if (not (fboundp mode))
+        (message "Warning: In setting magic-mode-alist, function `%s' is void." mode)
       (add-to-list 'magic-mode-alist alist 1))))
 
 ;; auto-mode-alist
 ;; 既存のモード設定を上書きする
-(dolist
-    (list
+(dolist                                 ; auto-mode-alistで上書きするモード
+    (mode
      '(
        (makefile-gmake-mode makefile-bsdmake-mode)
        (web-mode html-mode)
        ))
-  (let ((newmode (car list)) (oldmode (nth 1 list)))
-    (if (not (and (functionp oldmode) (functionp newmode)))
-        (message "Warning (auto-mode-alist): function `%s' or `%s' is not defined." newmode oldmode)
-      (while
-          (let ((alist (rassoc oldmode auto-mode-alist)))
-            (when alist
-                (setcdr alist newmode)))))))
+  (let ((newmode (car mode)) (oldmode (cadr mode)) alist)
+    (if (or (not (fboundp oldmode)) (not (fboundp newmode)))
+        (dolist (md mode)
+          (when (not (fboundp md))
+            (message "Warning: In setting auto-mode-alist, function `%s' is void." md)))
+      (while (setq alist (rassq oldmode auto-mode-alist))
+        (setcdr alist newmode)))))
 
 ;; 新しいモード設定を追加する
-(dolist
+(dolist                                 ; auto-mode-alistに追加するモード
     (alist
      '(
        ("Makefile\\.?.*". makefile-gmake-mode)
@@ -514,8 +510,8 @@
        ("cmd" . shell-script-mode)
        ))
   (let ((mode (cdr alist)))
-    (if (not (functionp mode))
-        (message "Warning (auto-mode-alist): function `%s' is not defined." mode)
+    (if (not (fboundp mode))
+        (message "Warning: In setting auto-mode-alist, function `%s' is void." mode)
       (add-to-list 'auto-mode-alist alist))))
 
 ;;
@@ -523,7 +519,7 @@
 ;;
 
 ;; global-key
-(dolist
+(dolist                                 ; グローバルのキーバインド
     (mapkeys
      '(
        ("<M-down>" windmove-down)
@@ -564,8 +560,8 @@
        ("RET" newline-and-indent)
        ))
   (let ((key (car mapkeys)) (func (nth 1 mapkeys)))
-    (if (not (functionp func))
-        (message "Warning: function `%s' is NOT defined." func)
+    (if (not (fboundp func))
+        (message "Warning: In setting keybind, function `%s' is void." func)
       (global-set-key (kbd key) func))))
 
 ;; ffap（find file at point）のキーバインド
@@ -575,7 +571,7 @@
 (other-window-bindings)
 
 ;; 無効にするキーバインド
-(dolist
+(dolist                                 ; グローバルで無効にするキー
     (key
      '(
        "C-x C-d"                         ; ffap-list-directory を無効に
@@ -587,7 +583,7 @@
 ;; モードごとのキーバインドを設定
 ;; 設定時、関数 my-init-<mode-map-name>-keybind を定義し、フックに追加する
 ;; リストの形式: (mode-library mode-hook mode-map-name ((key1 function1) (key2 function2)))
-(dolist
+(dolist                                 ; モードごとのキーバインド
     (list
      '(
        ("text-mode" text-mode-hook text-mode-map
