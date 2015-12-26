@@ -620,24 +620,23 @@
         (fset
          func-init-keybind
          `(lambda ()
-            (dolist
-                (map ',mapkeys)
+            (dolist (map ',mapkeys)
               (let ((key (car map)) (func (nth 1 map)))
-                (if (not (functionp func))
+                (if (not (fboundp func))
                     (message
-                     "Warning: In setting %s, function `%s' is not defined."
+                     "Warning: In setting %s keybind, function `%s' is void."
                      ,modemap-name func)
                   (define-key ,modemap (kbd key) func))))))
         `(add-hook ',hook ',func-init-keybind)))))
 
 ;;
-;; システムごとの設定
+;; システムごとの初期化ファイルの設定
 ;;
 (defvar system-name-simple
   (replace-regexp-in-string "\\..*\\'" "" (system-name))
   "The simple host name of the machine Emacs is running on, which is without domain information.")
 
-(dolist
+(dolist                                 ; システムごとの初期化ライブラリー
      (condi
      '(
        (system-type gnu/linux init-linux)
