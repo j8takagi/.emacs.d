@@ -20,7 +20,7 @@ install: all
 clean:
 	for dir in $(SITELISPS); do $(MAKE) -C $$dir clean; done
 
-COMPILE.el := $(EMACS) -batch -script ~/.emacs.d/init.el -f batch-byte-compile
+COMPILE.el := $(EMACS) -batch -f batch-byte-compile
 
 %.elc: %.el
 	$(COMPILE.el) $<
