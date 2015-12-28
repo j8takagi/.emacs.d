@@ -4,6 +4,7 @@ EMACS := emacs
 GREPV := grep -v
 INSTALL = install
 MKDIR := mkdir
+TEST := test
 RMR := $(RM) -R
 RSYNC := rsync
 RSYNCFLAG := -avz --delete
@@ -14,7 +15,7 @@ emacs-dir := ~/.emacs.d
 
 .PHONY: all init site-lisp install install-init.d install-init.sys.d install-site-lisp
 
-all: init init.d init.sys.d insert site-lisp
+all: init init.d init.sys.d insert install-site-lisp
 
 init: init.elc
 
@@ -41,20 +42,32 @@ install-init: $(emacs-dir) $(emacs-dir)/init.el~ init
 $(emacs-dir)/init.el~: $(emacs-dir)/init.el
 	@$(CP) $< $@
 
-install-init.d: init.d
+install-init.d: init.d $(emacs-dir)/init.d
 	@$(MAKE) -sC init.d install
 
-install-init.sys.d: init.sys.d
+$(emacs-dir)/init.d: $(emacs-dir)
+	@(if $(TEST) ! -d $@; then $(MKDIR) $@; fi)
+
+install-init.sys.d: init.sys.d $(emacs-dir)/init.sys.d
 	@$(MAKE) -sC init.sys.d install
 
-install-site-lisp: $(emacs-dir)/site-lisp
+$(emacs-dir)/init.sys.d: $(emacs-dir)
+	@(if $(TEST) ! -d $@; then $(MKDIR) $@; fi)
+
+install-site-lisp: site-lisp $(emacs-dir)/site-lisp
 	@$(MAKE) -sC site-lisp install
 
-install-insert:
+$(emacs-dir)/site-lisp: $(emacs-dir)
+	@(if $(TEST) ! -d $@; then $(MKDIR) $@; fi)
+
+install-insert: insert $(emacs-dir)/insert
 	@$(MAKE) -sC insert install
 
+$(emacs-dir)/insert: $(emacs-dir)
+	@(if $(TEST) ! -d $@; then $(MKDIR) $@; fi)
+
 $(emacs-dir):
-	$(MKDIR) $@
+	@(if $(TEST) ! -d $@; then $(MKDIR) $@; fi)
 
 %.elc: %.el
 	$(COMPILE.el) $<
