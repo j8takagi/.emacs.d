@@ -133,6 +133,7 @@
          (review-mode "review-mode" "Re:VIEW text editing mode")
          (rubydb "rubydb3x" "ruby debug")
          (svg-clock "svg-clock" "Start/stop svg-clock")
+         (mediawiki-mode "mediawiki" "Major mode for editing Mediawiki articles.")
          ))
     (let ((func (car funcfile)) (file (nth 1 funcfile)) (doc (nth 2 funcfile)))
       (if (not (locate-library file))
@@ -213,7 +214,6 @@
  '(yank-pop-change-selection 1)         ; yank-popを有効にする
 )
 
-
 ;; フレームの設定
 (unless (equal window-system nil)
   (dolist                               ; フレームパラメーター
@@ -273,11 +273,15 @@
      (custom-set-variables
       '(dired-recursive-copies 'always)  ; 確認なしにディレクトリーを再帰的にコピーする
       )
-     (my-init-require 'dired-x)         ; diredの拡張機能
-     (my-init-require 'image-dired)     ; diredでのサムネイル表示
-     (my-init-require 'sorter)          ; diredでのソート
-     (my-init-require 'wdired) ; diredでのファイル名編集を可能にする
-  ))
+     (dolist
+         (feat                          ; dired用に読み込むライブラリー
+          '(
+            dired-x                     ; diredの拡張機能
+            image-dired                 ; サムネイル表示
+            sorter                      ; ソート
+            wdired                      ; ファイル名編集
+          ))
+     (my-init-require feat))))
 
 ;; view-modeの設定
 (eval-after-load 'view
@@ -299,9 +303,7 @@
   '(my-init-require 'ucs-normalize-plus))
 
 ;; lisp-mode
-;;
-; タブの設定
-(defun my-init-indent-lisp-indent-line ()
+(defun my-init-indent-lisp-indent-line () ; インデントの設定
   (setq indent-line-function 'lisp-indent-line))
 
 (dolist
@@ -694,12 +696,13 @@
   (message "Duration of the Emacs initialization: %s" (emacs-init-time)))
 
 
-(add-hook 'kill-buffer-query-functions 'not-kill-but-bury-buffer)
-
 (dolist
-    (func
+    (hookfunc                           ; フックに設定するファンクション
      '(
-       session-initialize
-       my-init-message-startup-time
+       (after-init-hook session-initialize)
+       (after-init-hook my-init-message-startup-time)
+       (find-file-hook auto-insert)
+       (kill-buffer-query-functions not-kill-but-bury-buffer)
        ))
-  (add-hook 'after-init-hook func))
+  (let ((hook (car hookfunc)) (func (nth 1 hookfunc)))
+    (add-hook hook func)))
