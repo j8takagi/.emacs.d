@@ -165,7 +165,6 @@
        (show-paren-mode 1)        ; 括弧の対応を表示
        (transient-mark-mode 1)    ; リージョンをハイライト
        (whitespace-mode 1)        ; 空白を強調表示
-       (which-function-mode 1)    ; 関数名をモードラインに表示
        ;; 無効にするマイナーモード
        (blink-cursor-mode 0)        ; カーソルは点滅しない
        (electric-indent-mode 0) ; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
