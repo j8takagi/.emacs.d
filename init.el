@@ -41,12 +41,12 @@
   (let (pkgs req-pkgs pkg-desc)
     (unless (package-installed-p pkg)
       (if pkg-from
-          (message "Package %s is required from %s." pkg pkg-from))
+          (message "Package %s required from %s is not installed." pkg pkg-from))
       (when (not package-archive-contents)
         (package-refresh-contents))
       (if (not (assq pkg package-archive-contents))
           (message "Warning: Package `%s' is NOT found on archives." pkg)
-        (message "Package `%s' is NOT installed. Installation begins." pkg)
+        (message "Installation of package `%s' begins." pkg)
         (condition-case err
               (package-install pkg)
            (message "Error: %s\nFails to install %s" err pkg))))
@@ -267,8 +267,7 @@
      (let ((fullpath (expand-file-name path)))
        (if (not (car (file-attributes fullpath)))
            (message "Warning: Inf path `%s' is not exist or not directory." path)
-         (add-to-list 'Info-directory-list fullpath 1)
-         )))))
+         (add-to-list 'Info-directory-list fullpath 1))))))
 
 ;; dired
 (eval-when-compile (require 'dired))
