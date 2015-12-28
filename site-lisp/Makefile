@@ -1,26 +1,15 @@
-sitelisp-dir ?= ~/.emacs.d/site-lisp
-
-EMACS := emacs
-RSYNC := rsync
-RSYNCFLAG := -avz
-GREPV := grep -v
-
-CLEAN.rsync := $(GREPV) "^\(sent\)\|\(total\)\|\(sending\)"
-
 SITELISPS := $(shell sh -c "ls -F | grep /")
 
-.PHONY: all install clean
+.PHONY: all install clean distclean
 
-all: subdirs.elc
-	for dir in $(SITELISPS); do $(MAKE) -C $$dir all; done
+all:
+	$(foreach dir,$(SITELISPS),$(MAKE) -sC $(dir) all; )
 
 install: all
-	$(RSYNC) $(RSYNCFLAG) --exclude "Makefile*" --delete ./ $(sitelisp-dir)/ | $(CLEAN.rsync)
+	$(foreach dir,$(SITELISPS),$(MAKE) -sC $(dir) install; )
 
 clean:
-	for dir in $(SITELISPS); do $(MAKE) -C $$dir clean; done
+	$(foreach dir,$(SITELISPS),$(MAKE) -C $(dir) clean; )
 
-COMPILE.el := $(EMACS) -batch -f batch-byte-compile
-
-%.elc: %.el
-	$(COMPILE.el) $<
+distclean:
+	$(foreach dir,$(SITELISPS),$(MAKE) -C $(dir) distclean; )

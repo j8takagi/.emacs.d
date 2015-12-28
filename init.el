@@ -72,6 +72,7 @@
          inf-ruby
          magit
          markdown-mode
+         mediawiki
          mew
          session
          sokoban
@@ -101,20 +102,20 @@
 (dolist                                 ; 読み込むライブラリー
     (feat
      '(
-       ;; /usr/local/share/emacs/${VERSION}/lisp
+       ;; built-in libraries
        server
        uniquify
        ;; ~/.emacs.d/site-lisp
-       auto-elc-mode
-       byte-compile-buffer-file
-       count-japanese
-       exopen-mode
-       mediawiki
-       other-window-bindings
-       scroll-one-line
-       temp-buffer
-       ucs-normalize
-       window-control
+       auto-elc-mode                    ; .elファイルの自動コンパイル
+       buffer-window-plus               ; バッファとウィンドウの操作関数を追加
+       count-japanese                   ; 日本語の文字数をカウント
+       ediff-vc-plus                    ; Ediffの関数を追加
+       exopen                           ; 外部プログラムでファイルを開く
+       not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
+       scroll-one-line                  ; 1行スクロール
+       temp-buffer                      ; 一時バッファの作成
+       ucs-normalize                    ; 濁点を直す
+       window-control                   ; ウィンドウとフレームのサイズを調整
        ))
   (my-init-require feat))
 
@@ -127,11 +128,9 @@
          (bison-mode "bison-mode" "Major mode for editing bison/yacc files")
          (eukleides-mode "eukleides" "Major mode for editing Eukleides files")
          (flex-mode "flex-mode" "Major mode for editing flex files")
-         (graphviz-dot-mode "graphviz-dot-mode" "Major mode for the dot language")
          (mpv-ts-mode "mpv-ts" "transcription using mpv")
          (nxml-mode "nxml-mode" "Major mode for editing XML")
          (review-mode "review-mode" "Re:VIEW text editing mode")
-         (ruby-mode "ruby-mode" "Mode for editing ruby source files")
          (rubydb "rubydb3x" "ruby debug")
          (svg-clock "svg-clock" "Start/stop svg-clock")
          ))
@@ -214,8 +213,6 @@
  '(yank-pop-change-selection 1)         ; yank-popを有効にする
 )
 
-;; *scratch* と *Messages* のバッファを削除しない
-(my-init-require 'init-scratch-messages)
 
 ;; フレームの設定
 (unless (equal window-system nil)
@@ -254,7 +251,9 @@
 ;; Infoの設定
 (eval-after-load 'info
   '(progn
-     (custom-set-variables '(Info-directory-list (reverse Info-directory-list)))
+     (custom-set-variables
+      '(Info-directory-list (reverse Info-directory-list))
+      )
      (dolist                            ; Infoのパス
        (path
         '(
@@ -270,8 +269,15 @@
 ;; dired
 (eval-when-compile (require 'dired))
 (eval-after-load 'dired
-  '(my-init-require 'init-dired)
-  )
+  '(progn
+     (custom-set-variables
+      '(dired-recursive-copies 'always)  ; 確認なしにディレクトリーを再帰的にコピーする
+      )
+     (my-init-require 'dired-x)         ; diredの拡張機能
+     (my-init-require 'image-dired)     ; diredでのサムネイル表示
+     (my-init-require 'sorter)          ; diredでのソート
+     (my-init-require 'wdired) ; diredでのファイル名編集を可能にする
+  ))
 
 ;; view-modeの設定
 (eval-after-load 'view
@@ -281,24 +287,34 @@
      (custom-set-variables '(view-read-only 1))
      ;; view-modeでviのキーバインド
      (my-init-require 'view-mode-vi-bindings)))
+;; *Messages* バッファーを view-mode に
+(eval-after-load "view"
+  (save-current-buffer
+    (progn
+      (set-buffer "*Messages*")
+      (view-mode))))
 
 ;; バッファ全体の濁点分離を直す
-(eval-after-load 'ucs-normalize '(my-init-require 'init-nfc))
+(eval-after-load 'ucs-normalize
+  '(my-init-require 'ucs-normalize-plus))
 
 ;; lisp-mode
-(eval-after-load 'lisp-mode
-  '(progn                               ; タブの設定
-     (defun my-init-indent-lisp-indent-line ()
-       (setq indent-line-function 'lisp-indent-line))
-     (add-hook 'emacs-lisp-mode-hook 'my-init-indent-lisp-indent-line)))
+;;
+; タブの設定
+(defun my-init-indent-lisp-indent-line ()
+  (setq indent-line-function 'lisp-indent-line))
 
-;; auto-elc-mode
-(eval-after-load 'auto-elc-mode
-  '(add-hook 'emacs-lisp-mode-hook 'turn-on-auto-elc))
+(dolist
+    (func
+     '(
+       my-init-indent-lisp-indent-line
+       turn-on-auto-elc
+       ))
+  (add-hook 'emacs-lisp-mode-hook func))
 
 ;; Ediff
 (eval-after-load 'ediff
-  '(my-init-require 'init-ediff))
+  '(my-init-require 'ediff-vc-plus))
 
 ;; uniquify
 (eval-after-load 'uniquify
@@ -313,31 +329,28 @@
 
 ;; autoinsert
 ;; 参考: http://www.math.s.chiba-u.ac.jp/~matsu/emacs/emacs21/autoinsert.html
-(eval-after-load 'autoinsert
-  '(progn
-     (add-hook 'find-file-hook 'auto-insert)
-     (custom-set-variables
-      '(auto-insert-directory "~/.emacs.d/insert/")
-      '(auto-insert-query nil)
-      '(auto-insert-alist nil))
-     (my-init-require 'skeleton-file-name)
-     (my-init-require 'skeleton-pair-japanese)
-     (dolist                            ; モードごとのautoinsert設定
-         (libskel
-          '(
-            ("cc-mode" c-skeletons)
-            ("cc-mode" h-skeletons)
-            ("lisp-mode" emacs-lisp-skeletons)
-            ("tex-mode" latex-skeletons)
-            ("web-mode" web-skeletons)
-            ("graphviz-dot-mode" graphviz-dot-skeletons)
-            ))
-       (let ((lib (car libskel)) (skel (nth 1 libskel)))
-         (eval-after-load lib
-           `(my-init-require ',skel))))))
+(custom-set-variables
+ '(auto-insert-directory "~/.emacs.d/insert/")
+ '(auto-insert-query nil)
+ '(auto-insert-alist nil))
 
-;; session
-(add-hook 'after-init-hook 'session-initialize)
+(my-init-require 'skeleton-file-name)
+
+(my-init-require 'skeleton-pair-japanese)
+
+(dolist                            ; モードごとのautoinsert設定
+    (libskel
+     '(
+       ("cc-mode" c-skeletons)
+       ("cc-mode" h-skeletons)
+       ("lisp-mode" emacs-lisp-skeletons)
+       ("tex-mode" latex-skeletons)
+       ("web-mode" web-skeletons)
+       ("graphviz-dot-mode" graphviz-dot-skeletons)
+       ))
+  (let ((lib (car libskel)) (skel (nth 1 libskel)))
+    (eval-after-load lib
+      `(my-init-require ',skel))))
 
 ;; emacsclient
 (eval-after-load 'server
@@ -536,13 +549,28 @@
        ("C-c C-v" view-mode)
        ("C-c c" compile)
        ("C-c g" magit-status)
+       ("C-c l" magit-log-buffer-file)
        ("C-c t" switch-to-temp-buffer)
        ("C-c w t" whitespace-toggle-options)
        ("C-c w w" whitespace-mode)
        ("C-h TAB" info-lookup-symbol)
        ("C-j" newline)
        ("C-x '" just-one-space)
+       ("C-x 4 C-k" delete-kill-next-window-buffer)
+       ("C-x 4 C-s" scratch-other-window)
+       ("C-x 4 K" delete-kill-next-window-buffer)
+       ("C-x 4 k" kill-next-window-buffer)
+       ("C-x 4 m" message-other-window)
+       ("C-x 4 q" quit-next-window)
+       ("C-x 4 s" split-shell-current-directory)
+       ("C-x 4 |" toggle-split-next-window)
+       ("C-x 4 ~" swap-buffer-next-window)
+       ("C-x 5 C-s" new-frame-scratch)
+       ("C-x 5 m" new-frame-messages)
+       ("C-x 5 s" new-frame-shell-current-directory)
        ("C-x C-M-b" electric-buffer-list)
+       ("C-x C-M-f" exopen-find-file)
+       ("C-x C-M-k" delete-kill-current-next-window-buffer)
        ("C-x K" kill-buffer-and-window)
        ("C-x RET u" ucs-normalize-NFC-buffer)
        ("C-x m" man)
@@ -564,9 +592,6 @@
 ;; ffap（find file at point）のキーバインド
 (ffap-bindings)
 
-;; ウィンドウやバッファに関するキーバインド
-(other-window-bindings)
-
 ;; 無効にするキーバインド
 (dolist                                 ; グローバルで無効にするキー
     (key
@@ -578,17 +603,16 @@
   (global-unset-key (kbd key)))
 
 ;; モードごとのキーバインドを設定
-;; リストの形式: (feature mode-map-name ((key1 function1) (key2 function2)))
+;; 設定時、関数 my-init-<mode-map-name>-keybind を定義し、フックに追加する
+;; リストの形式: (mode-library mode-hook mode-map-name ((key1 function1) (key2 function2)))
 (dolist                                 ; モードごとのキーバインド
     (list
      '(
-       (nil
-        text-mode-map
+       ("text-mode" text-mode-hook text-mode-map
         (
          ("C-M-i" dabbrev-expand) ; ispell 起動を無効にし、dabbrev-expand を設定
          ))
-       (dired
-        dired-mode-map
+       ("dired" dired-mode-hook dired-mode-map
         (
          ("C-c ." dired-exopen-current-directory)
          ("C-c e" ediff-revision)
@@ -599,42 +623,40 @@
          ("r" dired-exopen-file)
          ("s" dired-toggle-sort)
          ))
-       (tex-mode
-        latex-mode-map
+       ("tex-mode" latex-mode-hook latex-mode-map
         (
          ("<M-return>" latex-insert-item) ; latex-insert-itemを再設定
          ("C-c p p" exopen-buffer-pdffile)
          ("C-c p d" exopen-buffer-dvifile)
          ("C-c C-c" comment-region)     ; tex-compileを無効にし、comment-region を設定
          ))
-       (lisp-mode
-        lisp-mode-shared-map
+       ("lisp-mode" emacs-lisp-mode-hook lisp-mode-shared-map
         (
          ;; ("<M-return>" noexist)      ; デバッグ用
          ("<M-return>" completion-at-point)
-         ("C-c C-e" eval-buffer)
          ))
-       (mediawiki
-        mediawiki-mode-map
+       ("mediawiki" mediawiki-mode-hook mediawiki-mode-map
         (
          ("C-x C-s" save-buffer)
          ))
        ))
-  (let ((lib (car list)) (modemap-name (nth 1 list)) (mapkeys (nth 2 list))
-        modemap)
-    (if (and lib (not (featurep lib)))
-        (message "Warning: In setting keybind, feature %s is not found." lib)
-      (if (not (boundp modemap-name))
-          (message "Warning: In setting keybind, %s is not variable." modemap-name)
-        (setq modemap (eval modemap-name))
-        (eval-after-load lib
-          (dolist (map mapkeys)
-            (let ((key (car map)) (func (nth 1 map)))
-              (if (or (not (keymapp modemap)) (not (fboundp func)))
-                  (if (not (keymapp modemap))
-                      (message "Warning: In setting keybind, `%s' is not keymap." modemap-name)
-                    (message "Warning: In setting %s keybind, function `%s' is void." modemap-name func))
-                (define-key modemap (kbd key) func)))))))))
+  (let* ((lib (car list)) (hook (nth 1 list))
+         (modemap (nth 2 list)) (mapkeys (nth 3 list))
+         (modemap-name (symbol-name modemap))
+         (func-init-keybind (read (concat "my-init-" modemap-name "-keybind"))))
+    (eval-after-load lib
+      (progn
+        (fset
+         func-init-keybind
+         `(lambda ()
+            (dolist (map ',mapkeys)
+              (let ((key (car map)) (func (nth 1 map)))
+                (if (not (fboundp func))
+                    (message
+                     "Warning: In setting %s keybind, function `%s' is void."
+                     ,modemap-name func)
+                  (define-key ,modemap (kbd key) func))))))
+        `(add-hook ',hook ',func-init-keybind)))))
 
 ;;
 ;; システムごとの初期化ファイルの設定
@@ -671,4 +693,13 @@
 (defun my-init-message-startup-time ()
   (message "Duration of the Emacs initialization: %s" (emacs-init-time)))
 
-(add-hook 'after-init-hook 'my-init-message-startup-time)
+
+(add-hook 'kill-buffer-query-functions 'not-kill-but-bury-buffer)
+
+(dolist
+    (func
+     '(
+       session-initialize
+       my-init-message-startup-time
+       ))
+  (add-hook 'after-init-hook func))

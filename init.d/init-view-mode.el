@@ -9,6 +9,8 @@
 
 
 ;;; Code:
+(require 'view)
+
 ;; read-only-mode
 (defun turn-on-read-only ()
   "Turn on the current buffer read-only"
@@ -49,18 +51,18 @@
 
 (add-hook 'find-file-hooks 'setting-files-read-only)
 
-(defvar major-mode-disable-view-mode-patterns
-  '(
-    "dired-.*-?mode"
-    "magit-.*-?mode"
-    "package-.*-?mode"
-    "Info-mode"
-    "\\*Buffer List\\*"
-    "tetris-mode"
-    "Life-mode"
-    "help-mode"
-    "sokoban-mode"
-    )
+(defvar major-mode-disable-view-mode-patterns nil
+  ;; '(
+  ;;   "dired-.*-?mode"
+  ;;   "magit-.*-?mode"
+  ;;   "package-.*-?mode"
+  ;;   "Info-mode"
+  ;;   "\\*Buffer List\\*"
+  ;;   "tetris-mode"
+  ;;   "Life-mode"
+  ;;   "help-mode"
+  ;;   "sokoban-mode"
+  ;;   )
   "Major mode patterns exclude from setting view-mode if buffer is read-only."
   )
 
@@ -70,10 +72,16 @@
     (dolist (mode major-mode-disable-view-mode-patterns)
       (when (string-match mode (symbol-name major-mode))
         (setq match t)))
-    (when (and buffer-read-only (not match))
+    (when (and buffer-read-only buffer-file-name match)
       (view-mode nil))))
 
 (add-hook 'after-change-major-mode-hook 'view-mode-if-buffer-read-only)
+
+;; *Messages* バッファーを view-mode に
+(save-current-buffer
+  (progn
+    (set-buffer "*Messages*")
+    (view-mode)))
 
 (provide 'init-view-mode)
 ;;; init-view-mode.el ends here

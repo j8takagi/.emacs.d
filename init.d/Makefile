@@ -18,7 +18,7 @@ emacs-dir := ~/.emacs.d
 all: $(ELCFILES)
 
 install: all $(emacs-dir)/init.d
-	$(RSYNC) $(RSYNCFLAG) --exclude='set-compile.el*' $(ELFILES) $(ELCFILES) $(emacs-dir)/init.d/ | $(CLEAN.rsync)
+	$(RSYNC) $(RSYNCFLAG) --exclude='set-compile.el*' --exclude='Makefile' ./ $(emacs-dir)/init.d/ | $(CLEAN.rsync)
 
 $(emacs-dir)/init.d:
 	$(MKDIR) $@

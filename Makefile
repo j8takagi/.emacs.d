@@ -33,13 +33,10 @@ site-lisp:
 get-abbrev:
 	$(RSYNC) $(RSYNCFLAG) $(emacs-dir)/abbrev_defs ./
 
-install: install-init install-abbrev install-init.d install-init.sys.d install-site-lisp install-insert
+install: install-init install-init.d install-init.sys.d install-site-lisp install-insert
 
 install-init: $(emacs-dir) $(emacs-dir)/init.el~ init
 	@$(RSYNC) $(RSYNCFLAG) init.el init.elc $(emacs-dir)/ | $(CLEAN.rsync)
-
-install-abbrev: $(emacs-dir)
-	@$(RSYNC) $(RSYNCFLAG) abbrev_defs $(emacs-dir)/ | $(CLEAN.rsync)
 
 $(emacs-dir)/init.el~: $(emacs-dir)/init.el
 	@$(CP) $< $@

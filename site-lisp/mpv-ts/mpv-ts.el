@@ -42,6 +42,8 @@
   "*mpv*"
   "the name of buffer associate with mpv process.")
 
+(defvar mpv-ts-mode-map nil)
+
 (defun mpv-ts-second-to-time (second)
   "秒単位の数値を時刻を表す文字列 00:00:00 に変換する"
   (format-time-string "%T" (seconds-to-time second) 1))

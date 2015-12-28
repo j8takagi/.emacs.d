@@ -11,12 +11,6 @@
 ;;; Code:
 (require 'view)
 
-;; (defun next-line-keep-column (&optional n)
-;;   "Move cursor vertically down N lines."
-;;   (let ((column (current-column)))
-    
-;;       ))
-
 (defun goto-line-default-end (&optional line)
   "Go to LINE. if LINE is omitted, go to the end line."
   (interactive "P")

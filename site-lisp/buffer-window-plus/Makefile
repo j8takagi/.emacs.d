@@ -1,4 +1,4 @@
-PACKAGENAME := view-mode-vi-bindings
+PACKAGENAME := buffer-window-plus
 
 EMACS := emacs
 COMPILE.el := $(EMACS) -batch -l ../../set-load-path.el -f batch-byte-compile
