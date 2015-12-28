@@ -7,14 +7,6 @@
             (shell-command-to-string
              "eval $(/usr/libexec/path_helper -s) && printf $PATH")))
 
-;; Emacs変数exec-pathに、環境変数PATHの内容を設定
-(setq exec-path nil)
-
-(dolist
-    (dir (split-string (getenv "PATH") "[:\n]"))
-  (when (file-directory-p dir)
-    (add-to-list 'exec-path dir t)))
-
 ;; 環境変数の設定
 (dolist
     (list

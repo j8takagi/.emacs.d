@@ -657,6 +657,14 @@
      (when (equal (eval func) sys)
        (my-init-require feat))))
 
+;; Emacs変数exec-pathに、環境変数PATHの内容を設定
+(when (member window-system '(x mac ns))
+  (setq exec-path nil)
+  (dolist
+      (dir (parse-colon-path (getenv "PATH")))
+    (when (file-directory-p dir)
+      (add-to-list 'exec-path dir t))))
+
 ;;
 ;; Emacs開始にかかった時間をメッセージに表示
 ;;
