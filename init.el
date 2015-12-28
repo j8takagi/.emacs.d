@@ -102,9 +102,7 @@
     (feat
      '(
        ;; /usr/local/share/emacs/${VERSION}/lisp
-       autoinsert
        server
-       skeleton
        uniquify
        ;; ~/.emacs.d/site-lisp
        auto-elc-mode
