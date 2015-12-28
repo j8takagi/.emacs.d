@@ -1,7 +1,7 @@
 PACKAGENAME := eukleides
 
 EMACS := emacs
-COMPILE.el := $(EMACS) -batch -l ../../set-load-path.el -f batch-byte-compile
+COMPILE.el := $(EMACS) -batch -f batch-byte-compile
 
 ELFILES := $(wildcard *.el)
 ELCFILES := $(addsuffix c,$(ELFILES))
@@ -12,6 +12,7 @@ RSYNCEXCLUDE := --exclude "Makefile*" --exclude "set-compile.el*"
 GREPV := grep -v
 CLEAN.rsync := $(GREPV) "^\(sent\)\|\(total\)\|\(sending\)\|\(./\)"
 ECHO := echo
+SED := sed
 
 INSTALL-SITELISP := ~/.emacs.d/site-lisp
 
@@ -23,7 +24,7 @@ $(INSTALL-SITELISP)/$(PACKAGENAME):
 	(MKDIR) $@
 
 install: $(INSTALL-SITELISP) all
-	@($(ECHO) "$(PACKAGENAME) -> $(INSTALL-SITELISP)/$(PACKAGENAME)"; $(RSYNC) $(RSYNCFLAG) $(RSYNCEXCLUDE) ./ $(INSTALL-SITELISP)/$(PACKAGENAME)/ | $(CLEAN.rsync))
+	@($(ECHO) "Installing $(PACKAGENAME) to $(INSTALL-SITELISP)/$(PACKAGENAME)"; $(RSYNC) $(RSYNCFLAG) $(RSYNCEXCLUDE) ./ $(INSTALL-SITELISP)/$(PACKAGENAME)/ | $(CLEAN.rsync))
 
 %.elc: %.el
 	$(COMPILE.el) $<

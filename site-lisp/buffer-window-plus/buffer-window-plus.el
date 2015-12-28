@@ -219,5 +219,5 @@ If splitted horizontally, vice versa."
   (interactive)
   (switch-to-buffer-other-frame (get-buffer "*Messages*")))
 
-(provide 'other-window-bindings)
-;;; other-window-bindings.el ends here
+(provide 'buffer-window-plus)
+;;; buffer-window-plus.el ends here
