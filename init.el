@@ -68,6 +68,7 @@
          ggtags
          gitignore-mode
          gnuplot
+         graphviz-dot-mode
          inf-ruby
          magit
          markdown-mode
