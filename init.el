@@ -607,16 +607,15 @@
   (global-unset-key (kbd key)))
 
 ;; モードごとのキーバインドを設定
-;; 設定時、関数 my-init-<mode-map-name>-keybind を定義し、フックに追加する
-;; リストの形式: (mode-library mode-hook mode-map-name ((key1 function1) (key2 function2)))
+;; リストの形式: (mode-library mode-map-name ((key1 function1) (key2 function2)))
 (dolist                                 ; モードごとのキーバインド
     (list
      '(
-       ("text-mode" text-mode-hook text-mode-map
+       ("text-mode" text-mode-map
         (
          ("C-M-i" dabbrev-expand) ; ispell 起動を無効にし、dabbrev-expand を設定
          ))
-       ("dired" dired-mode-hook dired-mode-map
+       ("dired" dired-mode-map
         (
          ("C-c ." dired-exopen-current-directory)
          ("C-c e" ediff-revision)
@@ -627,40 +626,31 @@
          ("r" dired-exopen-file)
          ("s" dired-toggle-sort)
          ))
-       ("tex-mode" latex-mode-hook latex-mode-map
+       ("tex-mode" latex-mode-map
         (
          ("<M-return>" latex-insert-item) ; latex-insert-itemを再設定
          ("C-c p p" exopen-buffer-pdffile)
          ("C-c p d" exopen-buffer-dvifile)
          ("C-c C-c" comment-region)     ; tex-compileを無効にし、comment-region を設定
          ))
-       ("lisp-mode" emacs-lisp-mode-hook lisp-mode-shared-map
+       ("lisp-mode" lisp-mode-shared-map
         (
          ;; ("<M-return>" noexist)      ; デバッグ用
          ("<M-return>" completion-at-point)
          ))
-       ("mediawiki" mediawiki-mode-hook mediawiki-mode-map
+       ("mediawiki" mediawiki-mode-map
         (
          ("C-x C-s" save-buffer)
          ))
        ))
-  (let* ((lib (car list)) (hook (nth 1 list))
-         (modemap (nth 2 list)) (mapkeys (nth 3 list))
-         (modemap-name (symbol-name modemap))
-         (func-init-keybind (read (concat "my-init-" modemap-name "-keybind"))))
+  (let ((lib (car list)) (modemap (nth 1 list)) (mapkeys (nth 2 list)))
     (eval-after-load lib
-      (progn
-        (fset
-         func-init-keybind
-         `(lambda ()
-            (dolist (map ',mapkeys)
-              (let ((key (car map)) (func (nth 1 map)))
-                (if (not (fboundp func))
-                    (message
-                     "Warning: In setting %s keybind, function `%s' is void."
-                     ,modemap-name func)
-                  (define-key ,modemap (kbd key) func))))))
-        `(add-hook ',hook ',func-init-keybind)))))
+      `(dolist (map ',mapkeys)
+         (let ((key (car map)) (func (nth 1 map)))
+           (if (not (fboundp func))
+               (message "Warning: In setting %s keybind, function `%s' is void."
+                        ,modemap func)
+             (define-key ,modemap (kbd key) func)))))))
 
 ;;
 ;; システムごとの初期化ファイルの設定
