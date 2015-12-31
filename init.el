@@ -32,12 +32,13 @@
 ;; パッケージ初期化
 (package-initialize)
 
+;; (message "auto-mode-alist just after package initialize: %s" auto-mode-alist)
 
 (defun my-init-install-package (pkg &optional pkg-from)
   "引数として指定されたパッケージがインストールされているかチェックし、
 未インストールの場合はインストールを実行する。
 パッケージが別パッケージを要求していた場合は、要求されたパッケージも再帰的にチェック・インストールする。
-返り値として、(パッケージ 要求するパッケージ)のリストを返す"
+返り値は、(パッケージ 要求するパッケージ)のリスト"
   (let (pkgs req-pkgs pkg-desc)
     (unless (package-installed-p pkg)
       (if pkg-from
