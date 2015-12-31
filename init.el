@@ -538,6 +538,7 @@
     (mapkeys
      '(
        ("<M-down>" windmove-down)
+       ("<M-f9>" gnuplot-make-buffer)
        ("<M-left>" windmove-left)
        ("<M-return>" expand-abbrev)
        ("<M-right>" windmove-right)
