@@ -316,7 +316,10 @@
 
 ;; Ediff
 (eval-after-load 'ediff
-  '(my-init-require 'ediff-vc-plus))
+  '(progn
+     (custom-set-variables
+      '(ediff-window-setup-function 'ediff-setup-windows-plain))
+     (my-init-require 'ediff-vc-plus)))
 
 ;; uniquify
 (eval-after-load 'uniquify

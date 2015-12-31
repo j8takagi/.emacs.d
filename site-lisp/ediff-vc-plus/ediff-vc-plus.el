@@ -1,10 +1,7 @@
 (require 'ediff)
 (require 'vc)
+(require 'ediff-vers)
 (require 'dired)
-
-(setq ediff-window-setup-function 'ediff-setup-windows-plain)
-
-(declare-function ediff-vc-internal "ediff-vers" (REV1 REV2 &optional STARTUP-HOOKS))
 
 ;;;###autoload
 (defun ediff-vc-latest-current ()
