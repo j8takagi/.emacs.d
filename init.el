@@ -503,8 +503,6 @@
 (dolist                                 ; auto-mode-alistに追加するモード
     (alist
      '(
-       ("Makefile\\.?.*". makefile-gmake-mode)
-       ("\\.[CcTt][Ss][Vv]\\'" . csv-mode)
        ("\\.[rR]\\'" . R-mode)
        ("\\.casl?\\'" . asm-mode)
        ("\\.d\\'". makefile-gmake-mode)
@@ -513,7 +511,6 @@
        ("\\.gv\\'" . graphviz-dot-mode)
        ("\\.ll?\\'" . flex-mode)
        ("\\.md\\'" . markdown-mode)
-       ("\\.mk\\'". makefile-gmake-mode)
        ("\\.re\\'" . review-mode)
        ("\\.svg\\'" . nxml-mode)
        ("\\.ts\\'" . mpv-ts-mode)
