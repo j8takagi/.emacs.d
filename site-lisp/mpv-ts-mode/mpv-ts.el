@@ -165,6 +165,10 @@
       (mpv-ts-insert-speak-prefix start-time (mpv-ts-read-speaker))
       ))
 
+(defun mpv-ts-jump-eob (buffer)
+  (with-current-buffer buffer
+    (goto-char (point-max))))
+
 (defun mpv-ts-play (audio-file &optional start-time end-time)
   "mpvによる音声再生を開始"
     (let
@@ -180,11 +184,14 @@
         (setq cmdstr (concat cmdstr " --start=" start-time)))
       (when end-time
         (setq cmdstr (concat cmdstr " --end=" end-time)))
+      (setq buffer-read-only nil)
       (insert (format-time-string "[%Y/%m/%d %H:%M:%S]" (current-time)) " $ " cmdstr "\n")
       (when curr-proc
         (interrupt-process curr-proc))
       (start-process-shell-command "mpv" buf cmdstr)
-      (mpv-ts-display-process)))
+      (run-with-timer 0 nil 'mpv-ts-jump-eob buf)
+      (mpv-ts-display-process)
+      (setq buffer-read-only 1)))
 
 (defun mpv-ts-play-interrupt (&optional process)
   "mpvによる音声再生を中止"
@@ -207,8 +214,7 @@
         (split-window nil (- (+ proc-win-height 1)))
         (set-window-buffer (next-window) mpv-ts-process-buffer-name)
         (setq proc-win (next-window)))
-      (select-window proc-win)
-      (goto-char (point-max))
+      (set-window-point proc-win (point-max))
       (select-window curr-win))))
 
 (defun mpv-ts-delete-process-window ()
@@ -217,6 +223,13 @@
   (let ((proc-win (get-buffer-window mpv-ts-process-buffer-name)))
     (when proc-win
       (delete-window proc-win))))
+
+(defun mpv-ts-delete-process-window-unless-mpv-ts ()
+  "mpvプロセスのウィンドウを削除"
+  (unless (eq major-mode 'mpv-ts-mode)
+      (let ((proc-win (get-buffer-window mpv-ts-process-buffer-name)))
+        (when proc-win
+          (delete-window proc-win)))))
 
 (defun mpv-ts-delete-process-change-mode ()
   "メジャーモードが変わったら、MPVプロセスのウィンドウを消す"
@@ -373,7 +386,13 @@
       (if (not (functionp func))
           (message "Warning: function `%s' is NOT defined." func)
         (define-key mpv-ts-mode-map (kbd key) func))))
-  (use-local-map mpv-ts-mode-map))
+  (use-local-map mpv-ts-mode-map)
+  (dolist
+      (hook
+       '(
+         window-configuration-change-hook
+         ))
+    (add-hook hook 'mpv-ts-delete-process-window-unless-mpv-ts)))
 
 (provide 'mpv-ts)
 ;;; mpv-ts.el ends here

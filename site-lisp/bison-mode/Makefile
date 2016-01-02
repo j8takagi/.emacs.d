@@ -1,4 +1,4 @@
-PACKAGENAME := bison
+PACKAGENAME := bison-mode
 
 EMACS := emacs
 COMPILE.el := $(EMACS) -batch -l set-compile.el -f batch-byte-compile

@@ -1,4 +1,4 @@
-PACKAGENAME := mpv-ts
+PACKAGENAME := mpv-ts-mode
 
 EMACS := emacs
 COMPILE.el := $(EMACS) -batch -f batch-byte-compile

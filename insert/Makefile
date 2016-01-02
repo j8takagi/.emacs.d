@@ -5,7 +5,7 @@ RSYNCFLAG := -avz --delete
 GREPV := grep -v
 
 CLEAN.rsync := $(GREPV) "^\(sent\)\|\(total\)\|\(sending\)"
-COMPILE.el := $(EMACS) -batch -l set-compile.el -l load-abbrev -f batch-byte-compile
+COMPILE.el := $(EMACS) -batch -l set-compile.el -l load-abbrev.el -f batch-byte-compile
 
 emacs-dir := ~/.emacs.d
 
