@@ -504,6 +504,7 @@
     (alist
      '(
        ("\\.[rR]\\'" . R-mode)
+       ("Makefile\\.template\\'" . makefile-gmake-mode)
        ("\\.casl?\\'" . asm-mode)
        ("\\.d\\'". makefile-gmake-mode)
        ("\\.euk\\'" . eukleides-mode)
