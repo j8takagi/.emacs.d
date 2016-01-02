@@ -3,3 +3,8 @@
 
 (require 'package)
 (package-initialize)
+
+;; Local Variables:
+;; no-byte-compile: t
+;; no-update-autoloads: t
+;; End:

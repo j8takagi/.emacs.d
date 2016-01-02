@@ -8,15 +8,14 @@
 ;;; Commentary:
 
 ;;; Code:
-(define-skeleton h-template
-  "Template of C language header file."
-  ;; (let ((inc (concat (upcase (file-name-base (buffer-file-name))) "_INCLUDE")))
-  nil
-  "#ifndef " (setq v1 '(upcase (file-name-base (buffer-file-name)))) "_INCLUDE" n
-  "#define " v1 "_INCLUDE" n
-  n _ n n
-  "#endif        /* end of " v1 "_INCLUDE */" n
-  )
+(let (v1 (upcase (file-name-base (buffer-file-name))))
+  (define-skeleton h-template
+    "Template of C language header file."
+    "#ifndef " v1 "_INCLUDE" n
+    "#define " v1 "_INCLUDE" n
+    n _ n n
+    "#endif        /* end of " v1 "_INCLUDE */" n
+    ))
 
 (define-auto-insert "\\.h\\'" 'h-template)
 

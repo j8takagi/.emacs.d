@@ -1,1 +1,1 @@
-(load-file "../abbrev_defs")
+(load-file "~/.emacs.d/abbrev_defs")
