@@ -9,9 +9,9 @@ RMR := $(RM) -R
 RSYNC := rsync
 RSYNCFLAG := -avz --delete
 
-COMPILE.el := $(EMACS) -batch -l set-load-path.el -l init.el -f batch-byte-compile
+COMPILE.el := $(EMACS) -batch -l set-compile.el -f batch-byte-compile
 CLEAN.rsync := $(GREPV) "^\(sent\)\|\(total\)\|\(sending\)"
-emacs-dir := ~/.emacs.d
+INSTALLDIR := ~/.emacs.d
 
 .PHONY: all init site-lisp install install-init.d install-init.sys.d install-site-lisp
 
@@ -32,59 +32,59 @@ site-lisp:
 	$(MAKE) -sC $@
 
 get-abbrev:
-	$(RSYNC) $(RSYNCFLAG) $(emacs-dir)/abbrev_defs ./
+	$(RSYNC) $(RSYNCFLAG) $(INSTALLDIR)/abbrev_defs ./
 
 install: install-init install-init.d install-init.sys.d install-site-lisp install-insert
 
-install-init: $(emacs-dir) $(emacs-dir)/init.el~ init
-	@$(RSYNC) $(RSYNCFLAG) init.el init.elc $(emacs-dir)/ | $(CLEAN.rsync)
+install-init: $(INSTALLDIR) $(INSTALLDIR)/init.el~ init
+	@$(RSYNC) $(RSYNCFLAG) init.el init.elc $(INSTALLDIR)/ | $(CLEAN.rsync)
 
-$(emacs-dir)/init.el~: $(emacs-dir)/init.el
+$(INSTALLDIR)/init.el~: $(INSTALLDIR)/init.el
 	@$(CP) $< $@
 
-install-init.d: init.d $(emacs-dir)/init.d
+install-init.d: init.d $(INSTALLDIR)/init.d
 	@$(MAKE) -sC init.d install
 
-$(emacs-dir)/init.d: $(emacs-dir)
+$(INSTALLDIR)/init.d: $(INSTALLDIR)
 	@(if $(TEST) ! -d $@; then $(MKDIR) $@; fi)
 
-install-init.sys.d: init.sys.d $(emacs-dir)/init.sys.d
+install-init.sys.d: init.sys.d $(INSTALLDIR)/init.sys.d
 	@$(MAKE) -sC init.sys.d install
 
-$(emacs-dir)/init.sys.d: $(emacs-dir)
+$(INSTALLDIR)/init.sys.d: $(INSTALLDIR)
 	@(if $(TEST) ! -d $@; then $(MKDIR) $@; fi)
 
-install-site-lisp: site-lisp $(emacs-dir)/site-lisp
+install-site-lisp: site-lisp $(INSTALLDIR)/site-lisp
 	@$(MAKE) -sC site-lisp install
 
-$(emacs-dir)/site-lisp: $(emacs-dir)
+$(INSTALLDIR)/site-lisp: $(INSTALLDIR)
 	@(if $(TEST) ! -d $@; then $(MKDIR) $@; fi)
 
-install-insert: insert $(emacs-dir)/insert
+install-insert: insert $(INSTALLDIR)/insert
 	@$(MAKE) -sC insert install
 
-$(emacs-dir)/insert: $(emacs-dir)
+$(INSTALLDIR)/insert: $(INSTALLDIR)
 	@(if $(TEST) ! -d $@; then $(MKDIR) $@; fi)
 
-$(emacs-dir):
+$(INSTALLDIR):
 	@(if $(TEST) ! -d $@; then $(MKDIR) $@; fi)
 
 %.elc: %.el
 	$(COMPILE.el) $<
 
-clean: clean-init clean-init.d clean-init.sys.d clean-insert clean-site-lisp
+clean: init-clean init.d-clean init.sys.d-clean insert-clean site-lisp-clean
 
-clean-init:
+init-clean:
 	$(RM) *.elc
 
-clean-init.d:
+init.d-clean:
 	$(MAKE) -C init.d clean
 
-clean-init.sys.d:
+init.sys.d-clean:
 	$(MAKE) -C init.sys.d clean
 
-clean-insert:
+insert-clean:
 	$(MAKE) -C insert clean
 
-clean-site-lisp:
+site-lisp-clean:
 	$(MAKE) -C site-lisp clean
