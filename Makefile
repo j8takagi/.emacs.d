@@ -72,6 +72,8 @@ $(INSTALLDIR):
 %.elc: %.el
 	$(COMPILE.el) $<
 
+distclean: clean
+
 clean: init-clean init.d-clean init.sys.d-clean insert-clean site-lisp-clean
 
 init-clean:
