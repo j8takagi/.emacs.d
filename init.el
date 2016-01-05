@@ -384,7 +384,7 @@
      (custom-set-variables              ; プロンプトの表示設定
       '(shell-prompt-pattern
         "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ "))
-     (my-init-require 'init-shell)))
+     (my-init-require 'set-process-query-on-exit)))
 
 ;;; CC-Mode
 (eval-when-compile (require 'cc-mode))

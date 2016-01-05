@@ -15,4 +15,4 @@
   (dolist (proc (process-list))
     (set-process-not-running-child-noquery-on-exit proc)))
 
-(provide 'init-shell)
+(provide 'set-process-query-on-exit)
