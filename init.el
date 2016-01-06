@@ -107,7 +107,6 @@
        not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
        scroll-one-line                  ; 1行スクロール
        temp-buffer                      ; 一時バッファの作成
-       ucs-normalize                    ; 濁点を直す
        window-control                   ; ウィンドウとフレームのサイズを調整
        ))
   (my-init-require feat))
