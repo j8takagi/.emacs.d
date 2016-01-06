@@ -1,9 +1,5 @@
 ;;;-*-Emacs-Lisp-*-
 
-(message "Loading init.el: Starting initialization %s at %s"
-         (emacs-version nil)
-         (format-time-string "%Y/%m/%d %T"))
-
 (defun my-init-require (feature)
   "Require FEATURE, and the result is written into the `*Messages*' buffer."
   (if (require feature nil 1)
@@ -11,6 +7,11 @@
     (if (not (locate-library (symbol-name feature)))
         (message "Warning: Feature `%s' is NOT found." feature)
       (message "Warning: Feature `%s' is failed to require." feature))))
+(message "Start of loading init.el at %s." (format-time-string "%Y/%m/%d %T"))
+
+(message (emacs-version nil))
+
+;; (message "Debug: features before loading init.el - %s" features)
 
 ;; load-pathの設定
 (let ((default-directory (expand-file-name user-emacs-directory)))
@@ -31,8 +32,6 @@
 
 ;; パッケージ初期化
 (package-initialize)
-
-;; (message "auto-mode-alist just after package initialize: %s" auto-mode-alist)
 
 (defun my-init-install-package (pkg &optional pkg-from)
   "引数として指定されたパッケージがインストールされているかチェックし、
@@ -57,6 +56,7 @@
         (dolist (rp (my-init-install-package req-pkg pkg))
            (add-to-list 'pkgs rp 1))))
     pkgs))
+;; (message "Debug: auto-mode-alist just after package initialize - %s" auto-mode-alist)
 
 ;; パッケージの設定
 (let (pkgs real-pkgs update-pkgs)
@@ -86,16 +86,18 @@
         (message "Package `%s' is required from `%s'." (car pkg-all) (nth 1 pkg-all)))
       (add-to-list 'pkgs (car pkg-all))))
   (setq real-pkgs (mapcar 'car package-alist)) ; インストールされているパッケージのリストを取得
-  (message "Installed packages: %s" (reverse real-pkgs)) ; インストールされているパッケージを表示
+  (message "Installed packages - %s" (reverse real-pkgs)) ; インストールされているパッケージを表示
   ;; アップデートされているパッケージを表示
   (package-menu--refresh real-pkgs)
   (dolist (update-pkg (package-menu--find-upgrades))
-    (message "Information: Package %s is updated. Version %s is available." (car update-pkg) (package-desc-version (cdr update-pkg))))
+    (message "Info: Package %s is updated. Version %s is available."
+             (car update-pkg)
+             (package-desc-version (cdr update-pkg))))
   ;; インストールされているパッケージで、指定したパッケージ以外のものがあれば表示
   (dolist (pkg pkgs)
     (setq real-pkgs (delete pkg real-pkgs)))
   (when real-pkgs
-    (message "Unexpected installed packages: %s"  (reverse real-pkgs))))
+    (message "Info: Unexpected installed packages %s"  (reverse real-pkgs))))
 
 ;;
 ;; ライブラリの読み込み
@@ -264,11 +266,10 @@
           ))
      (let ((fullpath (expand-file-name path)))
        (if (not (car (file-attributes fullpath)))
-           (message "Warning: Inf path `%s' is not exist or not directory." path)
+           (message "Warning: Info path `%s' is not exist or not directory." path)
          (add-to-list 'Info-directory-list fullpath 1))))))
 
 ;; dired
-(eval-when-compile (require 'dired))
 (eval-after-load 'dired
   '(progn
      (custom-set-variables
@@ -290,14 +291,8 @@
      ;; read-onlyファイルをview-modeで開く
      (my-init-require 'init-view-mode)
      (custom-set-variables '(view-read-only 1))
-     ;; view-modeでviのキーバインド
-     (my-init-require 'view-mode-vi-bindings)))
-;; *Messages* バッファーを view-mode に
-(eval-after-load "view"
-  (save-current-buffer
-    (progn
-      (set-buffer "*Messages*")
-      (view-mode))))
+     (my-init-require 'view-mode-vi-bindings) ;; view-modeでviのキーバインド
+     (with-current-buffer "*Messages*" (view-mode)))) ;; *Messages* バッファーを view-mode に
 
 ;; バッファ全体の濁点分離を直す
 (eval-after-load 'ucs-normalize
@@ -316,25 +311,21 @@
   (add-hook 'emacs-lisp-mode-hook func))
 
 ;; Ediff
-(eval-after-load 'ediff
-  '(progn
-     (custom-set-variables
-      '(ediff-window-setup-function 'ediff-setup-windows-plain))
-     (my-init-require 'ediff-vc-plus)))
+(custom-set-variables
+ '(ediff-window-setup-function 'ediff-setup-windows-plain)
+ '(ediff-split-window-function 'split-window-horizontally))
 
 ;; uniquify
-(eval-after-load 'uniquify
-  (custom-set-variables
-   '(uniquify-buffer-name-style 'post-forward-angle-brackets)
-   '(uniquify-ignore-buffers-re "*[^*]+*")))
+(custom-set-variables
+ '(uniquify-buffer-name-style 'post-forward-angle-brackets)
+ '(uniquify-ignore-buffers-re "*[^*]+*"))
 
 ;; *compilation*バッファをスクロールして表示
-(eval-when-compile (require 'compile))
 (eval-after-load 'compile
   '(custom-set-variables '(compilation-scroll-output 'first-error)))
 
 ;; autoinsert
-;; 参考: http://www.math.s.chiba-u.ac.jp/~matsu/emacs/emacs21/autoinsert.html
+;; 参考 http://www.math.s.chiba-u.ac.jp/~matsu/emacs/emacs21/autoinsert.html
 (custom-set-variables
  '(auto-insert-directory "~/.emacs.d/insert/")
  '(auto-insert-query nil)
@@ -360,16 +351,15 @@
 
 ;; emacsclient
 (eval-after-load 'server
-  '(unless (server-running-p) (server-start)))
+  '(unless (server-running-p)
+     (server-start)))
 
 ;; ChangeLog
-(eval-when-compile (require 'add-log))
 (eval-after-load 'add-log
   '(custom-set-variables '(change-log-default-name "~/ChangeLog")))
 
 ;; vc-follow-linkを無効にする
-;; 参考: http://d.hatena.ne.jp/a_bicky/20140607/1402131090
-(eval-when-compile (require 'vc-hooks))
+;; 参考 http://d.hatena.ne.jp/a_bicky/20140607/1402131090
 (eval-after-load 'vc-hooks
   '(custom-set-variables '(vc-follow-symlinks nil)))
 
@@ -378,7 +368,6 @@
   '(my-init-require 'init-whitespace))
 
 ;; shell-mode
-(eval-when-compile (require 'shell))
 (eval-after-load 'shell
   '(progn
      (custom-set-variables              ; プロンプトの表示設定
@@ -387,7 +376,6 @@
      (my-init-require 'set-process-query-on-exit)))
 
 ;;; CC-Mode
-(eval-when-compile (require 'cc-mode))
 (eval-after-load 'cc-mode
   '(progn
      (custom-set-variables '(c-default-style "k&r"))
@@ -407,12 +395,10 @@
        (add-hook 'c-mode-common-hook func))))
 
 ;; tex-mode
-(eval-when-compile (require 'tex-mode))
 (eval-after-load 'tex-mode
   '(add-hook 'latex-mode-hook 'turn-on-reftex))
 
 ;; web-mode
-(eval-when-compile (require 'web-mode))
 (eval-after-load 'web-mode
      (my-init-require 'init-web-mode))
 
@@ -426,34 +412,27 @@
        ))))
 
 ;; ess-site > R
-(eval-when-compile (require 'ess-site))
 (eval-after-load 'ess-site
   '(custom-set-variables '(ess-ask-for-ess-directory nil)))
 
 ;; bison-mode
-(eval-when-compile (require 'bison-mode))
 (eval-after-load 'bison-mode
   '(custom-set-variables
       '(bison-decl-token-column 0)
       '(bison-rule-enumeration-column 8)))
 
+(defun kill-local-compile-command ()
+  (kill-local-variable 'compile-command))
+
 ;; graphviz-dot-mode
-(eval-when-compile (require 'graphviz-dot-mode))
 (eval-after-load 'graphviz-dot-mode
-  '(progn
-     (defun my-init-graphviz-dot-mode-set-make-compile-command ()
-       (make-local-variable 'compile-command)
-       (custom-set-variables '(compile-command "make -k")))
-     (add-hook 'graphviz-dot-mode-hook
-             'my-init-graphviz-dot-mode-set-make-compile-command)))
+  '(add-hook 'graphviz-dot-mode-hook 'kill-local-compile-command))
 
 ;; magit
-(eval-when-compile (require 'magit))
 (eval-after-load 'magit
   '(custom-set-variables '(magit-status-buffer-switch-function 'switch-to-buffer)))
 
 ;; mew
-(eval-when-compile (require 'mew))
 (custom-set-variables '(read-mail-command 'mew))
 (define-mail-user-agent
   'mew-user-agent
@@ -463,7 +442,6 @@
   'mew-send-hook)
 
 ;; ruby-mode
-(eval-when-compile (require 'ruby-mode))
 (eval-after-load 'ruby-mode
   '(add-to-list 'interpreter-mode-alist '("ruby" . ruby-mode)))
 
@@ -608,7 +586,7 @@
   (global-unset-key (kbd key)))
 
 ;; モードごとのキーバインドを設定
-;; リストの形式: (mode-library mode-map-name ((key1 function1) (key2 function2)))
+;; リストの形式は、(mode-library mode-map-name ((key1 function1) (key2 function2)))
 (dolist                                 ; モードごとのキーバインド
     (list
      '(
@@ -683,12 +661,9 @@
     (when (file-directory-p dir)
       (add-to-list 'exec-path dir t))))
 
-;;
 ;; Emacs開始にかかった時間をメッセージに表示
-;;
 (defun my-init-message-startup-time ()
-  (message "Duration of the Emacs initialization: %s" (emacs-init-time)))
-
+  (message "Duration of the Emacs initialization - %s" (emacs-init-time)))
 
 (dolist
     (hookfunc                           ; フックに設定するファンクション
