@@ -29,10 +29,10 @@
 ;; (message "Debug: auto-mode-alist just after package initialize - %s" auto-mode-alist)
 
 ;; パッケージの設定
-(let (pkgs real-pkgs update-pkgs)
+(let (pkgs req-pkgs real-pkgs update-pkgs)
   ;; 指定したパッケージがインストールされていない場合は、インストール実行
   (dolist                               ; インストールするパッケージ
-      (pkg
+      (req-pkg
        '(
          csv-mode
          ess
@@ -52,10 +52,12 @@
          xbm-life
          xpm
          ))
-    (dolist (pkg-all (my-init-install-package pkg))
-      (when (nth 1 pkg-all)
-        (message "Package `%s' is required from `%s'." (car pkg-all) (nth 1 pkg-all)))
-      (add-to-list 'pkgs (car pkg-all))))
+    (add-to-list 'req-pkgs req-pkg)
+    (dolist (pkg (my-init-install-package req-pkg))
+      (when (and (cadr pkg) (not (member (car pkg) pkgs)))
+        (message "Package `%s' is required from `%s'." (car pkg) (cadr pkg)))
+      (add-to-list 'pkgs (car pkg))))
+  (message "Required packages - %s" (reverse req-pkgs)) ; init.elで指定したパッケージを表示
   (setq real-pkgs (mapcar 'car package-alist)) ; インストールされているパッケージのリストを取得
   (message "Installed packages - %s" (reverse real-pkgs)) ; インストールされているパッケージを表示
   ;; アップデートされているパッケージを表示
