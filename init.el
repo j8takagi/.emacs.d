@@ -49,6 +49,7 @@
          sokoban
          undo-tree
          web-mode
+         xbm-life
          xpm
          ))
     (dolist (pkg-all (my-init-install-package pkg))
