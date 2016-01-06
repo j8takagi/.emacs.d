@@ -1,12 +1,5 @@
 ;;;-*-Emacs-Lisp-*-
 
-(defun my-init-require (feature)
-  "Require FEATURE, and the result is written into the `*Messages*' buffer."
-  (if (require feature nil 1)
-      (message "Feature `%s' is required." feature)
-    (if (not (locate-library (symbol-name feature)))
-        (message "Warning: Feature `%s' is NOT found." feature)
-      (message "Warning: Feature `%s' is failed to require." feature))))
 (message "Start of loading init.el at %s." (format-time-string "%Y/%m/%d %T"))
 
 (message (emacs-version nil))
@@ -33,29 +26,6 @@
 ;; パッケージ初期化
 (package-initialize)
 
-(defun my-init-install-package (pkg &optional pkg-from)
-  "引数として指定されたパッケージがインストールされているかチェックし、
-未インストールの場合はインストールを実行する。
-パッケージが別パッケージを要求していた場合は、要求されたパッケージも再帰的にチェック・インストールする。
-返り値は、(パッケージ 要求するパッケージ)のリスト"
-  (let (pkgs req-pkgs pkg-desc)
-    (unless (package-installed-p pkg)
-      (if pkg-from
-          (message "Package %s required from %s is not installed." pkg pkg-from))
-      (when (not package-archive-contents)
-        (package-refresh-contents))
-      (if (not (assq pkg package-archive-contents))
-          (message "Warning: Package `%s' is NOT found on archives." pkg)
-        (message "Installation of package `%s' begins." pkg)
-        (condition-case err
-              (package-install pkg)
-           (message "Error: %s\nFails to install %s" err pkg))))
-    (when (setq pkg-desc (assq pkg package-alist))
-      (add-to-list 'pkgs `(,pkg ,pkg-from) 1)
-      (dolist (req-pkg (mapcar 'car (package-desc-reqs (cadr pkg-desc))))
-        (dolist (rp (my-init-install-package req-pkg pkg))
-           (add-to-list 'pkgs rp 1))))
-    pkgs))
 ;; (message "Debug: auto-mode-alist just after package initialize - %s" auto-mode-alist)
 
 ;; パッケージの設定
