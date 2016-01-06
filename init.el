@@ -373,7 +373,7 @@
 
 ;; web-mode
 (eval-after-load 'web-mode
-     (my-init-require 'init-web-mode))
+  '(my-init-require 'init-web-mode))
 
 ;; ess-site > R
 (eval-after-load 'ess-site
