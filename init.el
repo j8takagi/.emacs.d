@@ -445,8 +445,8 @@
 (dolist                                 ; auto-mode-alistに追加するモード
     (alist
      '(
+       ("[Mm]akefile\\.[a-zA-Z0-9]+\\'" . makefile-gmake-mode)
        ("\\.[rR]\\'" . R-mode)
-       ("Makefile\\.template\\'" . makefile-gmake-mode)
        ("\\.casl?\\'" . asm-mode)
        ("\\.d\\'". makefile-gmake-mode)
        ("\\.euk\\'" . eukleides-mode)
