@@ -79,13 +79,14 @@
     (feat
      '(
        ;; built-in libraries
+       ediff
        server
        uniquify
        ;; ~/.emacs.d/site-lisp
        auto-elc-mode                    ; .elファイルの自動コンパイル
        buffer-window-plus               ; バッファとウィンドウの操作関数を追加
        count-japanese                   ; 日本語の文字数をカウント
-       ediff-vc-plus                    ; Ediffの関数を追加
+       ediff-vc-plus                    ; Ediffの追加関数
        exopen                           ; 外部プログラムでファイルを開く
        not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
        scroll-one-line                  ; 1行スクロール
@@ -523,6 +524,7 @@
        ("C-x m" man)
        ("C-x p" call-last-kbd-macro)
        ("C-x q" bury-buffer)
+       ("C-x E" ediff-redisplay-current-frame)
        ("C-x v e" ediff-vc-latest-current)
        ("C-x v f" find-file-revision)
        ("M-?" help)
@@ -585,6 +587,10 @@
        ("mediawiki" nil mediawiki-mode-map
         (
          ("C-x C-s" save-buffer)
+         ))
+       ("ediff" ediff-keymap-setup-hook ediff-mode-map
+        (
+         ("Q" my-ediff-quit)
          ))
        ))
   (let ((lib (car list)) (hook (nth 1 list))

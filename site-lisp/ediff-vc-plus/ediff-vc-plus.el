@@ -50,4 +50,53 @@ Or, input FILE as 'FILE.~REVISON~' and FILE and REVISION is specified."
     (find-file (dired-get-file-for-visit))
     (ediff-vc-latest-current)))
 
+;;;###autoload
+(defun ediff-redisplay-current-frame ()
+  "Display Ediff Control panel in the current frame"
+  (interactive)
+  (when (get-buffer "*Ediff Control Panel*")
+    (switch-to-buffer "*Ediff Control Panel*")
+    (delete-other-windows)
+    (ediff-recenter)))
+
+(defvar ediff-saved-window-configuration)
+
+(defun ediff-save-window-configuration ()
+  (setq ediff-saved-window-configuration (current-window-configuration)))
+
+(defun ediff-restore-window-configuration ()
+  (set-window-configuration ediff-saved-window-configuration))
+
+(defun my-ediff-quit (reverse-default-keep-variants)
+  "Finish an Ediff session and exit Ediff.
+Unselects the selected difference, if any, restores the read-only and modified
+flags of the compared file buffers, kills Ediff buffers for this session
+\(but not buffers A, B, C\).
+
+If `ediff-keep-variants' is nil, the user will be asked whether the buffers
+containing the variants should be removed \(if they haven't been modified\).
+If it is t, they will be preserved unconditionally.  A prefix argument,
+temporarily reverses the meaning of this variable."
+  (interactive "P")
+  (let (buf)
+    (ediff-barf-if-not-control-buffer)
+    (setq buf (current-buffer))
+    (ediff-really-quit reverse-default-keep-variants)
+    (kill-buffer buf)))
+
+;;;###autoload
+(dolist
+    (hookfunc                           ; フックに設定するファンクション
+     '(
+       (ediff-before-setup-hook ediff-save-window-configuration)
+       (ediff-quit-hook ediff-restore-window-configuration)
+       (ediff-suspend-hook ediff-restore-window-configuration)
+       ))
+  (let ((hook (car hookfunc)) (func (cadr hookfunc)))
+    (cond
+     ((not (boundp hook)) (message "hook `%s' is void." hook))
+     ((not (fboundp func)) (message "function `%s' is void." func))
+     (t
+      (add-hook hook func)))))
+
 (provide 'ediff-vc-plus)
