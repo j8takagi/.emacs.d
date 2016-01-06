@@ -375,15 +375,6 @@
 (eval-after-load 'web-mode
      (my-init-require 'init-web-mode))
 
-;; image-mode
-(eval-when-compile (require 'image-file))
-(eval-after-load 'image-file
-  (custom-set-variables
-   '(image-file-name-extensions
-     '(
-       "svg" "png" "jpeg" "jpg" "gif" "tiff" "tif"
-       ))))
-
 ;; ess-site > R
 (eval-after-load 'ess-site
   '(custom-set-variables '(ess-ask-for-ess-directory nil)))
