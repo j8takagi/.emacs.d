@@ -554,11 +554,11 @@
 (dolist                                 ; モードごとのキーバインド
     (list
      '(
-       ("text-mode" text-mode-map
+       ("text-mode" nil text-mode-map
         (
          ("C-M-i" dabbrev-expand) ; ispell 起動を無効にし、dabbrev-expand を設定
          ))
-       ("dired" dired-mode-map
+       ("dired" nil dired-mode-map
         (
          ("C-c ." dired-exopen-current-directory)
          ("C-c e" ediff-revision)
@@ -569,32 +569,50 @@
          ("r" dired-exopen-file)
          ("s" dired-toggle-sort)
          ))
-       ("tex-mode" latex-mode-map
+       ("tex-mode" nil latex-mode-map
         (
          ("<M-return>" latex-insert-item) ; latex-insert-itemを再設定
          ("C-c p p" exopen-buffer-pdffile)
          ("C-c p d" exopen-buffer-dvifile)
          ("C-c C-c" comment-region)     ; tex-compileを無効にし、comment-region を設定
          ))
-       ("lisp-mode" lisp-mode-shared-map
+       ("lisp-mode" nil lisp-mode-shared-map
         (
          ;; ("<M-return>" noexist)      ; デバッグ用
          ("<M-return>" completion-at-point)
          ("C-c e" eval-buffer)
          ))
-       ("mediawiki" mediawiki-mode-map
+       ("mediawiki" nil mediawiki-mode-map
         (
          ("C-x C-s" save-buffer)
          ))
        ))
-  (let ((lib (car list)) (modemap (nth 1 list)) (mapkeys (nth 2 list)))
+  (let ((lib (car list)) (hook (nth 1 list))
+         (modemap (nth 2 list)) (mapkeys (nth 3 list)))
     (eval-after-load lib
-      `(dolist (map ',mapkeys)
-         (let ((key (car map)) (func (nth 1 map)))
-           (if (not (fboundp func))
-               (message "Warning: In setting %s keybind, function `%s' is void."
-                        ,modemap func)
-             (define-key ,modemap (kbd key) func)))))))
+      (cond
+       ((null hook)
+        `(dolist (map ',mapkeys)
+           (let ((key (car map)) (func (nth 1 map)))
+             (if (not (fboundp func))
+                 (message "Warning: In setting %s keybind, function `%s' is void."
+                          ,modemap func)
+               (define-key ,modemap (kbd key) func)))))
+       (t
+        (let* ((modemap-name (symbol-name modemap))
+              (func-init-keybind (read (concat "my-init-" modemap-name "-keybind"))))
+          (fset
+           func-init-keybind
+           `(lambda ()
+              (dolist
+                  (map ',mapkeys)
+                (let ((key (car map)) (func (nth 1 map)))
+                  (if (not (functionp func))
+                      (message
+                       "Warning: In setting %s, function `%s' is not defined."
+                       ,modemap-name func)
+                    (define-key ,modemap (kbd key) func))))))
+          `(add-hook ',hook ',func-init-keybind)))))))
 
 ;;
 ;; システムごとの初期化ファイルの設定
@@ -637,5 +655,11 @@
        (find-file-hook auto-insert)
        (kill-buffer-query-functions not-kill-but-bury-buffer)
        ))
-  (let ((hook (car hookfunc)) (func (nth 1 hookfunc)))
-    (add-hook hook func)))
+  (let ((hook (car hookfunc)) (func (cadr hookfunc)))
+    (cond
+     ((not (boundp hook)) (message "hook `%s' is void." hook))
+     ((not (fboundp func)) (message "function `%s' is void." func))
+     (t
+      (add-hook hook func)))))
+
+(message "End of loading init.el.")
