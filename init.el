@@ -97,7 +97,6 @@
        ;; built-in libraries
        ediff
        server
-       uniquify
        ;; ~/.emacs.d/site-lisp
        auto-elc-mode                    ; .elファイルの自動コンパイル
        buffer-window-plus               ; バッファとウィンドウの操作関数を追加
@@ -129,10 +128,16 @@
          ))
     (let ((func (car funcfile)) (file (nth 1 funcfile)) (doc (nth 2 funcfile)))
       (if (not (locate-library file))
-          (message "Warning: library file `%s' autoloaded from `%s' is not found." file func))
-      (when (autoload func file doc 1)
-        (add-to-list 'funcs func))))
-  (message "Autoload functions set in init.el: %s" (reverse funcs)))
+          (message "Warning: library file `%s' autoloaded from `%s' is not found." file func)
+        (if (fboundp func)
+            (message "Info: function `%s' is already defined." func)
+          (condition-case err
+              (progn
+                (autoload func file doc 1)
+                (add-to-list 'funcs func))
+            (error (message "Warning: Fails to set autoload %s from %s.\n%s: %s"
+                            func file (car err) (cadr err))))))))
+  (message "Autoload functions set in init.el - %s" (reverse funcs)))
 
 ;;
 ;; 文字コードの設定
@@ -140,6 +145,7 @@
 
 ;; 日本語環境
 (set-language-environment 'Japanese)
+
 ;; 文字コードのデフォルトはUTF-8
 (prefer-coding-system 'utf-8)
 
@@ -668,6 +674,7 @@
 (defun my-init-message-startup-time ()
   (message "Duration of the Emacs initialization - %s" (emacs-init-time)))
 
+;; フックの設定
 (dolist
     (hookfunc                           ; フックに設定するファンクション
      '(
