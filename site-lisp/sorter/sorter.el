@@ -54,9 +54,10 @@
         (sorter-translate  dired-actual-switches "S" ""))
   (dired-sort-other dired-actual-switches))))
 
-(add-hook 'dired-mode-hook
-          (lambda ()
-            (define-key dired-mode-map "s" 'dired-toggle-sort)))
+;; (defun dired-sort-set-key ()
+;;   (define-key dired-mode-map "s" 'dired-toggle-sort))
+
+;; (add-hook 'dired-mode-hook 'dired-sort-set-key)
 
 (defun dired-sort-set-modeline ()
   ;; Setq modeline display according to dired-actual-switches.
