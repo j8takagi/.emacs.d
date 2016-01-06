@@ -10,6 +10,22 @@
 (let ((default-directory (expand-file-name user-emacs-directory)))
   (normal-top-level-add-subdirs-to-load-path))
 
+
+(require 'initchart)
+
+;; Measure the execution time of a specified function for every call.
+;; Optionally, you might give a parameter name of the function you specified to
+;; record what value is passed to the function.
+(dolist
+    (funcarg
+     '(
+       (load file)
+       (require feature)
+       ))
+  (eval `(initchart-record-execution-time-of ,(car funcarg) ,(cadr funcarg))))
+
+(require 'my-init)
+
 ;;;
 ;;; パッケージ
 ;;;
