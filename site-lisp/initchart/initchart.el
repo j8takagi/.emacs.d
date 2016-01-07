@@ -134,13 +134,13 @@
                                                      (x          (* scale-width (- start-time time-offset)))
                                                      (y          (* scale-height level))
                                                      (width      (* scale-width (- end-time start-time))))
-                                                (format "<g><rect x=\"%.3f\" y=\"%.1f\" width=\"%f\" height=\"%f\" fill=\"hsl(%f, 100%%, 35%%)\"/><text x=\"%.3f\" y=\"%.1f\">%s</text></g>"
+                                                (format "<g><rect x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\" fill=\"hsl(%d, 100%%, 35%%)\"/><text x=\"%d\" y=\"%d\">%s</text></g>"
                                                         x y width scale-height (* 240 (exp (* -0.01 width)))  ; rect
                                                         x (+ y scale-height) name  ; text
                                                         ))))
                           (mapconcat #'identity
-                                     `(,(format "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" baseProfile=\"full\" viewBox=\"-100 %d %d %d\" width=\"1000px\">"
-                                                (- canvas-height 500) (+ canvas-width 900) canvas-height)
+                                     `(,(format "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" baseProfile=\"full\" viewBox=\"%d %d %d %d\" width=\"%dpx\" height=\"%dpx\">"
+                                                -100 0 (+ canvas-width 500) canvas-height 1000 (/ (* 1000 canvas-height) canvas-width))
                                        "<style>"
                                        "  line.major { stroke: black; stroke-width: 2; }"
                                        "  line.minor { stroke: gray;  stroke-width: 1; stroke-dasharray: 5, 5; }"
@@ -154,16 +154,16 @@
                                        ,@(mapcar (lambda (i)
                                                    (let ((x (/ (* 1000 i) 10)))
                                                      (concat
-                                                      (format "<line class=\"minor\" x1=\"%d\" y1=\"%.1f\" x2=\"%d\" y2=\"%.1f\"/>"
+                                                      (format "<line class=\"minor\" x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\"/>"
                                                               x 0
                                                               x canvas-height)
-                                                      (format "<text class=\"minor\" x=\"%d\" y=\"%.1f\">%.1f</text>"
+                                                      (format "<text class=\"minor\" x=\"%d\" y=\"%d\">%.1f</text>"
                                                               x canvas-height
                                                               (/ x 1000.0)))))
                                                  (number-sequence 0 (ceiling (* 10 (- time-max time-offset)))))
                                        ,@(mapcar (lambda (i)
                                                    (let ((x (* 1000 i)))
-                                                     (format "<line class=\"major\" x1=\"%d\" y1=\"%.1f\" x2=\"%d\" y2=\"%.1f\"/>"
+                                                     (format "<line class=\"major\" x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\"/>"
                                                              x 0
                                                              x canvas-height)))
                                                  (number-sequence 0 (- (ceiling (- time-max time-offset)) 1)))
