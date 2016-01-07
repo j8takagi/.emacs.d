@@ -126,7 +126,8 @@
                              (scale-width     1000)
                              (scale-height    100)
                              (canvas-width     (* scale-width (- time-max time-min)))
-                             (canvas-height    (* scale-height level-max)))
+                             (canvas-height    (* scale-height level-max))
+                             (view-size-ratio 0.4))
                         (cl-flet ((render-log (log level)
                                               (let* ((name       (nth 0 log))
                                                      (start-time (nth 1 log))
@@ -140,7 +141,7 @@
                                                         ))))
                           (mapconcat #'identity
                                      `(,(format "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" baseProfile=\"full\" viewBox=\"%d %d %d %d\" width=\"%dpx\" height=\"%dpx\">"
-                                                -100 0 (+ canvas-width 500) canvas-height 1000 (/ (* 1000 canvas-height) canvas-width))
+                                                -100 0 (+ canvas-width 1000) canvas-height (* canvas-width view-size-ratio) (* canvas-height view-size-ratio))
                                        "<style>"
                                        "  line.major { stroke: black; stroke-width: 2; }"
                                        "  line.minor { stroke: gray;  stroke-width: 1; stroke-dasharray: 5, 5; }"
