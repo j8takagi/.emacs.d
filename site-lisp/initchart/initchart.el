@@ -125,9 +125,14 @@
                              (time-offset     time-min)
                              (scale-width     1000)
                              (scale-height    100)
-                             (canvas-width     (* scale-width (- time-max time-min)))
+                             (margin-left     100)
+                             (margin-right    900)
+                             (margin-top      50)
+                             (margin-bottom   0)
+                             (canvas-width-margin (+ (+ (* scale-width (- time-max time-min)) margin-left) margin-right))
                              (canvas-height    (* scale-height level-max))
-                             (view-size-ratio 0.4))
+                             (canvas-height-margin (+ (+ (* scale-height level-max) margin-top) margin-bottom))
+                             (view-size-ratio 0.25))
                         (cl-flet ((render-log (log level)
                                               (let* ((name       (nth 0 log))
                                                      (start-time (nth 1 log))
@@ -141,7 +146,7 @@
                                                         ))))
                           (mapconcat #'identity
                                      `(,(format "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" baseProfile=\"full\" viewBox=\"%d %d %d %d\" width=\"%dpx\" height=\"%dpx\">"
-                                                -100 0 (+ canvas-width 1000) canvas-height (* canvas-width view-size-ratio) (* canvas-height view-size-ratio))
+                                                (- 0 margin-left) (- 0 margin-top) canvas-width-margin canvas-height-margin (* canvas-width-margin view-size-ratio) (* canvas-height-margin view-size-ratio))
                                        "<style>"
                                        "  line.major { stroke: black; stroke-width: 2; }"
                                        "  line.minor { stroke: gray;  stroke-width: 1; stroke-dasharray: 5, 5; }"
