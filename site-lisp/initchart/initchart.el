@@ -157,6 +157,8 @@
                                        "  rect:hover { opacity: 1; stroke: black; stroke-width: 2; }"
                                        "  rect:hover + text { visibility: visible; }"
                                        "</style>"
+                                       ,(format "<text class=\"major\" x=\"0\" y=\"0\">start at %s</text>"
+                                                (format-time-string "%Y/%m/%d %T" before-init-time))
                                        ,@(mapcar (lambda (i)
                                                    (let ((x (/ (* 1000 i) 10)))
                                                      (concat
