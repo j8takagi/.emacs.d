@@ -12,7 +12,8 @@ RSYNCEXCLUDE := --exclude "Makefile*" --exclude "set-compile.el*"
 GREPV := grep -v
 CLEAN.rsync := $(GREPV) "^\(sent\)\|\(total\)\|\(sending\)\|\(./\)"
 ECHO := echo
-MKDIR := mkdir
+MKDIR := mkdir -p
+TEST := test
 
 INSTALL-SITELISP := ~/.emacs.d/site-lisp
 
@@ -21,7 +22,7 @@ INSTALL-SITELISP := ~/.emacs.d/site-lisp
 all: $(ELCFILES)
 
 $(INSTALL-SITELISP)/$(PACKAGENAME): $(INSTALL-SITELISP)
-	$(MKDIR) $@
+	@(if $(TEST) ! -e $@; then $(MKDIR) $@; fi)
 
 install: $(INSTALL-SITELISP)/$(PACKAGENAME) all
 	@($(ECHO) "Installing $(PACKAGENAME) to $(INSTALL-SITELISP)/$(PACKAGENAME)"; $(RSYNC) $(RSYNCFLAG) $(RSYNCEXCLUDE) ./ $(INSTALL-SITELISP)/$(PACKAGENAME)/ | $(CLEAN.rsync))
