@@ -132,9 +132,7 @@
         (if (fboundp func)
             (message "Info: function `%s' is already defined." func)
           (condition-case err
-              (progn
-                (autoload func file doc 1)
-                (add-to-list 'funcs func))
+              (add-to-list 'funcs (autoload func file doc 1))
             (error (message "Warning: Fails to set autoload %s from %s.\n%s: %s"
                             func file (car err) (cadr err))))))))
   (message "Autoload functions set in init.el - %s" (reverse funcs)))
@@ -213,7 +211,7 @@
 )
 
 ;; フレームの設定
-(unless (equal window-system nil)
+(unless (null window-system)
   (dolist                               ; フレームパラメーター
       (val
        '(
@@ -241,8 +239,8 @@
         ("." . "~/backup")
         ))
    (let ((dir (expand-file-name (cdr ptndir))))
-     (if (not (file-directory-p dir))
-         (message "Warning: Backup directory `%s' is NOT exist." dir)
+     (if (not (car (file-attributes dir)))
+         (message "Warning: backup directory `%s' is not exist or not directory." dir)
        (setcdr ptndir dir)
        (add-to-list 'backup-directory-alist ptndir))))
 
@@ -261,7 +259,7 @@
           ))
      (let ((fullpath (expand-file-name path)))
        (if (not (car (file-attributes fullpath)))
-           (message "Warning: Info path `%s' is not exist or not directory." path)
+           (message "Warning: info path `%s' is not exist or not directory." path)
          (add-to-list 'Info-directory-list fullpath 1))))))
 
 ;; dired
@@ -584,10 +582,7 @@
        ("M-p" call-last-kbd-macro)
        ("RET" newline-and-indent)
        ))
-  (let ((key (car mapkeys)) (func (nth 1 mapkeys)))
-    (if (not (fboundp func))
-        (message "Warning: In setting keybind, function `%s' is void." func)
-      (global-set-key (kbd key) func))))
+  (my-init-global-set-key (car mapkeys) (cadr mapkeys)))
 
 ;; ffap（find file at point）のキーバインド
 (ffap-bindings)
@@ -644,32 +639,7 @@
          ("Q" my-ediff-quit)
          ))
        ))
-  (let ((lib (car list)) (hook (nth 1 list))
-         (modemap (nth 2 list)) (mapkeys (nth 3 list)))
-    (eval-after-load lib
-      (cond
-       ((null hook)
-        `(dolist (map ',mapkeys)
-           (let ((key (car map)) (func (nth 1 map)))
-             (if (not (fboundp func))
-                 (message "Warning: In setting %s keybind, function `%s' is void."
-                          ,modemap func)
-               (define-key ,modemap (kbd key) func)))))
-       (t
-        (let* ((modemap-name (symbol-name modemap))
-              (func-init-keybind (read (concat "my-init-" modemap-name "-keybind"))))
-          (fset
-           func-init-keybind
-           `(lambda ()
-              (dolist
-                  (map ',mapkeys)
-                (let ((key (car map)) (func (nth 1 map)))
-                  (if (not (functionp func))
-                      (message
-                       "Warning: In setting %s, function `%s' is not defined."
-                       ,modemap-name func)
-                    (define-key ,modemap (kbd key) func))))))
-          `(add-hook ',hook ',func-init-keybind)))))))
+  (my-init-modemap-set-key (car list) (nth 1 list) (nth 2 list) (nth 3 list)))
 
 ;;
 ;; システムごとの初期化ファイルの設定
@@ -688,9 +658,8 @@
        (window-system w32 init-w32)
        (system-name-simple "tiger" init-tiger)
        ))
-   (let ((func (car condi)) (sys (nth 1 condi)) (feat (nth 2 condi)))
-     (when (equal (eval func) sys)
-       (my-init-require feat))))
+  (when (equal (eval (car condi)) (nth 1 condi))
+    (my-init-require (nth 2 condi))))
 
 ;; Emacs変数exec-pathに、環境変数PATHの内容を設定
 (when (member window-system '(x mac ns))

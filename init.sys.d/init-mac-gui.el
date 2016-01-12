@@ -1,5 +1,6 @@
 ;; -*- mode: Emacs-Lisp; -*-
 ;; Mac OS X 非terminal 用の設定
+(require 'my-init)
 
 ;; Mac OS Xのpath_helperでPATHを取得し、あらためてPATHとして設定
 (let ((shell-file-name "/bin/bash"))
@@ -9,7 +10,7 @@
 
 ;; 環境変数の設定
 (dolist
-    (list
+    (envval
      '(
        ("LANG" "en_US.UTF-8")
        ("PAGER" "cat")
@@ -17,8 +18,7 @@
        ("EDITOR" "emacsclient")
        ("VISUAL" "emacsclient")
        ))
-  (let ((var (car list)) (val (nth 1 list)))
-    (setenv var val)))
+  (setenv (car envval) (cadr envval)))
 
 ;; 標準のフォントサイズとフォントファミリーの設定
 (set-face-attribute 'default nil
@@ -27,20 +27,13 @@
 
 ;; キャラクターセットごとにフォントファミリーを設定
 (dolist
-    (list
+    (charfont                           ; キャラクターセットごとのフォントファミリー
      '(
        (jisx0201 "Osaka")
        (japanese-jisx0213.2004-1 "Hiragino Kaku Gothic ProN")
        (japanese-jisx0213-2 "Hiragino Kaku Gothic ProN")
        ))
-  (let ((charset (car list))
-        (fontfamily (nth 1 list)))
-    (cond
-     ((not (member charset charset-list))
-        (message "Character set %s is not found." charset))
-     ((not (member fontfamily (font-family-list)))
-        (message "Font family %s is not found." fontfamily))
-     ((set-fontset-font t charset (font-spec :family fontfamily))))))
+  (my-init-set-fontfamily (car charfont) (cadr charfont)))
 
 ;; commandキーをEmacsのMetaキーに
 (setq mac-command-modifier 'meta)
@@ -49,15 +42,12 @@
 (mac-auto-ascii-mode 1)
 
 ;; Mac OS Xのキー設定
-(dolist
-    (map
+(dolist                                 ; グローバルのキーバインド
+    (mapkeys
      '(
        ("<M-f1>" other-frame)    ; Mac OS Xの他アプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする
-       ))
-  (let ((key (car map)) (func (nth 1 map)))
-    (if (not (functionp func))
-        (message "%s is not defined." func)
-      (global-set-key (kbd key) func))))
+      ))
+  (my-init-global-set-key (car mapkeys) (cadr mapkeys)))
 
 (cd "~")
 
