@@ -1,9 +1,9 @@
 ;;; ert-mode.el ---
 
-;; Copyright (C) 2015 by Kazuhito Takagi
+;; Copyright (C) 2016 by Kazuhito Takagi
 
 ;; Authors: Kazuhito Takagi
-;; Keywords: mpv transcription
+;; Keywords: ert erd database
 
 ;;; Commentary:
 
