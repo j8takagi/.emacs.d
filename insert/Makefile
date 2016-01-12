@@ -12,7 +12,7 @@ emacs-dir := ~/.emacs.d
 all: $(addsuffix c,$(wildcard *.el))
 
 install: all $(emacs-dir)/insert
-	$(RSYNC) $(RSYNCFLAG) --exclude='set-compile.el*' --exclude='load-abbrev.el*' *.el *.elc $(emacs-dir)/insert/ | $(CLEAN.rsync)
+	$(RSYNC) $(RSYNCFLAG) --exclude='set-compile.el*' --exclude='load-abbrev.el*' *.el *.elc template.* $(emacs-dir)/insert/ | $(CLEAN.rsync)
 
 $(emacs-dir)/insert:
 	$(MKDIR) $@
