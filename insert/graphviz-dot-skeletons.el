@@ -20,8 +20,5 @@
   ?\n
   )
 
-;; Autoinserting
-(define-auto-insert 'graphviz-dot-mode 'graphviz-dot-template)
-
 (provide 'graphviz-dot-skeletons)
 ;;; graphviz-dot-skeletons.el ends here

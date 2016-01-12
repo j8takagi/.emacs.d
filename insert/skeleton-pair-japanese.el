@@ -11,9 +11,6 @@
 ;;; Code:
 (require 'skeleton)
 
-;; skeleton-pairにより括弧挿入を自動化
-(setq skeleton-pair 1)
-
 ;; 日本語の括弧ペアを定義
 (dolist
     (pair

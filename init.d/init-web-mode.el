@@ -1,5 +1,4 @@
 (require 'web-mode)
-(require 'skeleton)
 
 ;; web-modeのface設定
 (custom-set-faces
@@ -15,13 +14,6 @@
 (defun web-mode-init ()
   "Set configuration to Hooks for Web mode."
   (setq web-mode-markup-indent-offset 0))
-
-(eval-after-load "skeleton"
-  (progn
-    (setq skeleton-pair 1)
-    (dolist
-        (key '("<" "'"))
-      (define-key web-mode-map (kbd key) 'skeleton-pair-insert-maybe))))
 
 (add-hook 'web-mode-hook 'web-mode-init)
 (provide 'init-web-mode)

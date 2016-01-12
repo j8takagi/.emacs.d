@@ -52,8 +52,6 @@
   > "())" ?\n
   )
 
-;; Autoinserting
-(define-auto-insert "\\.el\\'" 'emacs-lisp-template)
 
 (provide 'emacs-lisp-skeletons)
 ;;; emacs-lisp-skeletons.el ends here

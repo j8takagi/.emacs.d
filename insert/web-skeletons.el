@@ -584,8 +584,5 @@
   _ n
   "</th>" n)
 
-;; Autoinserting
-(define-auto-insert "\\.[sx]?html?\\(\\.[a-zA-Z_]+\\)?\\'" 'web-template)
-
 (provide 'web-skeletons)
 ;;; web-skeletons.el ends here

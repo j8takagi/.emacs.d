@@ -326,9 +326,26 @@
  '(auto-insert-query nil)
  '(auto-insert-alist nil))
 
+;; skeletonにより、プロンプトで補完入力したファイル名を挿入
 (my-init-require 'skeleton-file-name)
 
+;; skeleton-pairにより括弧挿入を自動化
+(setq skeleton-pair 1)
+
+;; 日本語の括弧についてのskeleton-pair設定
 (my-init-require 'skeleton-pair-japanese)
+
+;; モードごとのskeleton-pair設定
+(dolist
+    (modekey                            ; モードごとのskeleton-pairを設定するキー
+     '(
+       ("cc-mode" c-mode-map ("'"))
+       ("web-mode" web-mode-map ("<" "'"))
+       ("nxml-mode" nxml-mode-map ("<" "'"))
+       ))
+  (dolist (key (nth 2 modekey))
+    (eval-after-load (car modekey)
+      `(define-key ,(nth 1 modekey) ,(kbd key) 'skeleton-pair-insert-maybe))))
 
 (dolist                            ; モードごとのautoinsert設定
     (libskel
@@ -343,6 +360,19 @@
   (let ((lib (car libskel)) (skel (nth 1 libskel)))
     (eval-after-load lib
       `(my-init-require ',skel))))
+
+(dolist
+    (conditact
+     '(
+       ("lisp-mode" "\\.el\\'" 'emacs-lisp-template)
+       ("graphviz-dot-mode" 'graphviz-dot-mode 'graphviz-dot-template)
+       ("cc-mode" "\\.h\\'" 'h-template)
+       ("tex-mode" 'latex-mode 'latex-template)
+       ("web-mode" "\\.[sx]?html?\\(\\.[a-zA-Z_]+\\)?\\'" 'web-template)
+       ("mpv-ts-mode" 'mpv-ts-mode "template.ts")
+       ))
+  (eval-after-load (car conditact)
+    `(define-auto-insert ,(nth 1 conditact) ,(nth 2 conditact))))
 
 ;; emacsclient
 (eval-after-load 'server

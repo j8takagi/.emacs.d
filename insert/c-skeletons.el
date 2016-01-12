@@ -19,11 +19,18 @@
   "**/" ?\n
   )
 
+(define-skeleton c-if
+  "if statement in c-mode."
+  > "if(" _ ") {" ?\n
+  > ?\n
+  > "}" ?\n
+  )
+
 (define-skeleton c-elseif
   "else if statement in c-mode."
   > "else if(" _ ") {" ?\n
   > ?\n
-  "}" ?\n
+  > "}" ?\n
   )
 
 (define-skeleton c-else

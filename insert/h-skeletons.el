@@ -19,7 +19,5 @@
   "#endif        /* end of " h-template-file-name "_INCLUDE */" n
   )
 
-(define-auto-insert "\\.h\\'" 'h-template)
-
 (provide 'h-skeletons)
 ;;; h-skeletons.el ends here

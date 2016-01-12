@@ -134,9 +134,6 @@
   "\\end{eqnarray*}"
   )
 
-;; Autoinserting
-(define-auto-insert 'latex-mode 'latex-template)
-
 ;; Skeletons as Abbrev Expansions
 (dolist (
          list
