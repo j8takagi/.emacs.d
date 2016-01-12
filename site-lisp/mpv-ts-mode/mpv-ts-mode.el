@@ -1,4 +1,4 @@
-;;; mpv-ts.el --- 
+;;; mpv-ts-mode.el --- 
 
 ;; Copyright (C) 2015 by Kazuhito Takagi
 
@@ -10,25 +10,37 @@
 
 ;;; Code:
 
-(defgroup mpv-ts nil
+(defgroup mpv-ts-mode nil
   "Transcription using mpv."
+  :prefix "mpv-ts-"
   :group 'wp)
 
 (defcustom mpv-ts-default-pace 5
   "再生ペースの初期値。秒単位。時刻挿入時と再生時に用いられる"
-  :group 'mpv-ts)
+  :group 'mpv-ts-mode)
 
 (defcustom mpv-ts-speakers nil
   "発言者のリスト"
-  :group 'mpv-ts)
+  :group 'mpv-ts-mode)
 
 (defcustom mpv-ts-speakers-string nil
   "発言者のリストの文字列"
-  :group 'mpv-ts)
+  :group 'mpv-ts-mode)
+
+(make-variable-buffer-local 'mpv-ts-speakers-string)
+(put 'mpv-ts-speakers-string 'safe-local-variable 'string-or-null-p)
 
 (defcustom mpv-ts-audio-file nil
   "再生する音声ファイル"
-  :group 'mpv-ts)
+  :group 'mpv-ts-mode)
+
+(make-variable-buffer-local 'mpv-ts-audio-file)
+(put 'mpv-ts-audio-file 'safe-local-variable 'string-or-null-p)
+
+(defcustom mpv-ts-mode-hook nil
+  "Normal hook when entering `mpv-ts-mode'."
+  :type 'hook
+  :group 'mpv-ts-mode)
 
 (defvar mpv-ts-time-pattern
   "\\(\\([0-9]\\{1,2\\}\\):\\([0-9]\\{1,2\\}\\):\\([0-9]\\{1,2\\}\\)\\)"
@@ -360,6 +372,24 @@
       (mpv-ts-join-line-or-delete-time-buffer)
       (mpv-ts-delete-local-variables))))
 
+;;; Font lock
+(require 'font-lock)
+
+(defgroup mpv-ts-faces nil
+  "Faces used in MPV TS Mode"
+  :group 'mpv-ts-mode
+  :group 'faces)
+
+(defface mpv-ts-time-speaker-face
+  '((t (:bold nil :foreground "navy")))
+  "face for time in transcription."
+  :group 'mpv-ts-mode)
+
+(defface mpv-ts-unknown-tag-face
+  '((t (:bold t :foreground "red")))
+  "face for unknown tag."
+  :group 'mpv-ts-mode)
+
 (defun mpv-ts-mode ()
   "This mode is for transcription using mpv."
   (interactive)
@@ -387,6 +417,12 @@
           (message "Warning: function `%s' is NOT defined." func)
         (define-key mpv-ts-mode-map (kbd key) func))))
   (use-local-map mpv-ts-mode-map)
+  (setq font-lock-defaults
+        '((
+          ("^\\[[0-9]+:[0-5][0-9]:[0-5][0-9]\\] [^ ]*: " . 'mpv-ts-time-speaker-face)
+          ("【不明:.*?】" . 'mpv-ts-unknown-tag-face)
+          ("^[ \\t]*;.+$" . 'font-lock-comment-face)
+          )))
   (dolist
       (hook
        '(
@@ -394,5 +430,5 @@
          ))
     (add-hook hook 'mpv-ts-delete-process-window-unless-mpv-ts)))
 
-(provide 'mpv-ts)
-;;; mpv-ts.el ends here
+(provide 'mpv-ts-mode)
+;;; mpv-ts-mode.el ends here
