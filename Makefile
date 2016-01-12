@@ -13,7 +13,7 @@ COMPILE.el := $(EMACS) -batch -l set-compile.el -f batch-byte-compile
 CLEAN.rsync := $(GREPV) "^\(sent\)\|\(total\)\|\(sending\)"
 INSTALLDIR := ~/.emacs.d
 
-.PHONY: all init site-lisp install install-init.d install-init.sys.d install-site-lisp
+.PHONY: all init site-lisp install install-init.d install-init.sys.d install-site-lisp check test
 
 all: init init.d init.sys.d insert install-site-lisp
 
@@ -71,6 +71,11 @@ $(INSTALLDIR):
 
 %.elc: %.el
 	$(COMPILE.el) $<
+
+check: test
+
+test:
+	$(MAKE) -sC test
 
 distclean: clean
 

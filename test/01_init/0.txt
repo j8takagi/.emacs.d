@@ -1,0 +1,1 @@
+End of loading init.el.
