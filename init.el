@@ -361,7 +361,7 @@
       `(my-init-require ',skel))))
 
 (dolist
-    (conditact
+    (modetemplate
      '(
        ("lisp-mode" "\\.el\\'" 'emacs-lisp-template)
        ("graphviz-dot-mode" 'graphviz-dot-mode 'graphviz-dot-template)
@@ -370,8 +370,8 @@
        ("web-mode" "\\.[sx]?html?\\(\\.[a-zA-Z_]+\\)?\\'" 'web-template)
        ("mpv-ts-mode" 'mpv-ts-mode "template.ts")
        ))
-  (eval-after-load (car conditact)
-    `(define-auto-insert ,(nth 1 conditact) ,(nth 2 conditact))))
+  (eval-after-load (car modetemplate)
+    `(define-auto-insert ,(nth 1 modetemplate) ,(nth 2 modetemplate))))
 
 ;; emacsclient
 (eval-after-load 'server
@@ -651,7 +651,7 @@
   "The simple host name of the machine Emacs is running on, which is without domain information.")
 
 (dolist                                 ; システムごとの初期化ライブラリー
-     (condi
+     (syslib
      '(
        (system-type gnu/linux init-linux)
        (system-type darwin init-darwin)
@@ -660,8 +660,8 @@
        (window-system w32 init-w32)
        (system-name-simple "tiger" init-tiger)
        ))
-  (when (equal (eval (car condi)) (nth 1 condi))
-    (my-init-require (nth 2 condi))))
+  (when (equal (eval (car syslib)) (nth 1 syslib))
+    (my-init-require (nth 2 syslib))))
 
 ;; Emacs変数exec-pathに、環境変数PATHの内容を設定
 (when (member window-system '(x mac ns))
