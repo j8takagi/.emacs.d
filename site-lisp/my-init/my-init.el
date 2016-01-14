@@ -87,5 +87,28 @@ If function in MAPKEYS is void, warning message is printed into the `*Messages' 
     (message "Warning: font family %s is not available." fontfamily))
    ((set-fontset-font t charset (font-spec :family fontfamily)))))
 
+(defun my-init-set-autoload (function file doc)
+  "Define FUNCTION to autoload from FILE by autoload function.
+If FUNCTION is void or FILE is not found, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
+  (let (res)
+    (if (not (locate-library file))
+        (message "Warning: In setting autoload functions, library file `%s' autoloaded from `%s' is not found." file function)
+      (if (fboundp function)
+          (message "Info: In setting autoload functions, function `%s' is already defined." function)
+        (condition-case err
+            (setq res (autoload function file doc 1))
+          (error
+           (message "Warning: In setting autoload functions, fails to set autoload %s from %s.\n%s: %s"
+                    function file (car err) (cadr err))))))
+    res))
+
+(defun my-init-set-hook (hook function)
+  "Add FUNCTION to HOOK by add-hook function.
+If FUNCTION or HOOK is void, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
+  (cond
+   ((not (boundp hook)) (message "Warning: In setting hooks, hook `%s' is void." hook))
+   ((not (fboundp function)) (message "Warning: In setting hooks, function `%s' is void." function))
+   (t
+    (add-hook hook function))))
 (provide 'my-init)
 ;;; my-init.el ends here

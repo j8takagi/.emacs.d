@@ -127,15 +127,9 @@
          (svg-clock "svg-clock" "Start/stop svg-clock")
          (ucs-normalize-NFC-buffer "ucs-normalize-plus" "Normalize current buffer by the Unicode NFC.")
          ))
-    (let ((func (car funcfile)) (file (nth 1 funcfile)) (doc (nth 2 funcfile)))
-      (if (not (locate-library file))
-          (message "Warning: library file `%s' autoloaded from `%s' is not found." file func)
-        (if (fboundp func)
-            (message "Info: function `%s' is already defined." func)
-          (condition-case err
-              (add-to-list 'funcs (autoload func file doc 1))
-            (error (message "Warning: Fails to set autoload %s from %s.\n%s: %s"
-                            func file (car err) (cadr err))))))))
+    (add-to-list
+     'funcs
+     (my-init-set-autoload (car funcfile) (nth 1 funcfile) (nth 2 funcfile))))
   (message "Autoload functions set in init.el - %s" (reverse funcs)))
 
 ;;
