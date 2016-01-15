@@ -110,5 +110,19 @@ If FUNCTION or HOOK is void, warning message is printed into the `*Messages' buf
    ((not (fboundp function)) (message "Warning: In setting hooks, function `%s' is void." function))
    (t
     (add-hook hook function))))
+
+(defun my-init-overwrite-auto-mode-alist (mode-to mode-from)
+  "Over write auto-mode-alist from one mode to anothor mode.
+If MODE-TO or MODE-FROM is void, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
+  (let (conscell)
+    (cond
+     ((not (fboundp mode-to))
+      (message "Warning: In setting auto-mode-alist, mode `%s' overwritten to is void function." mode-to))
+     ((not (fboundp mode-from))
+      (message "Warning: In setting auto-mode-alist, mode `%s' overwritten from is void function." mode-from))
+     (t
+      (while (setq conscell (rassq mode-from auto-mode-alist))
+        (setcdr conscell mode-to))))))
+
 (provide 'my-init)
 ;;; my-init.el ends here

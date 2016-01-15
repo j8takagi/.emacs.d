@@ -473,18 +473,12 @@
 ;; auto-mode-alist
 ;; 既存のモード設定を上書きする
 (dolist                                 ; auto-mode-alistで上書きするモード
-    (mode
+    (mode-to-from
      '(
        (makefile-gmake-mode makefile-bsdmake-mode)
        (web-mode html-mode)
        ))
-  (let ((newmode (car mode)) (oldmode (cadr mode)) alist)
-    (if (or (not (fboundp oldmode)) (not (fboundp newmode)))
-        (dolist (md mode)
-          (when (not (fboundp md))
-            (message "Warning: In setting auto-mode-alist, function `%s' is void." md)))
-      (while (setq alist (rassq oldmode auto-mode-alist))
-        (setcdr alist newmode)))))
+  (my-init-overwrite-auto-mode-alist (car mode-to-from) (cadr mode-to-from)))
 
 ;; 新しいモード設定を追加する
 (dolist                                 ; auto-mode-alistに追加するモード
