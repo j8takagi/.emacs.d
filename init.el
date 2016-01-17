@@ -238,77 +238,76 @@
        (add-to-list 'backup-directory-alist (cons (car ptndir) dir)))))
 
 ;; Infoの設定
-(eval-after-load 'info
-  '(progn
-     (custom-set-variables
-      '(Info-directory-list (reverse Info-directory-list))
-      )
-     (dolist                            ; Infoのパス
-       (path
-        '(
-          "/usr/local/share/info/ja"
-          "~/share/info/ja"
-          "~/share/info"
-          ))
-     (let ((fullpath (expand-file-name path)))
-       (if (not (car (file-attributes fullpath)))
-           (message "Warning: info path `%s' is not exist or not directory." path)
-         (add-to-list 'Info-directory-list fullpath 1))))))
+(with-eval-after-load 'info
+  (custom-set-variables
+   '(Info-directory-list (reverse Info-directory-list))
+   )
+  (dolist                               ; Infoのパス
+      (path
+       '(
+         "/usr/local/share/info/ja"
+         "~/share/info/ja"
+         "~/share/info"
+         ))
+    (let (fullpath)
+      (if (not (file-directory-p (setq fullpath (expand-file-name path))))
+          (message "Warning: info path `%s' is not exist or not directory." fullpath)
+        (add-to-list 'Info-directory-list fullpath 1)))))
 
 ;; dired
-(eval-after-load 'dired
-  '(progn
-     (custom-set-variables
-      '(dired-recursive-copies 'always)  ; 確認なしにディレクトリーを再帰的にコピーする
-      )
-     (dolist
-         (feat                          ; dired用に読み込むライブラリー
-          '(
-            dired-x                     ; diredの拡張機能
-            image-dired                 ; サムネイル表示
-            sorter                      ; ソート
-            wdired                      ; ファイル名編集
-          ))
-     (my-init-require feat))))
+(with-eval-after-load 'dired
+  (custom-set-variables
+   '(dired-recursive-copies 'always)  ; 確認なしにディレクトリーを再帰的にコピーする
+   )
+  (dolist
+      (feat                          ; dired用に読み込むライブラリー
+       '(
+         dired-x                     ; diredの拡張機能
+         image-dired                 ; サムネイル表示
+         sorter                      ; ソート
+         wdired                      ; ファイル名編集
+         ))
+    (my-init-require feat)))
 
 ;; view-modeの設定
-(eval-after-load 'view
-  '(progn
-     ;; read-onlyファイルをview-modeで開く
-     (my-init-require 'init-view-mode)
-     (custom-set-variables '(view-read-only 1))
-     (my-init-require 'view-mode-vi-bindings) ;; view-modeでviのキーバインド
-     (with-current-buffer "*Messages*" (view-mode)))) ;; *Messages* バッファーを view-mode に
+(with-eval-after-load 'view
+  ;; read-onlyファイルをview-modeで開く
+  (my-init-require 'init-view-mode)
+  (custom-set-variables '(view-read-only 1))
+  (my-init-require 'view-mode-vi-bindings) ;; view-modeでviのキーバインド
+  (with-current-buffer "*Messages*" (view-mode))) ;; *Messages* バッファーを view-mode に
 
 ;; バッファ全体の濁点分離を直す
-(eval-after-load 'ucs-normalize
-  '(my-init-require 'ucs-normalize-plus))
+(with-eval-after-load 'ucs-normalize
+  (my-init-require 'ucs-normalize-plus))
 
 ;; lisp-mode
-(defun my-init-indent-lisp-indent-line () ; インデントの設定
-  (setq indent-line-function 'lisp-indent-line))
-
-(dolist
-    (func
-     '(
-       my-init-indent-lisp-indent-line
-       turn-on-auto-elc
-       ))
-  (add-hook 'emacs-lisp-mode-hook func))
+(with-eval-after-load 'lisp-mode
+  (defun my-init-indent-lisp-indent-line () ; インデントの設定
+    (setq indent-line-function 'lisp-indent-line))
+  (dolist
+      (func
+       '(
+         my-init-indent-lisp-indent-line
+         turn-on-auto-elc
+         ))
+    (add-hook 'emacs-lisp-mode-hook func)))
 
 ;; Ediff
-(custom-set-variables
- '(ediff-window-setup-function 'ediff-setup-windows-plain)
- '(ediff-split-window-function 'split-window-horizontally))
+(with-eval-after-load 'ediff
+  (custom-set-variables
+   '(ediff-window-setup-function 'ediff-setup-windows-plain)
+   '(ediff-split-window-function 'split-window-horizontally)))
 
 ;; uniquify
-(custom-set-variables
- '(uniquify-buffer-name-style 'post-forward-angle-brackets)
- '(uniquify-ignore-buffers-re "*[^*]+*"))
+(with-eval-after-load 'uniquify
+  (custom-set-variables
+   '(uniquify-buffer-name-style 'post-forward-angle-brackets)
+   '(uniquify-ignore-buffers-re "*[^*]+*")))
 
 ;; *compilation*バッファをスクロールして表示
-(eval-after-load 'compile
-  '(custom-set-variables '(compilation-scroll-output 'first-error)))
+(with-eval-after-load 'compile
+  (custom-set-variables '(compilation-scroll-output 'first-error)))
 
 ;; autoinsert
 ;; 参考 http://www.math.s.chiba-u.ac.jp/~matsu/emacs/emacs21/autoinsert.html
@@ -366,78 +365,78 @@
     `(define-auto-insert ,(nth 1 modetemplate) ,(nth 2 modetemplate))))
 
 ;; emacsclient
-(eval-after-load 'server
-  '(unless (server-running-p)
+(with-eval-after-load 'server
+  (unless (server-running-p)
      (server-start)))
 
 ;; ChangeLog
-(eval-after-load 'add-log
-  '(custom-set-variables '(change-log-default-name "~/ChangeLog")))
+(with-eval-after-load 'add-log
+  (custom-set-variables
+   '(change-log-default-name "~/ChangeLog")))
 
 ;; vc-follow-linkを無効にする
 ;; 参考 http://d.hatena.ne.jp/a_bicky/20140607/1402131090
-(eval-after-load 'vc-hooks
-  '(custom-set-variables '(vc-follow-symlinks nil)))
+(with-eval-after-load 'vc-hooks
+  (custom-set-variables '(vc-follow-symlinks nil)))
 
 ;; whitespace
-(eval-after-load 'whitespace
-  '(my-init-require 'init-whitespace))
+(with-eval-after-load 'whitespace
+  (my-init-require 'init-whitespace))
 
 ;; shell-mode
-(eval-after-load 'shell
-  '(progn
-     (custom-set-variables              ; プロンプトの表示設定
-      '(shell-prompt-pattern
-        "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ "))
-     (my-init-require 'set-process-query-on-exit)))
+(with-eval-after-load 'shell
+  (custom-set-variables              ; プロンプトの表示設定
+   '(shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ "))
+  (my-init-require 'set-process-query-on-exit))
 
 ;;; CC-Mode
-(eval-after-load 'cc-mode
-  '(progn
-     (custom-set-variables '(c-default-style "k&r"))
-     (custom-set-variables '(c-basic-offset 4))
-     (defun my-init-cc-ggtags-mode-turnon ()
-       (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-         (ggtags-mode 1)))
-     (defun my-init-require-gnu-mp ()
-       (when (derived-mode-p 'c-mode 'c++-mode)
-         (my-init-require 'gnu-mp)))
-     (dolist                            ; c-mode-common-hookに追加する関数
-         (func
-          '(
-            my-init-cc-ggtags-mode-turnon
-            my-init-require-gnu-mp
-            ))
-       (add-hook 'c-mode-common-hook func))))
+(with-eval-after-load 'cc-mode
+  (custom-set-variables
+   '(c-default-style "k&r")
+   '(c-basic-offset 4))
+  (defun my-init-cc-ggtags-mode-turnon ()
+    (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+      (ggtags-mode 1)))
+  (defun my-init-require-gnu-mp ()
+    (when (derived-mode-p 'c-mode 'c++-mode)
+      (my-init-require 'gnu-mp)))
+  (dolist                            ; c-mode-common-hookに追加する関数
+      (func
+       '(
+         my-init-cc-ggtags-mode-turnon
+         my-init-require-gnu-mp
+         ))
+    (add-hook 'c-mode-common-hook func)))
 
 ;; tex-mode
-(eval-after-load 'tex-mode
-  '(add-hook 'latex-mode-hook 'turn-on-reftex))
+(with-eval-after-load 'tex-mode
+  (add-hook 'latex-mode-hook 'turn-on-reftex))
 
 ;; web-mode
-(eval-after-load 'web-mode
-  '(my-init-require 'init-web-mode))
+(with-eval-after-load 'web-mode
+  (my-init-require 'init-web-mode))
 
 ;; ess-site > R
-(eval-after-load 'ess-site
-  '(custom-set-variables '(ess-ask-for-ess-directory nil)))
+(with-eval-after-load 'ess-site
+  (custom-set-variables '(ess-ask-for-ess-directory nil)))
 
 ;; bison-mode
-(eval-after-load 'bison-mode
-  '(custom-set-variables
-      '(bison-decl-token-column 0)
-      '(bison-rule-enumeration-column 8)))
+(with-eval-after-load 'bison-mode
+  (custom-set-variables
+   '(bison-decl-token-column 0)
+   '(bison-rule-enumeration-column 8)))
 
 (defun kill-local-compile-command ()
   (kill-local-variable 'compile-command))
 
 ;; graphviz-dot-mode
-(eval-after-load 'graphviz-dot-mode
-  '(add-hook 'graphviz-dot-mode-hook 'kill-local-compile-command))
+(with-eval-after-load 'graphviz-dot-mode
+  (add-hook 'graphviz-dot-mode-hook 'kill-local-compile-command))
 
 ;; magit
-(eval-after-load 'magit
-  '(custom-set-variables '(magit-status-buffer-switch-function 'switch-to-buffer)))
+(with-eval-after-load 'magit
+  '(custom-set-variables
+    '(magit-status-buffer-switch-function 'switch-to-buffer)))
 
 ;; mew
 (custom-set-variables '(read-mail-command 'mew))
