@@ -33,11 +33,11 @@
 (my-init-require 'package)
 
 (dolist                                 ; パッケージアーカイブ
-    (arch
+    (archive
      '(
-       ("melpa-stable" . "http://stable.melpa.org/packages/")
+       ("melpa-stable" "http://stable.melpa.org/packages/")
        ))
-  (add-to-list 'package-archives arch))
+  (add-to-list 'package-archives (cons (car archive) (cadr archive))))
 
 ;; パッケージ初期化
 (package-initialize)
@@ -198,7 +198,7 @@
  '(truncate-lines nil)         ; 継続行を表示しない
  '(truncate-partial-width-windows nil)  ; 行を切り捨てない
  '(use-dialog-box nil)                  ; ダイアログボックスは使わない
- '(user-mail-address "j8takagi@nifty.com") ; ChangeLogなどの設定
+ '(user-mail-address "j8takagi@nifty.com") ; ChangeLogなどで用いるメールアドレスの設定
  '(version-control 1)   ; バックアップファイルにバージョン番号を付ける
  '(visible-bell 1) ; エラー時、音が鳴るのではなく、画面が点滅するように
  '(yank-pop-change-selection 1)         ; yank-popを有効にする
@@ -207,14 +207,14 @@
 ;; フレームの設定
 (unless (null window-system)
   (dolist                               ; フレームパラメーター
-      (val
+      (fparam
        '(
-         (foreground-color . "black")
-         (background-color . "gray99")
-         (cursor-color . "DarkOliveGreen")
-         (cursor-type . box)
+         (foreground-color "black")
+         (background-color "gray99")
+         (cursor-color "DarkOliveGreen")
+         (cursor-type box)
          ))
-    (add-to-list 'default-frame-alist val)))
+    (add-to-list 'default-frame-alist (cons (car fparam) (cadr fparam)))))
 
 ;; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
 (dolist                                 ; 補完入力対象外の拡張子
@@ -230,13 +230,12 @@
 (dolist                                 ; バックアップ保存先
      (ptndir
       '(
-        ("." . "~/backup")
+        ("." "~/backup")
         ))
-   (let ((dir (expand-file-name (cdr ptndir))))
-     (if (not (car (file-attributes dir)))
+   (let (dir)
+     (if (not (file-directory-p (setq dir (expand-file-name (cadr ptndir)))))
          (message "Warning: backup directory `%s' is not exist or not directory." dir)
-       (setcdr ptndir dir)
-       (add-to-list 'backup-directory-alist ptndir))))
+       (add-to-list 'backup-directory-alist (cons (car ptndir) dir)))))
 
 ;; Infoの設定
 (eval-after-load 'info
@@ -459,15 +458,15 @@
 
 ;; magic-mode-alist
 (dolist                                 ; magic-mode-alistのパターン
-    (alist
+    (magic
      '(
-       ("<![Dd][Oo][Cc][Tt][Yy][Pp][Ee] [Hh][Tt][Mm][Ll]" . web-mode)
-       ("<\\?xml " . nxml-mode)
+       ("<![Dd][Oo][Cc][Tt][Yy][Pp][Ee] [Hh][Tt][Mm][Ll]" web-mode)
+       ("<\\?xml " nxml-mode)
        ))
-  (let ((mode (cdr alist)))
-    (if (not (fboundp mode))
+  (let (mode)
+    (if (not (fboundp (setq mode (cadr magic))))
         (message "Warning: In setting magic-mode-alist, function `%s' is void." mode)
-      (add-to-list 'magic-mode-alist alist 1))))
+      (add-to-list 'magic-mode-alist (cons (car magic) mode) 1))))
 
 ;; auto-mode-alist
 ;; 既存のモード設定を上書きする
@@ -481,33 +480,33 @@
 
 ;; 新しいモード設定を追加する
 (dolist                                 ; auto-mode-alistに追加するモード
-    (alist
+    (ptnmode
      '(
-       ("[Mm]akefile\\.[a-zA-Z0-9]+\\'" . makefile-gmake-mode)
-       ("\\.[rR]\\'" . R-mode)
-       ("\\.casl?\\'" . asm-mode)
-       ("\\.d\\'". makefile-gmake-mode)
-       ("\\.ert\\'" . ert-mode)
-       ("\\.euk\\'" . eukleides-mode)
-       ("\\.gp\\'" . gnuplot-mode)
-       ("\\.gv\\'" . graphviz-dot-mode)
-       ("\\.ll?\\'" . flex-mode)
-       ("\\.md\\'" . markdown-mode)
-       ("\\.re\\'" . review-mode)
-       ("\\.svg\\'" . nxml-mode)
-       ("\\.ts\\'" . mpv-ts-mode)
-       ("\\.wiki\\'" . mediawiki-mode)
-       ("\\.xml\\'" . nxml-mode)
-       ("\\.y?rb\\'" . ruby-mode)
-       ("\\.yy?\\'" . bison-mode)
-       ("\\`ja.wikipedia.org/w/index.php" . mediawiki-mode)
-       ("abbrev_defs" . emacs-lisp-mode)
-       ("cmd" . shell-script-mode)
+       ("[Mm]akefile\\.[a-zA-Z0-9]+\\'" makefile-gmake-mode)
+       ("\\.[rR]\\'" R-mode)
+       ("\\.casl?\\'" asm-mode)
+       ("\\.d\\'" makefile-gmake-mode)
+       ("\\.ert\\'" ert-mode)
+       ("\\.euk\\'" eukleides-mode)
+       ("\\.gp\\'" gnuplot-mode)
+       ("\\.gv\\'" graphviz-dot-mode)
+       ("\\.ll?\\'" flex-mode)
+       ("\\.md\\'" markdown-mode)
+       ("\\.re\\'" review-mode)
+       ("\\.svg\\'" nxml-mode)
+       ("\\.ts\\'" mpv-ts-mode)
+       ("\\.wiki\\'" mediawiki-mode)
+       ("\\.xml\\'" nxml-mode)
+       ("\\.y?rb\\'" ruby-mode)
+       ("\\.yy?\\'" bison-mode)
+       ("\\`ja.wikipedia.org/w/index.php" mediawiki-mode)
+       ("abbrev_defs" emacs-lisp-mode)
+       ("cmd" shell-script-mode)
        ))
-  (let ((mode (cdr alist)))
-    (if (not (fboundp mode))
+  (let (mode)
+    (if (not (fboundp (setq mode (cadr ptnmode))))
         (message "Warning: In setting auto-mode-alist, function `%s' is void." mode)
-      (add-to-list 'auto-mode-alist alist))))
+      (add-to-list 'auto-mode-alist (cons (car ptnmode) mode)))))
 
 ;;
 ;; キーバインド
@@ -589,7 +588,7 @@
 ;; モードごとのキーバインドを設定
 ;; リストの形式は、(mode-library mode-map-name ((key1 function1) (key2 function2)))
 (dolist                                 ; モードごとのキーバインド
-    (list
+    (modekey
      '(
        ("text-mode" nil text-mode-map
         (
@@ -628,7 +627,7 @@
          ("Q" my-ediff-quit)
          ))
        ))
-  (my-init-modemap-set-key (car list) (nth 1 list) (nth 2 list) (nth 3 list)))
+  (my-init-modemap-set-key (car modekey) (nth 1 modekey) (nth 2 modekey) (nth 3 modekey)))
 
 ;;
 ;; システムごとの初期化ファイルの設定
