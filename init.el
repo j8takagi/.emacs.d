@@ -63,7 +63,6 @@
          mew
          session
          sokoban
-         undo-tree
          web-mode
          xbm-life
          xpm
