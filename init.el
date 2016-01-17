@@ -448,10 +448,6 @@
   'mew-draft-kill
   'mew-send-hook)
 
-;; ruby-mode
-(eval-after-load 'ruby-mode
-  '(add-to-list 'interpreter-mode-alist '("ruby" . ruby-mode)))
-
 ;;
 ;; ファイルの自動判定
 ;;
