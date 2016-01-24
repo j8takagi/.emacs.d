@@ -1,38 +1,33 @@
 ;; -*- mode: Emacs-Lisp; -*-
 ;; MS-Windowsの設定
 
-;; フレームの設定
-(dolist
-    (val
-     '(
-       (width . 120)
-       (height . 34)
-       (top . 0)
-       (left . 0)
-       ))
-  (add-to-list 'default-frame-alist val))
+(require 'my-init)
 
 ;; 標準のフォントサイズとフォントファミリーの設定
 (set-face-attribute 'default nil
                     :height 120
                     :family "Consolas")
 
-;; 日本語フォントの設定
+;; 日本語フォントにメイリオ、半角カナのフォントにＭＳ ゴシックを設定
 (dolist
-    (list
+    (charfont                           ; キャラクターセットごとのフォントファミリー
      '(
        (jisx0201 "ＭＳ ゴシック")
        (japanese-jisx0213.2004-1 "メイリオ")
        (japanese-jisx0213-2 "メイリオ")
        ))
-  (let ((charset (car list))
-        (fontfamily (nth 1 list)))
-    (cond
-     ((not (member charset charset-list))
-        (message "Character set '%s' is not found." charset))
-     ((not (member fontfamily (font-family-list)))
-        (message "Font family '%s' is not found." fontfamily))
-     ((set-fontset-font t charset (font-spec :family fontfamily))))))
+  (my-init-set-fontfamily (car charfont) (cadr charfont)))
+
+;; フレームの設定
+(dolist
+    (fparam                             ; フレームパラメーター
+     '(
+       (width 120)
+       (height 34)
+       (top 0)
+       (left 0)
+       ))
+  (add-to-list 'default-frame-alist (cons (car fparam) (cadr fparam))))
 
 ;; 文字コードのデフォルトはUTF-8
 (prefer-coding-system 'utf-8-dos)
@@ -45,10 +40,10 @@
 (setenv "EDITOR" "emacsclient")
 
 ;; Shell-modeの文字コード設定
-(add-hook
- 'shell-mode-hook
- '(lambda ()
-    (set-buffer-process-coding-system 'cp932 'cp932)))
+(defun set-buffer-process-coding-system-cp932 ()
+  (set-buffer-process-coding-system 'cp932 'cp932))
+
+(add-hook 'shell-mode-hook 'set-buffer-process-coding-system-cp932)
 
 ;; IME切り替え時に undefined のエラーメッセージが表示されるのを抑制
 (global-set-key (kbd "<M-kanji>") 'ignore)
