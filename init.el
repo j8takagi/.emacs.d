@@ -645,12 +645,14 @@
     (my-init-require (nth 2 syslib))))
 
 ;; Emacs変数exec-pathに、環境変数PATHの内容を設定
-(when (member window-system '(x mac ns))
-  (setq exec-path nil)
-  (dolist
-      (dir (parse-colon-path (getenv "PATH")))
-    (when (file-directory-p dir)
-      (add-to-list 'exec-path dir t))))
+;; (when (member window-system '(x mac ns))
+;;   (let ((path (getenv "PATH")))
+;;     (message "PATH: %s" path)
+;;     (dolist
+;;         (dir (parse-colon-path path))
+;;       (if (not (file-directory-p dir))
+;;           (message "Warning: In setting exec-path from PATH, `%s' is not an existing directory." path)
+;;         (add-to-list 'exec-path dir t)))))
 
 ;; Emacs開始にかかった時間をメッセージに表示
 (defun my-init-message-startup-time ()
