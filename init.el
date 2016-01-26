@@ -277,10 +277,6 @@
   (my-init-require 'view-mode-vi-bindings) ;; view-modeでviのキーバインド
   (with-current-buffer "*Messages*" (view-mode))) ;; *Messages* バッファーを view-mode に
 
-;; バッファ全体の濁点分離を直す
-(with-eval-after-load 'ucs-normalize
-  (my-init-require 'ucs-normalize-plus))
-
 ;; lisp-mode
 (with-eval-after-load 'lisp-mode
   (defun my-init-indent-lisp-indent-line () ; インデントの設定
