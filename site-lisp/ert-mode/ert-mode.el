@@ -75,6 +75,7 @@
   ;;         (message "Warning: function `%s' is NOT defined." func)
   ;;       (define-key ert-mode-map (kbd key) func))))
   (use-local-map ert-mode-map)
+  (setq indent-line-function 'indent-relative)
   (setq font-lock-defaults
         '((
           ("#.*$" . 'ert-comment-face)
