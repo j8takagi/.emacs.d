@@ -2,12 +2,6 @@
 ;; Mac OS X 非terminal 用の設定
 (require 'my-init)
 
-;; Mac OS Xのpath_helperでPATHを取得し、あらためてPATHとして設定
-(let ((shell-file-name "/bin/bash"))
-    (setenv "PATH"
-            (shell-command-to-string
-             "eval $(/usr/libexec/path_helper -s) && printf $PATH")))
-
 ;; 環境変数の設定
 (dolist
     (envval
