@@ -32,40 +32,40 @@
 
 (defface ert-comment-face
   '((t (:bold nil :foreground "dark red")))
-  "face for comments in ERT mode."
+  "Face for comments in ERT mode."
   :group 'ert-mode)
 
 (defface ert-entity-face
   '((t (:bold t :foreground "dark green")))
-  "face for comments in ERT mode."
+  "Face for entities in ERT mode."
   :group 'ert-mode)
 
 (defface ert-attribute-face
   '((t (:bold nil :foreground "black")))
-  "face for comments in ERT mode."
+  "Face for attributes in ERT mode."
   :group 'ert-mode)
 
 (defface ert-pk-face
   '((t (:bold t :foreground "dim gray")))
-  "face for comments in ERT mode."
+  "Face for primary keys in ERT mode."
   :group 'ert-mode)
 
 (defface ert-relation-face
   '((t (:bold nil :foreground "dark green")))
-  "face for comments in ERT mode."
+  "Face for relations in ERT mode."
   :group 'ert-mode)
 
 (defface ert-colopt-face
   '((t (:bold nil :foreground "dark blue")))
-  "face for comments in ERT mode."
+  "Face for column options in ERT mode."
   :group 'ert-mode)
 
 (defun ert-mode ()
   "This mode is for editing ert files."
   (interactive)
   (setq major-mode 'ert-mode
-        mode-name "ert mode")
-  (setq ert-mode-map (make-keymap))
+        mode-name "ert mode"
+        ert-mode-map (make-keymap))
   ;; (dolist
   ;;     (map
   ;;      '(
