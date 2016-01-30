@@ -257,7 +257,9 @@
 ;; dired
 (with-eval-after-load 'dired
   (custom-set-variables
-   '(dired-recursive-copies 'always)  ; 確認なしにディレクトリーを再帰的にコピーする
+   '(dired-recursive-copies 'always)  ; diredでディレクトリーを再帰的にコピーするとき、確認しない
+   '(dired-dwim-target 1)             ; 対象ディレクトリーの推測
+   '(dired-isearch-filenames t)       ; diredでのisearchの対象をファイル名だけに
    )
   (dolist
       (feat                          ; dired用に読み込むライブラリー
@@ -347,7 +349,7 @@
     (eval-after-load lib
       `(my-init-require ',skel))))
 
-(dolist
+(dolist                                 ; モードごとのテンプレート
     (modetemplate
      '(
        ("lisp-mode" "\\.el\\'" 'emacs-lisp-template)
