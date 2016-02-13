@@ -124,6 +124,7 @@
          (review-mode "review-mode" "Re:VIEW text editing mode")
          (rubydb "rubydb3x" "ruby debug")
          (svg-clock "svg-clock" "Start/stop svg-clock")
+         (tsv-mode "tsv-mode" "Major mode for TSV files")
          (ucs-normalize-NFC-buffer "ucs-normalize-plus" "Normalize current buffer by the Unicode NFC.")
          ))
     (add-to-list
@@ -478,6 +479,7 @@
        ("[Mm]akefile\\.[a-zA-Z0-9]+\\'" makefile-gmake-mode)
        ("\\.[rR]\\'" R-mode)
        ("\\.casl?\\'" asm-mode)
+       ("\\.tsv\\'" tsv-mode)
        ("\\.d\\'" makefile-gmake-mode)
        ("\\.ert\\'" ert-mode)
        ("\\.euk\\'" eukleides-mode)
