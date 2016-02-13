@@ -521,6 +521,7 @@
        ("C-' l" windmove-right)
        ("C-," scroll-up-one-line)
        ("C-." scroll-down-one-line)
+       ("C-M-g" keyboard-escape-quit)
        ("C-`" expand-abbrev)
        ("C-c C-c" comment-region)
        ("C-c C-u" uncomment-region)
