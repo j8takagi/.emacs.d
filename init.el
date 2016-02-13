@@ -102,6 +102,7 @@
        count-japanese                   ; 日本語の文字数をカウント
        ediff-vc-plus                    ; Ediffの追加関数
        exopen                           ; 外部プログラムでファイルを開く
+       japanese-plus                    ; 全角半角変換
        not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
        scroll-one-line                  ; 1行スクロール
        temp-buffer                      ; 一時バッファの作成
