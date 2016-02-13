@@ -149,7 +149,6 @@
        (abbrev-mode 1)              ; Abbrevsを使う
        (auto-compression-mode 1)    ; 圧縮されたファイルを直接編集する
        (column-number-mode 1)       ; 列番号を表示
-       (global-auto-revert-mode 1) ; ファイルが外部で更新されたとき、バッファ自動再読み込み
        (global-font-lock-mode 1)  ; メジャーモードに合わせた色を付ける
        (line-number-mode 1)       ; 行番号を表示
        (show-paren-mode 1)        ; 括弧の対応を表示
