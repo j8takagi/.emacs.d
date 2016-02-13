@@ -120,7 +120,7 @@
          (eukleides-mode "eukleides" "Major mode for editing Eukleides files")
          (flex-mode "flex-mode" "Major mode for editing flex files")
          (mediawiki-mode "mediawiki" "Major mode for editing Mediawiki articles.")
-         (mpv-ts-mode "mpv-ts-mode" "transcription using mpv")
+         (mpv-ts-mode "mpv-ts-mode" "Major mode for editing transcription using mpv.")
          (review-mode "review-mode" "Re:VIEW text editing mode")
          (rubydb "rubydb3x" "ruby debug")
          (svg-clock "svg-clock" "Start/stop svg-clock")
