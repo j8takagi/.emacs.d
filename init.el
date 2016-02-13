@@ -201,6 +201,7 @@
  '(version-control 1)   ; バックアップファイルにバージョン番号を付ける
  '(visible-bell 1) ; エラー時、音が鳴るのではなく、画面が点滅するように
  '(yank-pop-change-selection 1)         ; yank-popを有効にする
+ '(save-interprogram-paste-before-kill 1) ; 他アプリのコピーバッファをkill-ringに保存する
 )
 
 ;; フレームの設定
