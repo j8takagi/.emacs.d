@@ -367,7 +367,9 @@
 ;; emacsclient
 (with-eval-after-load 'server
   (unless (server-running-p)
-     (server-start)))
+     (server-start))
+  (custom-set-variables
+   '(server-window 'pop-to-buffer)))
 
 ;; ChangeLog
 (with-eval-after-load 'add-log
