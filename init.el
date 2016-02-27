@@ -326,10 +326,11 @@
 (my-init-require 'skeleton-pair-japanese)
 
 ;; モードごとのskeleton-pair設定
+(define-key prog-mode-map (kbd "'") 'skeleton-pair-insert-maybe)
 (dolist
     (modekey                            ; モードごとのskeleton-pairを設定するキー
      '(
-       ("cc-mode" c-mode-map ("'"))
+       ("ert-mode" ert-mode-map ("'"))
        ("web-mode" web-mode-map ("<" "'"))
        ("nxml-mode" nxml-mode-map ("<" "'"))
        ))
