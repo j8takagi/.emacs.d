@@ -10,7 +10,7 @@
 
 ;;; Code:
 (defun japanese-plus-hankaku-region (regexp from to)
-  "Convert `zenkaku' chars in the region to `hankaku' chars."
+  "Convert REGEXP `zenkaku' chars in the region to `hankaku' chars."
   (save-restriction
     (narrow-to-region from to)
     (save-excursion
@@ -59,12 +59,6 @@
               (when zenkaku
                 (japanese-replace-region
                  (match-beginning 0) (match-end 0) zenkaku)))))))))
-
-;;;###autoload
-(defun japanese-plus-zenkaku-kana-buffer ()
-  "Convert Japanese `hankaku kana' chars in the current buffer to `zenkaku kana' chars."
-  (interactive)
-  (japanese-plus-zenkaku-kana-region (point-min) (point-max)))
 
 ;;;###autoload
 (defun japanese-plus-normal-alnum-kana-region (from to)
