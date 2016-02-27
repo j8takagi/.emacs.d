@@ -105,6 +105,7 @@
        japanese-plus                    ; 全角半角変換
        not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
        scroll-one-line                  ; 1行スクロール
+       seq                              ; 連番をつける
        temp-buffer                      ; 一時バッファの作成
        window-control                   ; ウィンドウとフレームのサイズを調整
        ))
