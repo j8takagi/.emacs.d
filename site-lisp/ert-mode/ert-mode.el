@@ -20,7 +20,10 @@
   :type 'hook
   :group 'ert-mode)
 
-(defvar ert-mode-map nil)
+(defvar ert-mode-map
+  (let ((map (make-sparse-keymap)))
+    map)
+  "Keymap for `ert-mode'.")
 
 ;;; Font lock
 (require 'font-lock)
@@ -84,7 +87,8 @@
           ("^[ \t]+\\+[^ \\[]+" . 'ert-pk-face)
           (">.+" . 'ert-relation-face)
           ("\\[.+?\\]" . 'ert-colopt-face)
-          ))))
+          )))
+  (setq comment-start "#"))
 
 (provide 'ert-mode)
 ;;; ert-mode.el ends here
