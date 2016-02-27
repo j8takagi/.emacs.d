@@ -1,4 +1,4 @@
-PACKAGENAME :=
+PACKAGENAME := "set this parameter, or error."
 
 EMACS := emacs
 COMPILE.el := $(EMACS) -batch -f batch-byte-compile
