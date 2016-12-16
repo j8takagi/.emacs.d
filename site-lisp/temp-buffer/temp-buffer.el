@@ -4,8 +4,7 @@
   (interactive)
   ;; バッファ名は現在の日時
   (switch-to-buffer
-   (generate-new-buffer
-    (concat (replace-regexp-in-string " +" "_" (current-time-string)) ".txt")))
+   (generate-new-buffer (format-time-string "%m-%d")))
   ;; text-modeを設定
   (text-mode))
 
