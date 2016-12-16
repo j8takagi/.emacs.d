@@ -24,7 +24,7 @@
 
 (defvar read-write-enable-dir-patterns
   '(
-    "~/201[4-9]_[01][0-9]"
+    "~/Documents/201[4-9]_[01][0-9]"
     "~/.emacs.d/elpa"
     "/tmp"
     )
