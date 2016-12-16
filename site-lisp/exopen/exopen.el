@@ -69,14 +69,14 @@
   "open file in external program"
   (let ((process-connection-type nil) (cmd) (cmdargs))
     (if exopen-suffix-cmd
-        (setq cmd (cdr(assoc (file-name-extension file 1) exopen-suffix-cmd))))
+        (setq cmd (cdr (assoc (file-name-extension file 1) exopen-suffix-cmd))))
     (unless cmd
       (setq cmd exopen-std-cmd)
       (setq cmdargs exopen-std-cmdargs))
     (let
         (
          (cmdstr (concat cmd " " cmdargs " \"" file "\""))
-         (proc (concat "exopen at " (format-time-string "%Y/%m/%d %H:%M:%S" (current-time)))))
+         (proc (concat "exopen at " (format-time-string "%Y/%m/%d %H:%M:%S"))))
       (message cmdstr)
       (start-process-shell-command proc nil cmdstr))))
 
