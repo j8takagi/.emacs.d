@@ -11,18 +11,18 @@
   (normal-top-level-add-subdirs-to-load-path))
 
 
-(require 'initchart)
+;; (require 'initchart)
 
-;; Measure the execution time of a specified function for every call.
-;; Optionally, you might give a parameter name of the function you specified to
-;; record what value is passed to the function.
-(dolist
-    (funcarg
-     '(
-       (load file)
-       (require feature)
-       ))
-  (eval `(initchart-record-execution-time-of ,(car funcarg) ,(cadr funcarg))))
+;; ;; Measure the execution time of a specified function for every call.
+;; ;; Optionally, you might give a parameter name of the function you specified to
+;; ;; record what value is passed to the function.
+;; (dolist
+;;     (funcarg
+;;      '(
+;;        (load file)
+;;        (require feature)
+;;        ))
+;;   (eval `(initchart-record-execution-time-of ,(car funcarg) ,(cadr funcarg))))
 
 (require 'my-init)
 
@@ -117,6 +117,7 @@
        '(
          (R-mode "ess-site" "Emacs Speaks Statistics mode")
          (bison-mode "bison-mode" "Major mode for editing bison/yacc files")
+         (crontab-mode "crontab-mode" "Major mode for editing crontab files")
          (ert-mode "ert-mode" "Major mode for editing ERT files.")
          (eukleides-mode "eukleides" "Major mode for editing Eukleides files")
          (flex-mode "flex-mode" "Major mode for editing flex files")
@@ -192,7 +193,6 @@
  '(history-length t)              ; 履歴の数を無制限に
  '(inhibit-startup-screen 1)            ; 起動時の画面を表示しない
  '(initial-scratch-message nil)   ; *scratch* にメッセージを表示しない
- '(kill-whole-line 1)          ; kill-lineのとき、改行も含めて切り取り
  '(make-backup-files 1)     ; バックアップファイルを作成する
  '(next-line-add-newlines nil) ; ファイル末尾での改行で、end of bufferエラーが発生しないように
  '(scroll-conservatively 1) ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
@@ -205,6 +205,9 @@
  '(yank-pop-change-selection 1)         ; yank-popを有効にする
  '(save-interprogram-paste-before-kill 1) ; 他アプリのコピーバッファをkill-ringに保存する
 )
+
+;; uniq-linesを、delete-duplicate-linesの別名として設定
+(defalias 'uniq-lines 'delete-duplicate-lines)
 
 ;; フレームの設定
 (unless (null window-system)
@@ -327,6 +330,7 @@
 
 ;; モードごとのskeleton-pair設定
 (define-key prog-mode-map (kbd "'") 'skeleton-pair-insert-maybe)
+(define-key lisp-mode-shared-map (kbd "'") 'self-insert-command)
 (dolist
     (modekey                            ; モードごとのskeleton-pairを設定するキー
      '(
@@ -480,7 +484,7 @@
 (dolist                                 ; auto-mode-alistに追加するモード
     (ptnmode
      '(
-       ("[Mm]akefile\\.[a-zA-Z0-9]+\\'" makefile-gmake-mode)
+       ("[Mm]akefile\\(\\.[a-zA-Z0-9]+\\)?\\'" makefile-gmake-mode)
        ("\\.[rR]\\'" R-mode)
        ("\\.casl?\\'" asm-mode)
        ("\\.tsv\\'" tsv-mode)
@@ -501,6 +505,8 @@
        ("\\`ja.wikipedia.org/w/index.php" mediawiki-mode)
        ("abbrev_defs" emacs-lisp-mode)
        ("cmd" shell-script-mode)
+       ("crontab\\(\\.[a-zA-Z0-9]+\\)?" crontab-mode)
+       ("!.+" conf-mode)
        ))
   (let (mode)
     (if (not (fboundp (setq mode (cadr ptnmode))))
@@ -529,6 +535,7 @@
        ("C-." scroll-down-one-line)
        ("C-M-g" keyboard-escape-quit)
        ("C-`" expand-abbrev)
+       ("C-c +" make-directory)
        ("C-c C-c" comment-region)
        ("C-c C-u" uncomment-region)
        ("C-c C-v" view-mode)
@@ -628,6 +635,11 @@
          ))
        ))
   (my-init-modemap-set-key (car modekey) (nth 1 modekey) (nth 2 modekey) (nth 3 modekey)))
+
+(font-lock-add-keywords 'messages-buffer-mode
+                        '(("^\\(Warning:\\) .*" 1 font-lock-warning-face t)))
+(with-current-buffer "*Messages*"
+  (font-lock-ensure))
 
 ;;
 ;; システムごとの初期化ファイルの設定
