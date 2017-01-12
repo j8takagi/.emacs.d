@@ -58,7 +58,7 @@
 
 (defun mpv-ts-second-to-time (second)
   "秒単位の数値を時刻を表す文字列 00:00:00 に変換する"
-  (format-time-string "%T" (seconds-to-time second) 1))
+  (format-time-string "%T" (seconds-to-time second) 0))
 
 (defun mpv-ts-time-to-second (time-string)
   "時刻を表す文字列 00:00:00 を秒単位の数値に変換する"
