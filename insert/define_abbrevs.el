@@ -25,6 +25,8 @@
          ("if" c-if)
          ("elseif" c-elseif)
          ("else" c-else)
+         ("for" c-for)
+         ("while" c-while)
          ))
        (emacs-lisp-mode-abbrev-table
         "lisp-mode"

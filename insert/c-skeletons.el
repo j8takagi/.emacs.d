@@ -1,4 +1,4 @@
-;;; c-skeletons.el --- 
+;;; c-skeletons.el ---
 
 ;; Copyright (C) 2014 by j8takagi
 
@@ -37,6 +37,20 @@
   "else statement in c-mode."
   > "else {" ?\n
   > _ ?\n
+  > "}" ?\n
+  )
+
+(define-skeleton c-for
+  "for statement in c-mode."
+  > "for(" _ "; ; ) {" ?\n
+  > ?\n
+  > "}" ?\n
+  )
+
+(define-skeleton c-while
+  "while statement in c-mode."
+  > "while(" _ ") {" ?\n
+  > ?\n
   > "}" ?\n
   )
 
