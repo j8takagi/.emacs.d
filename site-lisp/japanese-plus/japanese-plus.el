@@ -49,16 +49,15 @@
       (goto-char (point-min))
       (while (re-search-forward "\\ck" nil t)
         (let* ((hankaku (preceding-char))
-               (composition (get-char-code-property hankaku 'kana-composition)))
-          (if composition
-              (let ((slot (assq (following-char) composition)))
-                (when slot
-                  (japanese-replace-region
-                   (match-beginning 0) (1+ (point)) (cdr slot))))
+               (composition (get-char-code-property hankaku 'kana-composition))
+               next slot)
+          (if (and composition (setq slot (assq (following-char) composition)))
+              (japanese-replace-region (match-beginning 0) (1+ (point))
+                                       (cdr slot))
             (let ((zenkaku (japanese-zenkaku hankaku)))
-              (when zenkaku
-                (japanese-replace-region
-                 (match-beginning 0) (match-end 0) zenkaku)))))))))
+              (if zenkaku
+                  (japanese-replace-region (match-beginning 0) (match-end 0)
+                                           zenkaku)))))))))
 
 ;;;###autoload
 (defun japanese-plus-normal-alnum-kana-region (from to)
