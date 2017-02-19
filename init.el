@@ -331,20 +331,6 @@
 ;; 日本語の括弧についてのskeleton-pair設定
 (my-init-require 'skeleton-pair-japanese)
 
-;; モードごとのskeleton-pair設定
-(define-key prog-mode-map (kbd "'") 'skeleton-pair-insert-maybe)
-(define-key lisp-mode-shared-map (kbd "'") 'self-insert-command)
-(dolist
-    (modekey                            ; モードごとのskeleton-pairを設定するキー
-     '(
-       ("ert-mode" ert-mode-map ("'"))
-       ("web-mode" web-mode-map ("<" "'"))
-       ("nxml-mode" nxml-mode-map ("<" "'"))
-       ))
-  (dolist (key (nth 2 modekey))
-    (eval-after-load (car modekey)
-      `(define-key ,(nth 1 modekey) ,(kbd key) 'skeleton-pair-insert-maybe))))
-
 (dolist                            ; モードごとのautoinsert設定
     (libskel
      '(
@@ -410,11 +396,14 @@
   (defun my-init-require-gnu-mp ()
     (when (derived-mode-p 'c-mode 'c++-mode)
       (my-init-require 'gnu-mp)))
+  (defun my-init-c-disable-electric-state()
+    (c-toggle-electric-state -1))
   (dolist                            ; c-mode-common-hookに追加する関数
       (func
        '(
          my-init-cc-ggtags-mode-turnon
          my-init-require-gnu-mp
+         my-init-c-disable-electric-state
          ))
     (add-hook 'c-mode-common-hook func)))
 
@@ -596,7 +585,7 @@
   (global-unset-key (kbd key)))
 
 ;; モードごとのキーバインドを設定
-;; リストの形式は、(mode-library mode-map-name ((key1 function1) (key2 function2)))
+;; リストの形式は、(mode-library mode-hook mode-map-name ((key1 function1) (key2 function2)))
 (dolist                                 ; モードごとのキーバインド
     (modekey
      '(
@@ -635,6 +624,34 @@
        ("ediff" ediff-keymap-setup-hook ediff-mode-map
         (
          ("Q" my-ediff-quit)
+         ))
+       ("cc-mode" c-mode-common-hook c-mode-map
+        (
+         ("{" skeleton-pair-insert-maybe)
+         ("(" skeleton-pair-insert-maybe)
+         ("'" skeleton-pair-insert-maybe)
+         ))
+       (nil nil prog-mode-map
+        (
+         ("'" skeleton-pair-insert-maybe)
+         ))
+       (nil nil lisp-mode-shared-map
+        (
+         ("'" self-insert-command)
+         ))
+       ("ert-mode" nil ert-mode-map
+        (
+         ("'" skeleton-pair-insert-maybe)
+         ))
+       ("web-mode" nil web-mode-map
+        (
+         ("<" skeleton-pair-insert-maybe)
+         ("'" skeleton-pair-insert-maybe)
+         ))
+       ("nxml-mode" nil nxml-mode-map
+        (
+         ("<" skeleton-pair-insert-maybe)
+         ("'" skeleton-pair-insert-maybe)
          ))
        ))
   (my-init-modemap-set-key (car modekey) (nth 1 modekey) (nth 2 modekey) (nth 3 modekey)))
