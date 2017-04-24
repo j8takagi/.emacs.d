@@ -387,25 +387,7 @@
 
 ;;; CC-Mode
 (with-eval-after-load 'cc-mode
-  (custom-set-variables
-   '(c-default-style "k&r")
-   '(c-basic-offset 4))
-  (defun my-init-cc-ggtags-mode-turnon ()
-    (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-      (ggtags-mode 1)))
-  (defun my-init-require-gnu-mp ()
-    (when (derived-mode-p 'c-mode 'c++-mode)
-      (my-init-require 'gnu-mp)))
-  (defun my-init-c-disable-electric-state()
-    (c-toggle-electric-state -1))
-  (dolist                            ; c-mode-common-hookに追加する関数
-      (func
-       '(
-         my-init-cc-ggtags-mode-turnon
-         my-init-require-gnu-mp
-         my-init-c-disable-electric-state
-         ))
-    (add-hook 'c-mode-common-hook func)))
+  (my-init-require 'init-cc-mode))
 
 ;; tex-mode
 (with-eval-after-load 'tex-mode
@@ -414,6 +396,12 @@
 ;; web-mode
 (with-eval-after-load 'web-mode
   (my-init-require 'init-web-mode))
+
+;; nxml-mode
+(with-eval-after-load 'nxml-mode
+  (custom-set-variables
+   '(nxml-child-indent 0)
+   '(nxml-attribute-indent 0)))
 
 ;; ess-site > R
 (with-eval-after-load 'ess-site
@@ -436,6 +424,7 @@
 (with-eval-after-load 'magit
   '(custom-set-variables
     '(magit-status-buffer-switch-function 'switch-to-buffer)))
+(defvar with-editor-file-name-history-exclude 1)
 
 ;; mew
 (custom-set-variables '(read-mail-command 'mew))
