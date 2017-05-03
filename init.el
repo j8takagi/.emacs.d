@@ -358,6 +358,15 @@
   (eval-after-load (car modetemplate)
     `(define-auto-insert ,(nth 1 modetemplate) ,(nth 2 modetemplate))))
 
+(dolist                                 ; バッファごとの表示の設定
+    (bufptn
+     '(
+       "^\\*shell\\*$"
+       "^\\*magit: .+"
+       ))
+  (add-to-list 'display-buffer-alist
+               `(,bufptn . (display-buffer-same-window))))
+
 ;; emacsclient
 (with-eval-after-load 'server
   (unless (server-running-p)
