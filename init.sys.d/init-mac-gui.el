@@ -4,7 +4,7 @@
 
 ;; 環境変数の設定
 (dolist
-    (envval
+    (envval                             ; 環境変数ごとの設定値
      '(
        ("LANG" "en_US.UTF-8")
        ("PAGER" "cat")
