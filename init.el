@@ -240,7 +240,6 @@
   (dolist                               ; Infoのパス
       (path
        '(
-         "/usr/local/share/info/ja"
          "~/share/info/ja"
          "~/share/info"
          ))
