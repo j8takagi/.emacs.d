@@ -213,7 +213,7 @@
      '(
        ".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" "_prev"
         ".idx" ".ind" ".ilg" ".tmp" ".synctex.gz" ".dplg" ".dslg"
-       ".dSYM/" ".DS_Store"
+       ".dSYM/" ".DS_Store" ":com.dropbox.attributes:$DATA"
        ))
   (add-to-list 'completion-ignored-extensions ext))
 

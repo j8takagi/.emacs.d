@@ -102,6 +102,13 @@ If FUNCTION is void or FILE is not found, warning message is printed into the `*
                     function file (car err) (cadr err))))))
     res))
 
+(defun my-init-set-mode (mode)
+  "Set MODE. MODE format is assumed as `(FUNCTION 1)' to enable the mode, or `(FUNCTION 0)' to disable the mode. FUNCTION presents minor mode.
+If FUNCTION in MODE is void, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
+  (if (not (fboundp (car mode)))
+      (message "Warning: In setting minor mode, function %s is void." (car mode))
+    (eval mode)))
+
 (defun my-init-set-hook (hook function)
   "Add FUNCTION to HOOK by add-hook function.
 If FUNCTION or HOOK is void, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
