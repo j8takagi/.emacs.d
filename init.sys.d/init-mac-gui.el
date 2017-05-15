@@ -24,8 +24,8 @@
     (charfont                           ; キャラクターセットごとのフォントファミリー
      '(
        (jisx0201 "Osaka")
-       (japanese-jisx0213.2004-1 "Hiragino Kaku Gothic ProN")
-       (japanese-jisx0213-2 "Hiragino Kaku Gothic ProN")
+       (japanese-jisx0213.2004-1 "YuGothic")
+       (japanese-jisx0213-2 "YuGothic")
        ))
   (my-init-set-fontfamily (car charfont) (cadr charfont)))
 
