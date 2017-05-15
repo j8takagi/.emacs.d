@@ -407,10 +407,10 @@
    '(bison-decl-token-column 0)
    '(bison-rule-enumeration-column 8)))
 
+;; graphviz-dot-mode
 (defun kill-local-compile-command ()
   (kill-local-variable 'compile-command))
 
-;; graphviz-dot-mode
 (with-eval-after-load 'graphviz-dot-mode
   (add-hook 'graphviz-dot-mode-hook 'kill-local-compile-command))
 
@@ -418,6 +418,8 @@
 (with-eval-after-load 'magit
   '(custom-set-variables
     '(magit-status-buffer-switch-function 'switch-to-buffer)))
+
+;; Magitの「run-hooks: Symbol’s function definition is void: git-commit-setup-check-buffer」エラー対策
 (defvar with-editor-file-name-history-exclude 1)
 
 ;; mew
