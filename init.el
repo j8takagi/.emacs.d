@@ -133,17 +133,17 @@
     (mode
      '(
        ;; 有効にするマイナーモード
-       (abbrev-mode 1)              ; Abbrevsを使う
-       (auto-compression-mode 1)    ; 圧縮されたファイルを直接編集する
-       (column-number-mode 1)       ; 列番号を表示
+       (abbrev-mode 1)            ; Abbrevsを使う
+       (auto-compression-mode 1)  ; 圧縮されたファイルを直接編集する
+       (column-number-mode 1)     ; 列番号を表示
        (global-font-lock-mode 1)  ; メジャーモードに合わせた色を付ける
        (line-number-mode 1)       ; 行番号を表示
        (show-paren-mode 1)        ; 括弧の対応を表示
        (transient-mark-mode 1)    ; リージョンをハイライト
        (whitespace-mode 1)        ; 空白を強調表示
        ;; 無効にするマイナーモード
-       (blink-cursor-mode 0)        ; カーソルは点滅しない
-       (electric-indent-mode 0) ; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
+       (blink-cursor-mode 0)      ; カーソルは点滅しない
+       (electric-indent-mode 0)   ; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
        (menu-bar-mode 0)          ; メニューバーを表示しない
        (tool-bar-mode 0)          ; ツールバーを表示しない
        ))
@@ -170,28 +170,28 @@
     (custom-set-default (car varval) (cadr varval)))
 
 ;; 変数デフォルト値の設定
-(setq-default indent-line-function 'indent-to-left-margin) ; インデント用のファンクション
+(set-default 'indent-line-function 'indent-to-left-margin) ; インデント用のファンクション
 
 ;; カスタム変数の設定
 (custom-set-variables
- '(case-replace nil)           ; 置換時に大文字小文字を区別しない
- '(delete-old-versions 1) ; 古いバックアップファイルを自動的に削除する
- '(disabled-command-function nil) ; すべてのコマンドの使用制限を解除する
+ '(case-replace nil)                    ; 置換時に大文字小文字を区別しない
+ '(delete-old-versions 1)               ; 古いバックアップファイルを自動的に削除する
+ '(disabled-command-function nil)       ; すべてのコマンドの使用制限を解除する
  '(enable-recursive-minibuffers 1)      ; 再帰的にミニバッファを使う
  '(eval-expression-print-length nil)    ; evalした結果を全部表示する
- '(history-delete-duplicates 1)   ; 重複する履歴は削除
- '(history-length t)              ; 履歴の数を無制限に
+ '(history-delete-duplicates 1)         ; 重複する履歴は削除
+ '(history-length t)                    ; 履歴の数を無制限に
  '(inhibit-startup-screen 1)            ; 起動時の画面を表示しない
- '(initial-scratch-message nil)   ; *scratch* にメッセージを表示しない
- '(make-backup-files 1)     ; バックアップファイルを作成する
- '(next-line-add-newlines nil) ; ファイル末尾での改行で、end of bufferエラーが発生しないように
- '(scroll-conservatively 1) ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
- '(truncate-lines nil)         ; 継続行を表示しない
+ '(initial-scratch-message nil)         ; *scratch* にメッセージを表示しない
+ '(make-backup-files 1)                 ; バックアップファイルを作成する
+ '(next-line-add-newlines nil)          ; ファイル末尾での改行で、end of bufferエラーが発生しないように
+ '(scroll-conservatively 1)             ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
+ '(truncate-lines nil)                  ; 継続行を表示しない
  '(truncate-partial-width-windows nil)  ; 行を切り捨てない
  '(use-dialog-box nil)                  ; ダイアログボックスは使わない
  '(user-mail-address "j8takagi@nifty.com") ; ChangeLogなどで用いるメールアドレスの設定
- '(version-control 1)   ; バックアップファイルにバージョン番号を付ける
- '(visible-bell 1) ; エラー時、音が鳴るのではなく、画面が点滅するように
+ '(version-control 1)                   ; バックアップファイルにバージョン番号を付ける
+ '(visible-bell 1)                      ; エラー時、音が鳴るのではなく、画面が点滅するように
  '(yank-pop-change-selection 1)         ; yank-popを有効にする
  '(save-interprogram-paste-before-kill 1) ; 他アプリのコピーバッファをkill-ringに保存する
 )
