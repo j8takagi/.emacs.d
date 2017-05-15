@@ -10,13 +10,13 @@
 
 ;; 日本語フォントにメイリオ、半角カナのフォントにＭＳ ゴシックを設定
 (dolist
-    (charfont                           ; キャラクターセットごとのフォントファミリー
+    (charfont                           ; キャラクターセットごとのフォント属性の設定
      '(
-       (jisx0201 "ＭＳ ゴシック")
-       (japanese-jisx0213.2004-1 "游ゴシック")
-       (japanese-jisx0213-2 "游ゴシック")
+       (jisx0201 (font-spec :family "ＭＳ ゴシック"))
+       (japanese-jisx0213.2004-1 (font-spec :family "游ゴシック" :weight 'semi-bold))
+       (japanese-jisx0213-2 (font-spec :family "游ゴシック" :weight 'semi-bold))
        ))
-  (my-init-set-fontfamily (car charfont) (cadr charfont)))
+  (my-init-set-font-spec (car charfont) (eval (cadr charfont))))
 
 ;; フレームの設定
 (dolist
