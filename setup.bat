@@ -1,4 +1,3 @@
-set EMACS=C:\opt\emacs\bin\emacs
 set EMACSDIR=%HOME%\.emacs.d
 copy %EMACSDIR%\init.el %EMACSDIR%\init.el~
 copy init.el %EMACSDIR%\init.el
