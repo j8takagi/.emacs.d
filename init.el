@@ -276,7 +276,7 @@
 ;; lisp-mode
 (with-eval-after-load 'lisp-mode
   (defun my-init-indent-lisp-indent-line () ; インデントの設定
-    (setq indent-line-function 'lisp-indent-line))
+    (set-variable 'indent-line-function 'lisp-indent-line))
   (dolist
       (func
        '(
@@ -312,10 +312,10 @@
 (my-init-require 'skeleton-file-name)
 
 ;; skeleton-pairにより括弧挿入を自動化
-(setq skeleton-pair 1)
+(set-variable 'skeleton-pair 1)
 
 ;; skeletonの挿入後、改行しない
-(setq skeleton-end-hook nil)
+(set-variable 'skeleton-end-hook nil)
 
 ;; 日本語の括弧についてのskeleton-pair設定
 (my-init-require 'skeleton-pair-japanese)
