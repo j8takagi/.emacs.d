@@ -29,11 +29,12 @@
        ))
   (my-init-set-fontfamily (car charfont) (cadr charfont)))
 
-;; commandキーをEmacsのMetaキーに
-(setq mac-command-modifier 'meta)
 
-;; ミニバッファにカーソルを移動する際、自動的にキーボードをASCIIモードにする
-(mac-auto-ascii-mode 1)
+;; カスタム変数の設定
+(custom-set-variables
+ '(mac-command-modifier 'meta)        ; commandキーをEmacsのMetaキーに
+ '(mac-auto-ascii-mode 1)             ; ミニバッファへのカーソル移動時、日本語IMEを自動オフ
+ )
 
 ;; Mac OS Xのキー設定
 (dolist                                 ; グローバルのキーバインド

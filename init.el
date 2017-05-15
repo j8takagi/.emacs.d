@@ -132,24 +132,10 @@
 (dolist                                 ; マイナーモード
     (mode
      '(
-       ;; 有効にするマイナーモード
        (abbrev-mode 1)            ; Abbrevsを使う
-       (auto-compression-mode 1)  ; 圧縮されたファイルを直接編集する
-       (column-number-mode 1)     ; 列番号を表示
-       (global-font-lock-mode 1)  ; メジャーモードに合わせた色を付ける
-       (line-number-mode 1)       ; 行番号を表示
-       (show-paren-mode 1)        ; 括弧の対応を表示
-       (transient-mark-mode 1)    ; リージョンをハイライト
        (whitespace-mode 1)        ; 空白を強調表示
-       ;; 無効にするマイナーモード
-       (blink-cursor-mode 0)      ; カーソルは点滅しない
-       (electric-indent-mode 0)   ; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
-       (menu-bar-mode 0)          ; メニューバーを表示しない
-       (tool-bar-mode 0)          ; ツールバーを表示しない
        ))
-  (if (not (fboundp (car mode)))
-      (message "Warning: In setting minor mode, function %s is void." (car mode))
-    (eval mode)))
+  (my-init-set-mode mode))
 
 ;; メッセージダイアログボックスは使わない
 (defalias 'message-box 'message)
@@ -174,18 +160,29 @@
 
 ;; カスタム変数の設定
 (custom-set-variables
+ '(auto-compression-mode 1)             ; 圧縮されたファイルを直接編集する
+ '(blink-cursor-mode nil)               ; カーソルは点滅しない
  '(case-replace nil)                    ; 置換時に大文字小文字を区別しない
+ '(column-number-mode 1)                ; 列番号を表示
  '(delete-old-versions 1)               ; 古いバックアップファイルを自動的に削除する
  '(disabled-command-function nil)       ; すべてのコマンドの使用制限を解除する
+ '(electric-indent-mode nil)            ; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
  '(enable-recursive-minibuffers 1)      ; 再帰的にミニバッファを使う
  '(eval-expression-print-length nil)    ; evalした結果を全部表示する
+ '(global-font-lock-mode 1)             ; メジャーモードに合わせた色を付ける
  '(history-delete-duplicates 1)         ; 重複する履歴は削除
  '(history-length t)                    ; 履歴の数を無制限に
  '(inhibit-startup-screen 1)            ; 起動時の画面を表示しない
  '(initial-scratch-message nil)         ; *scratch* にメッセージを表示しない
+ '(line-number-mode 1)                  ; 行番号を表示
  '(make-backup-files 1)                 ; バックアップファイルを作成する
+ '(menu-bar-mode nil)                   ; メニューバーを表示しない
  '(next-line-add-newlines nil)          ; ファイル末尾での改行で、end of bufferエラーが発生しないように
+ '(save-interprogram-paste-before-kill 1) ; 他アプリのコピーバッファをkill-ringに保存する
  '(scroll-conservatively 1)             ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
+ '(show-paren-mode 1)                   ; 括弧の対応を表示
+ '(tool-bar-mode nil)                   ; ツールバーを表示しない
+ '(transient-mark-mode 1)               ; リージョンをハイライト
  '(truncate-lines nil)                  ; 継続行を表示しない
  '(truncate-partial-width-windows nil)  ; 行を切り捨てない
  '(use-dialog-box nil)                  ; ダイアログボックスは使わない
