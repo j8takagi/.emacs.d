@@ -13,8 +13,8 @@
     (charfont                           ; キャラクターセットごとのフォントファミリー
      '(
        (jisx0201 "ＭＳ ゴシック")
-       (japanese-jisx0213.2004-1 "メイリオ")
-       (japanese-jisx0213-2 "メイリオ")
+       (japanese-jisx0213.2004-1 "游ゴシック")
+       (japanese-jisx0213-2 "游ゴシック")
        ))
   (my-init-set-fontfamily (car charfont) (cadr charfont)))
 
