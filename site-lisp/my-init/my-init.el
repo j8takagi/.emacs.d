@@ -80,12 +80,15 @@ If function in MAPKEYS is void, warning message is printed into the `*Messages' 
 
 (defun my-init-set-fontfamily (charset fontfamily)
   "Use FONTFAMILY for character set CHARSET."
-  (cond
-   ((not (member charset charset-list))
-    (message "Warning: character set %s is not defined." charset))
-   ((not (member fontfamily (font-family-list)))
-    (message "Warning: In setting font family, font family %s is not available." fontfamily))
-   ((set-fontset-font t charset (font-spec :family fontfamily)))))
+  (if (not (member fontfamily (font-family-list)))
+      (message "Warning: In setting font family, font family %s is not available." fontfamily)
+    (my-init-set-font-spec charset (font-spec :family fontfamily))))
+
+(defun my-init-set-font-spec (charset fontspec)
+  "Use FONTSPEC for character set CHARSET."
+  (if (not (member charset charset-list))
+      (message "Warning: character set %s is not defined." charset)
+    (set-fontset-font t charset fontspec)))
 
 (defun my-init-set-autoload (function file doc)
   "Define FUNCTION to autoload from FILE by autoload function.
