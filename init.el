@@ -170,6 +170,12 @@
 ;; メッセージダイアログボックスは使わない
 (defalias 'message-box 'message)
 
+;; カスタム設定ファイル
+(set-variable 'custom-file "~/.emacs.d/.emacs-custom.el")
+(if (not (file-exists-p custom-file))
+    (message "Info: Custom file %s is not exist." custom-file)
+  (load custom-file))
+
 ;; カスタム変数デフォルト値の設定
 (dolist                                 ; カスタムデフォルト値
     (varval
