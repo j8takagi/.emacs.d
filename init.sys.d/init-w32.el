@@ -12,11 +12,11 @@
 (dolist
     (charfont                           ; キャラクターセットごとのフォント属性の設定
      '(
-       (jisx0201 (font-spec :family "ＭＳ ゴシック"))
-       (japanese-jisx0213.2004-1 (font-spec :family "游ゴシック" :weight 'semi-bold))
-       (japanese-jisx0213-2 (font-spec :family "游ゴシック" :weight 'semi-bold))
+       (jisx0201 "ＭＳ ゴシック")
+       (japanese-jisx0213.2004-1 "游ゴシック")
+       (japanese-jisx0213-2 "游ゴシック")
        ))
-  (my-init-set-font-spec (car charfont) (eval (cadr charfont))))
+  (my-init-set-fontfamily (car charfont) (cadr charfont)))
 
 ;; フレームの設定
 (dolist
