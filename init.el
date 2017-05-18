@@ -102,7 +102,6 @@
   (dolist                               ; autoloadする関数
       (funcfile
        '(
-         (R-mode "ess-site" "Emacs Speaks Statistics mode")
          (bison-mode "bison-mode" "Major mode for editing bison/yacc files")
          (crontab-mode "crontab-mode" "Major mode for editing crontab files")
          (ert-mode "ert-mode" "Major mode for editing ERT files.")
