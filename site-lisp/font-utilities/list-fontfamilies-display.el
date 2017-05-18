@@ -25,8 +25,7 @@ this regular expression.  When called interactively with a prefix
 argument, prompt for a regular expression using `read-regexp'."
   (interactive (list (and current-prefix-arg
                           (read-regexp "List font families matching regexp"))))
-  (let ((all (zerop (length regexp))) (max-length 0) line-format
-        setfonts currentfontset listfontset)
+  (let ((all (zerop (length regexp))) (max-length 0) line-format setfonts currentfontset)
     ;; We filter and take the max length in one pass
     (setq setfonts
           (delq nil (mapcar
@@ -40,15 +39,12 @@ argument, prompt for a regular expression using `read-regexp'."
     (setq max-length (1+ max-length)
           line-format (format "%%-%ds" max-length))
     (setq currentfontset (frame-parameter nil 'font))
-    (setq listfontset
-          (create-fontset-from-ascii-font currentfontset nil "list_fontfamilies"))
     (with-help-window "*Font families*"
       (with-current-buffer "*Font families*"
         (setq truncate-lines t)
         (dolist (afont setfonts)
-          (set-fontset-font listfontset 'unicode afont nil 'prepend)
-          (set-fontset-font listfontset 'ascii currentfontset)
-          (set-frame-font listfontset nil)
+          ;; (set-fontset-font t 'unicode afont nil 'prepend)
+          ;; (set-fontset-font t 'ascii currentfontset)
           (insert (propertize (format line-format afont) 'face (list :underline t)))
           (let ((beg (point)) (line-beg (line-beginning-position)))
             (insert (propertize list-fontfamilies-sample-text 'face (list :family afont)))
