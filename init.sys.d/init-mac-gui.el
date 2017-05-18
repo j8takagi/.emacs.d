@@ -1,6 +1,7 @@
 ;; -*- mode: Emacs-Lisp; -*-
 ;; Mac OS X 非terminal 用の設定
 (require 'my-init)
+(my-init-require 'fontset-set)
 
 ;; 環境変数の設定
 (dolist
@@ -14,13 +15,18 @@
        ))
   (setenv (car envval) (cadr envval)))
 
-;; 標準のフォントサイズとフォントファミリーの設定
-(set-face-attribute 'default nil
-                    :height 120
-                    :family "Menlo")
-
 ;;; 日本語の、全角フォントと、いわゆる半角フォントを設定
-(my-init-set-japanese-fontfamily "YuGothic" "Osaka")
+(custom-set-variables
+ '(fontset-set-charset-font-alist
+   '(
+     (ascii "Menlo")
+     (japanese-jisx0213.2004-1 "YuGothic")
+     (japanese-jisx0213-2 "YuGothic")
+     (katakana-jisx0201 "Osaka")
+     )))
+
+(fontset-set "mydefault")
+(add-to-list 'default-frame-alist '(font . "fontset-mydefault"))
 
 (defun mac-set-ime-cursor-color ()
   "IMEのオン／オフで、カーソルの色を変える"

@@ -1,15 +1,19 @@
 ;; -*- mode: Emacs-Lisp; -*-
 ;; MS-Windowsの設定
-
 (require 'my-init)
+(my-init-require 'fontset-set)
 
-;; 標準のフォントサイズとフォントファミリーの設定
-(set-face-attribute 'default nil
-                    :height 120
-                    :family "Consolas")
+;;; フォントの設定
+(custom-set-variables
+ '(fontset-set-charset-font-alist
+   '(
+     (ascii . "Consolas")
+     (japanese-jisx0213.2004-1 ."游ゴシック")
+     (japanese-jisx0213-2 . "游ゴシック")
+     (katakana-jisx0201 . "ＭＳ ゴシック")
+     )))
 
-;;; 日本語の、全角フォントと、いわゆる半角フォントを設定
-(my-init-set-japanese-fontfamily "游ゴシック" "ＭＳ ゴシック")
+(fontset-set "mydefault")
 
 ;; フレームの設定
 (dolist
@@ -19,6 +23,7 @@
        (height 34)
        (top 0)
        (left 0)
+       (font "fontset-mydefault")
        ))
   (add-to-list 'default-frame-alist (cons (car fparam) (cadr fparam))))
 
