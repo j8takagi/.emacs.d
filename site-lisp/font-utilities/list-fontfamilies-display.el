@@ -10,9 +10,11 @@
 
 ;;; Code:
 
-(defconst list-fontfamilies-sample-text
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789 !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~\nあいうえお アイウエオ 阿以右衛於"
+(defcustom list-fontfamilies-sample-text
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789 !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~\nあいうえお　アイウエオ　阿以右衛於"
   "Text string to display as the sample text for `list-fontfamilies-display'."
+  :type 'text
+  :group 'display
   )
 
 (defun list-fontfamilies-display (&optional regexp)
@@ -25,26 +27,31 @@ this regular expression.  When called interactively with a prefix
 argument, prompt for a regular expression using `read-regexp'."
   (interactive (list (and current-prefix-arg
                           (read-regexp "List font families matching regexp"))))
-  (let ((all (zerop (length regexp))) (max-length 0) line-format setfonts currentfontset)
+  (let ((all (zerop (length regexp))) (max-length 0) line-format
+        setfonts currentfontset listfontset)
     ;; We filter and take the max length in one pass
     (setq setfonts
-          (delq nil (mapcar
-                     (lambda (f)
-                       (when (or all (string-match-p regexp f))
-                         (setq max-length (max (length f) max-length))
-                         f))
-                     (sort (font-family-list) #'string-lessp))))
+          (delete-dups
+           (delq nil (mapcar
+                      (lambda (f)
+                        (when (or all (string-match-p regexp f))
+                          (setq max-length (max (length f) max-length))
+                          f))
+                      (sort (font-family-list) #'string-lessp)))))
     (unless setfonts
       (error "No font families matching \"%s\"" regexp))
     (setq max-length (1+ max-length)
           line-format (format "%%-%ds" max-length))
     (setq currentfontset (frame-parameter nil 'font))
+    (setq listfontset
+          (create-fontset-from-ascii-font currentfontset nil "list_fontfamilies"))
+    (set-frame-font listfontset nil)
     (with-help-window "*Font families*"
       (with-current-buffer "*Font families*"
         (setq truncate-lines t)
         (dolist (afont setfonts)
-          ;; (set-fontset-font t 'unicode afont nil 'prepend)
-          ;; (set-fontset-font t 'ascii currentfontset)
+          (set-fontset-font listfontset 'unicode afont)
+          (set-fontset-font listfontset 'ascii currentfontset)
           (insert (propertize (format line-format afont) 'face (list :underline t)))
           (let ((beg (point)) (line-beg (line-beginning-position)))
             (insert (propertize list-fontfamilies-sample-text 'face (list :family afont)))
@@ -55,7 +62,8 @@ argument, prompt for a regular expression using `read-regexp'."
             (while (not (eobp))
               (insert-char ?\s max-length)
               (forward-line 1))))
-        (goto-char (point-min))))))
+        (goto-char (point-min))))
+    (set-frame-font currentfontset nil)))
 
 (provide 'list-fontfamilies-display)
 ;;; list-fontfamilies-display.el ends here
