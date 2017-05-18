@@ -19,16 +19,26 @@
                     :height 120
                     :family "Menlo")
 
-;; キャラクターセットごとにフォントファミリーを設定
-(dolist
-    (charfont                           ; キャラクターセットごとのフォントファミリー
-     '(
-       (jisx0201 "Osaka")
-       (japanese-jisx0213.2004-1 "YuGothic")
-       (japanese-jisx0213-2 "YuGothic")
-       ))
-  (my-init-set-fontfamily (car charfont) (cadr charfont)))
+;;; 日本語の、全角フォントと、いわゆる半角フォントを設定
+(my-init-set-japanese-fontfamily "YuGothic" "Osaka")
 
+(defun mac-set-ime-cursor-color ()
+  "IMEのオン／オフで、カーソルの色を変える"
+  (catch 'match
+    (dolist
+        (imptn
+         '(
+           "^com\\.justsystems.inputmethod.atok[0-9]+\\.Japanese"
+           "^com\\.apple\\.inputmethod\\.Kotoeri\\.Japanese"
+           "^com\\.google\\.inputmethod\\.Japanese"
+           ))
+      (when (string-match imptn (mac-input-source))
+        (ime-cursor-set-color)
+        (throw 'match t)))
+    (ime-cursor-unset-color)))
+
+(add-hook 'mac-selected-keyboard-input-source-change-hook
+            'mac-set-ime-cursor-color)
 
 ;; カスタム変数の設定
 (custom-set-variables

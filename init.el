@@ -83,14 +83,17 @@
        ;; ~/.emacs.d/site-lisp
        auto-elc-mode                    ; .elファイルの自動コンパイル
        buffer-window-plus               ; バッファとウィンドウの操作関数を追加
+       char-font                        ; フォント情報の表示
        count-japanese                   ; 日本語の文字数をカウント
        ediff-vc-plus                    ; Ediffの追加関数
        exopen                           ; 外部プログラムでファイルを開く
+       ime-cursor                       ; IMEをオンにしたときにカーソルの色を変える
        japanese-plus                    ; 全角半角変換
        not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
        scroll-one-line                  ; 1行スクロール
        temp-buffer                      ; 一時バッファの作成
        window-control                   ; ウィンドウとフレームのサイズを調整
+       list-fontfamilies-display        ; フォントファミリー一覧を作成
        ))
   (my-init-require feat))
 
@@ -178,6 +181,12 @@
  '(make-backup-files 1)                 ; バックアップファイルを作成する
  '(menu-bar-mode nil)                   ; メニューバーを表示しない
  '(next-line-add-newlines nil)          ; ファイル末尾での改行で、end of bufferエラーが発生しないように
+ '(recentf-auto-cleanup 'never)         ; 存在しないファイルは消さない
+ '(recentf-auto-save-timer (run-with-idle-timer 30 t 'recentf-save-list)) ;; 30秒に一度自動保存
+ '(recentf-exclude '("/recentf" "COMMIT_EDITMSG" "/.?TAGS" "^/sudo:" "/\\.emacs\\.d/games/*-scores" "/\\.emacs\\.d/\\.*")) ;; recentfの除外ファイル
+ '(recentf-max-saved-items 2000)        ; 2000ファイルまで履歴保存する
+ '(recentf-mode 1)                      ; recentf
+ '(recentf-save-file "~/.emacs.d/.recentf") ; recentfの設定ファイル
  '(save-interprogram-paste-before-kill 1) ; 他アプリのコピーバッファをkill-ringに保存する
  '(scroll-conservatively 1)             ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
  '(show-paren-mode 1)                   ; 括弧の対応を表示
@@ -679,11 +688,6 @@
        (find-file-hook auto-insert)
        (kill-buffer-query-functions not-kill-but-bury-buffer)
        ))
-  (let ((hook (car hookfunc)) (func (cadr hookfunc)))
-    (cond
-     ((not (boundp hook)) (message "hook `%s' is void." hook))
-     ((not (fboundp func)) (message "function `%s' is void." func))
-     (t
-      (add-hook hook func)))))
+  (my-init-set-hook (car hookfunc) (cadr hookfunc)))
 
 (message "End of loading init.el.")
