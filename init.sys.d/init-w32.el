@@ -8,15 +8,8 @@
                     :height 120
                     :family "Consolas")
 
-;; 日本語フォントにメイリオ、半角カナのフォントにＭＳ ゴシックを設定
-(dolist
-    (charfont                           ; キャラクターセットごとのフォント属性の設定
-     '(
-       (jisx0201 "ＭＳ ゴシック")
-       (japanese-jisx0213.2004-1 "游ゴシック")
-       (japanese-jisx0213-2 "游ゴシック")
-       ))
-  (my-init-set-fontfamily (car charfont) (cadr charfont)))
+;;; 日本語の、全角フォントと、いわゆる半角フォントを設定
+(my-init-set-japanese-fontfamily "游ゴシック" "ＭＳ ゴシック")
 
 ;; フレームの設定
 (dolist
