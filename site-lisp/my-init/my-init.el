@@ -78,17 +78,30 @@ If function in MAPKEYS is void, warning message is printed into the `*Messages' 
                   (define-key ,modemap (kbd key) func))))))
         `(add-hook ',hook ',func-init-keybind))))))
 
+(defun my-init-set-font-spec (charset fontspec)
+  "Use FONTSPEC for character set CHARSET."
+  (if (not (member charset charset-list))
+      (message "Warning: character set %s is not defined." charset)
+    (set-fontset-font t charset fontspec)))
+
 (defun my-init-set-fontfamily (charset fontfamily)
   "Use FONTFAMILY for character set CHARSET."
   (if (not (member fontfamily (font-family-list)))
       (message "Warning: In setting font family, font family %s is not available." fontfamily)
     (my-init-set-font-spec charset (font-spec :family fontfamily))))
 
-(defun my-init-set-font-spec (charset fontspec)
-  "Use FONTSPEC for character set CHARSET."
-  (if (not (member charset charset-list))
-      (message "Warning: character set %s is not defined." charset)
-    (set-fontset-font t charset fontspec)))
+(defun my-init-set-japanese-fontfamily (zenkaku-font &optional hankaku-font)
+  "日本語のフォントを設定する"
+  (unless hankaku-font
+    (setq hankaku-font (eval zenkaku-font)))
+    (dolist
+        (codefont
+         '(
+           (japanese-jisx0213.2004-1 zenkaku-font)
+           (japanese-jisx0213-2 zenkaku-font)
+           (katakana-jisx0201 hankaku-font)
+           ))
+      (my-init-set-fontfamily (car codefont) (eval (cadr codefont)))))
 
 (defun my-init-set-autoload (function file doc)
   "Define FUNCTION to autoload from FILE by autoload function.
