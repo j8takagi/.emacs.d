@@ -15,13 +15,12 @@
        ))
   (setenv (car envval) (cadr envval)))
 
-;;; 日本語の、全角フォントと、いわゆる半角フォントを設定
+;;; フォントの設定
 (custom-set-variables
  '(fontset-set-charset-font-alist
    '(
+     (unicode "YuGothic")
      (ascii "Menlo")
-     (japanese-jisx0213.2004-1 "YuGothic")
-     (japanese-jisx0213-2 "YuGothic")
      (katakana-jisx0201 "Osaka")
      )))
 

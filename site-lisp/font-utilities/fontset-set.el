@@ -23,17 +23,17 @@
     (fontset-set-font-spec fontset charset (font-spec :family fontfamily))))
 
 (defcustom fontset-set-charset-font-alist nil
-  "Alist of (CHARSET . FONT) to set fontset."
+  "List of (CHARSET FONT) to set fontset."
   :type 'alist
   :group 'display
   )
 
-(defun fontset-set (fontaset-basename)
+(defun fontset-set (fontset-basename)
   (interactive)
   (fontset-set-charset-font
-   (fontset-set-create-fontset fontaset-basename)
+   (fontset-set-create-fontset fontset-basename)
    fontset-set-charset-font-alist)
-  (concat "fontset-" fontaset-basename))
+  (concat "fontset-" fontset-basename))
 
 (defun fontset-set-create-fontset (fontset-basename &optional asciifont)
   (interactive)
