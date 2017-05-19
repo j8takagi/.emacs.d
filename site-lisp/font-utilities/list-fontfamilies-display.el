@@ -41,17 +41,11 @@ argument, prompt for a regular expression using `read-regexp'."
       (error "No font families matching \"%s\"" regexp))
     (setq max-length (1+ max-length)
           line-format (format "%%-%ds" max-length))
-    (setq currentfontset (frame-parameter nil 'font))
-    (setq listfontset
-          (create-fontset-from-ascii-font currentfontset nil "list_fontfamilies"))
-    (set-frame-font listfontset nil)
     (with-help-window "*Font families*"
       (with-current-buffer "*Font families*"
         (setq truncate-lines t)
         (dolist (afont setfonts)
-          (set-fontset-font listfontset 'unicode afont)
-          (set-fontset-font listfontset 'ascii currentfontset)
-          (insert (propertize (format line-format afont) 'face (list :underline t)))
+          (insert (propertize (format line-format afont) 'face (list :overline t)))
           (let ((beg (point)) (line-beg (line-beginning-position)))
             (insert (propertize list-fontfamilies-sample-text 'face (list :family afont)))
             (insert "\n")
@@ -61,8 +55,7 @@ argument, prompt for a regular expression using `read-regexp'."
             (while (not (eobp))
               (insert-char ?\s max-length)
               (forward-line 1))))
-        (goto-char (point-min))))
-    (set-frame-font currentfontset nil)))
+        (goto-char (point-min))))))
 
 (provide 'list-fontfamilies-display)
 ;;; list-fontfamilies-display.el ends here
