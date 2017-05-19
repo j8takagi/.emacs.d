@@ -40,6 +40,7 @@
 
 (defun mac-set-ime-cursor-color ()
   "IMEのオン／オフで、カーソルの色を変える"
+  (interactive)
   (catch 'match
     (dolist
         (imptn
@@ -53,8 +54,14 @@
         (throw 'match t)))
     (ime-cursor-unset-color)))
 
-(add-hook 'mac-selected-keyboard-input-source-change-hook
-            'mac-set-ime-cursor-color)
+;; カーソル色を、IMの変更時とEmacsの画面を表示したときに設定する
+(dolist
+    (hook                           ; フック
+     '(
+       mac-selected-keyboard-input-source-change-hook
+       focus-in-hook
+       ))
+  (my-init-set-hook hook 'mac-set-ime-cursor-color))
 
 ;; カスタム変数の設定
 (custom-set-variables
