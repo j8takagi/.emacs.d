@@ -1,19 +1,19 @@
 ;; -*- mode: Emacs-Lisp; -*-
 ;; MS-Windowsの設定
 (require 'my-init)
-(my-init-require 'fontset-set)
 
 ;;; フォントの設定
 (custom-set-variables
  '(fontset-set-charset-font-alist
    '(
-     (ascii . "Consolas")
-     (japanese-jisx0213.2004-1 ."游ゴシック")
-     (japanese-jisx0213-2 . "游ゴシック")
-     (katakana-jisx0201 . "ＭＳ ゴシック")
+     (unicode "游ゴシック")
+     (ascii "Consolas")
+     (katakana-jisx0201 "ＭＳ ゴシック")
      )))
 
-(fontset-set "mydefault")
+(my-init-fontset-set-frame "mydefault")
+
+;(add-to-list 'face-font-rescale-alist '("游ゴシック" . 0.9375))
 
 ;; フレームの設定
 (dolist
