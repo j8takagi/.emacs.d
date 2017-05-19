@@ -6,7 +6,7 @@
 ;; Keywords: 
 
 ;;; Commentary:
-
+(require 'fontset-set)
 
 ;;; Code:
 (defun my-init-require (feature)
@@ -28,7 +28,7 @@ This function returns the list of (`package' `required package')."
   (let (pkgs req-pkgs pkg-desc)
     (unless (package-installed-p pkg)
       (if pkg-from
-          (message "Package %s required from %s is not installed." pkg pkg-from))
+          (message "Package `%s' required from `%s' is not installed." pkg pkg-from))
       (if (not (assq pkg package-archive-contents))
           (message "Warning: Package `%s' is NOT found on archives." pkg)
         (message "Installation of package `%s' begins." pkg)
@@ -59,7 +59,7 @@ If function in MAPKEYS is void, warning message is printed into the `*Messages' 
       `(dolist (map ',mapkeys)
          (let ((key (car map)) (func (nth 1 map)))
            (if (not (fboundp func))
-               (message "Warning: In setting %s keybind, function `%s' is void."
+               (message "Warning: In setting `%s' keybind, function `%s' is void."
                         ,modemap func)
              (define-key ,modemap (kbd key) func)))))
      (t
@@ -73,7 +73,7 @@ If function in MAPKEYS is void, warning message is printed into the `*Messages' 
               (let ((key (car map)) (func (nth 1 map)))
                 (if (not (functionp func))
                     (message
-                     "Warning: In setting %s, function `%s' is not defined."
+                     "Warning: In setting `%s', function `%s' is not defined."
                      ,modemap-name func)
                   (define-key ,modemap (kbd key) func))))))
         `(add-hook ',hook ',func-init-keybind))))))
@@ -89,7 +89,7 @@ If FUNCTION is void or FILE is not found, warning message is printed into the `*
         (condition-case err
             (setq res (autoload function file doc 1))
           (error
-           (message "Warning: In setting autoload functions, fails to set autoload %s from %s.\n%s: %s"
+           (message "Warning: In setting autoload functions, fails to set autoload `%s' from `%s'.\n%s: %s"
                     function file (car err) (cadr err))))))
     res))
 
@@ -97,7 +97,7 @@ If FUNCTION is void or FILE is not found, warning message is printed into the `*
   "Set MODE. MODE format is assumed as `(FUNCTION 1)' to enable the mode, or `(FUNCTION 0)' to disable the mode. FUNCTION presents minor mode.
 If FUNCTION in MODE is void, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
   (if (not (fboundp (car mode)))
-      (message "Warning: In setting minor mode, function %s is void." (car mode))
+      (message "Warning: In setting minor mode, function `%s' is void." (car mode))
     (eval mode)))
 
 (defun my-init-set-hook (hook function)
@@ -121,6 +121,12 @@ If MODE-TO or MODE-FROM is void, warning message is printed into the `*Messages'
      (t
       (while (setq conscell (rassq mode-from auto-mode-alist))
         (setcdr conscell mode-to))))))
+
+(defun my-init-fontset-set-frame (basename)
+  (let (afontset)
+    (setq afontset (fontset-set basename))
+    (add-to-list 'default-frame-alist `(font . ,afontset))
+    (message "Fontset `%s' is set to default-frame-alist." afontset)))
 
 (provide 'my-init)
 ;;; my-init.el ends here

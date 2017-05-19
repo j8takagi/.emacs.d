@@ -28,21 +28,15 @@
   :group 'display
   )
 
-(defun fontset-set (fontset-basename)
+(defun fontset-set-create-fontset (&optional basename asciifont)
+  "create fontset. It returns a name of the created fontset."
   (interactive)
-  (fontset-set-charset-font
-   (fontset-set-create-fontset fontset-basename)
-   fontset-set-charset-font-alist)
-  (concat "fontset-" fontset-basename))
-
-(defun fontset-set-create-fontset (fontset-basename &optional asciifont)
-  (interactive)
-  (let (afontset asciifont)
-    (unless asciifont
-      (setq asciifont (frame-parameter nil 'font)))
-    (create-fontset-from-ascii-font asciifont nil fontset-basename)))
+  (unless asciifont
+    (setq asciifont (frame-parameter nil 'font)))
+  (create-fontset-from-ascii-font asciifont nil basename))
 
 (defun fontset-set-charset-font (fontset charset-font-alist)
+  "set font in CHARSET-FONT-ALIST to the FONTSET."
   (interactive)
   (let (charsetfonts charsetfont)
     (setq charsetfonts charset-font-alist)

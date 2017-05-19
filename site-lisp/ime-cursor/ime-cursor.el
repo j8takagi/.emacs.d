@@ -10,17 +10,16 @@
 ;;; Code:
 (defcustom ime-cursor-color "navy" "Cursor color when IME is on." :group 'display)
 
-(defvar ime-cursor-original-color (face-attribute 'cursor :background))
-
 (defun ime-cursor-set-color ()
+  (interactive)
   "Set cursor color to `ime-cursor-color'."
-  (setq ime-cursor-original-color (face-attribute 'cursor :background))
   (set-cursor-color ime-cursor-color))
 
 (defun ime-cursor-unset-color ()
-  "Unset cursor color to default."
+  "Unset cursor color to default frame parameter, or black."
   (interactive)
-  (set-cursor-color ime-cursor-original-color))
+    (set-cursor-color
+     (or (assoc-default 'cursor-color default-frame-alist) "black")))
 
 (provide 'ime-cursor)
 ;;; ime-cursor.el ends here
