@@ -11,7 +11,7 @@
 ;;; Code:
 
 (defcustom list-fontfamilies-sample-text
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789 !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~\nあいうえお　アイウエオ　阿以右衛於"
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz\n0123456789 !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
   "Text string to display as the sample text for `list-fontfamilies-display'."
   :type 'text
   :group 'display
