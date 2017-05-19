@@ -1,7 +1,6 @@
 ;; -*- mode: Emacs-Lisp; -*-
 ;; Mac OS X 非terminal 用の設定
 (require 'my-init)
-(my-init-require 'fontset-set)
 
 ;; 環境変数の設定
 (dolist
@@ -19,13 +18,17 @@
 (custom-set-variables
  '(fontset-set-charset-font-alist
    '(
+     ;; (unicode "Source Han Code JP")
      (unicode "YuGothic")
      (ascii "Menlo")
      (katakana-jisx0201 "Osaka")
      )))
 
-(fontset-set "mydefault")
-(add-to-list 'default-frame-alist '(font . "fontset-mydefault"))
+(my-init-fontset-set-frame "mydefault")
+
+(setq face-font-rescale-alist
+      '(("YuGothic" . 1.2)))
+
 ;; フレームの設定
 (when (equal window-system 'mac)
   (dolist
