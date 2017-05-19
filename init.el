@@ -579,6 +579,10 @@
 (dolist                                 ; モードごとのキーバインド
     (modekey
      '(
+       (nil nil read-expression-map
+        (
+         ("<tab>" lisp-complete-symbol)
+         ))
        ("text-mode" nil text-mode-map
         (
          ("C-M-i" dabbrev-expand) ; ispell 起動を無効にし、dabbrev-expand を設定
