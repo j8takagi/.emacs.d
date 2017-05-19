@@ -27,8 +27,7 @@ this regular expression.  When called interactively with a prefix
 argument, prompt for a regular expression using `read-regexp'."
   (interactive (list (and current-prefix-arg
                           (read-regexp "List font families matching regexp"))))
-  (let ((all (zerop (length regexp))) (max-length 0) line-format
-        setfonts currentfontset listfontset)
+  (let ((all (zerop (length regexp))) (max-length 0) line-format setfonts)
     ;; We filter and take the max length in one pass
     (setq setfonts
           (delete-dups

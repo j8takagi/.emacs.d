@@ -51,5 +51,18 @@
       (fontset-set-fontfamily fontset (car charsetfont) (cadr charsetfont))
       (setq charsetfonts (cdr charsetfonts)))))
 
+(defun fontset-set (&optional fontset-basename)
+  "create fontset, then set font in `fontset-set-charset-font-alist' to the fontset.
+It returns a name of the created fontset."
+  (interactive)
+  (let (afontset)
+    (setq afontset
+          (fontset-set-create-fontset
+           fontset-basename
+           (cadr (assoc 'ascii fontset-set-charset-font-alist))))
+    (fontset-set-charset-font afontset
+                              fontset-set-charset-font-alist)
+    afontset))
+
 (provide 'fontset-set)
 ;;; fontset-set.el ends here
