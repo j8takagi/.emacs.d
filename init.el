@@ -670,7 +670,6 @@
        (window-system mac init-mac-gui)
        (window-system x init-x)
        (window-system w32 init-w32)
-       (system-name-simple "tiger" init-tiger)
        ))
   (when (equal (eval (car syslib)) (nth 1 syslib))
     (my-init-require (nth 2 syslib))))
