@@ -16,7 +16,7 @@
 
 ;;; フォントの設定
 (custom-set-variables
- '(fontset-set-charset-font-alist
+ '(fontset-set-charset-font-list
    '(
      ;; (unicode "Source Han Code JP")
      (unicode "YuGothic")

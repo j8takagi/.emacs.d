@@ -22,9 +22,9 @@
       (message "Warning: In setting font family, font family %s is not available." fontfamily)
     (fontset-set-font-spec fontset charset (font-spec :family fontfamily))))
 
-(defcustom fontset-set-charset-font-alist nil
+(defcustom fontset-set-charset-font-list nil
   "List of (CHARSET FONT) to set fontset."
-  :type 'alist
+  :type 'list
   :group 'display
   )
 
@@ -46,16 +46,16 @@
       (setq charsetfonts (cdr charsetfonts)))))
 
 (defun fontset-set (&optional fontset-basename)
-  "create fontset, then set font in `fontset-set-charset-font-alist' to the fontset.
+  "create fontset, then set font in `fontset-set-charset-font-list' to the fontset.
 It returns a name of the created fontset."
   (interactive)
   (let (afontset)
     (setq afontset
           (fontset-set-create-fontset
            fontset-basename
-           (cadr (assoc 'ascii fontset-set-charset-font-alist))))
+           (cadr (assoc 'ascii fontset-set-charset-font-list))))
     (fontset-set-charset-font afontset
-                              fontset-set-charset-font-alist)
+                              fontset-set-charset-font-list)
     afontset))
 
 (provide 'fontset-set)

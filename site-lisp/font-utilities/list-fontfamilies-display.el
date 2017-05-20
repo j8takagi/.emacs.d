@@ -13,7 +13,7 @@
 (defcustom list-fontfamilies-sample-text
   "ABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz\n0123456789 !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
   "Text string to display as the sample text for `list-fontfamilies-display'."
-  :type 'text
+  :type 'string
   :group 'display
   )
 
