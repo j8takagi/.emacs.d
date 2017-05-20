@@ -13,12 +13,6 @@
 
 (my-init-fontset-set-frame "mydefault")
 
-(setq face-font-rescale-alist
-      '(
-        ("游ゴシック" . 1.125)
-        ("ＭＳ ゴシック" . 1.125)
-        ))
-
 ;; フレームの設定
 (dolist
     (fparam                             ; フレームパラメーター
