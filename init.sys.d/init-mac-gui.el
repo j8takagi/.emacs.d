@@ -27,7 +27,10 @@
 (my-init-fontset-set-frame "mydefault")
 
 (setq face-font-rescale-alist
-      '(("YuGothic" . 1.2)))
+      '(
+        ("YuGothic" . 1.17)
+        ("Osaka" . 1.17)
+        ))
 
 ;; フレームの設定
 (when (equal window-system 'mac)
