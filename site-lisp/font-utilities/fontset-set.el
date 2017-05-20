@@ -14,7 +14,7 @@
   "Use FONTSPEC for character set CHARSET."
   (if (not (member charset charset-list))
       (message "Warning: character set %s is not defined." charset)
-    (set-fontset-font fontset charset fontspec nil 'prepend)))
+    (set-fontset-font fontset charset fontspec nil 'append)))
 
 (defun fontset-set-fontfamily (fontset charset fontfamily)
   "Use FONTFAMILY for character set CHARSET."
@@ -42,7 +42,7 @@
     (setq charsetfonts charset-font-alist)
     (while charsetfonts
       (setq charsetfont (car charsetfonts))
-      (fontset-set-fontfamily fontset (car charsetfont) (cadr charsetfont))
+      (fontset-set-font-spec fontset (car charsetfont) (eval (cadr charsetfont)))
       (setq charsetfonts (cdr charsetfonts)))))
 
 (defun fontset-set (&optional fontset-basename)
@@ -53,7 +53,7 @@ It returns a name of the created fontset."
     (setq afontset
           (fontset-set-create-fontset
            fontset-basename
-           (cadr (assoc 'ascii fontset-set-charset-font-list))))
+           (font-xlfd-name (eval (cadr (car fontset-set-charset-font-list))))))
     (fontset-set-charset-font afontset
                               fontset-set-charset-font-list)
     afontset))

@@ -18,10 +18,10 @@
 (custom-set-variables
  '(fontset-set-charset-font-list
    '(
-     ;; (unicode "Source Han Code JP")
-     (unicode "YuGothic")
-     (ascii "Menlo")
-     (katakana-jisx0201 "Osaka")
+     ;; (unicode (font-spec :family "Source Han Code JP"))
+     (ascii (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
+     (katakana-jisx0201 (font-spec :family "Osaka"))
+     (unicode (font-spec :family "YuGothic"))
      )))
 
 (my-init-fontset-set-frame "mydefault")
@@ -29,7 +29,7 @@
 ;; フレームの設定
 (when (equal window-system 'mac)
   (dolist
-      (fparam ;; フレームパラメーター
+      (fparam                           ; フレームパラメーター
        '(
          (width 180)
          (height 55)

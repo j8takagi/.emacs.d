@@ -4,11 +4,11 @@
 
 ;;; フォントの設定
 (custom-set-variables
- '(fontset-set-charset-font-alist
+ '(fontset-set-charset-font-list
    '(
-     (unicode "游ゴシック")
-     (ascii "Consolas")
-     (katakana-jisx0201 "ＭＳ ゴシック")
+     (ascii (font-spec :family "Consolas" :weight 'normal :size 12))
+     (unicode (font-spec :family "游ゴシック"))
+     (katakana-jisx0201 (font-spec :family "ＭＳ ゴシック"))
      )))
 
 (my-init-fontset-set-frame "mydefault")
@@ -17,9 +17,9 @@
 (dolist
     (fparam                             ; フレームパラメーター
      '(
-       (width 120)
-       (height 34)
-       (top 0)
+       (width 180)
+       (height 55)
+       (top 22)
        (left 0)
        (font "fontset-mydefault")
        ))
