@@ -83,17 +83,17 @@
        ;; ~/.emacs.d/site-lisp
        auto-elc-mode                    ; .elファイルの自動コンパイル
        buffer-window-plus               ; バッファとウィンドウの操作関数を追加
-       char-font                        ; フォント情報の表示
        count-japanese                   ; 日本語の文字数をカウント
        ediff-vc-plus                    ; Ediffの追加関数
        exopen                           ; 外部プログラムでファイルを開く
        ime-cursor                       ; IMEをオンにしたときにカーソルの色を変える
        japanese-plus                    ; 全角半角変換
+       list-fontfamilies-display        ; フォントファミリー一覧を作成
        not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
        scroll-one-line                  ; 1行スクロール
        temp-buffer                      ; 一時バッファの作成
        window-control                   ; ウィンドウとフレームのサイズを調整
-       list-fontfamilies-display        ; フォントファミリー一覧を作成
+       xlfd-at                          ; フォント情報の表示
        ))
   (my-init-require feat))
 
