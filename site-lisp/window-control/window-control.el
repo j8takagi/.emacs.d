@@ -92,17 +92,20 @@
        (start-height (frame-height))
        (default-width (cdr (assoc 'width default-frame-alist)))
        (default-height (cdr (assoc 'height default-frame-alist)))
+       (default "")
        key
        )
+    (when (and default-width default-height)
+      (setq default (format " d)efault:[%dx%d];" default-width default-height)))
     (catch 'end-flag
       (while t
         (setq key
               (aref
                (read-key-sequence-vector
                 (format
-                 "Frame Size current:[%dx%d]; s)tart:[%dx%d]; d)efault:[%dx%d]; h)-x j)+y k)-y l)+x; q)uit."
+                 "Frame Size current:[%dx%d]; s)tart:[%dx%d]; %s h)-x j)+y k)-y l)+x; q)uit."
                  (frame-width) (frame-height)
-                 start-width start-height default-width default-height))
+                 start-width start-height default))
                0))
         (cond
          ((member key '(?l right))
@@ -114,9 +117,15 @@
          ((member key '(?k up))
           (set-frame-height thisframe (- (frame-height) 1)))
          ((member key '(?d))
-          (progn
-            (set-frame-width thisframe default-width))
-          (set-frame-height thisframe default-height))
+          (cond
+           ((not default-width)
+            (message "Width is not set in default-frame-alist."))
+           ((not default-height)
+            (message "Height is not set in default-frame-alist."))
+           (t
+            (progn
+              (set-frame-width thisframe default-width)
+              (set-frame-height thisframe default-height)))))
          ((member key '(?s))
           (progn
             (set-frame-width thisframe start-width)
@@ -179,20 +188,22 @@
 (defvar frame-shift-size 20)
 
 (defun frame-shift-right ()
-  (let* ((leftcell (assoc 'left default-frame-alist))
-         (topcell (assoc 'top default-frame-alist)))
-    (setcdr leftcell (+ (cdr leftcell) frame-shift-size))
-    (setcdr topcell (+ (cdr topcell) frame-shift-size))))
+  (when default-frame-alist
+    (let* ((leftcell (assoc 'left default-frame-alist))
+           (topcell (assoc 'top default-frame-alist)))
+      (setcdr leftcell (+ (cdr leftcell) frame-shift-size))
+      (setcdr topcell (+ (cdr topcell) frame-shift-size)))))
 
 (defun frame-shift-left ()
-  (let* ((leftcell (assoc 'left default-frame-alist))
-         (left (cdr leftcell))
-         (topcell (assoc 'top default-frame-alist))
-         (top (cdr topcell)))
-    (if (>= left frame-shift-size)
-        (setcdr leftcell (- left frame-shift-size)))
-    (if (>= top frame-shift-size)
-        (setcdr topcell (- top frame-shift-size)))))
+  (when default-frame-alist
+    (let* ((leftcell (assoc 'left default-frame-alist))
+           (left (cdr leftcell))
+           (topcell (assoc 'top default-frame-alist))
+           (top (cdr topcell)))
+      (if (>= left frame-shift-size)
+          (setcdr leftcell (- left frame-shift-size)))
+      (if (>= top frame-shift-size)
+          (setcdr topcell (- top frame-shift-size))))))
 
 (define-key global-map "\C-\\" (make-sparse-keymap))     ; C-\ をプリフィックスキーに
 
