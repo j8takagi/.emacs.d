@@ -45,6 +45,7 @@
          markdown-mode
          mediawiki
          mew
+         pandoc
          session
          sokoban
          web-mode
@@ -658,6 +659,9 @@
                         '(("^\\(Warning:\\) .*" 1 font-lock-warning-face t)))
 (with-current-buffer "*Messages*"
   (font-lock-ensure))
+
+;; pandoc
+;(pandoc-turn-on-advice-eww)
 
 ;;
 ;; システムごとの初期化ファイルの設定
