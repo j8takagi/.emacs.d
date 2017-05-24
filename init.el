@@ -93,6 +93,7 @@
        not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
        scroll-one-line                  ; 1行スクロール
        temp-buffer                      ; 一時バッファの作成
+       tidy-file-name-history           ; ファイル名履歴リストの整理
        window-control                   ; ウィンドウとフレームのサイズを調整
        xlfd-at                          ; フォント情報の表示
        ))
@@ -706,5 +707,15 @@
        (kill-buffer-query-functions not-kill-but-bury-buffer)
        ))
   (my-init-set-hook (car hookfunc) (cadr hookfunc)))
+
+(with-eval-after-load 'session
+  (dolist
+      (hookfunc                           ; フックに設定するファンクション
+       '(
+         (find-file-hook session-set-file-name-history)
+         (session-before-save-hook delete-file-name-history-from-exclude-regexp)
+         (session-before-save-hook delete-file-name-history-not-exist)
+         ))
+    (my-init-set-hook (car hookfunc) (cadr hookfunc))))
 
 (message "End of loading init.el.")
