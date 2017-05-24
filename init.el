@@ -159,35 +159,39 @@
 
 ;; カスタム変数の設定
 (custom-set-variables
+ ;; 有効にするモード
  '(auto-compression-mode 1)             ; 圧縮されたファイルを直接編集する
- '(blink-cursor-mode nil)               ; カーソルは点滅しない
- '(case-replace nil)                    ; 置換時に大文字小文字を区別しない
  '(column-number-mode 1)                ; 列番号を表示
+ '(global-font-lock-mode 1)             ; メジャーモードに合わせた色を付ける
+ '(line-number-mode 1)                  ; 行番号を表示
+ '(recentf-mode 1)                      ; recentf
+ '(show-paren-mode 1)                   ; 括弧の対応を表示
+ '(tool-bar-mode nil)                   ; ツールバーを表示しない
+ '(transient-mark-mode 1)               ; リージョンをハイライト
+ ;; 無効にするモード
+ '(blink-cursor-mode nil)               ; カーソルは点滅しない
+ '(electric-indent-mode nil)            ; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
+ '(menu-bar-mode nil)                   ; メニューバーを表示しない
+ ;; モード以外
+ '(case-replace nil)                    ; 置換時に大文字小文字を区別しない
  '(delete-old-versions 1)               ; 古いバックアップファイルを自動的に削除する
  '(disabled-command-function nil)       ; すべてのコマンドの使用制限を解除する
- '(electric-indent-mode nil)            ; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
  '(enable-recursive-minibuffers 1)      ; 再帰的にミニバッファを使う
  '(eval-expression-print-length nil)    ; evalした結果を全部表示する
- '(global-font-lock-mode 1)             ; メジャーモードに合わせた色を付ける
  '(history-delete-duplicates 1)         ; 重複する履歴は削除
  '(history-length t)                    ; 履歴の数を無制限に
  '(inhibit-startup-screen 1)            ; 起動時の画面を表示しない
  '(initial-scratch-message nil)         ; *scratch* にメッセージを表示しない
- '(line-number-mode 1)                  ; 行番号を表示
  '(make-backup-files 1)                 ; バックアップファイルを作成する
- '(menu-bar-mode nil)                   ; メニューバーを表示しない
  '(next-line-add-newlines nil)          ; ファイル末尾での改行で、end of bufferエラーが発生しないように
- '(recentf-auto-cleanup 'never)         ; 存在しないファイルは消さない
+ '(recentf-auto-cleanup 'never)         ; 存在しないファイルを消さない
  '(recentf-auto-save-timer (run-with-idle-timer 30 t 'recentf-save-list)) ;; 30秒に一度自動保存
  '(recentf-exclude '("/recentf" "COMMIT_EDITMSG" "/.?TAGS" "^/sudo:" "/\\.emacs\\.d/games/*-scores" "/\\.emacs\\.d/\\.*")) ;; recentfの除外ファイル
  '(recentf-max-saved-items 2000)        ; 2000ファイルまで履歴保存する
- '(recentf-mode 1)                      ; recentf
  '(recentf-save-file "~/.emacs.d/.recentf") ; recentfの設定ファイル
  '(save-interprogram-paste-before-kill 1) ; 他アプリのコピーバッファをkill-ringに保存する
  '(scroll-conservatively 1)             ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
- '(show-paren-mode 1)                   ; 括弧の対応を表示
- '(tool-bar-mode nil)                   ; ツールバーを表示しない
- '(transient-mark-mode 1)               ; リージョンをハイライト
+ '(session-set-file-name-exclude-regexp "[/\\]\\.overview\\|[/\\]\\.session\\|News[/\\]\\|\\.emacs\\.d/\\|~$\\|COMMIT_EDITMSG") ; sessionで、file-name-historyから除外するファイル
  '(truncate-lines nil)                  ; 継続行を表示しない
  '(truncate-partial-width-windows nil)  ; 行を切り捨てない
  '(use-dialog-box nil)                  ; ダイアログボックスは使わない
