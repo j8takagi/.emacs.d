@@ -122,11 +122,6 @@ If MODE-TO or MODE-FROM is void, warning message is printed into the `*Messages'
       (while (setq conscell (rassq mode-from auto-mode-alist))
         (setcdr conscell mode-to))))))
 
-(defun my-init-fontset-set-frame (basename)
-  (let (afontset)
-    (setq afontset (fontset-set basename))
-    (add-to-list 'default-frame-alist `(font . ,afontset))
-    (message "Fontset `%s' is set to default-frame-alist." afontset)))
 
 (provide 'my-init)
 ;;; my-init.el ends here
