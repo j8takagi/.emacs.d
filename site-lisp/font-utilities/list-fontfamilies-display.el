@@ -12,7 +12,7 @@
 (require 'fontset-set)
 
 (defcustom list-fontfamilies-sample-text
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz\n0123456789 !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~\nあいうえお　アイウエオ　阿以宇衛於"
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz\n0123456789 !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
   "Text string to display as the sample text for `list-fontfamilies-display'."
   :type 'string
   :group 'display
@@ -29,10 +29,9 @@ argument, prompt for a regular expression using `read-regexp'."
   (interactive (list (and current-prefix-arg
                           (read-regexp "List font families matching regexp"))))
   (let
-      ((all (zerop (length regexp))) (max-length 0) line-format
-       setfonts afontset aface)
+      ((all (zerop (length regexp))) (max-length 0) line-format fontfamilies)
     ;; We filter and take the max length in one pass
-    (setq setfonts
+    (setq fontfamilies
           (delete-dups
            (delq nil (mapcar
                       (lambda (f)
@@ -40,29 +39,25 @@ argument, prompt for a regular expression using `read-regexp'."
                           (setq max-length (max (length f) max-length))
                           f))
                       (sort (font-family-list) #'string-lessp)))))
-    (unless setfonts
+    (unless fontfamilies
       (error "No font families matching \"%s\"" regexp))
     (setq max-length (1+ max-length)
           line-format (format "%%-%ds" max-length))
     (with-help-window "*Font families*"
       (with-current-buffer "*Font families*"
         (setq truncate-lines t)
-        (dolist (afont setfonts)
-          (insert (propertize (format line-format afont) 'face (list :overline t)))
-          (if (string-match-p "-" afont)
-              (insert (propertize list-fontfamilies-sample-text 'face (list :family afont)))
-            (setq afontset (fontset-set `((unicode . (font-spec :family ,afont)))))
-            (make-face (setq aface (intern (concat "list-fontfamilies-" afont))))
-            (set-face-attribute aface nil :font afontset))
+        (dolist (afontfamily fontfamilies)
+          (insert (propertize (format line-format afontfamily) 'face (list :overline t)))
           (let ((beg (point)) (line-beg (line-beginning-position)))
-            (insert (propertize list-fontfamilies-sample-text 'face aface))
+            (insert (propertize list-fontfamilies-sample-text 'face (list :family afontfamily)))
             (insert "\n")
             ;; If the sample text has multiple lines, line up all of them.
             (goto-char beg)
             (forward-line 1)
             (while (not (eobp))
               (insert-char ?\s max-length)
-              (forward-line 1))))
+              (forward-line 1)))
+          )
         (goto-char (point-min))))))
 
 (provide 'list-fontfamilies-display)
