@@ -122,6 +122,15 @@ If MODE-TO or MODE-FROM is void, warning message is printed into the `*Messages'
       (while (setq conscell (rassq mode-from auto-mode-alist))
         (setcdr conscell mode-to))))))
 
+(defun update-or-add-alist (alist key value)
+  "If key in ALIST, update VALUE of the key.
+Unless, cons cell (KEY . VALUE) is added"
+  (interactive)
+  (let (aconscell)
+   (if (setq aconscell (assoc key alist))
+       (setf (cdr aconscell) value)
+     (push (cons key value) default-frame-alist)))
+  alist)
 
 (provide 'my-init)
 ;;; my-init.el ends here
