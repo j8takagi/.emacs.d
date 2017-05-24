@@ -9,9 +9,10 @@
 
 
 ;;; Code:
+(require 'fontset-set)
 
 (defcustom list-fontfamilies-sample-text
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz\n0123456789 !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz\n0123456789 !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~\nあいうえお　アイウエオ　阿以宇衛於"
   "Text string to display as the sample text for `list-fontfamilies-display'."
   :type 'string
   :group 'display
@@ -27,7 +28,9 @@ this regular expression.  When called interactively with a prefix
 argument, prompt for a regular expression using `read-regexp'."
   (interactive (list (and current-prefix-arg
                           (read-regexp "List font families matching regexp"))))
-  (let ((all (zerop (length regexp))) (max-length 0) line-format setfonts)
+  (let
+      ((all (zerop (length regexp))) (max-length 0) line-format
+       setfonts afontset aface)
     ;; We filter and take the max length in one pass
     (setq setfonts
           (delete-dups

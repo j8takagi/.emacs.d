@@ -15,28 +15,29 @@
   (setenv (car envval) (cadr envval)))
 
 ;;; フォントの設定
-(custom-set-variables
- '(fontset-set-charset-font-list
-   '(
-     ;; (unicode (font-spec :family "Source Han Code JP"))
-     (ascii (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
-     (katakana-jisx0201 (font-spec :family "Osaka"))
-     (unicode (font-spec :family "YuGothic"))
-     )))
-
-(my-init-fontset-set-frame "mydefault")
 
 ;; フレームの設定
-(when (equal window-system 'mac)
+(let (afontset)
+  (setq afontset
+        (fontset-set
+         '(
+           ;; (unicode . (font-spec :family "Source Han Code JP" :weight 'normal :slant 'normal :size 12))
+           (ascii . (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
+           (unicode . (font-spec :family "Hiragino Kaku Gothic ProN"))
+           )
+         "mydefault"
+           ))
   (dolist
       (fparam                           ; フレームパラメーター
-       '(
+       `(
+         (font ,afontset)
          (width 180)
-         (height 55)
+         (height 56)
          (top 22)
          (left 0)
          ))
-    (add-to-list 'default-frame-alist (cons (car fparam) (cadr fparam)))))
+    (update-or-add-alist default-frame-alist (car fparam) (cadr fparam)))
+    (message "default-frame-alist set in init-ma-gui.el - %s" default-frame-alist))
 
 (defun mac-set-ime-cursor-color ()
   "IMEのオン／オフで、カーソルの色を変える"
