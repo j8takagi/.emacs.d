@@ -2,7 +2,7 @@
 
 (message "Start of loading init.el at %s." (format-time-string "%Y/%m/%d %T"))
 
-(message (emacs-version nil))
+(message (emacs-version))
 
 ;; load-pathの設定
 (let ((default-directory (expand-file-name user-emacs-directory)))
@@ -13,10 +13,9 @@
 ;;;
 ;;; パッケージ
 ;;;
-
 (my-init-require 'package)
 
-(dolist                                 ; パッケージアーカイブ
+(dolist                                 ; パッケージアーカイブサイト
     (archive
      '(
        ("melpa-stable" "http://stable.melpa.org/packages/")
@@ -185,7 +184,7 @@
 (defalias 'uniq-lines 'delete-duplicate-lines)
 
 ;; フレームの設定
-(unless (null window-system)
+(when window-system
   (dolist                               ; フレームパラメーター
       (fparam
        '(
@@ -194,7 +193,7 @@
          (cursor-color "DarkOliveGreen")
          (cursor-type box)
          ))
-    (add-to-list 'default-frame-alist (cons (car fparam) (cadr fparam)))))
+    (update-or-add-alist 'default-frame-alist (car fparam) (cadr fparam))))
 
 ;; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
 (dolist                                 ; 補完入力対象外の拡張子
@@ -317,9 +316,8 @@
        ("web-mode" web-skeletons)
        ("graphviz-dot-mode" graphviz-dot-skeletons)
        ))
-  (let ((lib (car libskel)) (skel (nth 1 libskel)))
-    (eval-after-load lib
-      `(my-init-require ',skel))))
+    (eval-after-load (car libskel)
+      `(my-init-require ',(cadr libskel))))
 
 (dolist                                 ; モードごとのテンプレート
     (modetemplate
@@ -410,7 +408,7 @@
   '(custom-set-variables
     '(magit-status-buffer-switch-function 'switch-to-buffer)))
 
-;; Magitの「run-hooks: Symbol’s function definition is void: git-commit-setup-check-buffer」エラー対策
+;; Magitの "run-hooks: Symbol’s function definition is void: git-commit-setup-check-buffer" エラー対策
 (defvar with-editor-file-name-history-exclude 1)
 
 ;; mew
