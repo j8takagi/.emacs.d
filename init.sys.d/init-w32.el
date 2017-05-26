@@ -9,8 +9,7 @@
          '(
            ;; (unicode . (font-spec :family "源ノ角ゴシック Code JP R" :weight 'normal :size 12))
            (ascii . (font-spec :family "Consolas" :weight 'normal :size 12))
-           (unicode . (font-spec :family "游ゴシック"))
-           (katakana-jisx0201 . (font-spec :family "ＭＳ ゴシック"))
+           (unicode . (font-spec :family "メイリオ"))
            )
          "mydefault"))
   (dolist
@@ -19,7 +18,7 @@
          (font ,afontset)
          (width 180)
          (height 56)
-         (top 22)
+         (top 0)
          (left 0)
          ))
     (update-or-add-alist 'default-frame-alist (car fparam) (cadr fparam)))
