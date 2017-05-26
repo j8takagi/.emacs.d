@@ -23,7 +23,7 @@
          '(
            ;; (unicode . (font-spec :family "Source Han Code JP" :weight 'normal :slant 'normal :size 12))
            (ascii . (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
-           (unicode . (font-spec :family "Hiragino Kaku Gothic ProN"))
+           (unicode . (font-spec :family "YuGothic"))
            )
          "mydefault"
            ))
