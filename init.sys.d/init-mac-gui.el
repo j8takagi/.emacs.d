@@ -70,6 +70,17 @@
  '(mac-auto-ascii-mode 1)             ; ミニバッファへのカーソル移動時、日本語IMEを自動オフ
  )
 
+;; view-modeの設定
+(with-eval-after-load 'view
+  (custom-set-variables
+   '(read-write-enable-dir-patterns
+     '(
+       "~/Documents/201[4-9]_[01][0-9]"
+       "~/.emacs.d/elpa"
+       "/tmp"
+       "/var"
+     ))))
+
 ;; Mac OS Xのキー設定
 (dolist                                 ; グローバルのキーバインド
     (mapkeys

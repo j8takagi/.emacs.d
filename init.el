@@ -255,15 +255,7 @@
   ;; read-onlyファイルをview-modeで開く
   (my-init-require 'init-view-mode)
   (custom-set-variables
-   '(read-write-enable-dir-patterns
-     '(
-       "~/Documents/201[4-9]_[01][0-9]"
-       "~/.emacs.d/elpa"
-       "/tmp"
-       "/var"
-     ))
-   '(view-read-only 1)
-   )
+   '(view-read-only 1))
   (with-current-buffer "*Messages*" (view-mode)) ;; *Messages* バッファーを view-mode に
   (my-init-require 'view-mode-vi-bindings) ;; view-modeでviのキーバインド
   )

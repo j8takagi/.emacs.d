@@ -44,6 +44,15 @@
 (defun set-buffer-process-coding-system-cp932 ()
   (set-buffer-process-coding-system 'cp932 'cp932))
 
+;; view-modeの設定
+(with-eval-after-load 'view
+  (custom-set-variables
+   '(read-write-enable-dir-patterns
+     '(
+       "E:/Documents/201[4-9]_[01][0-9]"
+       "~/.emacs.d/elpa"
+     ))))
+
 ;; IME切り替え時に undefined のエラーメッセージが表示されるのを抑制
 (set-variable 'default-input-method "W32-IME")
 
