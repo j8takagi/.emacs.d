@@ -6,8 +6,6 @@
 ;; Keywords: 
 
 ;;; Commentary:
-(require 'fontset-set)
-
 ;;; Code:
 (defun my-init-require (feature)
   "Require FEATURE, and the result is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
