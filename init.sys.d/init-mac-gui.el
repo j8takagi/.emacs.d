@@ -36,8 +36,8 @@
          (top 22)
          (left 0)
          ))
-    (update-or-add-alist default-frame-alist (car fparam) (cadr fparam)))
-    (message "default-frame-alist set in init-ma-gui.el - %s" default-frame-alist))
+    (update-or-add-alist 'default-frame-alist (car fparam) (cadr fparam)))
+  (message "default-frame-alist set in init-ma-gui.el - %s" default-frame-alist))
 
 (defun mac-set-ime-cursor-color ()
   "IMEのオン／オフで、カーソルの色を変える"

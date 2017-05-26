@@ -22,8 +22,8 @@
          (top 22)
          (left 0)
          ))
-    (update-or-add-alist default-frame-alist (car fparam) (cadr fparam)))
-    (message "default-frame-alist set in init-ma-gui.el - %s" default-frame-alist))
+    (update-or-add-alist 'default-frame-alist (car fparam) (cadr fparam)))
+  (message "default-frame-alist set in init-w32-gui.el - %s" default-frame-alist))
 
 ;; 文字コードのデフォルトはUTF-8
 (prefer-coding-system 'utf-8-dos)
