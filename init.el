@@ -693,10 +693,6 @@
   (when (equal (eval (car syslib)) (nth 1 syslib))
     (my-init-require (nth 2 syslib))))
 
-;; Emacs開始にかかった時間をメッセージに表示
-(defun my-init-message-startup-time ()
-  (message "Duration of the Emacs initialization - %s" (emacs-init-time)))
-
 ;; フックの設定
 (dolist
     (hookfunc                           ; フックに設定するファンクション

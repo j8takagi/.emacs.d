@@ -133,5 +133,10 @@ Unless, cons cell (KEY . VALUE) is added."
      (set alist-var (push (cons key value) alist)))
    alist))
 
+;; Emacs開始にかかった時間をメッセージに表示
+(defun my-init-message-startup-time ()
+  "Message Duration of the Emacs initialization time."
+  (message "Duration of the Emacs initialization - %s" (emacs-init-time)))
+
 (provide 'my-init)
 ;;; my-init.el ends here
