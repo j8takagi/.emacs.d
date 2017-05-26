@@ -42,6 +42,31 @@ This function returns the list of (`package' `required package')."
           (add-to-list 'pkgs rp 1))))
     pkgs))
 
+(defun my-init-check-package (req-pkg-list)
+  "Check whether packages in REQ-PKG_LIST is installed, updated, or
+packages not in REQ-PKG_LIST is installed."
+  (let (pkgs real-pkgs update-pkgs)
+    ;; If packages in REQ-PKG_LIST is not installed, install.
+    (dolist (req-pkg req-pkg-list)
+      (dolist (pkg (my-init-install-package req-pkg))
+        (when (and (cadr pkg) (not (member (car pkg) pkgs)))
+          (message "Package `%s' is required from `%s'." (car pkg) (cadr pkg)))
+        (add-to-list 'pkgs (car pkg))))
+    (message "Required packages - %s" req-pkg-list)
+    (setq real-pkgs (mapcar 'car package-alist))
+    (message "Installed packages - %s" (reverse real-pkgs))
+    ;; updated packages
+    (package-menu--refresh real-pkgs)
+    (dolist (update-pkg (package-menu--find-upgrades))
+      (message "Info: Package %s is updated. Version %s is available."
+               (car update-pkg)
+               (package-desc-version (cdr update-pkg))))
+    ;; installed packages not in REQ-PKG-LIST
+    (dolist (pkg pkgs)
+      (setq real-pkgs (delete pkg real-pkgs)))
+    (when real-pkgs
+      (message "Info: Unexpected installed packages %s"  (reverse real-pkgs)))))
+
 (defun my-init-global-set-key (key function)
   "Give KEY a global binding as FUNCTION by global-set-key.
 If FUNCTION is void, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."

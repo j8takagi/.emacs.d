@@ -28,49 +28,27 @@
 
 ;; (message "Debug: auto-mode-alist just after package initialize - %s" auto-mode-alist)
 
-;; パッケージの設定
-(let (pkgs req-pkgs real-pkgs update-pkgs)
-  ;; 指定したパッケージがインストールされていない場合は、インストール実行
-  (dolist                               ; インストールするパッケージ
-      (req-pkg
-       '(
-         csv-mode
-         ess
-         ggtags
-         gitignore-mode
-         gnuplot
-         graphviz-dot-mode
-         inf-ruby
-         magit
-         markdown-mode
-         mediawiki
-         mew
-         pandoc
-         session
-         sokoban
-         web-mode
-         xbm-life
-         xpm
-         ))
-    (add-to-list 'req-pkgs req-pkg)
-    (dolist (pkg (my-init-install-package req-pkg))
-      (when (and (cadr pkg) (not (member (car pkg) pkgs)))
-        (message "Package `%s' is required from `%s'." (car pkg) (cadr pkg)))
-      (add-to-list 'pkgs (car pkg))))
-  (message "Required packages - %s" (reverse req-pkgs)) ; init.elで指定したパッケージを表示
-  (setq real-pkgs (mapcar 'car package-alist)) ; インストールされているパッケージのリストを取得
-  (message "Installed packages - %s" (reverse real-pkgs)) ; インストールされているパッケージを表示
-  ;; アップデートされているパッケージを表示
-  (package-menu--refresh real-pkgs)
-  (dolist (update-pkg (package-menu--find-upgrades))
-    (message "Info: Package %s is updated. Version %s is available."
-             (car update-pkg)
-             (package-desc-version (cdr update-pkg))))
-  ;; インストールされているパッケージで、指定したパッケージ以外のものがあれば表示
-  (dolist (pkg pkgs)
-    (setq real-pkgs (delete pkg real-pkgs)))
-  (when real-pkgs
-    (message "Info: Unexpected installed packages %s"  (reverse real-pkgs))))
+;; インストールを確認するパッケージ
+(my-init-check-package
+ '(
+   csv-mode
+   ess
+   ggtags
+   gitignore-mode
+   gnuplot
+   graphviz-dot-mode
+   inf-ruby
+   magit
+   markdown-mode
+   mediawiki
+   mew
+   pandoc
+   session
+   sokoban
+   web-mode
+   xbm-life
+   xpm
+   ))
 
 ;;
 ;; ライブラリの読み込み
