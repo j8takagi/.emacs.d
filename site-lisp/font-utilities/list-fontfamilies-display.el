@@ -49,27 +49,28 @@ argument, prompt for a regular expression using `read-regexp'."
       (setq max-length (max (length (cdr acell)) max-length)))
     (setq max-length (1+ max-length)
           line-format (format "%%-%ds" max-length))
+    (select-frame-set-input-focus (make-frame))
+    (switch-to-buffer (get-buffer-create abuf))
     (with-help-window abuf
-      (with-current-buffer abuf
-        (setq truncate-lines t)
-        (catch 'nextfont)
-        (dolist (acell alist)
-          (setq afontfamily (car acell) afontprop (cdr acell))
-          (insert (propertize (format line-format afontprop) 'face (list :overline t)))
-          (internal-make-lisp-face
-           (setq aface (intern (concat "list-fontfamilies-" afontprop))) (selected-frame))
-          (condition-case aerr
-              (set-face-attribute aface (selected-frame)
-                                  :width 'normal :weight 'normal
-                                  :slant 'normal :font afontprop)
-            (error
-              (set-face-attribute aface (selected-frame)
-                                  :foreground
-                                  (face-attribute 'default ':background))))
-          (let ((apos (point)) (abeg (line-beginning-position)))
-            (insert (propertize list-fontfamilies-sample-text 'face aface) "\n")
-            (list-fontfamilies-line-up apos abeg max-length)))
-          (goto-char (point-min))))))
+      (setq truncate-lines t)
+      (catch 'nextfont)
+      (dolist (acell alist)
+        (setq afontfamily (car acell) afontprop (cdr acell))
+        (insert (propertize (format line-format afontprop) 'face (list :overline t)))
+        (internal-make-lisp-face
+         (setq aface (intern (concat "list-fontfamilies-" afontprop))) (selected-frame))
+        (condition-case aerr
+            (set-face-attribute aface (selected-frame)
+                                :width 'normal :weight 'normal
+                                :slant 'normal :font afontprop)
+          (error
+           (set-face-attribute aface (selected-frame)
+                               :foreground
+                               (face-attribute 'default ':background))))
+        (let ((apos (point)) (abeg (line-beginning-position)))
+          (insert (propertize list-fontfamilies-sample-text 'face aface) "\n")
+          (list-fontfamilies-line-up apos abeg max-length)))
+      (goto-char (point-min)))))
 
 (defun list-fontfamilies-line-up (pos line-begin max-length)
   "If the sample text has multiple lines, line up all of them."
