@@ -28,41 +28,50 @@ this regular expression.  When called interactively with a prefix
 argument, prompt for a regular expression using `read-regexp'."
   (interactive (list (and current-prefix-arg
                           (read-regexp "List font families matching regexp"))))
-  (let
-      ((all (zerop (length regexp))) (max-length 0) line-format fontfamilies)
+  (let ((max-length 0) aalist afontfamily aface afontprop avector line-format)
     ;; We filter and take the max length in one pass
-    (setq fontfamilies
-          (delete-dups
-           (delq nil (mapcar
-                      (lambda (f)
-                        (when (or all (string-match-p regexp f))
-                          (setq max-length (max (length f) max-length))
-                          f))
-                      (sort (font-family-list) #'string-lessp)))))
-    (unless fontfamilies
+    (unless (setq aalist (list-fontfamilies-alist regexp))
       (error "No font families matching \"%s\"" regexp))
+    (dolist (alst aalist)
+      (setq max-length (max (length (cdr alst)) max-length)))
     (setq max-length (1+ max-length)
           line-format (format "%%-%ds" max-length))
     (with-help-window "*Font families*"
       (with-current-buffer "*Font families*"
         (setq truncate-lines t)
-        (dolist (afontfamily fontfamilies)
-          (dolist (afont (delete-dups (x-list-fonts afontfamily)))
-            (insert (propertize (format line-format afontfamily) 'face (list :overline t)))
-            (let (fontprop (beg (point)) (line-beg (line-beginning-position)))
-              (setq fontprop
-                    (if (string-match-p "-" afontfamily)
-                        (vector afontfamily "normal" "normal")
-                      (x-decompose-font-name afont)))
-              (insert (propertize list-fontfamilies-sample-text 'face (list :family afontfamily :weight (intern (aref fontprop 1)) :slant (intern (aref fontprop 2)))))
-              (insert "\n")
-              ;; If the sample text has multiple lines, line up all of them.
-              (goto-char beg)
-              (forward-line 1)
-              (while (not (eobp))
-                (insert-char ?\s max-length)
-                (forward-line 1)))
-            ))
-          (goto-char (point-min))))))
+        (dolist (alst aalist)
+          (setq afontfamily (car alst) afontprop (cdr alst))
+          (internal-make-lisp-face
+           (setq aface (intern (concat "list-fontfamilies-" afontprop))) (selected-frame))
+          (if (string-match-p "-" afontfamily)
+              (set-face-attribute aface (selected-frame) :family afontfamily :weight 'normal :slant 'normal)
+            (set-face-font aface afontprop (selected-frame)))
+          (insert (propertize (format line-format afontprop) 'face (list :overline t)))
+          (let ((beg (point)) (line-beg (line-beginning-position)))
+            (insert (propertize list-fontfamilies-sample-text
+                                'face aface))
+            (insert "\n")
+            ;; If the sample text has multiple lines, line up all of them.
+            (goto-char beg)
+            (forward-line 1)
+            (while (not (eobp))
+              (insert-char ?\s (- max-length 8))
+              (forward-line 1))))
+      (goto-char (point-min))))))
+
+(defun list-fontfamilies-alist (&optional regexp)
+  "Alist (FONTFAMILY-NAME . XLFD) of font families.
+
+If REGEXP is nil, list all font families. If REGEXP is non-nil,
+list only those font families with names matching this
+regular expression.  When called interactively with a prefix
+argument, prompt for a regular expression using `read-regexp'."
+  (let (aalist)
+    (dolist (afontfamily (delete-dups (sort (font-family-list) #'string-lessp)))
+      (when (or (zerop (length regexp)) (string-match-p regexp afontfamily))
+        (dolist (axlfd (delete-dups (x-list-fonts afontfamily)))
+          (push (cons afontfamily axlfd) aalist))))
+    (nreverse aalist)))
+
 (provide 'list-fontfamilies-display)
 ;;; list-fontfamilies-display.el ends here
