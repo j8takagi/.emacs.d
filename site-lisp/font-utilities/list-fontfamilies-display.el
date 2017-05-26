@@ -58,7 +58,14 @@ argument, prompt for a regular expression using `read-regexp'."
           (insert (propertize (format line-format afontprop) 'face (list :overline t)))
           (internal-make-lisp-face
            (setq aface (intern (concat "list-fontfamilies-" afontprop))) (selected-frame))
-          (set-face-attribute aface (selected-frame) :family afontfamily)
+          (condition-case aerr
+              (set-face-attribute aface (selected-frame)
+                                  :width 'normal :weight 'normal
+                                  :slant 'normal :font afontprop)
+            (error
+              (set-face-attribute aface (selected-frame)
+                                  :foreground
+                                  (face-attribute 'default ':background))))
           (let ((apos (point)) (abeg (line-beginning-position)))
             (insert (propertize list-fontfamilies-sample-text 'face aface) "\n")
             (list-fontfamilies-line-up apos abeg max-length)))
