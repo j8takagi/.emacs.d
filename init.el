@@ -144,7 +144,6 @@
  '(column-number-mode 1)                ; 列番号を表示
  '(global-font-lock-mode 1)             ; メジャーモードに合わせた色を付ける
  '(line-number-mode 1)                  ; 行番号を表示
- '(recentf-mode 1)                      ; recentf
  '(show-paren-mode 1)                   ; 括弧の対応を表示
  '(tool-bar-mode nil)                   ; ツールバーを表示しない
  '(transient-mark-mode 1)               ; リージョンをハイライト
@@ -164,11 +163,6 @@
  '(initial-scratch-message nil)         ; *scratch* にメッセージを表示しない
  '(make-backup-files 1)                 ; バックアップファイルを作成する
  '(next-line-add-newlines nil)          ; ファイル末尾での改行で、end of bufferエラーが発生しないように
- '(recentf-auto-cleanup 'never)         ; 存在しないファイルを消さない
- '(recentf-auto-save-timer (run-with-idle-timer 30 t 'recentf-save-list)) ;; 30秒に一度自動保存
- '(recentf-exclude '("/recentf" "COMMIT_EDITMSG" "/.?TAGS" "^/sudo:" "/\\.emacs\\.d/games/*-scores" "/\\.emacs\\.d/\\.*")) ;; recentfの除外ファイル
- '(recentf-max-saved-items 2000)        ; 2000ファイルまで履歴保存する
- '(recentf-save-file "~/.emacs.d/.recentf") ; recentfの設定ファイル
  '(save-interprogram-paste-before-kill 1) ; 他アプリのコピーバッファをkill-ringに保存する
  '(scroll-conservatively 1)             ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
  '(session-set-file-name-exclude-regexp "[/\\]\\.overview\\|[/\\]\\.session\\|News[/\\]\\|\\.emacs\\.d/\\|~$\\|COMMIT_EDITMSG") ; sessionで、file-name-historyから除外するファイル
