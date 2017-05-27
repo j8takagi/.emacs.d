@@ -9,7 +9,7 @@
          '(
            ;; (unicode . (font-spec :family "源ノ角ゴシック Code JP R" :weight 'normal :size 12))
            (ascii . (font-spec :family "Consolas" :weight 'normal :size 12))
-           (unicode . (font-spec :family "メイリオ"))
+           (unicode . (font-spec :family "游ゴシック"))
            )
          "mydefault"))
   (dolist
