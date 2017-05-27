@@ -172,8 +172,9 @@
  '(user-mail-address "j8takagi@nifty.com") ; ChangeLogなどで用いるメールアドレスの設定
  '(version-control 1)                   ; バックアップファイルにバージョン番号を付ける
  '(visible-bell 1)                      ; エラー時、音が鳴るのではなく、画面が点滅するように
+ '(yank-excluded-properties t)          ; ヤンクで、テキストプロパティは捨てる
  '(yank-pop-change-selection 1)         ; yank-popを有効にする
-)
+ )
 
 ;; uniq-linesを、delete-duplicate-linesの別名として設定
 (defalias 'uniq-lines 'delete-duplicate-lines)
