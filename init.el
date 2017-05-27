@@ -15,12 +15,10 @@
 ;;;
 (my-init-require 'package)
 
-(dolist                                 ; パッケージアーカイブサイト
-    (archive
-     '(
-       ("melpa-stable" "http://stable.melpa.org/packages/")
-       ))
-  (add-to-list 'package-archives (cons (car archive) (cadr archive))))
+(my-init-add-package-archives
+ '(
+   ("melpa-stable" "http://stable.melpa.org/packages/")
+   ))
 
 ;; パッケージ初期化
 (package-initialize)
@@ -52,53 +50,45 @@
 ;;
 ;; ライブラリの読み込み
 ;;
-(dolist                                 ; 読み込むライブラリー
-    (feat
-     '(
-       ;; built-in libraries
-       ediff
-       server
-       ;; ~/.emacs.d/site-lisp
-       auto-elc-mode                    ; .elファイルの自動コンパイル
-       buffer-window-plus               ; バッファとウィンドウの操作関数を追加
-       count-japanese                   ; 日本語の文字数をカウント
-       ediff-vc-plus                    ; Ediffの追加関数
-       exopen                           ; 外部プログラムでファイルを開く
-       ime-cursor                       ; IMEをオンにしたときにカーソルの色を変える
-       japanese-plus                    ; 全角半角変換
-       list-fonts-display               ; フォント一覧作成コマンド
-       list-fontfamilies-display        ; フォントファミリー一覧作成コマンド
-       not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
-       scroll-one-line                  ; 1行スクロール
-       temp-buffer                      ; 一時バッファの作成
-       tidy-file-name-history           ; ファイル名履歴リストの整理
-       window-control                   ; ウィンドウとフレームのサイズを調整
-       xlfd-at                          ; フォント情報の表示
-       ))
-  (my-init-require feat))
+(my-init-requires
+ '(
+   ;; built-in libraries
+   ediff
+   server
+   ;; ~/.emacs.d/site-lisp
+   auto-elc-mode                    ; .elファイルの自動コンパイル
+   buffer-window-plus               ; バッファとウィンドウの操作関数を追加
+   count-japanese                   ; 日本語の文字数をカウント
+   ediff-vc-plus                    ; Ediffの追加関数
+   exopen                           ; 外部プログラムでファイルを開く
+   ime-cursor                       ; IMEをオンにしたときにカーソルの色を変える
+   japanese-plus                    ; 全角半角変換
+   list-fonts-display               ; フォント一覧作成コマンド
+   list-fontfamilies-display        ; フォントファミリー一覧作成コマンド
+   not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
+   scroll-one-line                  ; 1行スクロール
+   temp-buffer                      ; 一時バッファの作成
+   tidy-file-name-history           ; ファイル名履歴リストの整理
+   window-control                   ; ウィンドウとフレームのサイズを調整
+   xlfd-at                          ; フォント情報の表示
+   ))
 
 ;; autoloadの設定
-(let (funcs)
-  (dolist                               ; autoloadする関数
-      (funcfile
-       '(
-         (bison-mode "bison-mode" "Major mode for editing bison/yacc files")
-         (crontab-mode "crontab-mode" "Major mode for editing crontab files")
-         (ert-mode "ert-mode" "Major mode for editing ERT files.")
-         (eukleides-mode "eukleides" "Major mode for editing Eukleides files")
-         (flex-mode "flex-mode" "Major mode for editing flex files")
-         (mediawiki-mode "mediawiki" "Major mode for editing Mediawiki articles.")
-         (mpv-ts-mode "mpv-ts-mode" "Major mode for editing transcription using mpv.")
-         (review-mode "review-mode" "Re:VIEW text editing mode")
-         (rubydb "rubydb3x" "ruby debug")
-         (svg-clock "svg-clock" "Start/stop svg-clock")
-         (tsv-mode "tsv-mode" "Major mode for TSV files")
-         (ucs-normalize-NFC-buffer "ucs-normalize-plus" "Normalize current buffer by the Unicode NFC.")
-         ))
-    (add-to-list
-     'funcs
-     (my-init-set-autoload (car funcfile) (nth 1 funcfile) (nth 2 funcfile))))
-  (message "Autoload functions set in init.el - %s" (reverse funcs)))
+(my-init-set-autoloads
+ '(
+   (bison-mode "bison-mode" "Major mode for editing bison/yacc files")
+   (crontab-mode "crontab-mode" "Major mode for editing crontab files")
+   (ert-mode "ert-mode" "Major mode for editing ERT files.")
+   (eukleides-mode "eukleides" "Major mode for editing Eukleides files")
+   (flex-mode "flex-mode" "Major mode for editing flex files")
+   (mediawiki-mode "mediawiki" "Major mode for editing Mediawiki articles.")
+   (mpv-ts-mode "mpv-ts-mode" "Major mode for editing transcription using mpv.")
+   (review-mode "review-mode" "Re:VIEW text editing mode")
+   (rubydb "rubydb3x" "ruby debug")
+   (svg-clock "svg-clock" "Start/stop svg-clock")
+   (tsv-mode "tsv-mode" "Major mode for TSV files")
+   (ucs-normalize-NFC-buffer "ucs-normalize-plus" "Normalize current buffer by the Unicode NFC.")
+   ))
 
 ;;
 ;; 文字コードの設定
