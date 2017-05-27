@@ -66,7 +66,8 @@
        exopen                           ; 外部プログラムでファイルを開く
        ime-cursor                       ; IMEをオンにしたときにカーソルの色を変える
        japanese-plus                    ; 全角半角変換
-       list-fontfamilies-display        ; フォントファミリー一覧を作成
+       list-fonts-display               ; フォント一覧作成コマンド
+       list-fontfamilies-display        ; フォントファミリー一覧作成コマンド
        not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
        scroll-one-line                  ; 1行スクロール
        temp-buffer                      ; 一時バッファの作成
