@@ -1,43 +1,36 @@
 ;; -*- mode: Emacs-Lisp; -*-
 ;; Mac OS X 非terminal 用の設定
+
+(message "Start of loading init-mac-gui.")
+
 (require 'my-init)
 
 ;; 環境変数の設定
-(dolist
-    (envval                             ; 環境変数ごとの設定値
-     '(
-       ("LANG" "en_US.UTF-8")
-       ("PAGER" "cat")
-       ("MANPAGER" "cat")
-       ("EDITOR" "emacsclient")
-       ("VISUAL" "emacsclient")
-       ))
-  (setenv (car envval) (cadr envval)))
-
-;;; フォントの設定
+(my-init-setenv
+ '(
+   ("LANG" "en_US.UTF-8")
+   ("PAGER" "cat")
+   ("MANPAGER" "cat")
+   ("EDITOR" "emacsclient")
+   ("VISUAL" "emacsclient")
+   ))
 
 ;; フレームの設定
-(let (afontset)
-  (setq afontset
-        (fontset-set
-         '(
-           ;; (unicode . (font-spec :family "Source Han Code JP" :weight 'normal :slant 'normal :size 12))
-           (ascii . (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
-           (unicode . (font-spec :family "YuGothic"))
-           )
-         "mydefault"
-           ))
-  (dolist
-      (fparam                           ; フレームパラメーター
-       `(
-         (font ,afontset)
-         (width 180)
-         (height 56)
-         (top 22)
-         (left 0)
-         ))
-    (update-or-add-alist 'default-frame-alist (car fparam) (cadr fparam)))
-  (message "default-frame-alist set in init-ma-gui.el - %s" default-frame-alist))
+(my-init-set-default-frame-alist
+ `(
+   (font
+    ,(fontset-set
+      '(
+        ;; (unicode . (font-spec :family "Source Han Code JP" :weight 'normal :slant 'normal :size 12))
+        (ascii . (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
+        (unicode . (font-spec :family "YuGothic"))
+        )
+      "mydefault_mac"))
+   (width 180)
+   (height 56)
+   (top 23)
+   (left 0)
+   ))
 
 (defun mac-set-ime-cursor-color ()
   "IMEのオン／オフで、カーソルの色を変える"
@@ -56,13 +49,11 @@
     (ime-cursor-unset-color)))
 
 ;; カーソル色を、IMの変更時とEmacsの画面を表示したときに設定する
-(dolist
-    (hook                           ; フック
-     '(
-       mac-selected-keyboard-input-source-change-hook
-       focus-in-hook
-       ))
-  (my-init-set-hook hook 'mac-set-ime-cursor-color))
+(my-init-set-hooks
+ '(
+   (mac-selected-keyboard-input-source-change-hook mac-set-ime-cursor-color)
+   (focus-in-hook mac-set-ime-cursor-color)
+   ))
 
 ;; カスタム変数の設定
 (custom-set-variables
@@ -82,12 +73,10 @@
      ))))
 
 ;; Mac OS Xのキー設定
-(dolist                                 ; グローバルのキーバインド
-    (mapkeys
+(my-init-global-set-keys
      '(
        ("<M-f1>" other-frame)    ; Mac OS Xの他アプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする
-      ))
-  (my-init-global-set-key (car mapkeys) (cadr mapkeys)))
+       ))
 
 (cd "~")
 

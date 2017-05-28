@@ -7,6 +7,22 @@
 
 ;;; Commentary:
 ;;; Code:
+
+(defun update-or-add-alist (alist-var key value)
+  "If KEY in ALIST, update VALUE of the KEY.
+Unless, cons cell (KEY . VALUE) is added."
+  (interactive)
+  (let (aconscell (alist (symbol-value alist-var)))
+   (if (setq aconscell (assoc key alist))
+       (unless (equal (cdr aconscell) value)
+         (setf (cdr aconscell) value))
+     (set alist-var (push (cons key value) alist)))
+   alist))
+
+(defvar system-name-simple
+  (replace-regexp-in-string "\\..*\\'" "" (system-name))
+  "The simple host name of the machine Emacs is running on, which is without domain information.")
+
 (defun my-init-require (feature)
   "Require FEATURE, and the result is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
   (if (featurep feature)
@@ -24,11 +40,16 @@
   (dolist (afeat features-list)
     (my-init-require afeat)))
 
+(defun my-init-require-by-system (system-features-list)
+  (dolist (syslib system-features-list)
+    (when (equal (eval (car syslib)) (nth 1 syslib))
+      (my-init-require (nth 2 syslib)))))
+
 (defun my-init-add-package-archives (archives-list)
   "Add package archives to `package-archives'.
 Each element of ARCHIVES-LIST has the form (ID LOCATION)."
   (dolist (aarch archives-list)
-    (add-to-list 'package-archives (cons (car aarch) (cadr aarch)))))
+    (update-or-add-alist 'package-archives (car aarch) (cadr aarch))))
 
 (defun my-init-install-package (pkg &optional pkg-from)
   "Check whether PKG is installed. When not installed, the installation begins.
@@ -86,7 +107,7 @@ Each element of ARCHIVES-LIST has the form (FUNCTION FILE DOC)."
        (my-init-set-autoload (car afunc) (nth 1 afunc) (nth 2 afunc))))
     (if (not funcs)
         (message "Autoload functions is not set.")
-      (message "Autoload functions set in init.el - %s" (reverse funcs)))))
+      (message "Autoload functions - %s" (reverse funcs)))))
 
 (defun my-init-set-autoload (function file doc)
   "Define FUNCTION to autoload from FILE by autoload function.
@@ -109,6 +130,14 @@ If FUNCTION is void, warning message is printed into the `*Messages' buffer, or 
   (if (not (fboundp function))
       (message "Warning: In setting keybind, function `%s' is void." function)
     (global-set-key (kbd key) function)))
+
+(defun my-init-global-set-keys (keys-list)
+  (dolist (mapkeys keys-list)
+    (my-init-global-set-key (car mapkeys) (cadr mapkeys))))
+
+(defun my-init-global-unset-keys (keys-list)
+  (dolist (key keys-list)
+    (global-unset-key (kbd key))))
 
 (defun my-init-modemap-set-key (library hook modemap mapkeys)
   "Give KEY binding of MODEMAP as MAPKEYS after LIBRARY is loaded.
@@ -139,6 +168,11 @@ If function in MAPKEYS is void, warning message is printed into the `*Messages' 
                   (define-key ,modemap (kbd key) func))))))
         `(add-hook ',hook ',func-init-keybind))))))
 
+(defun my-init-modemap-set-keys (modekey-list)
+  (dolist (modekey modekey-list)
+    (my-init-modemap-set-key
+     (car modekey) (nth 1 modekey) (nth 2 modekey) (nth 3 modekey))))
+
 (defun my-init-set-mode (mode)
   "Set MODE. MODE format is assumed as `(FUNCTION 1)' to enable the mode, or `(FUNCTION 0)' to disable the mode. FUNCTION presents minor mode.
 If FUNCTION in MODE is void, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
@@ -146,14 +180,56 @@ If FUNCTION in MODE is void, warning message is printed into the `*Messages' buf
       (message "Warning: In setting minor mode, function `%s' is void." (car mode))
     (eval mode)))
 
-(defun my-init-set-hook (hook function)
-  "Add FUNCTION to HOOK by add-hook function.
-If FUNCTION or HOOK is void, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
-  (cond
-   ((not (boundp hook)) (message "Warning: In setting hooks, hook `%s' is void." hook))
-   ((not (fboundp function)) (message "Warning: In setting hooks, function `%s' is void." function))
-   (t
-    (add-hook hook function))))
+(defun my-init-set-modes (mode-list)
+  (dolist (mode mode-list)
+    (my-init-set-mode mode)))
+
+(defun my-init-custom-set-default (var-list)
+  (dolist (varval var-list)
+    (custom-set-default (car varval) (cadr varval))))
+
+(defun my-init-set-variables (var-list)
+  (dolist (varval var-list)
+    (set-variable (car varval) (cadr varval))))
+
+(defun my-init-defalias (symbol-list)
+  (dolist (symdef symbol-list)
+    (let ((asym (car symdef)) (adef (cadr symdef)))
+     (when (fboundp asym)
+         (message "Info: Function `%s' is already defined." asym))
+     (cond
+      ((not (fboundp adef)) (message "Warning: In setting alias, symbol `%s' is not function." adef))
+      (t
+       (defalias asym adef)
+       (message "`%s' is defined as alias of `%s'." asym adef))))))
+
+(defun my-init-set-default-frame-alist (parameters-list)
+  (dolist (fparam parameters-list)
+    (update-or-add-alist 'default-frame-alist (car fparam) (cadr fparam)))
+  (message "default-frame-alist: %s" default-frame-alist))
+
+(defun my-init-add-completion-ignored-extensions (extensions-list)
+  (dolist (ext extensions-list)
+    (add-to-list 'completion-ignored-extensions ext)))
+
+(defun my-init-set-display-buffer-same-window (buffer-pattern-list)
+  (dolist (bufptn buffer-pattern-list)
+    (update-or-add-alist 'display-buffer-alist
+                         bufptn '(display-buffer-same-window))))
+
+(defun my-init-set-magic-mode-alist (magic-list)
+  (dolist (magic magic-list)
+    (let (mode)
+      (if (not (fboundp (setq mode (cadr magic))))
+          (message "Warning: In setting magic-mode-alist, function `%s' is void." mode)
+        (update-or-add-alist 'magic-mode-alist (car magic) mode)))))
+
+(defun my-init-add-automode-alist (mode-list)
+  (dolist (ptnmode mode-list)
+    (let (mode)
+      (if (not (fboundp (setq mode (cadr ptnmode))))
+          (message "Warning: In setting auto-mode-alist, function `%s' is void." mode)
+        (update-or-add-alist 'auto-mode-alist (car ptnmode) mode)))))
 
 (defun my-init-overwrite-auto-mode-alist (mode-to mode-from)
   "Over write auto-mode-alist from one mode to anothor mode.
@@ -168,16 +244,27 @@ If MODE-TO or MODE-FROM is void, warning message is printed into the `*Messages'
       (while (setq conscell (rassq mode-from auto-mode-alist))
         (setcdr conscell mode-to))))))
 
-(defun update-or-add-alist (alist-var key value)
-  "If KEY in ALIST, update VALUE of the KEY.
-Unless, cons cell (KEY . VALUE) is added."
-  (interactive)
-  (let (aconscell (alist (symbol-value alist-var)))
-   (if (setq aconscell (assq key alist))
-       (unless (eq (cdr aconscell) value)
-         (setf (cdr aconscell) value))
-     (set alist-var (push (cons key value) alist)))
-   alist))
+(defun my-init-overwrite-auto-mode-alists (mode-list)
+  (dolist (mode-to-from mode-list)
+    (my-init-overwrite-auto-mode-alist (car mode-to-from) (cadr mode-to-from))))
+
+(defun my-init-set-hook (hook function)
+  "Add FUNCTION to HOOK by add-hook function.
+If FUNCTION or HOOK is void, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
+  (cond
+   ((not (boundp hook)) (message "Warning: In setting hooks, hook `%s' is void." hook))
+   ((not (fboundp function)) (message "Warning: In setting hooks, function `%s' is void." function))
+   (t
+    (add-hook hook function))))
+
+(defun my-init-set-hooks (hooks-list)
+  "Add function to hooks by list of (FUNCTION HOOK)."
+  (dolist (hookfunc hooks-list)
+    (my-init-set-hook (car hookfunc) (cadr hookfunc))))
+
+(defun my-init-setenv (env-list)
+  (dolist (envval env-list)
+    (setenv (car envval) (cadr envval))))
 
 ;; Emacs開始にかかった時間をメッセージに表示
 (defun my-init-message-startup-time ()

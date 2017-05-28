@@ -1,47 +1,42 @@
 ;; -*- mode: Emacs-Lisp; -*-
 ;; MS-Windowsの設定
+
+(message "Start of loading init-w32.")
+
 (require 'my-init)
 
 ;; フレームの設定
-(let (afontset)
-  (setq afontset
-        (fontset-set
-         '(
-           ;; (unicode . (font-spec :family "源ノ角ゴシック Code JP R" :weight 'normal :size 12))
-           (ascii . (font-spec :family "Consolas" :weight 'normal :size 12))
-           (unicode . (font-spec :family "游ゴシック"))
-           )
-         "mydefault"))
-  (dolist
-      (fparam                           ; フレームパラメーター
-       `(
-         (font ,afontset)
-         (width 180)
-         (height 56)
-         (top 0)
-         (left 0)
-         ))
-    (update-or-add-alist 'default-frame-alist (car fparam) (cadr fparam)))
-  (message "default-frame-alist set in init-w32-gui.el - %s" default-frame-alist))
+(my-init-set-default-frame-alist
+ `(
+   (font
+    ,(fontset-set
+      '(
+        ;; (unicode . (font-spec :family "源ノ角ゴシック Code JP R" :weight 'normal :size 12))
+        (ascii . (font-spec :family "Consolas" :weight 'normal :size 12))
+        (unicode . (font-spec :family "游ゴシック"))
+        )
+      "mydefault_w32"))
+   (width 180)
+   (height 56)
+   (top 0)
+   (left 0)
+   ))
 
 ;; 文字コードのデフォルトはUTF-8
 (prefer-coding-system 'utf-8-dos)
 
-;; 日本語ファイル名を正常に処理するための設定
-(dolist
-    (coding                             ; フレームパラメーター
-     '(
-       (default-file-name-coding-system cp932)
-       (default-process-coding-system (utf-8 . cp932))
-       ))
-     (set-variable (car coding) (cadr coding)))
+(my-init-set-variables
+ '(
+   (default-file-name-coding-system cp932) ; 日本語ファイル名を正常に処理する
+   (default-process-coding-system (utf-8 . cp932)) ; 日本語ファイル名を正常に処理する
+   (default-input-method "W32-IME")                ; IMEの設定
+   ))
 
 ;; 環境変数EDITORの設定
-(setenv "EDITOR" "emacsclient")
-
-;; Shell-modeの文字コード設定
-(defun set-buffer-process-coding-system-cp932 ()
-  (set-buffer-process-coding-system 'cp932 'cp932))
+(my-init-setenv
+ '(
+   ("EDITOR" "emacsclient")
+   ))
 
 ;; view-modeの設定
 (with-eval-after-load 'view
@@ -52,26 +47,23 @@
        "~/.emacs.d/elpa"
      ))))
 
-;; IME切り替え時に undefined のエラーメッセージが表示されるのを抑制
-(set-variable 'default-input-method "W32-IME")
-
-(dolist                                 ; グローバルのキーバインド
-    (mapkeys
+(my-init-global-set-keys
      '(
-       ("<M-kanji>" ignore)
+       ("<M-kanji>" ignore)             ; IME切り替え時に undefined のエラーメッセージが表示されるのを抑制
        ("<kanji>" toggle-input-method)
        ))
-  (my-init-global-set-key (car mapkeys) (cadr mapkeys)))
+
+;; Shell-modeの文字コード設定
+(defun set-buffer-process-coding-system-cp932 ()
+  (set-buffer-process-coding-system 'cp932 'cp932))
 
 ;; フックの設定
-(dolist
-    (hookfunc                           ; フックに設定するファンクション
-     '(
-       (shell-mode-hook set-buffer-process-coding-system-cp932)
-       (w32-ime-on-hook ime-cursor-set-color)
-       (w32-ime-off-hook ime-cursor-unset-color)
-       ))
-  (my-init-set-hook (car hookfunc) (cadr hookfunc)))
+(my-init-set-hooks
+ '(
+   (shell-mode-hook set-buffer-process-coding-system-cp932)
+   (w32-ime-on-hook ime-cursor-set-color)
+   (w32-ime-off-hook ime-cursor-unset-color)
+   ))
 
 (cd "~")
 
