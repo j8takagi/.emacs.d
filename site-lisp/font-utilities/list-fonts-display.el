@@ -26,14 +26,24 @@
   :group 'display
   )
 
-(defun list-fonts-display (&optional regexp)
+(defun list-fonts-display (&optional regexp &rest fontspecs)
   "List available fonts, using the same sample text in each.
 The sample text is a string that comes from the variable
 `list-fonts-sample-text'.
 
 If REGEXP is non-nil, list only those font families with names matching
 this regular expression.  When called interactively with a prefix
-argument, prompt for a regular expression using `read-regexp'."
+argument, prompt for a regular expression using `read-regexp'.
+
+
+If FONTSPECS is not nil, FONTSPECS elements are same as ARGS of font-spec.
+See `font-spec' and `set-face-attribute'.
+FONTSPECS elements must come in pairs KEY VALUE of font properties.
+KEY must be a valid font property name listed below:
+
+‘:family’, ‘:weight’, ‘:slant’, ‘:width’,
+`:foundry', `:adstyle', `:registry', `:size', `:name',
+`:script', `:lang', `:otf'"
   (interactive (list (and current-prefix-arg
                           (read-regexp "List font families matching regexp"))))
   (let (saved-fontset aalist)
@@ -42,31 +52,47 @@ argument, prompt for a regular expression using `read-regexp'."
      (create-fontset-from-ascii-font
       (frame-parameter (selected-frame) 'font) nil "list_fontfamilies")
      nil nil)
-    (unless (setq aalist (list-fonts-alist regexp))
+    (unless (setq aalist (list-fonts-alist regexp fontspecs))
       (error "No font families matching \"%s\"" regexp))
-    (list-fonts-alist-display aalist)
+    (list-fonts-list-display (mapcar 'cdr aalist))
     (set-frame-font saved-fontset nil)
     ))
 
-(defun list-fonts-alist (&optional regexp)
+(defun list-fonts-alist (&optional regexp fontspec-list)
   "Return alist (FONTFAMILY-NAME . XLFD) of font families.
 
 If REGEXP is nil, list all font families. If REGEXP is non-nil,
 list only those font families with names matching this
-regular expression."
-  (let (aalist)
+regular expression.
+
+If FONTSPEC-LIST is not nil, FONTSPEC-LIST elements are
+same as ARGS of font-spec. See `font-spec' and `set-face-attribute'.
+FONTSPEC-LIST elements must come in pairs KEY VALUE of font properties.
+KEY must be a valid font property name listed below:
+
+‘:family’, ‘:weight’, ‘:slant’, ‘:width’,
+`:foundry', `:adstyle', `:registry', `:size', `:name',
+`:script', `:lang', `:otf'"
+  (let (aalist afonts)
     (dolist (afontfamily (delete-dups (sort (font-family-list) #'string-lessp)))
       (when (or (zerop (length regexp)) (string-match-p regexp afontfamily))
-        (dolist (axlfd (delete-dups (x-list-fonts afontfamily)))
+        (condition-case aerr
+            (setq afonts
+                  (x-list-fonts
+                   (font-xlfd-name
+                    (apply 'font-spec :family afontfamily fontspec-list))))
+          (error
+            (setq afonts (x-list-fonts afontfamily))))
+        (dolist (axlfd (delete-dups afonts))
           (push (cons afontfamily axlfd) aalist))))
     (nreverse aalist)))
 
-(defun list-fonts-alist-display (alist)
+(defun list-fonts-list-display (fontslist)
   (let
       ((max-length 0) (abuf "*Fonts*")
-       afontfamily aface afontprop line-format)
-    (dolist (acell alist)
-      (setq max-length (max (length (cdr acell)) max-length)))
+       afontfamily aface line-format)
+    (dolist (afont fontslist)
+      (setq max-length (max (length afont) max-length)))
     (setq max-length (1+ max-length)
           line-format (format "%%-%ds" max-length))
     (select-frame-set-input-focus (make-frame))
@@ -74,14 +100,13 @@ regular expression."
     (with-help-window abuf
       (setq truncate-lines t)
       (catch 'nextfont)
-      (dolist (acell alist)
-        (setq afontfamily (car acell) afontprop (cdr acell))
-        (insert (propertize (format line-format afontprop) 'face (list :overline t)))
-        (setq aface (intern (concat "list-fonts-" afontprop)))
+      (dolist (afont fontslist)
+        (insert (propertize (format line-format afont) 'face (list :overline t)))
+        (setq aface (intern (concat "list-fonts-" afont)))
         (condition-case aerr
             (set-face-attribute aface (selected-frame)
                                 :width 'normal :weight 'normal
-                                :slant 'normal :font afontprop)
+                                :slant 'normal :font afont)
           (error
            (set-face-attribute aface (selected-frame)
                                :foreground
