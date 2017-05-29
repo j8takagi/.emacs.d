@@ -39,6 +39,14 @@
 ;; ■hook
 (require 'dired)
 
+;; hook
+(defcustom exopen-file-hook nil
+  "List of functions to be called after open a file external.
+The buffer's local variables (if any) will have been processed before the
+functions are called."
+  :group 'find-file
+  :type 'hook)
+
 ;; exopen-std-cmd: OSやWindowで設定された関連付けをもとに
 ;; ファイルを開くプログラムコマンドとオプション
 (defvar exopen-std-cmd nil
@@ -66,7 +74,7 @@
 ;;; ファイルを外部プログラムでオープン
 ;;; exopen-std-cmdで指定されたプログラムを使用
 (defun exopen-file (file)
-  "open file in external program"
+  "Open a file in external program."
   (let ((process-connection-type nil) (cmd) (cmdargs))
     (if exopen-suffix-cmd
         (setq cmd (cdr (assoc (file-name-extension file 1) exopen-suffix-cmd))))
@@ -78,7 +86,8 @@
          (cmdstr (concat cmd " " cmdargs " \"" file "\""))
          (proc (concat "exopen at " (format-time-string "%Y/%m/%d %H:%M:%S"))))
       (message cmdstr)
-      (start-process-shell-command proc nil cmdstr))))
+      (start-process-shell-command proc nil cmdstr)))
+  (run-hooks 'exopen-file-hook))
 
 ;;; バッファで開いているファイルを外部プログラムでオープン
 (defun exopen-buffer-file ()
