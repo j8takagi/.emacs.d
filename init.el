@@ -149,6 +149,7 @@
  '(backup-directory-alist '(("." . "~/backup"))) ; バックアップファイルの保存先
  '(case-replace nil)      ; 置換時に大文字小文字を区別しない
  '(delete-old-versions 1) ; 古いバックアップファイルを自動的に削除する
+ '(delete-by-moving-to-trash 1)   ;  ファイルの削除で、ゴミ箱を使う
  '(disabled-command-function nil) ; すべてのコマンドの使用制限を解除する
  '(enable-recursive-minibuffers 1)      ; 再帰的にミニバッファを使う
  '(eval-expression-print-length nil)    ; evalした結果を全部表示する
