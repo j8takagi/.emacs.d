@@ -588,6 +588,7 @@
   (my-init-set-hooks
    '(
      (find-file-hook session-set-file-name-history)
+     (exopen-file-hook session-set-file-name-history)
      (session-before-save-hook delete-file-name-history-from-exclude-regexp)
      (session-before-save-hook delete-file-name-history-not-exist)
      )))
