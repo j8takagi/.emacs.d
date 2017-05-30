@@ -23,13 +23,11 @@
    (font
     ,(fontset-set
       '(
-        ;; (unicode . (font-spec :family "Source Han Code JP" :weight 'normal :slant 'normal :size 12))
-        (ascii . (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
-        (unicode . (font-spec :family "YuGothic"))
+        (unicode . (font-spec :family "Source Han Code JP" :weight 'normal :slant 'normal :size 11))
         )
       "mydefault_mac"))
    (width 180)
-   (height 56)
+   (height 52)
    (top 23)
    (left 0)
    ))
