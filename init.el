@@ -13,7 +13,10 @@
 ;;;
 ;;; パッケージ
 ;;;
-(my-init-require 'package)
+(my-init-requires
+ '(
+   package
+   ))
 
 (my-init-add-package-archives
  '(
@@ -67,12 +70,13 @@
    list-fonts-display               ; フォント一覧作成コマンド
    not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
    scroll-one-line                  ; 1行スクロール
-   skeleton-file-name               ; skeletonにより、プロンプトで補完入力したファイル名を挿入
-   skeleton-pair-japanese           ; 日本語の括弧についてのskeleton-pair設定
    temp-buffer                      ; 一時バッファの作成
    tidy-file-name-history           ; ファイル名履歴リストの整理
    window-control                   ; ウィンドウとフレームのサイズを調整
    xlfd-at                          ; フォント情報の表示
+   ;; ~/.emacs.d/insert
+   skeleton-file-name               ; skeletonにより、プロンプトで補完入力したファイル名を挿入
+   skeleton-pair-japanese           ; 日本語の括弧についてのskeleton-pair設定
    ))
 
 ;; autoloadの設定
@@ -190,10 +194,10 @@
 
 ;; 開くときに同じウィンドウに表示するバッファ
 (my-init-set-display-buffer-same-window
-     '(
-       "^\\*shell\\*$"
-       "^\\*magit: .+"
-       ))
+ '(
+   "^\\*shell\\*$"
+   "^\\*magit: .+"
+   ))
 
 ;; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
 (my-init-add-completion-ignored-extensions
@@ -220,9 +224,15 @@
 
 ;; view-modeの設定
 (with-eval-after-load 'view
-  (my-init-require 'init-view-mode)        ; read-onlyファイルをview-modeで開く
-  (my-init-require 'view-mode-vi-bindings) ; view-modeでviのキーバインド
-  (custom-set-variables '(view-read-only 1))
+  (my-init-requires
+   '(
+     init-view-mode               ; read-onlyファイルをview-modeで開く
+     view-mode-vi-bindings        ; view-modeでviのキーバインド
+     ))
+  (custom-set-variables
+   '(
+     view-read-only 1)
+   )
   (with-current-buffer "*Messages*" (view-mode))) ;; *Messages* バッファーを view-mode に
 
 ;; lisp-mode
@@ -244,7 +254,8 @@
 (with-eval-after-load 'ediff
   (custom-set-variables
    '(ediff-window-setup-function 'ediff-setup-windows-plain)
-   '(ediff-split-window-function 'split-window-horizontally)))
+   '(ediff-split-window-function 'split-window-horizontally)
+   ))
 
 ;; uniquify
 (with-eval-after-load 'uniquify
@@ -267,22 +278,29 @@
 ;; ChangeLog
 (with-eval-after-load 'add-log
   (custom-set-variables
-   '(change-log-default-name "~/ChangeLog")))
+   '(change-log-default-name "~/ChangeLog")
+   ))
 
-;; vc-follow-linkを無効にする
-;; 参考 http://d.hatena.ne.jp/a_bicky/20140607/1402131090
 (with-eval-after-load 'vc-hooks
-  (custom-set-variables '(vc-follow-symlinks nil)))
+  (custom-set-variables
+   '(vc-follow-symlinks nil)            ; vc-follow-linkを無効にする 参考: https://abicky.net/2014/06/07/175130/
+   ))
 
 ;; whitespace
 (with-eval-after-load 'whitespace
-  (my-init-require 'init-whitespace))
+  (my-init-requires
+   '(
+     init-whitespace
+     )))
 
 ;; shell-mode
 (with-eval-after-load 'shell
   (custom-set-variables              ; プロンプトの表示設定
    '(shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ "))
-  (my-init-require 'set-process-query-on-exit))
+  (my-init-requires
+   '(
+     set-process-query-on-exit
+     )))
 
 ;;; CC-Mode
 (with-eval-after-load 'cc-mode
@@ -316,17 +334,21 @@
 (with-eval-after-load 'nxml-mode
   (custom-set-variables
    '(nxml-child-indent 0)
-   '(nxml-attribute-indent 0)))
+   '(nxml-attribute-indent 0)
+   ))
 
 ;; ess-site > R
 (with-eval-after-load 'ess-site
-  (custom-set-variables '(ess-ask-for-ess-directory nil)))
+  (custom-set-variables
+   '(ess-ask-for-ess-directory nil)
+   ))
 
 ;; bison-mode
 (with-eval-after-load 'bison-mode
   (custom-set-variables
    '(bison-decl-token-column 0)
-   '(bison-rule-enumeration-column 8)))
+   '(bison-rule-enumeration-column 8)
+   ))
 
 ;; graphviz-dot-mode
 (with-eval-after-load 'graphviz-dot-mode
