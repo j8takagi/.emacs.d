@@ -9,8 +9,6 @@
 
 
 ;;; Code:
-(require 'fontset-set)
-
 (defcustom list-fontfamilies-sample-text
   "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789 !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
   "Text string to display as the sample text for `list-fontfamilies-display'."

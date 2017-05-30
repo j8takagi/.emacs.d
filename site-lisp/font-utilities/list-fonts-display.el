@@ -7,9 +7,7 @@
 
 ;;; Commentary:
 
-
 ;;; Code:
-(require 'fontset-set)
 (require 'list-fontfamilies-display)
 
 (defcustom list-fonts-sample-text
@@ -59,7 +57,7 @@ KEY must be a valid font property name listed below:
     ))
 
 (defun list-fonts-alist (&optional regexp fontspec-list)
-  "Return alist (FONTFAMILY-NAME . XLFD) of font families.
+  "Return list of alist (FONTFAMILY-NAME . XLFD).
 
 If REGEXP is nil, list all font families. If REGEXP is non-nil,
 list only those font families with names matching this
@@ -70,7 +68,7 @@ same as ARGS of font-spec. See `font-spec' and `set-face-attribute'.
 FONTSPEC-LIST elements must come in pairs KEY VALUE of font properties.
 KEY must be a valid font property name listed below:
 
-‘:family’, ‘:weight’, ‘:slant’, ‘:width’,
+`:family’, `:weight’, `:slant’, `:width’,
 `:foundry', `:adstyle', `:registry', `:size', `:name',
 `:script', `:lang', `:otf'"
   (let (aalist afonts)
@@ -88,6 +86,9 @@ KEY must be a valid font property name listed below:
     (nreverse aalist)))
 
 (defun list-fonts-list-display (fontslist)
+  "List fonts in FONTLIST, using the same sample text in each.
+The sample text is a string that comes from the variable.
+`list-fonts-sample-text'."
   (let
       ((max-length 0) (abuf "*Fonts*")
        afontfamily aface line-format)
