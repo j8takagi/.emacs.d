@@ -35,7 +35,7 @@
    ))
 
 (defun mac-set-ime-cursor-color ()
-  "IMEのオン／オフで、カーソルの色を変える"
+  "IMEのオンとオフにあわせ、カーソルの色を変える"
   (interactive)
   (catch 'match
     (dolist
