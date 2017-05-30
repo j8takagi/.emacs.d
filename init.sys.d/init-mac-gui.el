@@ -23,9 +23,8 @@
    (font
     ,(fontset-set
       '(
-        ;; (unicode . (font-spec :family "Source Han Code JP" :weight 'normal :slant 'normal :size 12))
         (ascii . (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
-        (unicode . (font-spec :family "YuGothic"))
+        (unicode . (font-spec :family "Hiragino Sans"))
         )
       "mydefault_mac"))
    (width 180)
