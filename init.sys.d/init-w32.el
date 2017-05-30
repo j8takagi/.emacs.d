@@ -13,13 +13,12 @@
    (font
     ,(fontset-set
       '(
-        ;; (unicode . (font-spec :family "源ノ角ゴシック Code JP R" :weight 'normal :size 12))
-        (ascii . (font-spec :family "Consolas" :weight 'normal :size 12))
+        (ascii . (font-spec :family "Consolas" :weight 'normal :size 14))
         (unicode . (font-spec :family "游ゴシック"))
         )
       "mydefault_w32"))
-   (width 180)
-   (height 56)
+   (width 160)
+   (height 48)
    (top 0)
    (left 0)
    ))
