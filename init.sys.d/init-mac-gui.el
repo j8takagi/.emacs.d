@@ -1,6 +1,5 @@
 ;; -*- mode: Emacs-Lisp; -*-
 ;; Mac OS X 非terminal 用の設定
-
 (message "Start of loading init-mac-gui.")
 
 (require 'my-init)
@@ -23,7 +22,6 @@
    (font
     ,(fontset-set
       '(
-        ;; (unicode . (font-spec :family "Source Han Code JP" :weight 'normal :slant 'normal :size 12))
         (ascii . (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
         (unicode . (font-spec :family "YuGothic"))
         )
@@ -33,6 +31,9 @@
    (top 23)
    (left 0)
    ))
+
+(add-to-list 'face-font-rescale-alist '("YuGothic" . 1.167))
+
 
 (defun mac-set-ime-cursor-color ()
   "IMEのオンとオフにあわせ、カーソルの色を変える"
