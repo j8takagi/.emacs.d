@@ -5,6 +5,8 @@
 
 (require 'my-init)
 
+(my-init-require 'fontset-set)
+
 ;; 環境変数の設定
 (my-init-setenv
  '(

@@ -5,6 +5,8 @@
 
 (require 'my-init)
 
+(my-init-require 'fontset-set)
+
 ;; フレームの設定
 (my-init-set-default-frame-alist
  `(
