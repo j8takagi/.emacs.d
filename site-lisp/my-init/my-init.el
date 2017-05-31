@@ -190,30 +190,23 @@ If FUNCTION is void, warning message is printed into the `*Messages' buffer, or 
   "Give KEY binding of MODEMAP as MAPKEYS after LIBRARY is loaded.
 If HOOK is not nil, the binding is via the HOOK.
 If function in MAPKEYS is void, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
-  (eval-after-load library
-    (cond
-     ((null hook)
-      `(dolist (map ',mapkeys)
-         (let ((key (car map)) (func (nth 1 map)))
-           (if (not (fboundp func))
-               (message "Warning: In setting `%s' keybind, function `%s' is void."
-                        ,modemap func)
-             (define-key ,modemap (kbd key) func)))))
-     (t
-      (let* ((modemap-name (symbol-name modemap))
-             (func-init-keybind (read (concat "my-init-" modemap-name "-keybind"))))
-        (fset
-         func-init-keybind
-         `(lambda ()
-            (dolist
-                (map ',mapkeys)
-              (let ((key (car map)) (func (nth 1 map)))
-                (if (not (functionp func))
-                    (message
-                     "Warning: In setting `%s', function `%s' is not defined."
-                     ,modemap-name func)
-                  (define-key ,modemap (kbd key) func))))))
-        `(add-hook ',hook ',func-init-keybind))))))
+  (let ((modemap-name (symbol-name modemap)) afunc)
+    (eval-after-load library
+      (progn
+        (setq afunc
+              `(lambda ()
+                 (dolist (map ',mapkeys)
+                   (let ((key (car map)) (func (cadr map)))
+                     (if (not (fboundp func))
+                         (message
+                          ,(concat "Warning: In setting `" modemap-name  "' keybind, function `%s' is void.") func)
+                       (define-key ,modemap (kbd key) func))))))
+        (cond
+         ((not hook) (eval afunc))
+         (t
+          (let ((func-init-keybind (read (concat "my-init-" modemap-name "-keybind"))))
+            (fset func-init-keybind afunc)
+            `(add-hook ',hook ',func-init-keybind))))))))
 
 (defun my-init-modemap-set-keys (modekey-list)
   (dolist (modekey modekey-list)
