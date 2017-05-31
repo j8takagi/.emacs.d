@@ -138,7 +138,7 @@ Each ALIST-KEY-VAL has the form (ALIST-NAME (KEY1 VALUE1) (KEY2 VALUE2) ...)."
     (setq asym (car aalist))
     (dolist (akeyval (cdr aalist))
       (update-or-add-alist asym (car akeyval) (cadr akeyval)))
-    (message "%s: %s" (symbol-name asym) (symbol-value asym)))))
+    (message "%s alist is set." (symbol-name asym)))))
 
 (defun my-init-set-list (&rest list-val)
   "Set LIST-VAL value to the list.
@@ -147,21 +147,29 @@ Each LIST-VAL has the form (LIST-NAME (VALUE1 VALUE2 ...))."
     (dolist (lst list-val)
       (dolist (val (cadr lst))
         (add-to-list (setq asym (car lst)) val))
-      (message "%s: %s" (symbol-name asym) (symbol-value asym)))))
+      (message "%s list is set." (symbol-name asym)))))
+
 
 (defun my-init-defaliases (&rest sym-def)
   "Set SYMBOL’s function definition to DEFINITION in SYM-DEF.
 Each SYM-DEF has the form (SYMBOL DEFINITION &optional DOCSTRING)."
-  (dolist (asymdef sym-def)
-    (let ((asym (car asymdef)) (adef (cadr asymdef)))
-     (when (fboundp asym)
+  (let (asym adef)
+    (dolist (asymdef sym-def)
+     (when (fboundp (setq asym (car asymdef)))
        (message "Info: Function `%s' is already defined as `%s'." asym (symbol-name asym)))
-     (cond
-      ((not (fboundp adef))
-       (message "Warning: In setting alias, symbol `%s' is not function." adef))
-      ((not (eq (symbol-function asym) adef))
-       (defalias asym adef)
-       (message "`%s' is defined as alias of `%s'." asym adef))))))
+     (if (not (fboundp (setq adef (cadr asymdef))))
+         (message "Warning: In setting alias, symbol `%s' is not function." adef)
+       (defalias asym adef (nth 3 asymdef))
+       (message "`%s' is defined as alias of `%s'." asym adef)))))
+
+(defun my-init-view-mode-buffer (&rest buffer-name-regexp)
+  "Buffers match BUFFER-NAME-REGEXP to enable view-mode."
+  (save-excursion
+    (dolist (abuf (buffer-list))
+      (dolist (aregexp buffer-name-regexp)
+        (when (string-match-p aregexp (buffer-name abuf))
+          (set-buffer abuf)
+          (view-mode))))))
 
 (defun my-init-global-set-key (key function)
   "Give KEY a global binding as FUNCTION by global-set-key.
@@ -212,13 +220,6 @@ If function in MAPKEYS is void, warning message is printed into the `*Messages' 
     (my-init-modemap-set-key
      (car modekey) (nth 1 modekey) (nth 2 modekey) (nth 3 modekey))))
 
-(defun my-init-set-mode (mode)
-  "Set MODE. MODE format is assumed as `(FUNCTION 1)' to enable the mode, or `(FUNCTION 0)' to disable the mode. FUNCTION presents minor mode.
-If FUNCTION in MODE is void, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
-  (if (not (fboundp (car mode)))
-      (message "Warning: In setting minor mode, function `%s' is void." (car mode))
-    (eval mode)))
-
 (defun my-init-set-modes (&rest modeval)
   "Set MODE. MODE format is assumed as `(FUNCTION 1)' to enable the mode, or `(FUNCTION 0)' to disable the mode. FUNCTION presents minor mode.
 
@@ -228,21 +229,6 @@ If FUNCTION in MODE is void, warning message is printed into the `*Messages' buf
       (if (not (fboundp (setq amode (car amodeval))))
           (message "Warning: In setting minor mode, function `%s' is void." amode)
         (eval amodeval)))))
-
-(defun my-init-custom-set-default (var-list)
-  (dolist (varval var-list)
-    (custom-set-default (car varval) (cadr varval))))
-
-(defun my-init-defalias (symbol-list)
-  (dolist (symdef symbol-list)
-    (let ((asym (car symdef)) (adef (cadr symdef)))
-     (when (fboundp asym)
-         (message "Info: Function `%s' is already defined." asym))
-     (cond
-      ((not (fboundp adef)) (message "Warning: In setting alias, symbol `%s' is not function." adef))
-      (t
-       (defalias asym adef)
-       (message "`%s' is defined as alias of `%s'." asym adef))))))
 
 (defun my-init-add-completion-ignored-extensions (extensions-list)
   (dolist (ext extensions-list)
@@ -262,36 +248,32 @@ If FUNCTION in MODE is void, warning message is printed into the `*Messages' buf
           (message "Warning: In setting auto-mode-alist, function `%s' is void." mode)
         (update-or-add-alist 'auto-mode-alist (car ptnmode) mode)))))
 
-(defun my-init-overwrite-auto-mode-alist (mode-to mode-from)
+(defun my-init-overwrite-auto-mode-alists (&rest mode-to-from)
   "Over write auto-mode-alist from one mode to anothor mode.
 If MODE-TO or MODE-FROM is void, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
-  (let (conscell)
-    (cond
-     ((not (fboundp mode-to))
-      (message "Warning: In setting auto-mode-alist, mode `%s' overwritten to is void function." mode-to))
-     ((not (fboundp mode-from))
-      (message "Warning: In setting auto-mode-alist, mode `%s' overwritten from is void function." mode-from))
-     (t
-      (while (setq conscell (rassq mode-from auto-mode-alist))
-        (setcdr conscell mode-to))))))
+  (let (ato afrom (conscell))
+    (dolist (atofrom mode-to-from)
+      (cond
+       ((not (fboundp (setq ato (car atofrom))))
+        (message "Warning: In setting auto-mode-alist, mode `%s' overwritten to is void function." ato))
+       ((not (fboundp (setq afrom (cadr atofrom))))
+        (message "Warning: In setting auto-mode-alist, mode `%s' overwritten from is void function." afrom))
+       (t
+        (while (setq conscell (rassq afrom auto-mode-alist))
+          (setcdr conscell ato)))))))
 
-(defun my-init-overwrite-auto-mode-alists (mode-list)
-  (dolist (mode-to-from mode-list)
-    (my-init-overwrite-auto-mode-alist (car mode-to-from) (cadr mode-to-from))))
-
-(defun my-init-set-hook (hook function)
-  "Add FUNCTION to HOOK by add-hook function.
+(defun my-init-set-hooks (&rest hook-func)
+  "Add function to hooks by list of (FUNCTION HOOK).
 If FUNCTION or HOOK is void, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
-  (cond
-   ((not (boundp hook)) (message "Warning: In setting hooks, hook `%s' is void." hook))
-   ((not (fboundp function)) (message "Warning: In setting hooks, function `%s' is void." function))
-   (t
-    (add-hook hook function))))
-
-(defun my-init-set-hooks (hooks-list)
-  "Add function to hooks by list of (FUNCTION HOOK)."
-  (dolist (hookfunc hooks-list)
-    (my-init-set-hook (car hookfunc) (cadr hookfunc))))
+  (let (ahook afunc)
+    (dolist (ahookfunc hook-func)
+      (cond
+       ((not (boundp (setq ahook (car ahookfunc))))
+        (message "Warning: In setting hooks, hook `%s' is void." ahook))
+       ((not (fboundp (setq afunc (cadr ahookfunc))))
+        (message "Warning: In setting hooks, function `%s' is void." afunc))
+       (t
+        (add-hook ahook afunc))))))
 
 (defun my-init-setenv (env-list)
   (dolist (envval env-list)

@@ -13,6 +13,7 @@
 ;;;
 ;;; パッケージ
 ;;;
+
 (my-init-requires
  'package
  )
@@ -40,7 +41,6 @@
  'markdown-mode
  'mediawiki
  'mew
- 'pandoc
  'session
  'sokoban
  'web-mode
@@ -104,12 +104,11 @@
 ;; 文字コードのデフォルトはUTF-8
 (prefer-coding-system 'utf-8)
 
-
 ;;
 ;; 一般
 ;;
 
-; モードの設定
+; モード
 (my-init-set-modes
  ;; 有効にするモード
  '(auto-compression-mode 1)       ; 圧縮されたファイルを直接編集する
@@ -127,14 +126,14 @@
  '(tool-bar-mode 0)               ; ツールバーを表示しない
  )
 
-; 変数デフォルト値の設定
+; 変数デフォルト値
 (my-init-set-default-variables
  '(indent-line-function indent-to-left-margin) ; インデント用のファンクション
  '(indent-tabs-mode nil)                       ; タブをスペースに展開
  '(tab-width 4)                                ; タブ幅は4
  )
 
-; 変数の設定
+; 変数
 (my-init-set-variables
  '(skeleton-pair 1)               ; skeleton-pairにより括弧挿入を自動化
  '(skeleton-end-hook nil)         ; skeletonの挿入後、改行しない
@@ -164,14 +163,11 @@
  '(visible-bell 1)               ; エラー時、音が鳴るのではなく、画面が点滅するように
  '(yank-excluded-properties t)   ; ヤンクで、テキストプロパティは捨てる
  '(yank-pop-change-selection 1)  ; yank-popを有効にする
+ '(read-mail-command mew)        ; メールを読むときにmewを使う
+ '(custom-file "~/.emacs.d/.emacs-custom.el") ;カスタムの設定値を書き込むファイル
  )
 
-(my-init-defalias
- '(
-   (uniq-lines delete-duplicate-lines)  ; uniq-linesを、delete-duplicate-linesの別名に
-   (message-box message)                ; メッセージダイアログボックスは使わない
-   ))
-
+; 連想リスト
 (my-init-set-alist
  (when window-system
    '(default-frame-alist                ; デフォルトフレーム
@@ -189,6 +185,7 @@
    )
  )
 
+; リスト
 (my-init-set-list
  '(completion-ignored-extensions        ; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
    (
@@ -202,24 +199,82 @@
     ))
  )
 
+; エイリアス
+(my-init-defaliases
+ '(uniq-lines delete-duplicate-lines)  ; uniq-linesを、delete-duplicate-linesの別名に
+ '(message-box message)                ; メッセージダイアログボックスは使わない
+ )
+
 ;; view-modeの設定
 (with-eval-after-load 'view
   (my-init-requires
    'init-view-mode               ; read-onlyファイルをview-modeで開く
    'view-mode-vi-bindings        ; view-modeでviのキーバインド
    )
-  (custom-set-variables
-   '(
-     view-read-only 1)
+  (my-init-set-variables
+   '(view-read-only 1)
    )
-  (with-current-buffer "*Messages*" (view-mode))) ;; *Messages* バッファーを view-mode に
+  (my-init-view-mode-buffer
+   "\\*Messages\\*"                     ; *Messages*バッファをview-modeに
+   ))
+
+;; *Messages*の警告が目立つように
+(font-lock-add-keywords 'messages-buffer-mode
+                        '(("^\\(\\(Warning\\|Error\\):\\) .*" 1 font-lock-warning-face t)))
+(with-current-buffer "*Messages*" (font-lock-ensure))
+
+;; uniquify
+(with-eval-after-load 'uniquify
+  (my-init-set-variables
+   '(uniquify-buffer-name-style post-forward-angle-brackets)
+   '(uniquify-ignore-buffers-re "*[^*]+*")))
+
+;; emacsclient
+(with-eval-after-load 'server
+  (unless (server-running-p)
+     (server-start))
+  (my-init-set-variables
+   '(server-window 'pop-to-buffer)
+   ))
+
+;; compile
+(with-eval-after-load 'compile
+  (my-init-set-variables
+   '(compilation-scroll-output first-error) ; *compilation*バッファをスクロールして表示
+   ))
+
+;; ChangeLog
+(with-eval-after-load 'add-log
+  (my-init-set-variables
+   '(change-log-default-name "~/ChangeLog")
+   ))
+
+(with-eval-after-load 'vc-hooks
+  (my-init-set-variables
+   '(vc-follow-symlinks nil)            ; vc-follow-linkを無効にする 参考: https://abicky.net/2014/06/07/175130/
+   ))
+
+;; whitespace
+(with-eval-after-load 'whitespace
+  (my-init-requires
+   'init-whitespace
+   ))
+
+;;
+;; Ediff
+;;
+(with-eval-after-load 'ediff
+  (my-init-set-variables
+   '(ediff-window-setup-function ediff-setup-windows-plain)
+   '(ediff-split-window-function split-window-horizontally)
+   ))
 
 ;;
 ;; dired
 ;;
 (with-eval-after-load 'dired
-  (custom-set-variables
-   '(dired-recursive-copies 'always)  ; diredでディレクトリーを再帰的にコピーするとき、確認しない
+  (my-init-set-variables
+   '(dired-recursive-copies always)  ; diredでディレクトリーを再帰的にコピーするとき、確認しない
    '(dired-dwim-target 1)             ; 対象ディレクトリーの推測
    '(dired-isearch-filenames t)       ; diredでのisearchの対象をファイル名だけに
    )
@@ -230,71 +285,34 @@
    'wdired                      ; ファイル名編集
    ))
 
+;;
 ;; lisp-mode
+;;
 (with-eval-after-load 'lisp-mode
   (my-init-requires
    'emacs-lisp-skeletons
    )
-  (defun my-init-indent-lisp-indent-line () ; インデントの設定
-    (set-variable 'indent-line-function 'lisp-indent-line))
+  (defun my-init-indent-lisp-indent-line ()
+    (set-variable 'indent-line-function 'lisp-indent-line)) ; インデントの設定
   (my-init-set-hooks
-   '(
-     (emacs-lisp-mode-hook my-init-indent-lisp-indent-line)
-     (emacs-lisp-mode-hook turn-on-auto-elc)
-     ))
+   '(emacs-lisp-mode-hook my-init-indent-lisp-indent-line)
+   '(emacs-lisp-mode-hook turn-on-auto-elc)
+   )
   (define-auto-insert "\\.el\\'" 'emacs-lisp-template))
 
-;; Ediff
-(with-eval-after-load 'ediff
-  (custom-set-variables
-   '(ediff-window-setup-function 'ediff-setup-windows-plain)
-   '(ediff-split-window-function 'split-window-horizontally)
-   ))
-
-;; uniquify
-(with-eval-after-load 'uniquify
-  (custom-set-variables
-   '(uniquify-buffer-name-style 'post-forward-angle-brackets)
-   '(uniquify-ignore-buffers-re "*[^*]+*")))
-
-;; *compilation*バッファをスクロールして表示
-(with-eval-after-load 'compile
-  (custom-set-variables '(compilation-scroll-output 'first-error)))
-
-
-;; emacsclient
-(with-eval-after-load 'server
-  (unless (server-running-p)
-     (server-start))
-  (custom-set-variables
-   '(server-window 'pop-to-buffer)))
-
-;; ChangeLog
-(with-eval-after-load 'add-log
-  (custom-set-variables
-   '(change-log-default-name "~/ChangeLog")
-   ))
-
-(with-eval-after-load 'vc-hooks
-  (custom-set-variables
-   '(vc-follow-symlinks nil)            ; vc-follow-linkを無効にする 参考: https://abicky.net/2014/06/07/175130/
-   ))
-
-;; whitespace
-(with-eval-after-load 'whitespace
-  (my-init-requires
-   'init-whitespace
-   ))
-
+;;
 ;; shell-mode
+;;
 (with-eval-after-load 'shell
-  (custom-set-variables              ; プロンプトの表示設定
-   '(shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ "))
+  (my-init-set-variables
+   '(shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ")) ; プロンプトの表示設定
   (my-init-requires
    'set-process-query-on-exit
    ))
 
-;;; CC-Mode
+;;
+;; CC-Mode
+;;
 (with-eval-after-load 'cc-mode
   (my-init-requires
    'init-cc-mode
@@ -303,15 +321,21 @@
    )
   (define-auto-insert "\\.h\\'" 'h-template))
 
+;;
 ;; tex-mode
+;;
 (with-eval-after-load 'tex-mode
   (my-init-requires
    'latex-skeletons
    )
   (define-auto-insert 'latex-mode 'latex-template)
-  (add-hook 'latex-mode-hook 'turn-on-reftex))
+  (my-init-set-hooks
+   '(latex-mode-hook turn-on-reftex)
+   ))
 
+;;
 ;; web-mode
+;;
 (with-eval-after-load 'web-mode
   (my-init-requires
    'init-web-mode
@@ -319,27 +343,35 @@
    )
   (define-auto-insert "\\.[sx]?html?\\(\\.[a-zA-Z_]+\\)?\\'" 'web-template))
 
+;;
 ;; nxml-mode
+;;
 (with-eval-after-load 'nxml-mode
-  (custom-set-variables
+  (my-init-set-variables
    '(nxml-child-indent 0)
    '(nxml-attribute-indent 0)
    ))
 
+;;
 ;; ess-site > R
+;;
 (with-eval-after-load 'ess-site
-  (custom-set-variables
+  (my-init-set-variables
    '(ess-ask-for-ess-directory nil)
    ))
 
+;;
 ;; bison-mode
+;;
 (with-eval-after-load 'bison-mode
-  (custom-set-variables
+  (my-init-set-variables
    '(bison-decl-token-column 0)
    '(bison-rule-enumeration-column 8)
    ))
 
+;;
 ;; graphviz-dot-mode
+;;
 (with-eval-after-load 'graphviz-dot-mode
   (defun kill-local-compile-command ()
     (kill-local-variable 'compile-command))
@@ -347,26 +379,34 @@
    'graphviz-dot-skeletons
    )
   (define-auto-insert 'graphviz-dot-mode 'graphviz-dot-template)
-  (add-hook 'graphviz-dot-mode-hook 'kill-local-compile-command))
+  (my-init-set-hooks
+   '(graphviz-dot-mode-hook kill-local-compile-command)
+   ))
 
+;;
 ;; magit
-;; "run-hooks: Symbol’s function definition is void: git-commit-setup-check-buffer" エラー対策
-(defvar with-editor-file-name-history-exclude 1)
+;;
+(defvar with-editor-file-name-history-exclude 1) ; "run-hooks: Symbol’s function definition is void: git-commit-setup-check-buffer" エラー対策
 
 (with-eval-after-load 'magit
-  '(custom-set-variables
-    '(magit-status-buffer-switch-function 'switch-to-buffer)))
+  (my-init-set-variables
+   '(magit-status-buffer-switch-function switch-to-buffer)
+   ))
 
+;;
 ;; mew
-(custom-set-variables '(read-mail-command 'mew))
+;;
 (define-mail-user-agent
   'mew-user-agent
   'mew-user-agent-compose
   'mew-draft-send-message
   'mew-draft-kill
-  'mew-send-hook)
+  'mew-send-hook
+  )
 
+;;
 ;; mpv-ts-mode
+;;
 (with-eval-after-load 'mpv-ts-mode
   (define-auto-insert 'mpv-ts-mode "template.ts"))
 
@@ -375,23 +415,21 @@
 ;;
 
 ;; magic-mode-alist
-(my-init-set-magic-mode-alist
- '(
+(my-init-set-alist
+ '(magic-mode-alist
    ("<![Dd][Oo][Cc][Tt][Yy][Pp][Ee] [Hh][Tt][Mm][Ll]" web-mode)
    ("<\\?xml " nxml-mode)
    ))
 
-;; auto-mode-alist
-;; 既存のモード設定を上書きする
+;; auto-mode-alistで、既存のモード設定を上書きする
 (my-init-overwrite-auto-mode-alists
- '(
-   (makefile-gmake-mode makefile-bsdmake-mode)
-   (web-mode html-mode)
-   ))
+ '(makefile-gmake-mode makefile-bsdmake-mode)
+ '(web-mode html-mode)
+ )
 
 ;; 新しいモード設定を追加する
-(my-init-add-automode-alist
- '(
+(my-init-set-alist
+ '(auto-mode-alist
    ("[Mm]akefile\\(\\.[a-zA-Z0-9]+\\)?\\'" makefile-gmake-mode)
    ("\\.[rR]\\'" R-mode)
    ("\\.casl?\\'" asm-mode)
@@ -496,10 +534,6 @@
 ;; リストの形式は、(mode-library mode-hook mode-map-name ((key1 function1) (key2 function2)))
 (my-init-modemap-set-keys
  '(
-   (nil nil read-expression-map
-        (
-         ("<tab>" lisp-complete-symbol)
-         ))
    ("text-mode" nil text-mode-map
     (
      ("C-M-i" dabbrev-expand) ; ispell 起動を無効にし、dabbrev-expand を設定
@@ -564,15 +598,11 @@
      ("<" skeleton-pair-insert-maybe)
      ("'" skeleton-pair-insert-maybe)
      ))
+   (nil eval-expression-minibuffer-setup-hook read-expression-map
+        (
+         ("<M-return>" completion-at-point)
+         ))
    ))
-
-;; メッセージバッファーの設定
-(font-lock-add-keywords 'messages-buffer-mode
-                        '(("^\\(\\(Warning\\|Error\\):\\) .*" 1 font-lock-warning-face t)))
-(with-current-buffer "*Messages*" (font-lock-ensure))
-
-;; pandoc
-;(pandoc-turn-on-advice-eww)
 
 ;;
 ;; システムごとの初期化ファイルの設定
@@ -587,20 +617,18 @@
 
 ;; フックの設定
 (my-init-set-hooks
- '(
-   (after-init-hook session-initialize)
-   (after-init-hook my-init-message-startup-time)
-   (find-file-hook auto-insert)
-   (kill-buffer-query-functions not-kill-but-bury-buffer)
-   ))
+   '(after-init-hook session-initialize)
+   '(after-init-hook my-init-message-startup-time)
+   '(find-file-hook auto-insert)
+   '(kill-buffer-query-functions not-kill-but-bury-buffer)
+   )
 
 (with-eval-after-load 'session
   (my-init-set-hooks
-   '(
-     (find-file-hook session-set-file-name-history)
-     (exopen-file-hook session-set-file-name-history)
-     (session-before-save-hook delete-file-name-history-from-exclude-regexp)
-     (session-before-save-hook delete-file-name-history-not-exist)
-     )))
+   '(find-file-hook session-set-file-name-history)
+   '(exopen-file-hook session-set-file-name-history)
+   '(session-before-save-hook delete-file-name-history-from-exclude-regexp)
+   '(session-before-save-hook delete-file-name-history-not-exist)
+   ))
 
 (message "End of loading init.el.")

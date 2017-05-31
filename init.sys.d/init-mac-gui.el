@@ -19,12 +19,13 @@
 
 (my-init-set-alist
  `(default-frame-alist                  ; デフォルトフレーム
-    (font ,(fontset-set
-            '(
-              (ascii . (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
-              (unicode . (font-spec :family "Hiragino Sans"))
-              )
-            "mydefault_mac"))
+    (font
+     ,(fontset-set
+       '(
+         (ascii . (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
+         (unicode . (font-spec :family "Hiragino Sans"))
+         )
+       "mydefault_mac"))
     (width 180)
     (height 56)
     (top 23)
@@ -49,10 +50,9 @@
 
 ;; カーソル色を、IMの変更時とEmacsの画面を表示したときに設定する
 (my-init-set-hooks
- '(
-   (mac-selected-keyboard-input-source-change-hook mac-set-ime-cursor-color)
-   (focus-in-hook mac-set-ime-cursor-color)
-   ))
+ '(mac-selected-keyboard-input-source-change-hook mac-set-ime-cursor-color)
+ '(focus-in-hook mac-set-ime-cursor-color)
+ )
 
 ;; カスタム変数の設定
 (my-init-set-variables
@@ -73,9 +73,9 @@
 
 ;; Mac OS Xのキー設定
 (my-init-global-set-keys
-     '(
-       ("<M-f1>" other-frame)    ; Mac OS Xの他アプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする
-       ))
+ '(
+   ("<M-f1>" other-frame)    ; Mac OS Xの他アプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする
+   ))
 
 (cd "~")
 

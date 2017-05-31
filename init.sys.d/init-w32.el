@@ -5,23 +5,23 @@
 
 (require 'my-init)
 
-(my-init-require 'fontset-set)
+(my-init-requires 'fontset-set)
 
 ;; フレームの設定
-(my-init-set-default-frame-alist
- `(
-   (font
-    ,(fontset-set
-      '(
-        (ascii . (font-spec :family "Consolas" :weight 'normal :size 14))
-        (unicode . (font-spec :family "游ゴシック"))
-        )
-      "mydefault_w32"))
-   (width 160)
-   (height 48)
-   (top 0)
-   (left 0)
-   ))
+(my-init-set-alist
+ `(default-frame-alist                  ; デフォルトフレーム
+    (font
+     ,(fontset-set
+       '(
+         (ascii . (font-spec :family "Consolas" :weight 'normal :size 14))
+         (unicode . (font-spec :family "游ゴシック"))
+         )
+       "mydefault_w32"))
+    (width 160)
+    (height 48)
+    (top 0)
+    (left 0)
+    ))
 
 ;; 文字コードのデフォルトはUTF-8
 (prefer-coding-system 'utf-8-dos)
@@ -41,18 +41,18 @@
 
 ;; view-modeの設定
 (with-eval-after-load 'view
-  (custom-set-variables
+  (my-init-set-variables
    '(read-write-enable-dir-patterns
-     '(
-       "E:/Documents/201[4-9]_[01][0-9]"
-       "~/.emacs.d/elpa"
-     ))))
+     (
+      "E:/Documents/201[4-9]_[01][0-9]"
+      "~/.emacs.d/elpa"
+      ))))
 
 (my-init-global-set-keys
-     '(
-       ("<M-kanji>" ignore)             ; IME切り替え時に undefined のエラーメッセージが表示されるのを抑制
-       ("<kanji>" toggle-input-method)
-       ))
+ '(
+   ("<M-kanji>" ignore)             ; IME切り替え時に undefined のエラーメッセージが表示されるのを抑制
+   ("<kanji>" toggle-input-method)
+   ))
 
 ;; Shell-modeの文字コード設定
 (defun set-buffer-process-coding-system-cp932 ()
