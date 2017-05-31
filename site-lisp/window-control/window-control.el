@@ -22,10 +22,10 @@
 
 ;;; Commentary:
 
-;; Emcasのフレームとウィンドウを制御する。
+;; Control Emcas frame and window.
 
 ;; ■動作環境
-;; Emacs 24.3で動作を確認
+;; Emacs 25.2で動作を確認
 
 ;; ■インストール方法
 ;; 1. LOAD-PATHで指定されているディレクトリにこのファイルをコピーする
@@ -188,22 +188,22 @@
 (defvar frame-shift-size 20)
 
 (defun frame-shift-right ()
-  (when default-frame-alist
-    (let* ((leftcell (assoc 'left default-frame-alist))
-           (topcell (assoc 'top default-frame-alist)))
-      (setcdr leftcell (+ (cdr leftcell) frame-shift-size))
-      (setcdr topcell (+ (cdr topcell) frame-shift-size)))))
+  (let (leftcell topcell)
+  (when (setq leftcell (assoc 'left default-frame-alist))
+    (setcdr leftcell (+ (cdr leftcell) frame-shift-size)))
+  (when (setq topcell (assoc 'top default-frame-alist))
+    (setcdr topcell (+ (cdr topcell) frame-shift-size)))))
 
 (defun frame-shift-left ()
-  (when default-frame-alist
-    (let* ((leftcell (assoc 'left default-frame-alist))
-           (left (cdr leftcell))
-           (topcell (assoc 'top default-frame-alist))
-           (top (cdr topcell)))
-      (if (>= left frame-shift-size)
-          (setcdr leftcell (- left frame-shift-size)))
-      (if (>= top frame-shift-size)
-          (setcdr topcell (- top frame-shift-size))))))
+  (let (leftcell topcell left top)
+    (when (and
+           (setq leftcell (assoc 'left default-frame-alist))
+           (>= (setq left (cdr leftcell)) frame-shift-size))
+      (setcdr leftcell (- left frame-shift-size)))
+    (when (and
+           (setq topcell (assoc 'top default-frame-alist))
+           (>= (setq top (cdr topcell)) frame-shift-size))
+      (setcdr topcell (- top frame-shift-size)))))
 
 (define-key global-map "\C-\\" (make-sparse-keymap))     ; C-\ をプリフィックスキーに
 
