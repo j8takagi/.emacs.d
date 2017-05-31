@@ -5,7 +5,7 @@
 
 (require 'my-init)
 
-(my-init-require 'fontset-set)
+(my-init-requires 'fontset-set)
 
 ;; 環境変数の設定
 (my-init-setenv
@@ -17,21 +17,19 @@
    ("VISUAL" "emacsclient")
    ))
 
-;; フレームの設定
-(my-init-set-default-frame-alist
- `(
-   (font
-    ,(fontset-set
-      '(
-        (ascii . (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
-        (unicode . (font-spec :family "Hiragino Sans"))
-        )
-      "mydefault_mac"))
-   (width 180)
-   (height 56)
-   (top 23)
-   (left 0)
-   ))
+(my-init-set-alist
+ `(default-frame-alist                  ; デフォルトフレーム
+    (font ,(fontset-set
+            '(
+              (ascii . (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
+              (unicode . (font-spec :family "Hiragino Sans"))
+              )
+            "mydefault_mac"))
+    (width 180)
+    (height 56)
+    (top 23)
+    (left 0)
+    ))
 
 (defun mac-set-ime-cursor-color ()
   "IMEのオンとオフにあわせ、カーソルの色を変える"
@@ -57,21 +55,21 @@
    ))
 
 ;; カスタム変数の設定
-(custom-set-variables
- '(mac-command-modifier 'meta)        ; commandキーをEmacsのMetaキーに
+(my-init-set-variables
+ '(mac-command-modifier meta)        ; commandキーをEmacsのMetaキーに
  '(mac-auto-ascii-mode 1)             ; ミニバッファへのカーソル移動時、日本語IMEを自動オフ
  )
 
 ;; view-modeの設定
 (with-eval-after-load 'view
-  (custom-set-variables
+  (my-init-set-list
    '(read-write-enable-dir-patterns
-     '(
-       "~/Documents/201[4-9]_[01][0-9]"
-       "~/.emacs.d/elpa"
-       "/tmp"
-       "/var"
-     ))))
+     (
+      "~/Documents/201[4-9]_[01][0-9]"
+      "~/.emacs.d/elpa"
+      "/tmp"
+      "/var"
+      ))))
 
 ;; Mac OS Xのキー設定
 (my-init-global-set-keys

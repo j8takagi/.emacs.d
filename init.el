@@ -14,9 +14,8 @@
 ;;; パッケージ
 ;;;
 (my-init-requires
- '(
-   package
-   ))
+ 'package
+ )
 
 (my-init-add-package-archives
  '(
@@ -29,75 +28,74 @@
 ;; (message "Debug: auto-mode-alist just after package initialize - %s" auto-mode-alist)
 
 ;; インストールを確認するパッケージ
-(my-init-check-package
- '(
-   csv-mode
-   ess
-   ggtags
-   gitignore-mode
-   gnuplot
-   graphviz-dot-mode
-   inf-ruby
-   magit
-   markdown-mode
-   mediawiki
-   mew
-   pandoc
-   session
-   sokoban
-   web-mode
-   xbm-life
-   xpm
-   ))
+(my-init-check-packages
+ 'csv-mode
+ 'ess
+ 'ggtags
+ 'gitignore-mode
+ 'gnuplot
+ 'graphviz-dot-mode
+ 'inf-ruby
+ 'magit
+ 'markdown-mode
+ 'mediawiki
+ 'mew
+ 'pandoc
+ 'session
+ 'sokoban
+ 'web-mode
+ 'xbm-life
+ 'xpm
+ )
 
 ;;
 ;; ライブラリの読み込み
 ;;
-(my-init-requires
- '(
-   ;; built-in libraries
-   ediff
-   server
-   ;; ~/.emacs.d/site-lisp
-   auto-elc-mode                    ; .elファイルの自動コンパイル
-   buffer-window-plus               ; バッファとウィンドウの操作関数を追加
-   count-japanese                   ; 日本語の文字数をカウント
-   ediff-vc-plus                    ; Ediffの追加関数
-   exopen                           ; 外部プログラムでファイルを開く
-   ime-cursor                       ; IMEをオンにしたときにカーソルの色を変える
-   japanese-plus                    ; 全角半角変換
-   list-fontfamilies-display        ; フォントファミリー一覧作成コマンド
-   list-fonts-display               ; フォント一覧作成コマンド
-   not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
-   scroll-one-line                  ; 1行スクロール
-   temp-buffer                      ; 一時バッファの作成
-   tidy-file-name-history           ; ファイル名履歴リストの整理
-   window-control                   ; ウィンドウとフレームのサイズを調整
-   xlfd-at                          ; フォント情報の表示
-   ;; ~/.emacs.d/insert
-   skeleton-file-name               ; skeletonにより、プロンプトで補完入力したファイル名を挿入
-   skeleton-pair-japanese           ; 日本語の括弧についてのskeleton-pair設定
-   ))
 
-;; autoloadの設定
+;; require
+(my-init-requires
+ ;; built-in libraries
+ 'ediff
+ 'server
+ ;; ~/.emacs.d/site-lisp
+ 'auto-elc-mode                    ; .elファイルの自動コンパイル
+ 'buffer-window-plus               ; バッファとウィンドウの操作関数を追加
+ 'count-japanese                   ; 日本語の文字数をカウント
+ 'ediff-vc-plus                    ; Ediffの追加関数
+ 'exopen                           ; 外部プログラムでファイルを開く
+ 'ime-cursor                       ; IMEをオンにしたときにカーソルの色を変える
+ 'japanese-plus                    ; 全角半角変換
+ 'list-fontfamilies-display        ; フォントファミリー一覧作成コマンド
+ 'list-fonts-display               ; フォント一覧作成コマンド
+ 'not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
+ 'scroll-one-line                  ; 1行スクロール
+ 'temp-buffer                      ; 一時バッファの作成
+ 'tidy-file-name-history           ; ファイル名履歴リストの整理
+ 'window-control                   ; ウィンドウとフレームのサイズを調整
+ 'xlfd-at                          ; フォント情報の表示
+ ;; ~/.emacs.d/insert
+ 'skeleton-file-name               ; skeletonにより、プロンプトで補完入力したファイル名を挿入
+ 'skeleton-pair-japanese           ; 日本語の括弧についてのskeleton-pair設定
+ )
+
+;; autoload
 (my-init-set-autoloads
- '(
-   (bison-mode "bison-mode" "Major mode for editing bison/yacc files")
-   (crontab-mode "crontab-mode" "Major mode for editing crontab files")
-   (ert-mode "ert-mode" "Major mode for editing ERT files.")
-   (eukleides-mode "eukleides" "Major mode for editing Eukleides files")
-   (flex-mode "flex-mode" "Major mode for editing flex files")
-   (mediawiki-mode "mediawiki" "Major mode for editing Mediawiki articles.")
-   (mpv-ts-mode "mpv-ts-mode" "Major mode for editing transcription using mpv.")
-   (review-mode "review-mode" "Re:VIEW text editing mode")
-   (rubydb "rubydb3x" "ruby debug")
-   (svg-clock "svg-clock" "Start/stop svg-clock")
-   (tsv-mode "tsv-mode" "Major mode for TSV files")
-   (ucs-normalize-NFC-buffer "ucs-normalize-plus" "Normalize current buffer by the Unicode NFC.")
-   ))
+ '(bison-mode "bison-mode" "Major mode for editing bison/yacc files")
+ '(crontab-mode "crontab-mode" "Major mode for editing crontab files")
+ '(ert-mode "ert-mode" "Major mode for editing ERT files")
+ '(eukleides-mode "eukleides" "Major mode for editing Eukleides files")
+ '(flex-mode "flex-mode" "Major mode for editing flex files")
+ '(mediawiki-mode "mediawiki" "Major mode for editing Mediawiki articles")
+ '(mpv-ts-mode "mpv-ts-mode" "Major mode for editing transcription using mpv")
+ '(review-mode "review-mode" "Re:VIEW text editing mode")
+ '(rubydb "rubydb3x" "ruby debug")
+ '(svg-clock "svg-clock" "Start/stop svg-clock")
+ '(tsv-mode "tsv-mode" "Major mode for TSV files")
+ '(ucs-normalize-NFC-buffer "ucs-normalize-plus" "Normalize current buffer by the Unicode NFC")
+ )
 
 ;;
-;; 文字コードの設定
+;; 文字コード
 ;;
 
 ;; 日本語環境
@@ -106,53 +104,45 @@
 ;; 文字コードのデフォルトはUTF-8
 (prefer-coding-system 'utf-8)
 
-;; カスタム設定ファイル
-(set-variable 'custom-file "~/.emacs.d/.emacs-custom.el")
 
-;; カスタム変数デフォルト値の設定
-(my-init-custom-set-default
- '(
-   (indent-tabs-mode nil)           ; タブをスペースに展開
-   (tab-width 4)                    ; タブ幅は4
-   ))
+;;
+;; 一般
+;;
 
-;; 変数デフォルト値の設定
-(set-default 'indent-line-function 'indent-to-left-margin) ; インデント用のファンクション
-
+; モードの設定
 (my-init-set-modes
- '(
-   (abbrev-mode 1)            ; Abbrevsを使う
-   (whitespace-mode 1)        ; 空白を強調表示
-   ))
-
-(my-init-set-variables
- '(
-   (skeleton-pair 1)                    ; skeleton-pairにより括弧挿入を自動化
-   (skeleton-end-hook nil)              ; skeletonの挿入後、改行しない
-   ))
-
-;; カスタム変数の設定
-(custom-set-variables
  ;; 有効にするモード
  '(auto-compression-mode 1)       ; 圧縮されたファイルを直接編集する
  '(column-number-mode 1)          ; 列番号を表示
  '(global-font-lock-mode 1)       ; メジャーモードに合わせた色を付ける
  '(line-number-mode 1)            ; 行番号を表示
  '(show-paren-mode 1)             ; 括弧の対応を表示
- '(tool-bar-mode nil)             ; ツールバーを表示しない
  '(transient-mark-mode 1)         ; リージョンをハイライト
+ '(abbrev-mode 1)                 ; Abbrevsを使う
+ '(whitespace-mode 1)             ; 空白を強調表示
  ;; 無効にするモード
- '(blink-cursor-mode nil)               ; カーソルは点滅しない
- '(electric-indent-mode nil) ; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
- '(menu-bar-mode nil)        ; メニューバーを表示しない
- ;; モード以外
- '(Info-additional-directory-list '("~/share/info/ja" "~/share/info")) ; Infoファイルの場所
+ '(blink-cursor-mode 0)           ; カーソルは点滅しない
+ '(electric-indent-mode 0)        ; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
+ '(menu-bar-mode 0)               ; メニューバーを表示しない
+ '(tool-bar-mode 0)               ; ツールバーを表示しない
+ )
+
+; 変数デフォルト値の設定
+(my-init-set-default-variables
+ '(indent-line-function indent-to-left-margin) ; インデント用のファンクション
+ '(indent-tabs-mode nil)                       ; タブをスペースに展開
+ '(tab-width 4)                                ; タブ幅は4
+ )
+
+; 変数の設定
+(my-init-set-variables
+ '(skeleton-pair 1)               ; skeleton-pairにより括弧挿入を自動化
+ '(skeleton-end-hook nil)         ; skeletonの挿入後、改行しない
  '(auto-insert-alist nil)
  '(auto-insert-directory "~/.emacs.d/insert/")
  '(auto-insert-query nil)
- '(backup-directory-alist '(("." . "~/backup"))) ; バックアップファイルの保存先
- '(case-replace nil)      ; 置換時に大文字小文字を区別しない
- '(delete-old-versions 1) ; 古いバックアップファイルを自動的に削除する
+ '(case-replace nil)              ; 置換時に大文字小文字を区別しない
+ '(delete-old-versions 1)         ; 古いバックアップファイルを自動的に削除する
  '(delete-by-moving-to-trash 1)   ;  ファイルの削除で、ゴミ箱を使う
  '(disabled-command-function nil) ; すべてのコマンドの使用制限を解除する
  '(enable-recursive-minibuffers 1)      ; 再帰的にミニバッファを使う
@@ -162,18 +152,18 @@
  '(inhibit-startup-screen 1)            ; 起動時の画面を表示しない
  '(initial-scratch-message nil)   ; *scratch* にメッセージを表示しない
  '(make-backup-files 1)           ; バックアップファイルを作成する
- '(next-line-add-newlines nil) ; ファイル末尾での改行で、end of bufferエラーが発生しないように
+ '(next-line-add-newlines nil)    ; ファイル末尾での改行で、end of bufferエラーが発生しないように
  '(save-interprogram-paste-before-kill 1) ; 他アプリのコピーバッファをkill-ringに保存する
- '(scroll-conservatively 1) ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
+ '(scroll-conservatively 1)       ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
  '(session-set-file-name-exclude-regexp "[/\\]\\.overview\\|[/\\]\\.session\\|News[/\\]\\|\\.emacs\\.d/\\|~$\\|COMMIT_EDITMSG") ; sessionで、file-name-historyから除外するファイル
  '(truncate-lines nil)                  ; 継続行を表示しない
  '(truncate-partial-width-windows nil)  ; 行を切り捨てない
  '(use-dialog-box nil)                  ; ダイアログボックスは使わない
  '(user-mail-address "j8takagi@nifty.com") ; ChangeLogなどで用いるメールアドレスの設定
- '(version-control 1)   ; バックアップファイルにバージョン番号を付ける
- '(visible-bell 1) ; エラー時、音が鳴るのではなく、画面が点滅するように
- '(yank-excluded-properties t)  ; ヤンクで、テキストプロパティは捨てる
- '(yank-pop-change-selection 1) ; yank-popを有効にする
+ '(version-control 1)            ; バックアップファイルにバージョン番号を付ける
+ '(visible-bell 1)               ; エラー時、音が鳴るのではなく、画面が点滅するように
+ '(yank-excluded-properties t)   ; ヤンクで、テキストプロパティは捨てる
+ '(yank-pop-change-selection 1)  ; yank-popを有効にする
  )
 
 (my-init-defalias
@@ -182,32 +172,51 @@
    (message-box message)                ; メッセージダイアログボックスは使わない
    ))
 
-;; フレームの設定
-(when window-system
-  (my-init-set-default-frame-alist
+(my-init-set-alist
+ (when window-system
+   '(default-frame-alist                ; デフォルトフレーム
+      (foreground-color "black")
+      (background-color "gray99")
+      (cursor-color "DarkOliveGreen")
+      (cursor-type box)
+      ))
+ '(display-buffer-alist                 ; バッファの表示方法の指定
+   ("^\\*shell\\*$" ((display-buffer-same-window)))
+   ("^\\*magit: .+" ((display-buffer-same-window)))
+   )
+ '(backup-directory-alist
+   ("." "~/backup")
+   )
+ )
+
+(my-init-set-list
+ '(completion-ignored-extensions        ; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
+   (
+    ".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" "_prev"
+    ".idx" ".ind" ".ilg" ".tmp" ".synctex.gz" ".dplg" ".dslg"
+    ".dSYM/" ".DS_Store" ":com.dropbox.attributes:$DATA"
+    ))
+ '(Info-additional-directory-list       ; Infoファイルの場所
+   (
+    "~/share/info/ja" "~/share/info"
+    ))
+ )
+
+;; view-modeの設定
+(with-eval-after-load 'view
+  (my-init-requires
+   'init-view-mode               ; read-onlyファイルをview-modeで開く
+   'view-mode-vi-bindings        ; view-modeでviのキーバインド
+   )
+  (custom-set-variables
    '(
-     (foreground-color "black")
-     (background-color "gray99")
-     (cursor-color "DarkOliveGreen")
-     (cursor-type box)
-     )))
+     view-read-only 1)
+   )
+  (with-current-buffer "*Messages*" (view-mode))) ;; *Messages* バッファーを view-mode に
 
-;; 開くときに同じウィンドウに表示するバッファ
-(my-init-set-display-buffer-same-window
- '(
-   "^\\*shell\\*$"
-   "^\\*magit: .+"
-   ))
-
-;; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
-(my-init-add-completion-ignored-extensions
- '(
-   ".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" "_prev"
-   ".idx" ".ind" ".ilg" ".tmp" ".synctex.gz" ".dplg" ".dslg"
-   ".dSYM/" ".DS_Store" ":com.dropbox.attributes:$DATA"
-   ))
-
+;;
 ;; dired
+;;
 (with-eval-after-load 'dired
   (custom-set-variables
    '(dired-recursive-copies 'always)  ; diredでディレクトリーを再帰的にコピーするとき、確認しない
@@ -215,32 +224,17 @@
    '(dired-isearch-filenames t)       ; diredでのisearchの対象をファイル名だけに
    )
   (my-init-requires
-   '(
-     dired-x                     ; diredの拡張機能
-     image-dired                 ; サムネイル表示
-     sorter                      ; ソート
-     wdired                      ; ファイル名編集
-     )))
-
-;; view-modeの設定
-(with-eval-after-load 'view
-  (my-init-requires
-   '(
-     init-view-mode               ; read-onlyファイルをview-modeで開く
-     view-mode-vi-bindings        ; view-modeでviのキーバインド
-     ))
-  (custom-set-variables
-   '(
-     view-read-only 1)
-   )
-  (with-current-buffer "*Messages*" (view-mode))) ;; *Messages* バッファーを view-mode に
+   'dired-x                     ; diredの拡張機能
+   'image-dired                 ; サムネイル表示
+   'sorter                      ; ソート
+   'wdired                      ; ファイル名編集
+   ))
 
 ;; lisp-mode
 (with-eval-after-load 'lisp-mode
   (my-init-requires
-   '(
-     emacs-lisp-skeletons
-     ))
+   'emacs-lisp-skeletons
+   )
   (defun my-init-indent-lisp-indent-line () ; インデントの設定
     (set-variable 'indent-line-function 'lisp-indent-line))
   (my-init-set-hooks
@@ -289,45 +283,40 @@
 ;; whitespace
 (with-eval-after-load 'whitespace
   (my-init-requires
-   '(
-     init-whitespace
-     )))
+   'init-whitespace
+   ))
 
 ;; shell-mode
 (with-eval-after-load 'shell
   (custom-set-variables              ; プロンプトの表示設定
    '(shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ "))
   (my-init-requires
-   '(
-     set-process-query-on-exit
-     )))
+   'set-process-query-on-exit
+   ))
 
 ;;; CC-Mode
 (with-eval-after-load 'cc-mode
   (my-init-requires
-   '(
-     init-cc-mode
-     c-skeletons
-     h-skeletons
-     ))
+   'init-cc-mode
+   'c-skeletons
+   'h-skeletons
+   )
   (define-auto-insert "\\.h\\'" 'h-template))
 
 ;; tex-mode
 (with-eval-after-load 'tex-mode
   (my-init-requires
-   '(
-     latex-skeletons
-     ))
+   'latex-skeletons
+   )
   (define-auto-insert 'latex-mode 'latex-template)
   (add-hook 'latex-mode-hook 'turn-on-reftex))
 
 ;; web-mode
 (with-eval-after-load 'web-mode
   (my-init-requires
-   '(
-     init-web-mode
-     web-skeletons
-     ))
+   'init-web-mode
+   'web-skeletons
+   )
   (define-auto-insert "\\.[sx]?html?\\(\\.[a-zA-Z_]+\\)?\\'" 'web-template))
 
 ;; nxml-mode
@@ -355,9 +344,8 @@
   (defun kill-local-compile-command ()
     (kill-local-variable 'compile-command))
   (my-init-requires
-   '(
-     graphviz-dot-skeletons
-     ))
+   'graphviz-dot-skeletons
+   )
   (define-auto-insert 'graphviz-dot-mode 'graphviz-dot-template)
   (add-hook 'graphviz-dot-mode-hook 'kill-local-compile-command))
 
@@ -589,14 +577,13 @@
 ;;
 ;; システムごとの初期化ファイルの設定
 ;;
-(my-init-require-by-system
- '(
-   (system-type gnu/linux init-linux)
-   (system-type darwin init-darwin)
-   (window-system mac init-mac-gui)
-   (window-system x init-x)
-   (window-system w32 init-w32)
-   ))
+(my-init-requires-by-system
+ '(system-type gnu/linux init-linux)
+ '(system-type darwin init-darwin)
+ '(window-system mac init-mac-gui)
+ '(window-system x init-x)
+ '(window-system w32 init-w32)
+ )
 
 ;; フックの設定
 (my-init-set-hooks

@@ -23,27 +23,25 @@ Unless, cons cell (KEY . VALUE) is added."
   (replace-regexp-in-string "\\..*\\'" "" (system-name))
   "The simple host name of the machine Emacs is running on, which is without domain information.")
 
-(defun my-init-require (feature)
+(defun my-init-requires (&rest feature)
   "Require FEATURE, and the result is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
-  (if (featurep feature)
-      (message "Info: Feature `%s' is already required." feature)
-    (if (not (locate-library (symbol-name feature)))
-        (message "Warning: Feature `%s' is NOT found." feature)
-      (condition-case err
-          (progn
-            (require feature)
-            (message "Feature `%s' is required." feature))
-        (error (message "Warning: Fails to require feature `%s'.\n%s: %s" feature (car err) (cadr err)))))))
+  (dolist (afeat feature)
+    (if (featurep afeat)
+        (message "Info: Feature `%s' is already required." afeat)
+      (if (not (locate-library (symbol-name afeat)))
+          (message "Warning: Feature `%s' is NOT found." afeat)
+        (condition-case err
+            (progn
+              (require afeat)
+              (message "Feature `%s' is required." afeat))
+          (error (message "Warning: Fails to require feature `%s'.\n%s: %s" afeat (car err) (cadr err))))))))
 
-(defun my-init-requires (features-list)
-  "Require FEATURE, and the result is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
-  (dolist (afeat features-list)
-    (my-init-require afeat)))
-
-(defun my-init-require-by-system (system-features-list)
-  (dolist (syslib system-features-list)
-    (when (equal (eval (car syslib)) (nth 1 syslib))
-      (my-init-require (nth 2 syslib)))))
+(defun my-init-requires-by-system (&rest sys-features)
+  "If current system type or window system got by VARIABLE is match to SYSTEM, Require FEATURE by `my-init-requires' in SYS-FEATURES.
+Each element of SYS-FEATURES has the form (VARIABLE SYSTEM FEATURE)."
+  (dolist (asysfeat sys-features)
+    (when (equal (eval (car asysfeat)) (cadr asysfeat))
+      (my-init-requires (nth 2 asysfeat)))))
 
 (defun my-init-add-package-archives (archives-list)
   "Add package archives to `package-archives'.
@@ -51,7 +49,7 @@ Each element of ARCHIVES-LIST has the form (ID LOCATION)."
   (dolist (aarch archives-list)
     (update-or-add-alist 'package-archives (car aarch) (cadr aarch))))
 
-(defun my-init-install-package (pkg &optional pkg-from)
+(defun my-init-install-packages (pkg &optional pkg-from)
   "Check whether PKG is installed. When not installed, the installation begins.
 If the package requires other packages, installation of the packges begin recursively.
 This function returns the list of (`package' `required package')."
@@ -68,21 +66,21 @@ This function returns the list of (`package' `required package')."
     (when (setq pkg-desc (assq pkg package-alist))
       (add-to-list 'pkgs `(,pkg ,pkg-from) 1)
       (dolist (req-pkg (mapcar 'car (package-desc-reqs (cadr pkg-desc))))
-        (dolist (rp (my-init-install-package req-pkg pkg))
+        (dolist (rp (my-init-install-packages req-pkg pkg))
           (add-to-list 'pkgs rp 1))))
     pkgs))
 
-(defun my-init-check-package (req-pkg-list)
-  "Check whether packages in REQ-PKG_LIST is installed, updated, or
-packages not in REQ-PKG_LIST is installed."
+(defun my-init-check-packages (&rest package)
+  "Check whether PACKAGE is installed, updated, or
+packages not in PACKAGE is installed."
   (let (pkgs real-pkgs update-pkgs)
-    ;; If packages in REQ-PKG_LIST is not installed, install.
-    (dolist (req-pkg req-pkg-list)
-      (dolist (pkg (my-init-install-package req-pkg))
+    ;; If PACKAGE is not installed, install.
+    (dolist (req-pkg package)
+      (dolist (pkg (my-init-install-packages req-pkg))
         (when (and (cadr pkg) (not (member (car pkg) pkgs)))
           (message "Package `%s' is required from `%s'." (car pkg) (cadr pkg)))
         (add-to-list 'pkgs (car pkg))))
-    (message "Required packages - %s" req-pkg-list)
+    (message "Required packages - %s" package)
     (setq real-pkgs (mapcar 'car package-alist))
     (message "Installed packages - %s" (reverse real-pkgs))
     ;; updated packages
@@ -97,32 +95,73 @@ packages not in REQ-PKG_LIST is installed."
     (when real-pkgs
       (message "Info: Unexpected installed packages %s"  (reverse real-pkgs)))))
 
-(defun my-init-set-autoloads (functions-list)
-  "Define autoload functions from FUNCTIONS-LIST.
-Each element of ARCHIVES-LIST has the form (FUNCTION FILE DOC)."
-  (let (funcs)
-    (dolist (afunc functions-list)
-      (add-to-list
-       'funcs
-       (my-init-set-autoload (car afunc) (nth 1 afunc) (nth 2 afunc))))
-    (if (not funcs)
-        (message "Autoload functions is not set.")
-      (message "Autoload functions - %s" (reverse funcs)))))
+(defun my-init-set-autoloads (&rest func-file-doc)
+  "Define autoload functions from FUNC-FILE-DOC.
+Each FUNC-FILE-DOC has the form (FUNCTION FILE DOC).
 
-(defun my-init-set-autoload (function file doc)
-  "Define FUNCTION to autoload from FILE by autoload function.
 If FUNCTION is void or FILE is not found, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
-  (let (res)
-    (if (not (locate-library file))
-        (message "Warning: In setting autoload functions, library file `%s' autoloaded from `%s' is not found." file function)
-      (if (fboundp function)
-          (message "Info: In setting autoload functions, function `%s' is already defined." function)
-        (condition-case err
-            (setq res (autoload function file doc 1))
-          (error
-           (message "Warning: In setting autoload functions, fails to set autoload `%s' from `%s'.\n%s: %s"
-                    function file (car err) (cadr err))))))
-    res))
+  (let (funcs ffd)
+    (dolist (ffd func-file-doc)
+      (let ((afunc (car ffd)) (afile (cadr ffd)) (adoc (nth 2 ffd)))
+        (if (not (locate-library afile))
+            (message "Warning: In setting autoload functions, library file `%s' autoloaded from `%s' is not found." afile afunc)
+          (if (fboundp afunc)
+              (message "Info: In setting autoload functions, function `%s' is already defined." afunc)
+            (condition-case aerr
+                (push (autoload afunc afile adoc 1) funcs)
+              (error
+               (message "Warning: In setting autoload functions, fails to set autoload `%s' from `%s'.\n%s" afunc afile aerr)))))))
+    (if (not funcs)
+        (message "Autoload functions is not defined.")
+      (message "Autoload functions are defined. - %s" (reverse funcs)))))
+
+(defun my-init-set-default-variables (&rest var-val)
+  "Set default values to variables in VAR-VAL.
+Each VAR-VAL has the form (VARIABLE VALUE)."
+  (dolist (avarval var-val)
+    (set-default (car avarval) (cadr avarval))))
+
+(defun my-init-set-variables (&rest var-val)
+  "Set variables in VAR-VAL.
+Each VAR-VAL has the form (VARIABLE VALUE)."
+  (let (avar)
+    (dolist (avarval var-val)
+      (if (not (setq avar (car avarval)))
+          (message "Variable %s is not defined." avar)
+        (set-variable avar (cadr avarval))))))
+
+(defun my-init-set-alist (&rest alist-key-val)
+  "Set ALIST-KEY-VAL value to the alist.
+Each ALIST-KEY-VAL has the form (ALIST-NAME (KEY1 VALUE1) (KEY2 VALUE2) ...)."
+  (let (asym)
+  (dolist (aalist alist-key-val)
+    (setq asym (car aalist))
+    (dolist (akeyval (cdr aalist))
+      (update-or-add-alist asym (car akeyval) (cadr akeyval)))
+    (message "%s: %s" (symbol-name asym) (symbol-value asym)))))
+
+(defun my-init-set-list (&rest list-val)
+  "Set LIST-VAL value to the list.
+Each LIST-VAL has the form (LIST-NAME (VALUE1 VALUE2 ...))."
+  (let (asym)
+    (dolist (lst list-val)
+      (dolist (val (cadr lst))
+        (add-to-list (setq asym (car lst)) val))
+      (message "%s: %s" (symbol-name asym) (symbol-value asym)))))
+
+(defun my-init-defaliases (&rest sym-def)
+  "Set SYMBOL’s function definition to DEFINITION in SYM-DEF.
+Each SYM-DEF has the form (SYMBOL DEFINITION &optional DOCSTRING)."
+  (dolist (asymdef sym-def)
+    (let ((asym (car asymdef)) (adef (cadr asymdef)))
+     (when (fboundp asym)
+       (message "Info: Function `%s' is already defined as `%s'." asym (symbol-name asym)))
+     (cond
+      ((not (fboundp adef))
+       (message "Warning: In setting alias, symbol `%s' is not function." adef))
+      ((not (eq (symbol-function asym) adef))
+       (defalias asym adef)
+       (message "`%s' is defined as alias of `%s'." asym adef))))))
 
 (defun my-init-global-set-key (key function)
   "Give KEY a global binding as FUNCTION by global-set-key.
@@ -180,17 +219,19 @@ If FUNCTION in MODE is void, warning message is printed into the `*Messages' buf
       (message "Warning: In setting minor mode, function `%s' is void." (car mode))
     (eval mode)))
 
-(defun my-init-set-modes (mode-list)
-  (dolist (mode mode-list)
-    (my-init-set-mode mode)))
+(defun my-init-set-modes (&rest modeval)
+  "Set MODE. MODE format is assumed as `(FUNCTION 1)' to enable the mode, or `(FUNCTION 0)' to disable the mode. FUNCTION presents minor mode.
+
+If FUNCTION in MODE is void, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
+  (let (amode)
+    (dolist (amodeval modeval)
+      (if (not (fboundp (setq amode (car amodeval))))
+          (message "Warning: In setting minor mode, function `%s' is void." amode)
+        (eval amodeval)))))
 
 (defun my-init-custom-set-default (var-list)
   (dolist (varval var-list)
     (custom-set-default (car varval) (cadr varval))))
-
-(defun my-init-set-variables (var-list)
-  (dolist (varval var-list)
-    (set-variable (car varval) (cadr varval))))
 
 (defun my-init-defalias (symbol-list)
   (dolist (symdef symbol-list)
@@ -203,19 +244,9 @@ If FUNCTION in MODE is void, warning message is printed into the `*Messages' buf
        (defalias asym adef)
        (message "`%s' is defined as alias of `%s'." asym adef))))))
 
-(defun my-init-set-default-frame-alist (parameters-list)
-  (dolist (fparam parameters-list)
-    (update-or-add-alist 'default-frame-alist (car fparam) (cadr fparam)))
-  (message "default-frame-alist: %s" default-frame-alist))
-
 (defun my-init-add-completion-ignored-extensions (extensions-list)
   (dolist (ext extensions-list)
     (add-to-list 'completion-ignored-extensions ext)))
-
-(defun my-init-set-display-buffer-same-window (buffer-pattern-list)
-  (dolist (bufptn buffer-pattern-list)
-    (update-or-add-alist 'display-buffer-alist
-                         bufptn '(display-buffer-same-window))))
 
 (defun my-init-set-magic-mode-alist (magic-list)
   (dolist (magic magic-list)
