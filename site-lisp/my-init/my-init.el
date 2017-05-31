@@ -186,32 +186,34 @@ If FUNCTION is void, warning message is printed into the `*Messages' buffer, or 
   (dolist (key keys-list)
     (global-unset-key (kbd key))))
 
-(defun my-init-modemap-set-key (library hook modemap mapkeys)
+(defun my-init-modemap-set-keys (&rest modemap)
   "Give KEY binding of MODEMAP as MAPKEYS after LIBRARY is loaded.
+MODEMAP form is (MODEMAP LIBRARY HOOK ((KEY1 FUNCTION1) (KEY2 FUNCTION2) ... )).
+
 If HOOK is not nil, the binding is via the HOOK.
 If function in MAPKEYS is void, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
-  (let ((modemap-name (symbol-name modemap)) afunc)
-    (eval-after-load library
-      (progn
-        (setq afunc
-              `(lambda ()
-                 (dolist (map ',mapkeys)
-                   (let ((key (car map)) (func (cadr map)))
-                     (if (not (fboundp func))
-                         (message
-                          ,(concat "Warning: In setting `" modemap-name  "' keybind, function `%s' is void.") func)
-                       (define-key ,modemap (kbd key) func))))))
-        (cond
-         ((not hook) (eval afunc))
-         (t
-          (let ((func-init-keybind (read (concat "my-init-" modemap-name "-keybind"))))
-            (fset func-init-keybind afunc)
-            `(add-hook ',hook ',func-init-keybind))))))))
-
-(defun my-init-modemap-set-keys (modekey-list)
-  (dolist (modekey modekey-list)
-    (my-init-modemap-set-key
-     (car modekey) (nth 1 modekey) (nth 2 modekey) (nth 3 modekey))))
+  (let (amap alib ahook amapname funcdef)
+    (dolist (amodemap modemap)
+      (setq
+       amap (car amodemap) alib (cadr amodemap) ahook (nth 2 amodemap)
+       keyfuncs (nth 3 amodemap))
+      (eval-after-load alib
+        (progn
+          (setq funcdef
+                `(lambda ()
+                   (dolist (keyfunc ',keyfuncs)
+                     (let ((akey (car keyfunc)) (afunc (cadr keyfunc)))
+                       (if (not (fboundp afunc))
+                           (message
+                            ,(concat "Warning: In setting `" (setq amapname (symbol-name amap)) "' keybind, function `%s' is void.") afunc)
+                         (define-key ,amap (kbd akey) afunc))))))
+          (cond
+           ((not ahook)
+            (eval funcdef))
+           (t
+            (let ((func-add-keybind (read (concat "my-init-" amapname "-keybind"))))
+              (fset func-add-keybind funcdef)
+              `(add-hook ',ahook ',func-add-keybind)))))))))
 
 (defun my-init-set-modes (&rest modeval)
   "Set MODE. MODE format is assumed as `(FUNCTION 1)' to enable the mode, or `(FUNCTION 0)' to disable the mode. FUNCTION presents minor mode.

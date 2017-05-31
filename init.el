@@ -533,76 +533,75 @@
 ;; モードごとのキーバインドを設定
 ;; リストの形式は、(mode-library mode-hook mode-map-name ((key1 function1) (key2 function2)))
 (my-init-modemap-set-keys
- '(
-   ("text-mode" nil text-mode-map
-    (
-     ("C-M-i" dabbrev-expand) ; ispell 起動を無効にし、dabbrev-expand を設定
-     ))
-   ("dired" nil dired-mode-map
-    (
-     ("C-c ." dired-exopen-current-directory)
-     ("C-c e" ediff-revision)
-     ("C-c i" image-dired)
-     ("C-c r" dired-exopen-file)
-     ("C-c w" wdired-change-to-wdired-mode)
-     ("E" dired-ediff-vc-latest-current)
-     ("r" dired-exopen-file)
-     ("s" dired-toggle-sort)
-     ))
-   ("tex-mode" nil latex-mode-map
-    (
-     ("<M-return>" latex-insert-item) ; latex-insert-itemを再設定
-     ("C-c p p" exopen-buffer-pdffile)
-     ("C-c p d" exopen-buffer-dvifile)
-     ("C-c C-c" comment-region)     ; tex-compileを無効にし、comment-region を設定
-     ))
-   ("lisp-mode" nil lisp-mode-shared-map
-    (
-     ;; ("<M-return>" noexist)      ; デバッグ用
-     ("<M-return>" completion-at-point)
-     ("C-c e" eval-buffer)
-     ))
-   ("mediawiki" nil mediawiki-mode-map
-    (
-     ("C-x C-s" save-buffer)
-     ))
-   ("ediff" ediff-keymap-setup-hook ediff-mode-map
-    (
-     ("Q" my-ediff-quit)
-     ))
-   ("cc-mode" c-mode-common-hook c-mode-map
-    (
-     ("{" skeleton-pair-insert-maybe)
-     ("(" skeleton-pair-insert-maybe)
-     ("'" skeleton-pair-insert-maybe)
-     ))
-   (nil nil prog-mode-map
-        (
-         ("'" skeleton-pair-insert-maybe)
-         ))
-   (nil nil lisp-mode-shared-map
-        (
-         ("'" self-insert-command)
-         ))
-   ("ert-mode" nil ert-mode-map
-    (
-     ("'" skeleton-pair-insert-maybe)
-     ))
-   ("web-mode" nil web-mode-map
-    (
-     ("<" skeleton-pair-insert-maybe)
-     ("'" skeleton-pair-insert-maybe)
-     ))
-   ("nxml-mode" nil nxml-mode-map
-    (
-     ("<" skeleton-pair-insert-maybe)
-     ("'" skeleton-pair-insert-maybe)
-     ))
-   ("simple" eval-expression-minibuffer-setup-hook read-expression-map
+ '(text-mode-map "text-mode" nil
+   (
+    ("C-M-i" dabbrev-expand) ; ispell 起動を無効にし、dabbrev-expand を設定
+    ))
+ '(dired-mode-map "dired" nil
+   (
+    ("C-c ." dired-exopen-current-directory)
+    ("C-c e" ediff-revision)
+    ("C-c i" image-dired)
+    ("C-c r" dired-exopen-file)
+    ("C-c w" wdired-change-to-wdired-mode)
+    ("E" dired-ediff-vc-latest-current)
+    ("r" dired-exopen-file)
+    ("s" dired-toggle-sort)
+    ))
+ '(latex-mode-map "tex-mode" nil
+   (
+    ("<M-return>" latex-insert-item) ; latex-insert-itemを再設定
+    ("C-c p p" exopen-buffer-pdffile)
+    ("C-c p d" exopen-buffer-dvifile)
+    ("C-c C-c" comment-region)     ; tex-compileを無効にし、comment-region を設定
+    ))
+ '(lisp-mode-shared-map "lisp-mode" nil
+   (
+    ;; ("<M-return>" noexist)      ; デバッグ用
+    ("<M-return>" completion-at-point)
+    ("C-c e" eval-buffer)
+    ))
+ '(mediawiki-mode-map "mediawiki" nil
+   (
+    ("C-x C-s" save-buffer)
+    ))
+ '(ediff-mode-map "ediff" ediff-keymap-setup-hook
+   (
+    ("Q" my-ediff-quit)
+    ))
+ '(c-mode-map "cc-mode" c-mode-common-hook
+   (
+    ("{" skeleton-pair-insert-maybe)
+    ("(" skeleton-pair-insert-maybe)
+    ("'" skeleton-pair-insert-maybe)
+    ))
+ '(prog-mode-map nil nil
+   (
+    ("'" skeleton-pair-insert-maybe)
+    ))
+ '(lisp-mode-shared-map nil nil
+   (
+    ("'" self-insert-command)
+    ))
+ '(ert-mode-map "ert-mode" nil
+   (
+    ("'" skeleton-pair-insert-maybe)
+    ))
+ '(web-mode-map "web-mode" nil
+   (
+    ("<" skeleton-pair-insert-maybe)
+    ("'" skeleton-pair-insert-maybe)
+    ))
+ '(nxml-mode-map "nxml-mode" nil
+   (
+    ("<" skeleton-pair-insert-maybe)
+    ("'" skeleton-pair-insert-maybe)
+    ))
+  '(read-expression-map "simple" eval-expression-minibuffer-setup-hook
     (
      ("<M-return>" completion-at-point) ; 補完入力
      ))
-   ))
+  )
 
 ;;
 ;; システムごとの初期化ファイルの設定
