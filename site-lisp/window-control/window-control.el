@@ -1,6 +1,6 @@
 ;;; window-control.el
 
-;; Copyright (C) 2014  j8takagi
+;; Copyright (C) 2014, 2017  j8takagi
 
 ;; Author: j8takagi <j8takagi@nifty.com>
 ;; Keywords: Emacs elisp compile
@@ -41,6 +41,14 @@
 ;; window-control
 ;;
 ;; from: window-resizer - http://d.hatena.ne.jp/khiker/20100119/window_resize
+
+
+(defvar wctl-window-resize-hook)
+
+(defvar wctl-frame-resize-hook)
+
+(defvar wctl-frame-move-hook)
+
 (defun wctl-window-resize ()
   "Resize window."
   (interactive)
@@ -80,7 +88,8 @@
          ((member key '(?q))
           (progn
             (message "Window resize: quit")
-            (throw 'end-flag t))))))))
+            (throw 'end-flag t)))))))
+  (run-hooks 'wctl-window-resize-hook))
 
 (defun wctl-frame-resize ()
   "Resize frame"
@@ -133,7 +142,8 @@
          ((member key '(?q))
           (progn
             (message "Frame Resize: quit")
-            (throw 'end-flag t))))))))
+            (throw 'end-flag t)))))))
+    (run-hooks 'wctl-frame-resize-hook))
 
 (defun wctl-frame-move ()
   "Move frame."
@@ -177,7 +187,8 @@
          ((member key '(?q))
           (progn
             (message "Frame Move: quit")
-            (throw 'end-flag t))))))))
+            (throw 'end-flag t)))))))
+      (run-hooks 'wctl-frame-resize-hook))
 
 (add-hook 'before-make-frame-hook 'frame-shift-right)
 
