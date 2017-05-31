@@ -598,10 +598,10 @@
      ("<" skeleton-pair-insert-maybe)
      ("'" skeleton-pair-insert-maybe)
      ))
-   (nil eval-expression-minibuffer-setup-hook read-expression-map
-        (
-         ("<M-return>" completion-at-point)
-         ))
+   ("simple" eval-expression-minibuffer-setup-hook read-expression-map
+    (
+     ("<M-return>" completion-at-point) ; 補完入力
+     ))
    ))
 
 ;;
