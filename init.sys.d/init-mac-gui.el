@@ -34,28 +34,6 @@
     (left 0)
     ))
 
-(defun mac-set-ime-cursor-color ()
-  "IMEのオンとオフにあわせ、カーソルの色を変える"
-  (interactive)
-  (catch 'match
-    (dolist
-        (imptn
-         '(
-           "^com\\.justsystems.inputmethod.atok[0-9]+\\.Japanese"
-           "^com\\.apple\\.inputmethod\\.Kotoeri\\.Japanese"
-           "^com\\.google\\.inputmethod\\.Japanese"
-           ))
-      (when (string-match imptn (mac-input-source))
-        (ime-cursor-set-color)
-        (throw 'match t)))
-    (ime-cursor-unset-color)))
-
-;; カーソル色を、IMの変更時とEmacsの画面を表示したときに設定する
-(my-init-set-hooks
- '(mac-selected-keyboard-input-source-change-hook mac-set-ime-cursor-color)
- '(focus-in-hook mac-set-ime-cursor-color)
- )
-
 ;; カスタム変数の設定
 (my-init-set-variables
  '(mac-command-modifier meta)        ; commandキーをEmacsのMetaキーに
@@ -72,6 +50,9 @@
       "/tmp"
       "/var"
       ))))
+
+; IMEのオンとオフにあわせ、カーソルの色を変える
+(mac-ime-cursor-add-hook)
 
 ;; Mac OS Xのキー設定
 (my-init-global-set-keys
