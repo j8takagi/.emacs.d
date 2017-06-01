@@ -43,10 +43,10 @@ Each element of SYS-FEATURES has the form (VARIABLE SYSTEM FEATURE)."
     (when (equal (eval (car asysfeat)) (cadr asysfeat))
       (my-init-requires (nth 2 asysfeat)))))
 
-(defun my-init-add-package-archives (archives-list)
+(defun my-init-add-package-archives (&rest archives)
   "Add package archives to `package-archives'.
-Each element of ARCHIVES-LIST has the form (ID LOCATION)."
-  (dolist (aarch archives-list)
+Each element of ARCHIVES has the form (ID LOCATION)."
+  (dolist (aarch archives)
     (update-or-add-alist 'package-archives (car aarch) (cadr aarch))))
 
 (defun my-init-install-packages (pkg &optional pkg-from)
@@ -171,20 +171,21 @@ Each SYM-DEF has the form (SYMBOL DEFINITION &optional DOCSTRING)."
           (set-buffer abuf)
           (view-mode))))))
 
-(defun my-init-global-set-key (key function)
-  "Give KEY a global binding as FUNCTION by global-set-key.
-If FUNCTION is void, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
-  (if (not (fboundp function))
-      (message "Warning: In setting keybind, function `%s' is void." function)
-    (global-set-key (kbd key) function)))
+(defun my-init-global-set-keys (&rest key-func)
+  "Give global binding as KEY-FUNC by global-set-key.
+Each KEY-FUNC form is (KEY FUNCTION).
 
-(defun my-init-global-set-keys (keys-list)
-  (dolist (mapkeys keys-list)
-    (my-init-global-set-key (car mapkeys) (cadr mapkeys))))
+If FUNCTION is void, warning message is printed into the `*Messages' buffer,
+or the standard error stream in batch mode."
+  (let (afunc)
+    (dolist (akeyfunc key-func)
+      (if (not (fboundp (setq afunc (cadr akeyfunc))))
+          (message "Warning: In setting keybind, function `%s' is void." afunc)
+        (global-set-key (kbd (car akeyfunc)) afunc)))))
 
-(defun my-init-global-unset-keys (keys-list)
-  (dolist (key keys-list)
-    (global-unset-key (kbd key))))
+(defun my-init-global-unset-keys (&rest keys)
+  (dolist (akey keys)
+    (global-unset-key (kbd akey))))
 
 (defun my-init-modemap-set-keys (&rest modemap)
   "Give KEY binding of MODEMAP as MAPKEYS after LIBRARY is loaded.
@@ -268,11 +269,13 @@ If FUNCTION or HOOK is void, warning message is printed into the `*Messages' buf
        ((not (fboundp (setq afunc (cadr ahookfunc))))
         (message "Warning: In setting hooks, function `%s' is void." afunc))
        (t
-        (add-hook ahook afunc))))))
+          (add-hook ahook afunc))))))
 
-(defun my-init-setenv (env-list)
-  (dolist (envval env-list)
-    (setenv (car envval) (cadr envval))))
+(defun my-init-setenv (&rest env-val)
+  "Add system environment variables to values by list of ENV-VAL.
+Each ENV-VAL form is (ENVIRONMENT VALUE)."
+  (dolist (aenvval env-val)
+    (setenv (car aenvval) (cadr aenvval))))
 
 ;; Emacs開始にかかった時間をメッセージに表示
 (defun my-init-message-startup-time ()

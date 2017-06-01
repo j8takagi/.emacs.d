@@ -1,21 +1,23 @@
 ;; -*- mode: Emacs-Lisp; -*-
-;; Mac OS X 非terminal 用の設定
+;; Mac OS X GUI用の設定
 
 (message "Start of loading init-mac-gui.")
 
 (require 'my-init)
 
-(my-init-requires 'fontset-set)
+(my-init-requires
+ 'fontset-set
+ 'mac-ime-cursor
+ )
 
 ;; 環境変数の設定
 (my-init-setenv
- '(
-   ("LANG" "en_US.UTF-8")
-   ("PAGER" "cat")
-   ("MANPAGER" "cat")
-   ("EDITOR" "emacsclient")
-   ("VISUAL" "emacsclient")
-   ))
+ '("LANG" "en_US.UTF-8")
+ '("PAGER" "cat")
+ '("MANPAGER" "cat")
+ '("EDITOR" "emacsclient")
+ '("VISUAL" "emacsclient")
+ )
 
 (my-init-set-alist
  `(default-frame-alist                  ; デフォルトフレーム
@@ -73,9 +75,8 @@
 
 ;; Mac OS Xのキー設定
 (my-init-global-set-keys
- '(
-   ("<M-f1>" other-frame)    ; Mac OS Xの他アプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする
-   ))
+ '("<M-f1>" other-frame)    ; Mac OS Xの他アプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする
+ )
 
 (cd "~")
 

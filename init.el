@@ -19,9 +19,8 @@
  )
 
 (my-init-add-package-archives
- '(
-   ("melpa-stable" "http://stable.melpa.org/packages/")
-   ))
+ '("melpa-stable" "http://stable.melpa.org/packages/")
+ )
 
 ;; パッケージ初期化
 (package-initialize)
@@ -461,74 +460,72 @@
 
 ;; global-key
 (my-init-global-set-keys
- '(
-   ("<M-down>" windmove-down)
-   ("<M-f9>" gnuplot-make-buffer)
-   ("<M-left>" windmove-left)
-   ("<M-return>" expand-abbrev)
-   ("<M-right>" windmove-right)
-   ("<M-up>" windmove-up)
-   ("C-' h" windmove-left)
-   ("C-' j" windmove-down)
-   ("C-' k" windmove-up)
-   ("C-' l" windmove-right)
-   ("C-," scroll-up-one-line)
-   ("C-." scroll-down-one-line)
-   ("C-M-g" keyboard-escape-quit)
-   ("C-`" expand-abbrev)
-   ("C-c +" make-directory)
-   ("C-c C-c" comment-region)
-   ("C-c C-u" uncomment-region)
-   ("C-c C-v" view-mode)
-   ("C-c c" compile)
-   ("C-c g" magit-status)
-   ("C-c l" magit-log-buffer-file)
-   ("C-c t" switch-to-temp-buffer)
-   ("C-c w t" whitespace-toggle-options)
-   ("C-c w w" whitespace-mode)
-   ("C-h TAB" info-lookup-symbol)
-   ("C-j" newline)
-   ("C-x '" just-one-space)
-   ("C-x 4 C-k" delete-kill-next-window-buffer)
-   ("C-x 4 C-s" scratch-other-window)
-   ("C-x 4 K" delete-kill-next-window-buffer)
-   ("C-x 4 k" kill-next-window-buffer)
-   ("C-x 4 m" message-other-window)
-   ("C-x 4 q" quit-next-window)
-   ("C-x 4 s" split-shell-current-directory)
-   ("C-x 4 |" toggle-split-next-window)
-   ("C-x 4 ~" swap-buffer-next-window)
-   ("C-x 5 C-s" new-frame-scratch)
-   ("C-x 5 m" new-frame-messages)
-   ("C-x 5 s" new-frame-shell-current-directory)
-   ("C-x C-M-b" electric-buffer-list)
-   ("C-x C-M-f" exopen-find-file)
-   ("C-x C-M-k" delete-kill-current-next-window-buffer)
-   ("C-x E" ediff-redisplay-current-frame)
-   ("C-x K" kill-buffer-and-window)
-   ("C-x RET u" ucs-normalize-NFC-buffer)
-   ("C-x m" man)
-   ("C-x p" call-last-kbd-macro)
-   ("C-x q" bury-buffer)
-   ("C-x v e" ediff-vc-latest-current)
-   ("C-x v f" find-file-revision)
-   ("M-?" help)
-   ("M-[" backward-paragraph)
-   ("M-]" forward-paragraph)
-   ("M-p" call-last-kbd-macro)
-   ("RET" newline-and-indent)
-   ))
+ '("<M-down>" windmove-down)
+ '("<M-f9>" gnuplot-make-buffer)
+ '("<M-left>" windmove-left)
+ '("<M-return>" expand-abbrev)
+ '("<M-right>" windmove-right)
+ '("<M-up>" windmove-up)
+ '("C-' h" windmove-left)
+ '("C-' j" windmove-down)
+ '("C-' k" windmove-up)
+ '("C-' l" windmove-right)
+ '("C-," scroll-up-one-line)
+ '("C-." scroll-down-one-line)
+ '("C-M-g" keyboard-escape-quit)
+ '("C-`" expand-abbrev)
+ '("C-c +" make-directory)
+ '("C-c C-c" comment-region)
+ '("C-c C-u" uncomment-region)
+ '("C-c C-v" view-mode)
+ '("C-c c" compile)
+ '("C-c g" magit-status)
+ '("C-c l" magit-log-buffer-file)
+ '("C-c t" switch-to-temp-buffer)
+ '("C-c w t" whitespace-toggle-options)
+ '("C-c w w" whitespace-mode)
+ '("C-h TAB" info-lookup-symbol)
+ '("C-j" newline)
+ '("C-x '" just-one-space)
+ '("C-x 4 C-k" delete-kill-next-window-buffer)
+ '("C-x 4 C-s" scratch-other-window)
+ '("C-x 4 K" delete-kill-next-window-buffer)
+ '("C-x 4 k" kill-next-window-buffer)
+ '("C-x 4 m" message-other-window)
+ '("C-x 4 q" quit-next-window)
+ '("C-x 4 s" split-shell-current-directory)
+ '("C-x 4 |" toggle-split-next-window)
+ '("C-x 4 ~" swap-buffer-next-window)
+ '("C-x 5 C-s" new-frame-scratch)
+ '("C-x 5 m" new-frame-messages)
+ '("C-x 5 s" new-frame-shell-current-directory)
+ '("C-x C-M-b" electric-buffer-list)
+ '("C-x C-M-f" exopen-find-file)
+ '("C-x C-M-k" delete-kill-current-next-window-buffer)
+ '("C-x E" ediff-redisplay-current-frame)
+ '("C-x K" kill-buffer-and-window)
+ '("C-x RET u" ucs-normalize-NFC-buffer)
+ '("C-x m" man)
+ '("C-x p" call-last-kbd-macro)
+ '("C-x q" bury-buffer)
+ '("C-x v e" ediff-vc-latest-current)
+ '("C-x v f" find-file-revision)
+ '("M-?" help)
+ '("M-[" backward-paragraph)
+ '("M-]" forward-paragraph)
+ '("M-p" call-last-kbd-macro)
+ '("RET" newline-and-indent)
+ )
 
 ;; ffap（find file at point）のキーバインド
 (ffap-bindings)
 
 ;; 無効にするキーバインド
 (my-init-global-unset-keys
- '(
-   "C-x C-d"                         ; ffap-list-directory を無効に
-   "C-x 4 0"                         ; kill-buffer-and-window を無効に
-   "M-`"                             ; tmm-menubar を無効に
-   ))
+ "C-x C-d"                         ; ffap-list-directory を無効に
+ "C-x 4 0"                         ; kill-buffer-and-window を無効に
+ "M-`"                             ; tmm-menubar を無効に
+ )
 
 ;; モードごとのキーバインドを設定
 ;; リストの形式は、(mode-library mode-hook mode-map-name ((key1 function1) (key2 function2)))
@@ -616,11 +613,11 @@
 
 ;; フックの設定
 (my-init-set-hooks
-   '(after-init-hook session-initialize)
-   '(after-init-hook my-init-message-startup-time)
-   '(find-file-hook auto-insert)
-   '(kill-buffer-query-functions not-kill-but-bury-buffer)
-   )
+ '(after-init-hook session-initialize)
+ '(after-init-hook my-init-message-startup-time)
+ '(find-file-hook auto-insert)
+ '(kill-buffer-query-functions not-kill-but-bury-buffer)
+ )
 
 (with-eval-after-load 'session
   (my-init-set-hooks
