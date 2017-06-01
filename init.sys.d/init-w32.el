@@ -39,7 +39,7 @@
 
 ;; view-modeの設定
 (with-eval-after-load 'view
-  (my-init-set-variables
+  (my-init-set-list
    '(read-write-enable-dir-patterns
      (
       "E:/Documents/201[4-9]_[01][0-9]"
