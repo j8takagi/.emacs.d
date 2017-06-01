@@ -40,6 +40,7 @@
  'markdown-mode
  'mediawiki
  'mew
+ 'pandoc
  'session
  'sokoban
  'web-mode
@@ -110,64 +111,59 @@
 ; モード
 (my-init-set-modes
  ;; 有効にするモード
- '(auto-compression-mode 1)       ; 圧縮されたファイルを直接編集する
- '(column-number-mode 1)          ; 列番号を表示
- '(global-font-lock-mode 1)       ; メジャーモードに合わせた色を付ける
- '(line-number-mode 1)            ; 行番号を表示
- '(show-paren-mode 1)             ; 括弧の対応を表示
- '(transient-mark-mode 1)         ; リージョンをハイライト
  '(abbrev-mode 1)                 ; Abbrevsを使う
  '(whitespace-mode 1)             ; 空白を強調表示
- ;; 無効にするモード
- '(blink-cursor-mode 0)           ; カーソルは点滅しない
- '(electric-indent-mode 0)        ; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
- '(menu-bar-mode 0)               ; メニューバーを表示しない
- '(tool-bar-mode 0)               ; ツールバーを表示しない
- )
-
-; 変数デフォルト値
-(my-init-set-default-variables
- '(indent-line-function indent-to-left-margin) ; インデント用のファンクション
- '(indent-tabs-mode nil)                       ; タブをスペースに展開
- '(tab-width 4)                                ; タブ幅は4
  )
 
 ; 変数
-(my-init-set-variables
- '(skeleton-pair 1)               ; skeleton-pairにより括弧挿入を自動化
- '(skeleton-end-hook nil)         ; skeletonの挿入後、改行しない
- '(auto-insert-alist nil)
- '(auto-insert-directory "~/.emacs.d/insert/")
- '(auto-insert-query nil)
- '(case-replace nil)              ; 置換時に大文字小文字を区別しない
- '(delete-old-versions 1)         ; 古いバックアップファイルを自動的に削除する
- '(delete-by-moving-to-trash 1)   ;  ファイルの削除で、ゴミ箱を使う
+(custom-set-variables
+ '(indent-line-function 'indent-to-left-margin) ; インデント用のファンクション
+ '(auto-compression-mode 1)         ; 圧縮されたファイルを直接編集する
+ '(auto-insert-alist nil)           ;
+ '(auto-insert-directory "~/.emacs.d/insert/") ;
+ '(auto-insert-query nil)                      ;
+ '(blink-cursor-mode nil)                      ; カーソルは点滅しない
+ '(case-replace nil)                ; 置換時に大文字小文字を区別しない
+ '(column-number-mode 1)            ; 列番号を表示
+ '(custom-file "~/.emacs.d/.emacs-custom.el") ;カスタムの設定値を書き込むファイル
+ '(delete-by-moving-to-trash 1)      ;  ファイルの削除で、ゴミ箱を使う
+ '(delete-old-versions 1) ; 古いバックアップファイルを自動的に削除する
  '(disabled-command-function nil) ; すべてのコマンドの使用制限を解除する
+ '(skeleton-end-hook nil)         ; skeletonの挿入後、改行しない
+ '(skeleton-pair 1)              ; skeleton-pairにより括弧挿入を自動化
+ '(electric-indent-mode nil) ; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
  '(enable-recursive-minibuffers 1)      ; 再帰的にミニバッファを使う
  '(eval-expression-print-length nil)    ; evalした結果を全部表示する
- '(history-delete-duplicates 1)         ; 重複する履歴は削除
- '(history-length t)                    ; 履歴の数を無制限に
- '(inhibit-startup-screen 1)            ; 起動時の画面を表示しない
+ '(global-font-lock-mode 1)       ; メジャーモードに合わせた色を付ける
+ '(history-delete-duplicates 1)   ; 重複する履歴は削除
+ '(history-length t)              ; 履歴の数を無制限に
+ '(indent-tabs-mode nil)          ; タブをスペースに展開
+ '(inhibit-startup-screen 1)      ; 起動時の画面を表示しない
  '(initial-scratch-message nil)   ; *scratch* にメッセージを表示しない
+ '(line-number-mode 1)            ; 行番号を表示
  '(make-backup-files 1)           ; バックアップファイルを作成する
- '(next-line-add-newlines nil)    ; ファイル末尾での改行で、end of bufferエラーが発生しないように
+ '(menu-bar-mode nil)             ; メニューバーを表示しない
+ '(next-line-add-newlines nil) ; ファイル末尾での改行で、end of bufferエラーが発生しないように
+ '(read-mail-command 'mew)      ; メールを読むときにmewを使う
  '(save-interprogram-paste-before-kill 1) ; 他アプリのコピーバッファをkill-ringに保存する
- '(scroll-conservatively 1)       ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
+ '(scroll-conservatively 1) ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
  '(session-set-file-name-exclude-regexp "[/\\]\\.overview\\|[/\\]\\.session\\|News[/\\]\\|\\.emacs\\.d/\\|~$\\|COMMIT_EDITMSG") ; sessionで、file-name-historyから除外するファイル
- '(truncate-lines nil)                  ; 継続行を表示しない
+ '(show-paren-mode 1)             ; 括弧の対応を表示
+ '(tab-width 4)                  ; タブ幅は4
+ '(tool-bar-mode nil)            ; ツールバーを表示しない
+ '(transient-mark-mode 1)        ; リージョンをハイライト
+ '(truncate-lines nil)           ; 継続行を表示しない
  '(truncate-partial-width-windows nil)  ; 行を切り捨てない
  '(use-dialog-box nil)                  ; ダイアログボックスは使わない
  '(user-mail-address "j8takagi@nifty.com") ; ChangeLogなどで用いるメールアドレスの設定
- '(version-control 1)            ; バックアップファイルにバージョン番号を付ける
- '(visible-bell 1)               ; エラー時、音が鳴るのではなく、画面が点滅するように
- '(yank-excluded-properties t)   ; ヤンクで、テキストプロパティは捨てる
- '(yank-pop-change-selection 1)  ; yank-popを有効にする
- '(read-mail-command mew)        ; メールを読むときにmewを使う
- '(custom-file "~/.emacs.d/.emacs-custom.el") ;カスタムの設定値を書き込むファイル
+ '(version-control 1)   ; バックアップファイルにバージョン番号を付ける
+ '(visible-bell 1) ; エラー時、音が鳴るのではなく、画面が点滅するように
+ '(yank-excluded-properties t)  ; ヤンクで、テキストプロパティは捨てる
+ '(yank-pop-change-selection 1) ; yank-popを有効にする
  )
 
 ; 連想リスト
-(my-init-set-alist
+(my-init-custom-set-alist
  (when window-system
    '(default-frame-alist                ; デフォルトフレーム
       (foreground-color "black")
@@ -176,26 +172,23 @@
       (cursor-type box)
       ))
  '(display-buffer-alist                 ; バッファの表示方法の指定
-   ("^\\*shell\\*$" ((display-buffer-same-window)))
-   ("^\\*magit: .+" ((display-buffer-same-window)))
+   ("^\\*shell\\*$" (display-buffer-same-window))
+   ("^\\*magit: .+" (display-buffer-same-window))
    )
  '(backup-directory-alist
    ("." "~/backup")
-   )
- )
+   ))
 
 ; リスト
-(my-init-set-list
+(my-init-custom-set-list
  '(completion-ignored-extensions        ; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
-   (
-    ".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" "_prev"
-    ".idx" ".ind" ".ilg" ".tmp" ".synctex.gz" ".dplg" ".dslg"
-    ".dSYM/" ".DS_Store" ":com.dropbox.attributes:$DATA"
-    ))
+   ".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" "_prev"
+   ".idx" ".ind" ".ilg" ".tmp" ".synctex.gz" ".dplg" ".dslg"
+   ".dSYM/" ".DS_Store" ":com.dropbox.attributes:$DATA"
+   )
  '(Info-additional-directory-list       ; Infoファイルの場所
-   (
-    "~/share/info/ja" "~/share/info"
-    ))
+   "~/share/info/ja" "~/share/info"
+   )
  )
 
 ; エイリアス
@@ -210,7 +203,7 @@
    'init-view-mode               ; read-onlyファイルをview-modeで開く
    'view-mode-vi-bindings        ; view-modeでviのキーバインド
    )
-  (my-init-set-variables
+  (custom-set-variables
    '(view-read-only 1)
    )
   (my-init-view-mode-buffer
@@ -224,32 +217,32 @@
 
 ;; uniquify
 (with-eval-after-load 'uniquify
-  (my-init-set-variables
-   '(uniquify-buffer-name-style post-forward-angle-brackets)
+  (custom-set-variables
+   '(uniquify-buffer-name-style 'post-forward-angle-brackets)
    '(uniquify-ignore-buffers-re "*[^*]+*")))
 
 ;; emacsclient
 (with-eval-after-load 'server
   (unless (server-running-p)
      (server-start))
-  (my-init-set-variables
+  (custom-set-variables
    '(server-window 'pop-to-buffer)
    ))
 
 ;; compile
 (with-eval-after-load 'compile
-  (my-init-set-variables
-   '(compilation-scroll-output first-error) ; *compilation*バッファをスクロールして表示
+  (custom-set-variables
+   '(compilation-scroll-output 'first-error) ; *compilation*バッファをスクロールして表示
    ))
 
 ;; ChangeLog
 (with-eval-after-load 'add-log
-  (my-init-set-variables
+  (custom-set-variables
    '(change-log-default-name "~/ChangeLog")
    ))
 
 (with-eval-after-load 'vc-hooks
-  (my-init-set-variables
+  (custom-set-variables
    '(vc-follow-symlinks nil)            ; vc-follow-linkを無効にする 参考: https://abicky.net/2014/06/07/175130/
    ))
 
@@ -263,17 +256,17 @@
 ;; Ediff
 ;;
 (with-eval-after-load 'ediff
-  (my-init-set-variables
-   '(ediff-window-setup-function ediff-setup-windows-plain)
-   '(ediff-split-window-function split-window-horizontally)
+  (custom-set-variables
+   '(ediff-window-setup-function 'ediff-setup-windows-plain)
+   '(ediff-split-window-function 'split-window-horizontally)
    ))
 
 ;;
 ;; dired
 ;;
 (with-eval-after-load 'dired
-  (my-init-set-variables
-   '(dired-recursive-copies always)  ; diredでディレクトリーを再帰的にコピーするとき、確認しない
+  (custom-set-variables
+   '(dired-recursive-copies 'always)  ; diredでディレクトリーを再帰的にコピーするとき、確認しない
    '(dired-dwim-target 1)             ; 対象ディレクトリーの推測
    '(dired-isearch-filenames t)       ; diredでのisearchの対象をファイル名だけに
    )
@@ -303,7 +296,7 @@
 ;; shell-mode
 ;;
 (with-eval-after-load 'shell
-  (my-init-set-variables
+  (custom-set-variables
    '(shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ")) ; プロンプトの表示設定
   (my-init-requires
    'set-process-query-on-exit
@@ -346,7 +339,7 @@
 ;; nxml-mode
 ;;
 (with-eval-after-load 'nxml-mode
-  (my-init-set-variables
+  (custom-set-variables
    '(nxml-child-indent 0)
    '(nxml-attribute-indent 0)
    ))
@@ -355,7 +348,7 @@
 ;; ess-site > R
 ;;
 (with-eval-after-load 'ess-site
-  (my-init-set-variables
+  (custom-set-variables
    '(ess-ask-for-ess-directory nil)
    ))
 
@@ -386,11 +379,6 @@
 ;; magit
 ;;
 (defvar with-editor-file-name-history-exclude 1) ; "run-hooks: Symbol’s function definition is void: git-commit-setup-check-buffer" エラー対策
-
-(with-eval-after-load 'magit
-  (my-init-set-variables
-   '(magit-status-buffer-switch-function switch-to-buffer)
-   ))
 
 ;;
 ;; mew
@@ -612,7 +600,7 @@
  )
 
 ;; フックの設定
-(my-init-set-hooks
+(my-init-custom-set-list
  '(after-init-hook session-initialize)
  '(after-init-hook my-init-message-startup-time)
  '(find-file-hook auto-insert)
@@ -620,11 +608,12 @@
  )
 
 (with-eval-after-load 'session
-  (my-init-set-hooks
+  (my-init-custom-set-list
    '(find-file-hook session-set-file-name-history)
    '(exopen-file-hook session-set-file-name-history)
-   '(session-before-save-hook delete-file-name-history-from-exclude-regexp)
-   '(session-before-save-hook delete-file-name-history-not-exist)
+   '(session-before-save-hook
+     delete-file-name-history-from-exclude-regexp
+     delete-file-name-history-not-exist)
    ))
 
 (message "End of loading init.el.")

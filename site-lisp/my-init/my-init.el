@@ -140,6 +140,26 @@ Each ALIST-KEY-VAL has the form (ALIST-NAME (KEY1 VALUE1) (KEY2 VALUE2) ...)."
       (update-or-add-alist asym (car akeyval) (cadr akeyval)))
     (message "%s alist is set." (symbol-name asym)))))
 
+(defun my-init-custom-set-alist (&rest alist-key-val)
+  "Custom set ALIST-KEY-VAL value to the alist.
+Each ALIST-KEY-VAL has the form (ALIST-NAME (KEY1 VALUE1) (KEY2 VALUE2) ...)."
+  (let (asym keyvals)
+    (dolist (aalist alist-key-val)
+      (setq asym (car aalist) keyvals (symbol-value (car aalist)))
+      (dolist (akeyval (cdr aalist))
+        (update-or-add-alist 'keyvals (car akeyval) (cadr akeyval)))
+      (custom-set-variables `(,asym ',keyvals)))))
+
+(defun my-init-custom-set-list (&rest list-val)
+  "Set LIST-VAL value to the list.
+Each LIST-VAL has the form (LIST-NAME VALUE1 VALUE2 ...)."
+  (let (asym vals)
+    (dolist (lst list-val)
+      (setq asym (car lst) vals (symbol-value (car lst)))
+      (dolist (val (cdr lst))
+        (add-to-list 'vals val))
+      (custom-set-variables `(,asym ',vals)))))
+
 (defun my-init-set-list (&rest list-val)
   "Set LIST-VAL value to the list.
 Each LIST-VAL has the form (LIST-NAME (VALUE1 VALUE2 ...))."
@@ -148,7 +168,6 @@ Each LIST-VAL has the form (LIST-NAME (VALUE1 VALUE2 ...))."
       (dolist (val (cadr lst))
         (add-to-list (setq asym (car lst)) val))
       (message "%s list is set." (symbol-name asym)))))
-
 
 (defun my-init-defaliases (&rest sym-def)
   "Set SYMBOL’s function definition to DEFINITION in SYM-DEF.

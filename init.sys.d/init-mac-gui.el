@@ -19,7 +19,7 @@
  '("VISUAL" "emacsclient")
  )
 
-(my-init-set-alist
+(my-init-custom-set-alist
  `(default-frame-alist                  ; デフォルトフレーム
     (font
      ,(fontset-set
@@ -35,8 +35,8 @@
     ))
 
 ;; カスタム変数の設定
-(my-init-set-variables
- '(mac-command-modifier meta)        ; commandキーをEmacsのMetaキーに
+(custom-set-variables
+ '(mac-command-modifier 'meta)        ; commandキーをEmacsのMetaキーに
  '(mac-auto-ascii-mode 1)             ; ミニバッファへのカーソル移動時、日本語IMEを自動オフ
  )
 
