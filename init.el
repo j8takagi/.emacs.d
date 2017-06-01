@@ -55,6 +55,7 @@
 ;; require
 (my-init-requires
  ;; built-in libraries
+ 'autoinsert
  'ediff
  'server
  ;; ~/.emacs.d/site-lisp
@@ -119,9 +120,9 @@
 (custom-set-variables
  '(indent-line-function 'indent-to-left-margin) ; インデント用のファンクション
  '(auto-compression-mode 1)         ; 圧縮されたファイルを直接編集する
- '(auto-insert-alist nil)           ;
- '(auto-insert-directory "~/.emacs.d/insert/") ;
- '(auto-insert-query nil)                      ;
+ '(auto-insert-alist nil)           ; auto-insert-alistの初期化
+ '(auto-insert-directory "~/.emacs.d/insert/") ; auto-insertテンプレートディレクトリ
+ '(auto-insert-query nil)                      ; auto-insertでユーザーに尋ねない
  '(blink-cursor-mode nil)                      ; カーソルは点滅しない
  '(case-replace nil)                ; 置換時に大文字小文字を区別しない
  '(column-number-mode 1)            ; 列番号を表示
@@ -290,7 +291,8 @@
    '(emacs-lisp-mode-hook my-init-indent-lisp-indent-line)
    '(emacs-lisp-mode-hook turn-on-auto-elc)
    )
-  (define-auto-insert "\\.el\\'" 'emacs-lisp-template))
+  (my-init-custom-set-alist
+   '(auto-insert-alist ("\\.el\\'" emacs-lisp-template))))
 
 ;;
 ;; shell-mode
@@ -311,7 +313,8 @@
    'c-skeletons
    'h-skeletons
    )
-  (define-auto-insert "\\.h\\'" 'h-template))
+  (my-init-custom-set-alist
+   '(auto-insert-alist ("\\.h\\'" h-template))))
 
 ;;
 ;; tex-mode
@@ -320,7 +323,8 @@
   (my-init-requires
    'latex-skeletons
    )
-  (define-auto-insert 'latex-mode 'latex-template)
+  (my-init-custom-set-alist
+   '(auto-insert-alist (latex-mode latex-template)))
   (my-init-set-hooks
    '(latex-mode-hook turn-on-reftex)
    ))
@@ -333,7 +337,8 @@
    'init-web-mode
    'web-skeletons
    )
-  (define-auto-insert "\\.[sx]?html?\\(\\.[a-zA-Z_]+\\)?\\'" 'web-template))
+  (my-init-custom-set-alist
+   '(auto-insert-alist ("\\.[sx]?html?\\(\\.[a-zA-Z_]+\\)?\\'" web-template))))
 
 ;;
 ;; nxml-mode
@@ -370,7 +375,9 @@
   (my-init-requires
    'graphviz-dot-skeletons
    )
-  (define-auto-insert 'graphviz-dot-mode 'graphviz-dot-template)
+  (my-init-custom-set-alist
+   '(auto-insert-alist (graphviz-dot-mode graphviz-dot-template)))
+  (defvar graphviz-dot-mode-hook nil)
   (my-init-set-hooks
    '(graphviz-dot-mode-hook kill-local-compile-command)
    ))
@@ -395,7 +402,8 @@
 ;; mpv-ts-mode
 ;;
 (with-eval-after-load 'mpv-ts-mode
-  (define-auto-insert 'mpv-ts-mode "template.ts"))
+  (my-init-custom-set-alist
+   '(auto-insert-alist (mpv-ts-mode "template.ts"))))
 
 ;;
 ;; ファイルの自動判定
