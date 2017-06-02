@@ -41,7 +41,6 @@
  'mediawiki
  'mew
  'pandoc
- 'session
  'sokoban
  'web-mode
  'xbm-life
@@ -70,6 +69,7 @@
  'list-fonts-display               ; フォント一覧作成コマンド
  'not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
  'scroll-one-line                  ; 1行スクロール
+ 'session
  'temp-buffer                      ; 一時バッファの作成
  'tidy-file-name-history           ; ファイル名履歴リストの整理
  'window-control                   ; ウィンドウとフレームのサイズを調整
