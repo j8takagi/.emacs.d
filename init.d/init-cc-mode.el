@@ -4,15 +4,15 @@
  '(c-default-style "k&r")
  '(c-basic-offset 4))
 
-(defun init-cc-ggtags-mode-turnon ()
+(defun init-cc-ggtags-mode-on ()
   (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
     (ggtags-mode 1)))
 
-(defun init-require-gnu-mp ()
+(defun init-cc-require-gnu-mp ()
   (when (derived-mode-p 'c-mode 'c++-mode)
     (require 'gnu-mp)))
 
-(defun init-c-disable-electric-state()
+(defun init-cc-disable-electric-state()
   (when (derived-mode-p 'c-mode)
     (c-toggle-electric-state -1)))
 
@@ -20,8 +20,8 @@
     (func
      '(
        init-cc-ggtags-mode-turnon
-       init-require-gnu-mp
-       init-c-disable-electric-state
+       init-cc-require-gnu-mp
+       init-cc-disable-electric-state
        ))
   (add-hook 'c-mode-common-hook func))
 
