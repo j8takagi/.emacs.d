@@ -201,13 +201,13 @@
 ;; view-modeの設定
 (with-eval-after-load 'view
   (my-init-requires
-   'init-view-mode               ; read-onlyファイルをview-modeで開く
-   'view-mode-vi-bindings        ; view-modeでviのキーバインド
+   'set-view-mode                     ; read-onlyファイルをview-modeで開く
+   'view-mode-vi-bindings             ; view-modeでviのキーバインド
    )
   (custom-set-variables
    '(view-read-only 1)
    )
-  (my-init-view-mode-buffer
+  (set-view-mode-buffers
    "\\*Messages\\*"                     ; *Messages*バッファをview-modeに
    ))
 

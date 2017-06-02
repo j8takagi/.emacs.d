@@ -40,7 +40,7 @@
 ;; view-modeの設定
 (with-eval-after-load 'view
   (my-init-custom-set-list
-   '(read-write-enable-dir-patterns
+   '(set-view-mode-read-write-directory-patterns
       "E:/Documents/201[4-9]_[01][0-9]"
       "~/.emacs.d/elpa"
       )))

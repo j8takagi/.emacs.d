@@ -181,15 +181,6 @@ Each SYM-DEF has the form (SYMBOL DEFINITION &optional DOCSTRING)."
        (defalias asym adef (nth 3 asymdef))
        (message "`%s' is defined as alias of `%s'." asym adef)))))
 
-(defun my-init-view-mode-buffer (&rest buffer-name-regexp)
-  "Buffers match BUFFER-NAME-REGEXP to enable view-mode."
-  (save-excursion
-    (dolist (abuf (buffer-list))
-      (dolist (aregexp buffer-name-regexp)
-        (when (string-match-p aregexp (buffer-name abuf))
-          (set-buffer abuf)
-          (view-mode))))))
-
 (defun my-init-global-set-keys (&rest key-func)
   "Give global binding as KEY-FUNC by global-set-key.
 Each KEY-FUNC form is (KEY FUNCTION).
