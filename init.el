@@ -71,7 +71,6 @@
  'scroll-one-line                  ; 1行スクロール
  'session
  'temp-buffer                      ; 一時バッファの作成
- 'tidy-file-name-history           ; ファイル名履歴リストの整理
  'window-control                   ; ウィンドウとフレームのサイズを調整
  'xlfd-at                          ; フォント情報の表示
  ;; ~/.emacs.d/insert
@@ -148,7 +147,6 @@
  '(read-mail-command 'mew)      ; メールを読むときにmewを使う
  '(save-interprogram-paste-before-kill 1) ; 他アプリのコピーバッファをkill-ringに保存する
  '(scroll-conservatively 1) ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
- '(session-set-file-name-exclude-regexp "[/\\]\\.overview\\|[/\\]\\.session\\|News[/\\]\\|\\.emacs\\.d/\\|~$\\|COMMIT_EDITMSG") ; sessionで、file-name-historyから除外するファイル
  '(show-paren-mode 1)             ; 括弧の対応を表示
  '(tab-width 4)                  ; タブ幅は4
  '(tool-bar-mode nil)            ; ツールバーを表示しない
@@ -189,6 +187,9 @@
    )
  '(Info-additional-directory-list       ; Infoファイルの場所
    "~/share/info/ja" "~/share/info"
+   )
+ '(session-file-name-history-exclude-regexps
+   "\\.emacs\\.d/" "~$" "COMMIT_EDITMSG" ; sessionで、file-name-historyから除外するファイル
    )
  )
 
@@ -620,8 +621,7 @@
    '(find-file-hook session-set-file-name-history)
    '(exopen-file-hook session-set-file-name-history)
    '(session-before-save-hook
-     delete-file-name-history-from-exclude-regexp
-     delete-file-name-history-not-exist)
+     session-cleanup-file-name-history-exclude-regexp)
    ))
 
 (message "End of loading init.el.")
