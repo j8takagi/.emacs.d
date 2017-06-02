@@ -12,12 +12,21 @@
   "If KEY in ALIST, update VALUE of the KEY.
 Unless, cons cell (KEY . VALUE) is added."
   (interactive)
-  (let (aconscell (alist (symbol-value alist-var)))
-   (if (setq aconscell (assoc key alist))
-       (unless (equal (cdr aconscell) value)
-         (setf (cdr aconscell) value))
-     (set alist-var (push (cons key value) alist)))
-   alist))
+  (let (acell (alst (symbol-value alist-var)))
+   (if (setq acell (assoc key alst))
+       (unless (equal (cdr acell) value)
+         (setf (cdr acell) value))
+     (set alist-var (push (cons key value) alst)))
+   alst))
+
+(defun overwrite-values-alist (alist-var value-new-old-alist)
+  "Overwrite ALIST-VAR alist by VALUE-NEW-OLD alist.
+Each VALUE-NEW-OLD-ALIST has the form (VALUE-NEW . VALUE-OLD)."
+  (let ((alst (symbol-value alist-var)))
+    (dolist (newold value-new-old-alist)
+      (while (setq acell (rassoc (cdr newold) alst))
+        (setf (cdr acell) (car newold))))
+    alst))
 
 (defvar system-name-simple
   (replace-regexp-in-string "\\..*\\'" "" (system-name))
@@ -236,37 +245,18 @@ If FUNCTION in MODE is void, warning message is printed into the `*Messages' buf
           (message "Warning: In setting minor mode, function `%s' is void." amode)
         (eval amodeval)))))
 
-(defun my-init-add-completion-ignored-extensions (extensions-list)
-  (dolist (ext extensions-list)
-    (add-to-list 'completion-ignored-extensions ext)))
-
-(defun my-init-set-magic-mode-alist (magic-list)
-  (dolist (magic magic-list)
-    (let (mode)
-      (if (not (fboundp (setq mode (cadr magic))))
-          (message "Warning: In setting magic-mode-alist, function `%s' is void." mode)
-        (update-or-add-alist 'magic-mode-alist (car magic) mode)))))
-
-(defun my-init-add-automode-alist (mode-list)
-  (dolist (ptnmode mode-list)
-    (let (mode)
-      (if (not (fboundp (setq mode (cadr ptnmode))))
-          (message "Warning: In setting auto-mode-alist, function `%s' is void." mode)
-        (update-or-add-alist 'auto-mode-alist (car ptnmode) mode)))))
-
-(defun my-init-overwrite-auto-mode-alists (&rest mode-to-from)
-  "Over write auto-mode-alist from one mode to anothor mode.
-If MODE-TO or MODE-FROM is void, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
-  (let (ato afrom (conscell))
-    (dolist (atofrom mode-to-from)
+(defun my-init-overwrite-auto-mode-alist (&rest mode-new-old)
+  (let (anew aold alst)
+    (dolist (newold mode-new-old)
       (cond
-       ((not (fboundp (setq ato (car atofrom))))
-        (message "Warning: In setting auto-mode-alist, mode `%s' overwritten to is void function." ato))
-       ((not (fboundp (setq afrom (cadr atofrom))))
-        (message "Warning: In setting auto-mode-alist, mode `%s' overwritten from is void function." afrom))
+       ((not (fboundp (setq anew (car newold))))
+        (message "Warning: In setting auto-mode-alist, mode `%s' overwritten from is void function." anew))
+       ((not (fboundp (setq aold (cadr newold))))
+        (message "Warning: In setting auto-mode-alist, mode `%s' overwritten to is void function." anew))
        (t
-        (while (setq conscell (rassq afrom auto-mode-alist))
-          (setcdr conscell ato)))))))
+        (setq alst (push (cons anew aold) alst)))))
+    (overwrite-values-alist 'auto-mode-alist alst)
+    (message "auto-mode-alist is overwritten.")))
 
 (defun my-init-set-hooks (&rest hook-func)
   "Add function to hooks by list of (FUNCTION HOOK).

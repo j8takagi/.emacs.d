@@ -418,7 +418,7 @@
    ))
 
 ;; auto-mode-alistで、既存のモード設定を上書きする
-(my-init-overwrite-auto-mode-alists
+(my-init-overwrite-auto-mode-alist
  '(makefile-gmake-mode makefile-bsdmake-mode)
  '(web-mode html-mode)
  )
