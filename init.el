@@ -191,6 +191,9 @@
  '(session-file-name-history-exclude-regexps
    "\\.emacs\\.d/" "~$" "COMMIT_EDITMSG" ; sessionで、file-name-historyから除外するファイル
    )
+ '(session-restore-last-point-exclude-regexps
+   "COMMIT_EDITMSG" ; session-restore-last-pointから除外するファイル
+   )
  )
 
 ; エイリアス
