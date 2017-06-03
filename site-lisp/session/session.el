@@ -1146,20 +1146,27 @@ remove final slash according to function `directory-file-name'."
 Don't add the file name if it matches
 `session-file-name-history-exclude-regexps', or if it is already at the front
 of `file-name-history'.  This function is useful in `find-file-hooks'."
-  (and session-use-package
-       buffer-file-name
-       (not (string= (car file-name-history) buffer-file-name))
-       (not (string= (car file-name-history) buffer-file-truename))
+  (let ((last-file-name (car file-name-history)))
+    (and session-use-package
+         buffer-file-name
+         (not (member last-file-name (list buffer-file-name buffer-file-truename)))
 ;;       (file-exists-p buffer-file-name) (file-readable-p buffer-file-name)
-       (let ((name (session-abbrev-file-name buffer-file-name)) (exclude nil))
-         (unless session-file-name-history-exclude-regexps
-           (catch 'findmatch
-             (dolist (aregexp session-file-name-history-exclude-regexps)
-               (when (string-match-p aregexp name)
-                 (setq exclude t)
-                 (throw 'findmatch t)))))
-         (unless exclude
-           (push name file-name-history)))))
+         (let ((name (session-abbrev-file-name buffer-file-name)) (exclude nil))
+           (unless (session-file-name-exclude-p name)
+             (push name file-name-history))))
+    (when (session-file-name-exclude-p last-file-name)
+      (setq file-name-history (cdr file-name-history)))))
+
+(defun session-file-name-exclude-p (name)
+  (let ((exclude nil))
+    (if (not session-file-name-history-exclude-regexps)
+        t
+      (catch 'findmatch
+        (dolist (aregexp session-file-name-history-exclude-regexps)
+          (when (string-match-p aregexp name)
+            (setq exclude t)
+            (throw 'findmatch t))))
+      exclude)))
 
 (defun session-find-file-hook ()
   "Function in `find-file-hook'.  See `session-file-alist'."
