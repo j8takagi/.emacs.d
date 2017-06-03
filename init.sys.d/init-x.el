@@ -1,7 +1,7 @@
 ;; -*- mode: Emacs-Lisp; -*-
 ;;; X-Windowの設定
 
-(require 'my-init)
+(message "Start of loading %s." load-file-name)
 
 ;; 標準のフォントサイズとフォントファミリーの設定
 (set-face-attribute 'default nil

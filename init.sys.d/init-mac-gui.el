@@ -1,7 +1,7 @@
 ;; -*- mode: Emacs-Lisp; -*-
 ;; Mac OS X GUI用の設定
 
-(message "Start of loading init-mac-gui.")
+(message "Start of loading %s." load-file-name)
 
 (require 'my-init)
 

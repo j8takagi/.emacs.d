@@ -1,6 +1,6 @@
 ;;;-*-Emacs-Lisp-*-
 
-(message "Start of loading init at %s." (format-time-string "%Y/%m/%d %T"))
+(message "Start of loading %s at %s." load-file-name (format-time-string "%Y/%m/%d %T"))
 
 (message (emacs-version))
 
