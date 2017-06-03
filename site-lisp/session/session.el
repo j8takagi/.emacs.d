@@ -1165,16 +1165,14 @@ of `file-name-history'.  This function is useful in `find-file-hooks'."
 
 (defun session-element-exclude-p (element exclude-regexps)
   (let ((exclude nil))
-    (if (null exclude-regexps)
-        t
-      (catch 'findmatch
-        (dolist (aregexp exclude-regexps)
-          (when (string-match-p aregexp element)
-            (setq exclude t)
-            (throw 'findmatch t))))
-      exclude)))
-
 (defun session-find-file-hook ()
+    (catch 'findmatch
+      (dolist (aregexp exclude-regexps)
+        (when (string-match-p aregexp element)
+          (setq exclude t)
+          (throw 'findmatch t))))
+    exclude))
+
   "Function in `find-file-hook'.  See `session-file-alist'."
   (unless
       (or
