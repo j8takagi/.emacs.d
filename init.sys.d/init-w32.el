@@ -14,7 +14,7 @@
      ,(fontset-set
        '(
          (ascii . (font-spec :family "Consolas" :weight 'normal :size 14))
-         (unicode . (font-spec :family "游ゴシック"))
+         (unicode . (font-spec :family "メイリオ"))
          )
        "mydefault_w32"))
     (width 160)
