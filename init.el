@@ -215,7 +215,8 @@
 ;; *Messages*の警告が目立つように
 (font-lock-add-keywords 'messages-buffer-mode
                         '(("^\\(\\(Warning\\|Error\\):\\) .*" 1 font-lock-warning-face t)))
-(with-current-buffer "*Messages*" (font-lock-ensure))
+(when (>= emacs-major-version 25)
+    (with-current-buffer "*Messages*" (font-lock-ensure)))
 
 ;; uniquify
 (with-eval-after-load 'uniquify
