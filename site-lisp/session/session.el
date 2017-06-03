@@ -323,8 +323,8 @@ not exclude any file."
   :group 'session-miscellaneous
   :type '(repeat regexp))
 
-(defcustom session-find-file-hook-exclude-regexps nil
-  "*Regexp matching file names not to enable `session-find-file-hook'.
+(defcustom session-restore-last-point-exclude-regexps nil
+  "*Regexp matching file names not to enable `session-restore-last-point'.
 Value nil means, do not exclude any file."
   :group 'session-miscellaneous
   :type '(repeat regexp))
@@ -701,7 +701,7 @@ See `session-buffer-check-function'."
 
 (defvar session-last-change nil
   "Position of last change in current buffer.
-This variable is set by `session-find-file-hook' if the buffer was
+This variable is set by `session-restore-last-point' if the buffer was
 changed in a previous session.  It can also be set by providing an
 prefix argument to `session-jump-to-last-change'.")
 (make-variable-buffer-local 'session-last-change)
@@ -1165,7 +1165,6 @@ of `file-name-history'.  This function is useful in `find-file-hooks'."
 
 (defun session-element-exclude-p (element exclude-regexps)
   (let ((exclude nil))
-(defun session-find-file-hook ()
     (catch 'findmatch
       (dolist (aregexp exclude-regexps)
         (when (string-match-p aregexp element)
@@ -1173,12 +1172,13 @@ of `file-name-history'.  This function is useful in `find-file-hooks'."
           (throw 'findmatch t))))
     exclude))
 
+(defun session-restore-last-point ()
   "Function in `find-file-hook'.  See `session-file-alist'."
   (unless
       (or
        (eq this-command 'session-disable)
        (null session-use-package)
-       (session-element-exclude-p (session-buffer-file-name) session-find-file-hook-exclude-regexps))
+       (session-element-exclude-p (session-buffer-file-name) session-restore-last-point-exclude-regexps))
     (let* ((ass (assoc (session-buffer-file-name) session-file-alist))
        (point (second ass))
        (mark (third ass))
@@ -1784,9 +1784,9 @@ this function to `after-init-hook'."
          (remove-hook 'kill-buffer-hook 'save-place-to-alist)))))
     (when (or (eq session-initialize t)
           (memq 'places session-initialize))
-      ;; `session-find-file-hook' should be *very* late in `find-file-hooks',
+      ;; `session-restore-last-point' should be *very* late in `find-file-hooks',
       ;; esp. if some package, e.g. crypt, iso-cvt, change the buffer contents:
-      (add-hook 'find-file-hooks 'session-find-file-hook t)
+      (add-hook 'find-file-hooks 'session-restore-last-point t)
       (add-hook 'find-file-not-found-hooks 'session-find-file-not-found-hook t)
       (add-hook 'kill-buffer-hook 'session-kill-buffer-hook)
       (if session-register-swap-out
