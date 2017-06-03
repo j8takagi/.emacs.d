@@ -323,6 +323,12 @@ not exclude any file."
   :group 'session-miscellaneous
   :type '(repeat regexp))
 
+(defcustom session-find-file-hook-exclude-regexps nil
+  "*Regexp matching file names not to enable `session-find-file-hook'.
+Value nil means, do not exclude any file."
+  :group 'session-miscellaneous
+  :type '(repeat regexp))
+
 (defvar session-menu-accelerator-support
   (and (featurep 'menu-accelerator-support)
        (fboundp 'submenu-generate-accelerator-spec)
@@ -1170,8 +1176,11 @@ of `file-name-history'.  This function is useful in `find-file-hooks'."
 
 (defun session-find-file-hook ()
   "Function in `find-file-hook'.  See `session-file-alist'."
-  (unless (or (eq this-command 'session-disable)
-          (null session-use-package))
+  (unless
+      (or
+       (eq this-command 'session-disable)
+       (null session-use-package)
+       (session-element-exclude-p (session-buffer-file-name) session-find-file-hook-exclude-regexps))
     (let* ((ass (assoc (session-buffer-file-name) session-file-alist))
        (point (second ass))
        (mark (third ass))
