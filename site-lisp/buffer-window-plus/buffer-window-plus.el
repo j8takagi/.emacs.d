@@ -104,46 +104,36 @@ And, delete the next window."
   (quit-window nil (next-window)))
 
 ;; シェルにカレントディレクトリへのcdコマンドを送る
-(defun shell-send-cd (directory)
+(defun shell-send-cd (&optional directory)
   "Send cd command of default directory to shell."
   (interactive)
-  (setq default-directory directory)
-  (goto-char (point-max))
-  (comint-kill-input)
-  (insert (concat "cd '" (expand-file-name directory) "'"))
-  (comint-send-input)
-  (recenter 1)
-  (goto-char (point-max)))
+  (when (directory-name-p directory)
+    (setq default-directory
+          (expand-file-name directory)))
+  (when (get-buffer "*shell*")
+    (with-current-buffer "*shell*"
+      (goto-char (point-max))
+      (comint-kill-input)
+      (insert (concat "cd '" default-directory "'"))
+      (comint-send-input)
+      (goto-char (point-max)))))
 
-;; カレントディレクトリでシェルバッファを開く
 (defun shell-current-directory ()
    "If shell buffer exists, change directory in shell
 to default directory in current buffer.
 Otherwise, open new shell buffer of the dafault directory."
    (interactive)
-   (let* (
-       (shell-buffer (get-buffer "*shell*"))
-       (proc (get-buffer-process shell-buffer))
-       (curbuf (current-buffer))
-       (curdir default-directory)
-       (cd-command (concat "cd " curdir)))
-     (if shell-buffer
-         (if (process-running-child-p proc)
-             (message "Child process is running in the shell.")
-           (progn
-             (set-buffer shell-buffer)
-             (shell-send-cd curdir)))
-       (shell))))
-
-;; 現在のバッファを、カレントディレクトリのシェルバッファに切り替える
-(defun switch-to-shell-current-directory ()
-  "Switch current buffer to shell buffer of
-default directory."
-  (interactive)
-  (unless (string= (buffer-name) "*shell*")
-    (progn
-      (shell-current-directory)
-      (switch-to-buffer (get-buffer "*shell*")))))
+   (let (abuf aproc)
+     (when (not (and
+                 (setq abuf (get-buffer "*shell*"))
+                 (setq aproc (get-buffer-process abuf))))
+       (shell))
+     (if (process-running-child-p aproc)
+         (message "Child process is running in the shell.")
+       (unless (equal (buffer-name) "*shell*")
+         (switch-to-buffer "*shell*"))
+       (shell-send-cd)
+       (recenter 1))))
 
 ;; フレームを2分割にし、カレントディレクトリのシェルバッファを開く
 (defun split-shell-current-directory ()
@@ -154,17 +144,15 @@ shell of default directory in current buffer."
     (progn
       (delete-other-windows)
       (split-window-below)
-      (switch-to-shell-current-directory))))
+      (shell-current-directory))))
 
 ;; 新しいフレームに、カレントディレクトリのシェルバッファを開く
 (defun new-frame-shell-current-directory ()
   "Make a new frame, and switch the new frame window
 to shell of default directory in current buffer."
   (interactive)
-  (unless (string= (buffer-name) "*shell*")
-    (progn
-      (make-frame-command)
-      (switch-to-shell-current-directory))))
+  (select-frame (make-frame-command))
+  (shell-current-directory))
 
 (defun toggle-split-next-window ()
   "Toggle split between selected window and next window.
