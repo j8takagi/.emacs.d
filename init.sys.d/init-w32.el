@@ -1,7 +1,7 @@
 ;; -*- mode: Emacs-Lisp; -*-
 ;; MS-Windowsの設定
 
-(message "Start of loading init-w32.")
+(message "Start of loading %s." load-file-name)
 
 (require 'my-init)
 
