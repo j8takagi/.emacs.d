@@ -1151,7 +1151,7 @@ remove final slash according to function `directory-file-name'."
   "Add file-name of current buffer to `file-name-history'.
 Don't add the file name if it matches
 `session-file-name-history-exclude-regexps', or if it is already at the front
-of `file-name-history'.  This function is useful in `find-file-hooks'."
+of `file-name-history'.  This function is useful in `find-file-hook'."
   (let ((last-file-name (car file-name-history)))
     (and session-use-package
          buffer-file-name
@@ -1164,12 +1164,11 @@ of `file-name-history'.  This function is useful in `find-file-hooks'."
       (setq file-name-history (cdr file-name-history)))))
 
 (defun session-element-exclude-p (element exclude-regexps)
-  (let ((exclude nil))
+  (let (exclude)
     (catch 'findmatch
       (dolist (aregexp exclude-regexps)
         (when (string-match-p aregexp element)
-          (setq exclude t)
-          (throw 'findmatch t))))
+          (throw 'findmatch (setq exclude t)))))
     exclude))
 
 (defun session-restore-last-point ()
@@ -1779,14 +1778,14 @@ this function to `after-init-hook'."
       (when (functionp 'eval-after-load)
     (eval-after-load "saveplace"
       '(progn
-         (remove-hook 'find-file-hooks 'save-place-find-file-hook)
+         (remove-hook 'find-file-hook 'save-place-find-file-hook)
          (remove-hook 'kill-emacs-hook 'save-place-kill-emacs-hook)
          (remove-hook 'kill-buffer-hook 'save-place-to-alist)))))
     (when (or (eq session-initialize t)
           (memq 'places session-initialize))
-      ;; `session-restore-last-point' should be *very* late in `find-file-hooks',
+      ;; `session-restore-last-point' should be *very* late in `find-file-hook',
       ;; esp. if some package, e.g. crypt, iso-cvt, change the buffer contents:
-      (add-hook 'find-file-hooks 'session-restore-last-point t)
+      (add-hook 'find-file-hook 'session-restore-last-point t)
       (add-hook 'find-file-not-found-hooks 'session-find-file-not-found-hook t)
       (add-hook 'kill-buffer-hook 'session-kill-buffer-hook)
       (if session-register-swap-out

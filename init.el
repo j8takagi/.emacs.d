@@ -256,7 +256,13 @@
 (with-eval-after-load 'whitespace
   (my-init-requires
    'init-whitespace
-   ))
+   )
+  (my-init-custom-set-list
+   '(whitespace-disabled-major-mode-list
+     (
+     Custom-mode mew-summary-mode completion-list-mode help-mode
+     magit-mode tetris-mode w3m-mode mew-message-mode
+     ))))
 
 ;;
 ;; Ediff
@@ -339,11 +345,23 @@
 ;;
 (with-eval-after-load 'web-mode
   (my-init-requires
-   'init-web-mode
    'web-skeletons
    )
+  (custom-set-variables
+   '(web-mode-markup-indent-offset 0)     ; HTMLタグのインデントを0に
+   '(web-mode-indent-style 1)            ; 1: text at the beginning of line is not indented
+   )
   (my-init-custom-set-alist
-   '(auto-insert-alist ("\\.[sx]?html?\\(\\.[a-zA-Z_]+\\)?\\'" web-template))))
+   '(auto-insert-alist ("\\.[sx]?html?\\(\\.[a-zA-Z_]+\\)?\\'" web-template))
+   )
+  (custom-set-faces
+   '(web-mode-comment-face ((nil (:foreground "#D9333F"))))
+   '(web-mode-doctype-face ((nil (:foreground "#82AE46"))))
+   '(web-mode-html-attr-name-face ((nil (:foreground "#C97586"))))
+   '(web-mode-html-attr-value-face ((nil (:foreground "#82AE46"))))
+   '(web-mode-html-tag-face ((nil (:foreground "#00c0e0" :weight bold))))
+   '(web-mode-server-comment-face ((nil (:foreground "#D9333F")))))
+  )
 
 ;;
 ;; nxml-mode
