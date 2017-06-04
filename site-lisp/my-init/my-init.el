@@ -7,6 +7,8 @@
 
 ;;; Commentary:
 ;;; Code:
+(require 'cus-edit)
+(require 'package)
 
 (defun update-or-add-alist (alist-var key value)
   "If KEY in ALIST, update VALUE of the KEY.
@@ -27,6 +29,16 @@ Each VALUE-NEW-OLD-ALIST has the form (VALUE-NEW . VALUE-OLD)."
       (while (setq acell (rassoc (cdr newold) alst))
         (setf (cdr acell) (car newold))))
     alst))
+
+(defun my-init-validate-custom-variable-type (custom-variable &optional value)
+  "Varidate VALUES is match CUSTOM-VARIABLE to custom-variable-type in symbol property.
+If VALUE matches custom-variable-type in symbol properties list, t.
+When VALUE is ommited or nil, current value of CUSTOM-VARIABLE is validated."
+  (let (atype)
+    (when (null value)
+      (setq value (symbol-value custom-variable)))
+    (when (setq atype (custom-variable-type custom-variable))
+      (widget-apply (widget-convert atype) :match value))))
 
 (defvar system-name-simple
   (replace-regexp-in-string "\\..*\\'" "" (system-name))
@@ -149,25 +161,26 @@ Each ALIST-KEY-VAL has the form (ALIST-NAME (KEY1 VALUE1) (KEY2 VALUE2) ...)."
       (update-or-add-alist asym (car akeyval) (cadr akeyval)))
     (message "%s alist is set." (symbol-name asym)))))
 
-(defun my-init-custom-set-alist (&rest alist-key-val)
+(defun my-init-custom-set-alist (&rest alist-args)
   "Custom set ALIST-KEY-VAL value to the alist.
-Each ALIST-KEY-VAL has the form (ALIST-NAME (KEY1 VALUE1) (KEY2 VALUE2) ...)."
-  (let (asym keyvals)
-    (dolist (aalist alist-key-val)
-      (setq asym (car aalist) keyvals (symbol-value (car aalist)))
-      (dolist (akeyval (cdr aalist))
+Each ALIST-KEY-VAL has the form (ALIST-NAME[ NOW[ REQUEST[ COMMENT]]] (KEY1 VALUE1) (KEY2 VALUE2) ...)."
+  (let (asym arest keyvals anow areq acomm)
+    (dolist (aalist alist-args)
+      (setq asym (car aalist) arest (cdr aalist))
+      (unless (listp (cadr arest))
+        (setq anow (car arest) arest (cdr arest))
+        (unless (listp (cadr arest))
+          (setq areq (car arest) arest (cdr arest))
+          (unless (listp (cadr arest))
+            (setq acomm (car arest) arest (cdr arest)))))
+      (setq keyvals (symbol-value asym))
+      (dolist (akeyval arest)
         (update-or-add-alist 'keyvals (car akeyval) (cadr akeyval)))
-      (custom-set-variables `(,asym ',keyvals)))))
-
-(defun my-init-custom-set-list (&rest list-val)
-  "Set LIST-VAL value to the list.
-Each LIST-VAL has the form (LIST-NAME VALUE1 VALUE2 ...)."
-  (let (asym vals)
-    (dolist (lst list-val)
-      (setq asym (car lst) vals (symbol-value (car lst)))
-      (dolist (val (cdr lst))
-        (add-to-list 'vals val))
-      (custom-set-variables `(,asym ',vals)))))
+      (if (null (my-init-validate-custom-variable-type asym keyvals))
+          (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
+                   asym (custom-variable-type asym) keyvals)
+        (unless (eq keyvals (symbol-value asym))
+          (custom-set-variables `(,asym ',keyvals ,anow ,areq ,acomm)))))))
 
 (defun my-init-set-list (&rest list-val)
   "Set LIST-VAL value to the list.
@@ -177,6 +190,50 @@ Each LIST-VAL has the form (LIST-NAME (VALUE1 VALUE2 ...))."
       (dolist (val (cadr lst))
         (add-to-list (setq asym (car lst)) val))
       (message "%s list is set." (symbol-name asym)))))
+
+(defun my-init-custom-set-list (&rest list-val)
+  "Set LIST-VAL value to the list.
+Each LIST-VAL has the form (LIST-NAME[ NOW[ REQUEST[ COMMENT]]] (VALUE1 VALUE2 ...))."
+  (let (asym vals arest anow areq acomm)
+    (dolist (lst list-val)
+      (setq asym (car lst) vals (symbol-value asym) arest (cdr lst))
+      (unless (listp (cadr arest))
+        (setq anow (car arest) arest (cdr arest))
+        (unless (listp (cadr arest))
+          (setq areq (car arest) arest (cdr arest))
+          (unless (listp (cadr arest))
+            (setq acomm (car arest) arest (cdr arest)))))
+      (dolist (val (car arest))
+        (add-to-list 'vals val))
+      (if (null (my-init-validate-custom-variable-type asym vals))
+          (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
+                   asym (custom-variable-type asym) vals)
+        (unless (eq vals (symbol-value asym))
+          (custom-set-variables `(,asym ',vals ,anow ,areq ,acomm)))))))
+
+;; (defun my-init-custom-set-variables (&rest ARGS)
+;;   "Custom set variable values specified in ARGS.
+;; Each ARGS has form (SYMBOL EXP [NOW [REQUEST [COMMENT]]]).
+;; The ARGS form is same to `custom-set-variables'.
+;; Except EXP need no quote when EXP is SYMBOL,
+;; and/or add each element when EXP is list,
+;; update or add each element when EXP is association list (alist)."
+;;   (let (asym aexp anow areq acomment)
+;;     (dolist (arg args)
+;;       (if (symbolp (setq asym (nth 0 arg)))
+;;           (error (format "%s is not symbol." asym)))
+;;       (setq
+;;        aexp (nth 1 arg) anow (nth 2 arg) areq (nth 3 arg)
+;;        acomment
+;;        (concat
+;;         (when load-file-name "set in %s. " load-file-name)
+;;         (nth 4 arg)))
+;;       (cond
+;;        ((symbolp aexp)
+;;         (custom-set-variables asym aexp anow areq acomment))
+;;        ((and (listp aexp) (listp (car aexp)))
+;;         (my-init-custom-set-alist asym aexp anow areq acomment))
+;;        ))))
 
 (defun my-init-defaliases (&rest sym-def)
   "Set SYMBOL’s function definition to DEFINITION in SYM-DEF.

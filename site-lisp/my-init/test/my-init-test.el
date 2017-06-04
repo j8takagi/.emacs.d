@@ -82,6 +82,16 @@ overwrite a integer value."
   (let ((abc '((1 . a) (2 . "a") (3 . 1))))
     (should (equal (overwrite-values-alist 'abc '((11 . 1))) '((1 . a) (2 . "a") (3 . 11))))
     ))
+(ert-deftest my-init-test-validate-custom-variable-type-1 ()
+  "Tests `validate-custom-variable-type'.
+Validate auto-mode-alist self value."
+  (let ((auto-mode-alist '((".txt" . text-mode))))
+    (should (my-init-validate-custom-variable-type 'auto-mode-alist))))
 
-(provide 'my-init-test)
+(ert-deftest my-init-test-validate-custom-variable-type-2 ()
+  "Tests `validate-custom-variable-type'.
+Validate auto-mode-alist self mismatch value."
+  (let ((auto-mode-alist '(".txt" ".html")))
+    (should (null (my-init-validate-custom-variable-type 'auto-mode-alist)))))
+
 ;;; my-init-test.el ends here

@@ -16,13 +16,12 @@
   (when (derived-mode-p 'c-mode)
     (c-toggle-electric-state -1)))
 
-(dolist                            ; c-mode-common-hookに追加する関数
-    (func
-     '(
-       init-cc-ggtags-mode-turnon
-       init-cc-require-gnu-mp
-       init-cc-disable-electric-state
-       ))
-  (add-hook 'c-mode-common-hook func))
+(my-init-custom-set-list
+ '(c-mode-common-hook
+   (
+    init-cc-ggtags-mode-on
+    init-cc-require-gnu-mp
+    init-cc-disable-electric-state
+    )))
 
 (provide 'init-cc-mode)

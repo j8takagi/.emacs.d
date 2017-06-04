@@ -181,19 +181,23 @@
 ; リスト
 (my-init-custom-set-list
  '(completion-ignored-extensions        ; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
-   ".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" "_prev"
-   ".idx" ".ind" ".ilg" ".tmp" ".synctex.gz" ".dplg" ".dslg"
-   ".dSYM/" ".DS_Store" ":com.dropbox.attributes:$DATA"
-   )
+   (
+    ".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" "_prev"
+    ".idx" ".ind" ".ilg" ".tmp" ".synctex.gz" ".dplg" ".dslg"
+    ".dSYM/" ".DS_Store" ":com.dropbox.attributes:$DATA"
+    ))
  '(Info-additional-directory-list       ; Infoファイルの場所
-   "~/share/info/ja" "~/share/info"
-   )
+   (
+    "~/share/info/ja" "~/share/info"
+    ))
  '(session-file-name-history-exclude-regexps
-   "\\.emacs\\.d/" "~$" "COMMIT_EDITMSG" ; sessionで、file-name-historyから除外するファイル
-   )
+   (
+    "\\.emacs\\.d/" "~$" "COMMIT_EDITMSG" ; sessionで、file-name-historyから除外するファイル
+    ))
  '(session-restore-last-point-exclude-regexps
-   "COMMIT_EDITMSG" ; session-restore-last-pointから除外するファイル
-   )
+   (
+    "COMMIT_EDITMSG" ; session-restore-last-pointから除外するファイル
+    ))
  )
 
 ; エイリアス
@@ -632,18 +636,18 @@
 
 ;; フックの設定
 (my-init-custom-set-list
- '(after-init-hook session-initialize)
- '(after-init-hook my-init-message-startup-time)
- '(find-file-hook auto-insert)
- '(kill-buffer-query-functions not-kill-but-bury-buffer)
+ '(after-init-hook (session-initialize))
+ '(after-init-hook (my-init-message-startup-time))
+ '(find-file-hook (auto-insert))
+ '(kill-buffer-query-functions (not-kill-but-bury-buffer))
  )
 
 (with-eval-after-load 'session
   (my-init-custom-set-list
-   '(find-file-hook session-set-file-name-history)
-   '(exopen-file-hook session-set-file-name-history)
+   '(find-file-hook (session-set-file-name-history))
+   '(exopen-file-hook (session-set-file-name-history))
    '(session-before-save-hook
-     session-cleanup-file-name-history-exclude-regexp)
+     (session-cleanup-file-name-history-exclude-regexp))
    ))
 
 (message "End of loading init.el.")

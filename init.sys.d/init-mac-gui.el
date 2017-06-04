@@ -44,8 +44,10 @@
 (with-eval-after-load 'view
   (my-init-custom-set-list
    '(set-view-mode-read-write-directory-patterns
-     "~/Documents/201[4-9]_[01][0-9]" "~/.emacs.d/elpa" "/tmp" "/var"
-     )))
+     (
+      "~/Documents/201[4-9]_[01][0-9]"
+      "~/.emacs.d/elpa" "/tmp" "/var"
+      ))))
 
 ; IMEのオンとオフにあわせ、カーソルの色を変える
 (mac-ime-cursor-add-hook)
