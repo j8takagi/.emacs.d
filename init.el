@@ -111,7 +111,6 @@
 ; モード
 (my-init-set-modes
  ;; 有効にするモード
- '(abbrev-mode 1)                 ; Abbrevsを使う
  '(whitespace-mode 1)             ; 空白を強調表示
  )
 
