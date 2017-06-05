@@ -1,10 +1,12 @@
-(require 'whitespace)
+(require 'my-init)
+(my-init-requires 'whitespace)
 
 ;タブ	、全角スペース　、行末の空白    
-(custom-set-variables
- '(whitespace-style '(face tabs spaces trailing) nil nil "set in init-whitespace")
- '(whitespace-space-regexp "\\(　\\)" nil nil "set in init-whitespace")
- '(whitespace-trailing-regexp "\\( +$\\)" nil nil "set in init-whitespace")
+(my-init-custom-set-variables
+ '(whitespace-style nil)
+ '(whitespace-style (face tabs spaces trailing))
+ '(whitespace-space-regexp "\\(　\\)")
+ '(whitespace-trailing-regexp "\\( +$\\)")
  )
 
 (let (
@@ -44,7 +46,7 @@
       (whitespace-mode 0)
     (whitespace-mode 1)))
 
-(my-init-custom-set-list
+(my-init-custom-set-variables
  '(after-change-major-mode-hook (init-whitespace-mode))
  '(view-mode-hook (init-whitespace-mode)))
 

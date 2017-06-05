@@ -19,30 +19,28 @@
  '("VISUAL" "emacsclient")
  )
 
-(my-init-custom-set-alist
+(my-init-custom-set-variables
  `(default-frame-alist                  ; デフォルトフレーム
-    (font
-     ,(fontset-set
-       '(
-         (ascii . (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
-         (unicode . (font-spec :family "Hiragino Sans"))
-         )
-       "mydefault_mac"))
-    (width 180)
-    (height 56)
-    (top 23)
-    (left 0)
-    ))
-
-;; カスタム変数の設定
-(custom-set-variables
- '(mac-command-modifier 'meta)        ; commandキーをEmacsのMetaキーに
+    (
+     (font
+      ,(fontset-set
+        '(
+          (ascii . (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
+          (unicode . (font-spec :family "Hiragino Sans"))
+          )
+        "mydefault_mac"))
+     (width 180)
+     (height 56)
+     (top 23)
+     (left 0)
+     ))
+ '(mac-command-modifier meta)        ; commandキーをEmacsのMetaキーに
  '(mac-auto-ascii-mode 1)             ; ミニバッファへのカーソル移動時、日本語IMEを自動オフ
  )
 
 ;; view-modeの設定
 (with-eval-after-load 'view
-  (my-init-custom-set-list
+  (my-init-custom-set-variables
    '(set-view-mode-read-write-directory-patterns
      (
       "~/Documents/201[4-9]_[01][0-9]"

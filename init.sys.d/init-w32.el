@@ -7,9 +7,15 @@
 
 (my-init-requires 'fontset-set)
 
-;; フレームの設定
-(my-init-custom-set-alist
+;; 環境変数EDITORの設定
+(my-init-setenv
+ '("EDITOR" "emacsclient")
+ )
+
+
+(my-init-custom-set-variables
  `(default-frame-alist                  ; デフォルトフレーム
+    (
     (font
      ,(fontset-set
        '(
@@ -22,28 +28,19 @@
     (top 0)
     (left 0)
     ))
-
-;; 文字コードのデフォルトはUTF-8
-(prefer-coding-system 'utf-8-dos)
-
-(custom-set-variables
- '(default-file-name-coding-system 'cp932) ; 日本語ファイル名を正常に処理する
- '(default-process-coding-system '(utf-8 . cp932)) ; 日本語ファイル名を正常に処理する
+ '(default-file-name-coding-system cp932) ; 日本語ファイル名を正常に処理する
  '(default-input-method "W32-IME")                ; IMEの設定
+ '(default-process-coding-system (utf-8 cp932)) ; 日本語ファイル名を正常に処理する
  )
 
-;; 環境変数EDITORの設定
-(my-init-setenv
- '("EDITOR" "emacsclient")
+(custom-set-variables
  )
 
 ;; view-modeの設定
 (with-eval-after-load 'view
-  (my-init-custom-set-list
+  (my-init-custom-set-variables
    '(set-view-mode-read-write-directory-patterns
-     (
-      "E:/Documents/201[4-9]_[01][0-9]"
-      "~/.emacs.d/elpa"
+     ("E:/Documents/201[4-9]_[01][0-9]" "~/.emacs.d/elpa"
       ))))
 
 (my-init-global-set-keys
@@ -54,6 +51,9 @@
 ;; Shell-modeの文字コード設定
 (defun set-buffer-process-coding-system-cp932 ()
   (set-buffer-process-coding-system 'cp932 'cp932))
+
+;; 文字コードのデフォルトはUTF-8
+(prefer-coding-system 'utf-8-dos)
 
 ;; フックの設定
 (my-init-custom-set-list

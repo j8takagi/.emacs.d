@@ -115,27 +115,30 @@
  )
 
 ; 変数
-(custom-set-variables
- '(indent-line-function 'indent-to-left-margin) ; インデント用のファンクション
+(put 'disabled-command-function 'custom-type '(choice (const nil) function))
+(my-init-custom-set-variables
+ '(Info-additional-directory-list ("~/share/info/ja" "~/share/info" )) ; Infoファイルの場所
  '(auto-compression-mode 1)         ; 圧縮されたファイルを直接編集する
  '(auto-insert-alist nil)           ; auto-insert-alistの初期化
  '(auto-insert-directory "~/.emacs.d/insert/") ; auto-insertテンプレートディレクトリ
  '(auto-insert-query nil)                      ; auto-insertでユーザーに尋ねない
+ '(backup-directory-alist (("." "~/backup")))
  '(blink-cursor-mode nil)                      ; カーソルは点滅しない
  '(case-replace nil)                ; 置換時に大文字小文字を区別しない
  '(column-number-mode 1)            ; 列番号を表示
+ '(completion-ignored-extensions (".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" "_prev" ".idx" ".ind" ".ilg" ".tmp" ".synctex.gz" ".dplg" ".dslg" ".dSYM/" ".DS_Store" ":com.dropbox.attributes:$DATA")) ; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
  '(custom-file "~/.emacs.d/.emacs-custom.el") ;カスタムの設定値を書き込むファイル
  '(delete-by-moving-to-trash 1)      ;  ファイルの削除で、ゴミ箱を使う
  '(delete-old-versions 1) ; 古いバックアップファイルを自動的に削除する
  '(disabled-command-function nil) ; すべてのコマンドの使用制限を解除する
- '(skeleton-end-hook nil)         ; skeletonの挿入後、改行しない
- '(skeleton-pair 1)              ; skeleton-pairにより括弧挿入を自動化
+ '(display-buffer-alist (("^\\*shell\\*$" (display-buffer-same-window)) ("^\\*magit: .+" (display-buffer-same-window)))) ; バッファの表示方法
  '(electric-indent-mode nil) ; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
  '(enable-recursive-minibuffers 1)      ; 再帰的にミニバッファを使う
  '(eval-expression-print-length nil)    ; evalした結果を全部表示する
  '(global-font-lock-mode 1)       ; メジャーモードに合わせた色を付ける
  '(history-delete-duplicates 1)   ; 重複する履歴は削除
  '(history-length t)              ; 履歴の数を無制限に
+ '(indent-line-function indent-to-left-margin) ; インデント用のファンクション
  '(indent-tabs-mode nil)          ; タブをスペースに展開
  '(inhibit-startup-screen 1)      ; 起動時の画面を表示しない
  '(initial-scratch-message nil)   ; *scratch* にメッセージを表示しない
@@ -143,10 +146,14 @@
  '(make-backup-files 1)           ; バックアップファイルを作成する
  '(menu-bar-mode nil)             ; メニューバーを表示しない
  '(next-line-add-newlines nil) ; ファイル末尾での改行で、end of bufferエラーが発生しないように
- '(read-mail-command 'mew)      ; メールを読むときにmewを使う
+ '(read-mail-command mew)      ; メールを読むときにmewを使う
  '(save-interprogram-paste-before-kill 1) ; 他アプリのコピーバッファをkill-ringに保存する
  '(scroll-conservatively 1) ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
+ '(session-file-name-history-exclude-regexps ("\\.emacs\\.d/" "~$" "COMMIT_EDITMSG")) ; sessionで、file-name-historyから除外するファイル
+ '(session-restore-last-point-exclude-regexps ("COMMIT_EDITMSG")) ; session-restore-last-pointから除外するファイル
  '(show-paren-mode 1)             ; 括弧の対応を表示
+ '(skeleton-end-hook nil)         ; skeletonの挿入後、改行しない
+ '(skeleton-pair 1)              ; skeleton-pairにより括弧挿入を自動化
  '(tab-width 4)                  ; タブ幅は4
  '(tool-bar-mode nil)            ; ツールバーを表示しない
  '(transient-mark-mode 1)        ; リージョンをハイライト
@@ -160,44 +167,15 @@
  '(yank-pop-change-selection 1) ; yank-popを有効にする
  )
 
-; 連想リスト
-(my-init-custom-set-alist
- (when window-system
+(when window-system
+  (my-init-custom-set-variables
    '(default-frame-alist                ; デフォルトフレーム
-      (foreground-color "black")
-      (background-color "gray99")
-      (cursor-color "DarkOliveGreen")
-      (cursor-type box)
-      ))
- '(display-buffer-alist                 ; バッファの表示方法の指定
-   ("^\\*shell\\*$" (display-buffer-same-window))
-   ("^\\*magit: .+" (display-buffer-same-window))
-   )
- '(backup-directory-alist
-   ("." "~/backup")
-   ))
-
-; リスト
-(my-init-custom-set-list
- '(completion-ignored-extensions        ; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
-   (
-    ".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" "_prev"
-    ".idx" ".ind" ".ilg" ".tmp" ".synctex.gz" ".dplg" ".dslg"
-    ".dSYM/" ".DS_Store" ":com.dropbox.attributes:$DATA"
-    ))
- '(Info-additional-directory-list       ; Infoファイルの場所
-   (
-    "~/share/info/ja" "~/share/info"
-    ))
- '(session-file-name-history-exclude-regexps
-   (
-    "\\.emacs\\.d/" "~$" "COMMIT_EDITMSG" ; sessionで、file-name-historyから除外するファイル
-    ))
- '(session-restore-last-point-exclude-regexps
-   (
-    "COMMIT_EDITMSG" ; session-restore-last-pointから除外するファイル
-    ))
- )
+      (
+       (foreground-color "black")
+       (background-color "gray99")
+       (cursor-color "DarkOliveGreen")
+       (cursor-type box)
+       ))))
 
 ; エイリアス
 (my-init-defaliases
@@ -211,7 +189,7 @@
    'set-view-mode                     ; read-onlyファイルをview-modeで開く
    'view-mode-vi-bindings             ; view-modeでviのキーバインド
    )
-  (custom-set-variables
+  (my-init-custom-set-variables
    '(view-read-only 1)
    )
   (set-view-mode-buffers
@@ -226,32 +204,32 @@
 
 ;; uniquify
 (with-eval-after-load 'uniquify
-  (custom-set-variables
-   '(uniquify-buffer-name-style 'post-forward-angle-brackets)
+  (my-init-custom-set-variables
+   '(uniquify-buffer-name-style post-forward-angle-brackets)
    '(uniquify-ignore-buffers-re "*[^*]+*")))
 
 ;; emacsclient
 (with-eval-after-load 'server
   (unless (server-running-p)
      (server-start))
-  (custom-set-variables
-   '(server-window 'pop-to-buffer)
+  (my-init-custom-set-variables
+   '(server-window pop-to-buffer)
    ))
 
 ;; compile
 (with-eval-after-load 'compile
-  (custom-set-variables
-   '(compilation-scroll-output 'first-error) ; *compilation*バッファをスクロールして表示
+  (my-init-custom-set-variables
+   '(compilation-scroll-output first-error) ; *compilation*バッファをスクロールして表示
    ))
 
 ;; ChangeLog
 (with-eval-after-load 'add-log
-  (custom-set-variables
+  (my-init-custom-set-variables
    '(change-log-default-name "~/ChangeLog")
    ))
 
 (with-eval-after-load 'vc-hooks
-  (custom-set-variables
+  (my-init-custom-set-variables
    '(vc-follow-symlinks nil)            ; vc-follow-linkを無効にする 参考: https://abicky.net/2014/06/07/175130/
    ))
 
@@ -260,7 +238,7 @@
   (my-init-requires
    'init-whitespace
    )
-  (my-init-custom-set-list
+  (my-init-custom-set-variables
    '(whitespace-disabled-major-mode-list
      (
      Custom-mode mew-summary-mode completion-list-mode help-mode
@@ -271,17 +249,17 @@
 ;; Ediff
 ;;
 (with-eval-after-load 'ediff
-  (custom-set-variables
-   '(ediff-window-setup-function 'ediff-setup-windows-plain)
-   '(ediff-split-window-function 'split-window-horizontally)
+  (my-init-custom-set-variables
+   '(ediff-window-setup-function ediff-setup-windows-plain)
+   '(ediff-split-window-function split-window-horizontally)
    ))
 
 ;;
 ;; dired
 ;;
 (with-eval-after-load 'dired
-  (custom-set-variables
-   '(dired-recursive-copies 'always)  ; diredでディレクトリーを再帰的にコピーするとき、確認しない
+  (my-init-custom-set-variables
+   '(dired-recursive-copies always)  ; diredでディレクトリーを再帰的にコピーするとき、確認しない
    '(dired-dwim-target 1)             ; 対象ディレクトリーの推測
    '(dired-isearch-filenames t)       ; diredでのisearchの対象をファイル名だけに
    )
@@ -301,18 +279,16 @@
    )
   (defun my-init-indent-lisp-indent-line ()
     (set-variable 'indent-line-function 'lisp-indent-line)) ; インデントの設定
-  (my-init-set-hooks
-   '(emacs-lisp-mode-hook my-init-indent-lisp-indent-line)
-   '(emacs-lisp-mode-hook turn-on-auto-elc)
-   )
-  (my-init-custom-set-alist
-   '(auto-insert-alist ("\\.el\\'" emacs-lisp-template))))
+  (my-init-custom-set-variables
+   '(emacs-lisp-mode-hook (my-init-indent-lisp-indent-line turn-on-auto-elc))
+   '(auto-insert-alist (("\\.el\\'" emacs-lisp-template)))
+   ))
 
 ;;
-;; shell-mode
+;; Shell-mode
 ;;
 (with-eval-after-load 'shell
-  (custom-set-variables
+  (my-init-custom-set-variables
    '(shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ")) ; プロンプトの表示設定
   (my-init-requires
    'set-process-query-on-exit
@@ -327,8 +303,8 @@
    'c-skeletons
    'h-skeletons
    )
-  (my-init-custom-set-alist
-   '(auto-insert-alist ("\\.h\\'" h-template))))
+  (my-init-custom-set-variables
+   '(auto-insert-alist (("\\.h\\'" h-template)))))
 
 ;;
 ;; tex-mode
@@ -337,11 +313,10 @@
   (my-init-requires
    'latex-skeletons
    )
-  (my-init-custom-set-alist
-   '(auto-insert-alist (latex-mode latex-template)))
-  (my-init-set-hooks
-   '(latex-mode-hook turn-on-reftex)
-   ))
+  (my-init-custom-set-variables
+   '(auto-insert-alist ((latex-mode latex-template)))
+   '(latex-mode-hook (turn-on-reftex)))
+   )
 
 ;;
 ;; web-mode
@@ -350,12 +325,12 @@
   (my-init-requires
    'web-skeletons
    )
-  (custom-set-variables
+  (my-init-custom-set-variables
    '(web-mode-markup-indent-offset 0)     ; HTMLタグのインデントを0に
    '(web-mode-indent-style 1)            ; 1: text at the beginning of line is not indented
    )
-  (my-init-custom-set-alist
-   '(auto-insert-alist ("\\.[sx]?html?\\(\\.[a-zA-Z_]+\\)?\\'" web-template))
+  (my-init-custom-set-variables
+   '(auto-insert-alist (("\\.[sx]?html?\\(\\.[a-zA-Z_]+\\)?\\'" web-template)))
    )
   (custom-set-faces
    '(web-mode-comment-face ((nil (:foreground "#D9333F"))))
@@ -370,7 +345,7 @@
 ;; nxml-mode
 ;;
 (with-eval-after-load 'nxml-mode
-  (custom-set-variables
+  (my-init-custom-set-variables
    '(nxml-child-indent 0)
    '(nxml-attribute-indent 0)
    ))
@@ -379,7 +354,7 @@
 ;; ess-site > R
 ;;
 (with-eval-after-load 'ess-site
-  (custom-set-variables
+  (my-init-custom-set-variables
    '(ess-ask-for-ess-directory nil)
    ))
 
@@ -387,7 +362,7 @@
 ;; bison-mode
 ;;
 (with-eval-after-load 'bison-mode
-  (my-init-set-variables
+  (my-init-custom-set-variables
    '(bison-decl-token-column 0)
    '(bison-rule-enumeration-column 8)
    ))
@@ -401,11 +376,10 @@
   (my-init-requires
    'graphviz-dot-skeletons
    )
-  (my-init-custom-set-alist
-   '(auto-insert-alist (graphviz-dot-mode graphviz-dot-template)))
   (defvar graphviz-dot-mode-hook nil)
-  (my-init-set-hooks
-   '(graphviz-dot-mode-hook kill-local-compile-command)
+  (my-init-custom-set-variables
+   '(auto-insert-alist ((graphviz-dot-mode graphviz-dot-template)))
+   '(graphviz-dot-mode-hook (kill-local-compile-command))
    ))
 
 ;;
@@ -428,8 +402,8 @@
 ;; mpv-ts-mode
 ;;
 (with-eval-after-load 'mpv-ts-mode
-  (my-init-custom-set-alist
-   '(auto-insert-alist (mpv-ts-mode "template.ts"))))
+  (my-init-custom-set-variables
+   '(auto-insert-alist ((mpv-ts-mode "template.ts")) 1 (mpv-ts-mode))))
 
 ;;
 ;; ファイルの自動判定
@@ -634,15 +608,14 @@
  )
 
 ;; フックの設定
-(my-init-custom-set-list
- '(after-init-hook (session-initialize))
- '(after-init-hook (my-init-message-startup-time))
+(my-init-custom-set-variables
  '(find-file-hook (auto-insert))
  '(kill-buffer-query-functions (not-kill-but-bury-buffer))
  )
 
 (with-eval-after-load 'session
-  (my-init-custom-set-list
+  (my-init-custom-set-variables
+   '(after-init-hook (session-initialize my-init-message-startup-time))
    '(find-file-hook (session-set-file-name-history))
    '(exopen-file-hook (session-set-file-name-history))
    '(session-before-save-hook

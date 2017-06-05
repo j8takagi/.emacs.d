@@ -29,7 +29,8 @@
 (with-eval-after-load 'view
   (my-init-custom-set-list
    '(set-view-mode-read-write-directory-patterns
-     "/media/.+/Documents/" "~/.emacs.d/elpa" "/tmp" "/var"
-     )))
+     (
+      "/media/.+/Documents/" "~/.emacs.d/elpa" "/tmp" "/var"
+      ))))
 
 (provide 'init-x)

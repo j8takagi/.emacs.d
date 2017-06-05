@@ -162,19 +162,12 @@ Each ALIST-KEY-VAL has the form (ALIST-NAME (KEY1 VALUE1) (KEY2 VALUE2) ...)."
     (message "%s alist is set." (symbol-name asym)))))
 
 (defun my-init-custom-set-alist (&rest alist-args)
-  "Custom set ALIST-KEY-VAL value to the alist.
-Each ALIST-KEY-VAL has the form (ALIST-NAME[ NOW[ REQUEST[ COMMENT]]] (KEY1 VALUE1) (KEY2 VALUE2) ...)."
-  (let (asym arest keyvals anow areq acomm)
-    (dolist (aalist alist-args)
-      (setq asym (car aalist) arest (cdr aalist))
-      (unless (listp (cadr arest))
-        (setq anow (car arest) arest (cdr arest))
-        (unless (listp (cadr arest))
-          (setq areq (car arest) arest (cdr arest))
-          (unless (listp (cadr arest))
-            (setq acomm (car arest) arest (cdr arest)))))
-      (setq keyvals (symbol-value asym))
-      (dolist (akeyval arest)
+  "Custom set ALIST-ARGS value to the alist.
+Each ALIST-ARGS has the form (ALIST-NAME ((KEY1 VALUE1) (KEY2 VALUE2) ...)[ NOW[ REQUEST[ COMMENT]]])."
+  (let (asym keyvals anow areq acomm)
+    (dolist (alst alist-args)
+      (setq asym (car alst) keyvals (symbol-value asym))
+      (dolist (akeyval (cadr alst))
         (update-or-add-alist 'keyvals (car akeyval) (cadr akeyval)))
       (if (null (my-init-validate-custom-variable-type asym keyvals))
           (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
@@ -193,47 +186,64 @@ Each LIST-VAL has the form (LIST-NAME (VALUE1 VALUE2 ...))."
 
 (defun my-init-custom-set-list (&rest list-val)
   "Set LIST-VAL value to the list.
-Each LIST-VAL has the form (LIST-NAME[ NOW[ REQUEST[ COMMENT]]] (VALUE1 VALUE2 ...))."
-  (let (asym vals arest anow areq acomm)
+Each LIST-VAL has the form (LIST-NAME (VALUE1 VALUE2 ...)[ NOW[ REQUEST[ COMMENT]]])."
+  (let (vals exps asym)
     (dolist (lst list-val)
-      (setq asym (car lst) vals (symbol-value asym) arest (cdr lst))
-      (unless (listp (cadr arest))
-        (setq anow (car arest) arest (cdr arest))
-        (unless (listp (cadr arest))
-          (setq areq (car arest) arest (cdr arest))
-          (unless (listp (cadr arest))
-            (setq acomm (car arest) arest (cdr arest)))))
-      (dolist (val (car arest))
-        (add-to-list 'vals val))
+      (unless (listp (setq vals (cadr lst)))
+        (error (format "The 2nd arg is not list.\nArg: %s" vals)))
+      (setq asym (car lst) exps (symbol-value asym))
+      (dolist (aval vals)
+        (add-to-list 'exps aval))
       (if (null (my-init-validate-custom-variable-type asym vals))
           (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
-                   asym (custom-variable-type asym) vals)
+                   asym (custom-variable-type asym) exps)
         (unless (eq vals (symbol-value asym))
-          (custom-set-variables `(,asym ',vals ,anow ,areq ,acomm)))))))
+          (custom-set-variables `(,asym ',exps
+                                        ,(nth 2 lst) ,(nth 3 lst) ,(nth 4 lst))))))))
 
-;; (defun my-init-custom-set-variables (&rest ARGS)
-;;   "Custom set variable values specified in ARGS.
-;; Each ARGS has form (SYMBOL EXP [NOW [REQUEST [COMMENT]]]).
-;; The ARGS form is same to `custom-set-variables'.
-;; Except EXP need no quote when EXP is SYMBOL,
-;; and/or add each element when EXP is list,
-;; update or add each element when EXP is association list (alist)."
-;;   (let (asym aexp anow areq acomment)
-;;     (dolist (arg args)
-;;       (if (symbolp (setq asym (nth 0 arg)))
-;;           (error (format "%s is not symbol." asym)))
-;;       (setq
-;;        aexp (nth 1 arg) anow (nth 2 arg) areq (nth 3 arg)
-;;        acomment
-;;        (concat
-;;         (when load-file-name "set in %s. " load-file-name)
-;;         (nth 4 arg)))
-;;       (cond
-;;        ((symbolp aexp)
-;;         (custom-set-variables asym aexp anow areq acomment))
-;;        ((and (listp aexp) (listp (car aexp)))
-;;         (my-init-custom-set-alist asym aexp anow areq acomment))
-;;        ))))
+(defun my-init-custom-set-variables (&rest args)
+  "Custom set variable values specified in ARGS.
+Each ARGS has form (SYMBOL EXP [NOW [REQUEST [COMMENT]]]).
+The ARGS form is same to `custom-set-variables'.
+Except EXP need no quote when EXP is SYMBOL,
+and/or add each element when EXP is list,
+update or add each element when EXP is association list (alist)."
+  (let (asym aexp anow areq acomm prevcomm newcomm afile cusvars ovars)
+    (dolist (arg args)
+      (setq
+       asym (nth 0 arg) aexp (nth 1 arg) anow (nth 2 arg) areq (nth 3 arg)
+       acomm (my-init-create-variable-comment asym (nth 4 arg)))
+      (if (custom-variable-p asym)
+          (push asym cusvars)
+        (push asym ovars))
+      (if (and (not (null aexp)) (listp aexp))
+          (if (listp (car aexp))
+              (my-init-custom-set-alist `(,asym ,aexp ,anow ,areq ,acomm))
+            (my-init-custom-set-list `(,asym ,aexp ,anow ,areq ,acomm)))
+        (if (null (my-init-validate-custom-variable-type asym aexp))
+            (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
+                     asym (custom-variable-type asym) aexp)
+          (if (and (not (null aexp)) (symbolp aexp))
+              (custom-set-variables `(,asym ',aexp ,anow ,areq ,acomm))
+            (custom-set-variables `(,asym ,aexp ,anow ,areq ,acomm))))))
+    (when cusvars
+      (message (format "Custom variables are set: %s" cusvars)))
+    (when ovars
+      (message (format "Other variables are set: %s" ovars)))))
+
+(defun my-init-create-variable-comment (var &optional add-comment)
+  "Create variable comment of VAR by loading file or buffer file and ADD-COMMENT."
+  (let (acomm afile)
+    (when (setq afile (or load-file-name buffer-file-name (buffer-name)))
+      (setq acomm (concat (format "set in `%s'." afile))))
+    (when add-comment
+      (setq acomm (concat acomm (when acomm " ") add-comment)))
+    (when (equal (my-init-variable-comment var) acomm)
+       (setq acomm nil))
+     acomm))
+
+(defun my-init-variable-comment (var)
+  (get var 'variable-comment))
 
 (defun my-init-defaliases (&rest sym-def)
   "Set SYMBOL’s function definition to DEFINITION in SYM-DEF.
@@ -241,7 +251,7 @@ Each SYM-DEF has the form (SYMBOL DEFINITION &optional DOCSTRING)."
   (let (asym adef)
     (dolist (asymdef sym-def)
      (when (fboundp (setq asym (car asymdef)))
-       (message "Info: Function `%s' is already defined as `%s'." asym (symbol-name asym)))
+       (message "Info: Function `%s' is already defined as %s." asym (indirect-function asym)))
      (if (not (fboundp (setq adef (cadr asymdef))))
          (message "Warning: In setting alias, symbol `%s' is not function." adef)
        (defalias asym adef (nth 3 asymdef))
