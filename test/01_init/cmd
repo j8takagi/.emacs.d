@@ -1,1 +1,0 @@
-emacs --script ../../init.el 2>&1 | tee message.log | grep -e "^Warning" -e "^Error" -e "^End of loading init.el\."
