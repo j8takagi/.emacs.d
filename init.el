@@ -299,12 +299,17 @@
 ;;
 (with-eval-after-load 'cc-mode
   (my-init-requires
-   'init-cc-mode
+   'cc-mode-plus
    'c-skeletons
    'h-skeletons
    )
   (my-init-custom-set-variables
-   '(auto-insert-alist (("\\.h\\'" h-template)))))
+   '(c-default-style ((c-mode "k&r")))
+   '(c-basic-offset 4)
+   '(auto-insert-alist (("\\.h\\'" h-template)))
+   '(c-mode-common-hook
+     (init-cc-ggtags-mode-on init-cc-require-gnu-mp init-cc-disable-electric-state))
+   ))
 
 ;;
 ;; tex-mode

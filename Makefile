@@ -13,14 +13,11 @@ COMPILE.el := $(EMACS) -batch -l set-compile.el -f batch-byte-compile
 CLEAN.rsync := $(GREPV) "^\(sent\)\|\(total\)\|\(sending\)"
 INSTALLDIR := ~/.emacs.d
 
-.PHONY: all init site-lisp install install-init.d install-init.sys.d install-site-lisp check test
+.PHONY: all init site-lisp install install-init.sys.d install-site-lisp check test
 
-all: init init.d init.sys.d insert install-site-lisp
+all: init init.sys.d insert install-site-lisp
 
 init: init.elc
-
-init.d:
-	$(MAKE) -C $@
 
 init.sys.d:
 	$(MAKE) -C $@
@@ -34,19 +31,13 @@ site-lisp:
 get-abbrev:
 	$(RSYNC) $(RSYNCFLAG) $(INSTALLDIR)/abbrev_defs ./
 
-install: install-init install-init.d install-init.sys.d install-site-lisp install-insert
+install: install-init install-init.sys.d install-site-lisp install-insert
 
 install-init: $(INSTALLDIR) $(INSTALLDIR)/init.el~ init
 	@$(RSYNC) $(RSYNCFLAG) init.el init.elc $(INSTALLDIR)/ | $(CLEAN.rsync)
 
 $(INSTALLDIR)/init.el~: $(INSTALLDIR)/init.el
 	@$(CP) $< $@
-
-install-init.d: init.d $(INSTALLDIR)/init.d
-	@$(MAKE) -sC init.d install
-
-$(INSTALLDIR)/init.d: $(INSTALLDIR)
-	@(if $(TEST) ! -d $@; then $(MKDIR) $@; fi)
 
 install-init.sys.d: init.sys.d $(INSTALLDIR)/init.sys.d
 	@$(MAKE) -sC init.sys.d install
@@ -79,7 +70,7 @@ test:
 
 distclean: clean
 
-clean: init-clean init.d-clean init.sys.d-clean insert-clean site-lisp-clean
+clean: init-clean init.sys.d-clean insert-clean site-lisp-clean
 
 init-clean:
 	$(RM) *.elc
