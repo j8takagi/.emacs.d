@@ -3,17 +3,16 @@
 
 (message "Start of loading %s." load-file-name)
 
-(require 'my-init)
+(require 'listify)
 
-(my-init-requires 'fontset-set)
+(listify-requires 'fontset-set)
 
 ;; 環境変数EDITORの設定
-(my-init-setenv
+(listify-setenv
  '("EDITOR" "emacsclient")
  )
 
-
-(my-init-custom-set-variables
+(listify-set
  `(default-frame-alist                  ; デフォルトフレーム
     (
     (font
@@ -33,17 +32,14 @@
  '(default-process-coding-system (utf-8 cp932)) ; 日本語ファイル名を正常に処理する
  )
 
-(custom-set-variables
- )
-
 ;; view-modeの設定
 (with-eval-after-load 'view
-  (my-init-custom-set-variables
+  (listify-set
    '(set-view-mode-read-write-directory-patterns
      ("E:/Documents/201[4-9]_[01][0-9]" "~/.emacs.d/elpa"
       ))))
 
-(my-init-global-set-keys
+(listify-global-set-keys
  '("<M-kanji>" ignore)             ; IME切り替え時に undefined のエラーメッセージが表示されるのを抑制
  '("<kanji>" toggle-input-method)
  )
@@ -56,7 +52,7 @@
 (prefer-coding-system 'utf-8-dos)
 
 ;; フックの設定
-(my-init-custom-set-list
+(listify-set
  '(shell-mode-hook (set-buffer-process-coding-system-cp932))
  '(w32-ime-on-hook (ime-cursor-set-color))
  '(w32-ime-off-hook (ime-cursor-unset-color))

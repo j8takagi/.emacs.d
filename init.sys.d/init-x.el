@@ -3,14 +3,14 @@
 
 (message "Start of loading %s." load-file-name)
 
-(require 'my-init)
+(require 'listify)
 
-(my-init-requires
+(listify-requires
  'fontset-set
  )
 
 ;; 標準のフォントサイズとフォントファミリーの設定
-(my-init-custom-set-alist
+(listify-set
  `(default-frame-alist                  ; デフォルトフレーム
     (font
      ,(fontset-set
@@ -27,7 +27,7 @@
 
 ;; view-modeの設定
 (with-eval-after-load 'view
-  (my-init-custom-set-list
+  (listify-set
    '(set-view-mode-read-write-directory-patterns
      (
       "/media/.+/Documents/" "~/.emacs.d/elpa" "/tmp" "/var"

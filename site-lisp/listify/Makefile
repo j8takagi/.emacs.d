@@ -1,4 +1,4 @@
-PACKAGENAME := my-init
+PACKAGENAME := listify
 
 EMACS := emacs
 COMPILE.el := $(EMACS) -batch -f batch-byte-compile
@@ -25,7 +25,7 @@ $(INSTALL-SITELISP)/$(PACKAGENAME): $(INSTALL-SITELISP)
 	@(if $(TEST) ! -e $@; then $(MKDIR) $@; fi)
 
 install: $(INSTALL-SITELISP)/$(PACKAGENAME) all
-	@($(ECHO) "Installing $(PACKAGENAME) to $(INSTALL-SITELISP)/$(PACKAGENAME)"; $(RSYNC) $(RSYNCFLAG) $(RSYNCEXCLUDE) ./ $(INSTALL-SITELISP)/$(PACKAGENAME)/ | $(CLEAN.rsync))
+	@($(ECHO) "Installing $(PACKAGENAME)" && $(RSYNC) $(RSYNCFLAG) $(RSYNCEXCLUDE) ./ $(INSTALL-SITELISP)/$(PACKAGENAME)/ | $(CLEAN.rsync))
 
 %.elc: %.el
 	$(COMPILE.el) $<

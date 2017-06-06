@@ -8,17 +8,17 @@
 (let ((default-directory (expand-file-name user-emacs-directory)))
   (normal-top-level-add-subdirs-to-load-path))
 
-(require 'my-init)
+(require 'listify)
 
 ;;;
 ;;; パッケージ
 ;;;
 
-(my-init-requires
+(listify-requires
  'package
  )
 
-(my-init-add-package-archives
+(listify-add-package-archives
  '("melpa-stable" "http://stable.melpa.org/packages/")
  )
 
@@ -28,7 +28,7 @@
 ;; (message "Debug: auto-mode-alist just after package initialize - %s" auto-mode-alist)
 
 ;; インストールを確認するパッケージ
-(my-init-check-packages
+(listify-check-packages
  'csv-mode
  'ess
  'ggtags
@@ -52,14 +52,16 @@
 ;;
 
 ;; require
-(my-init-requires
+(listify-requires
  ;; built-in libraries
  'autoinsert
  'ediff
  'server
+ 'whitespace
  ;; ~/.emacs.d/site-lisp
  'auto-elc-mode                    ; .elファイルの自動コンパイル
- 'buffer-window-plus               ; バッファとウィンドウの操作関数を追加
+ 'buffer-window-plus               ; バッファとウィンドウの操作関数
+ 'cc-mode-plus                     ; cc-modeの追加関数
  'count-japanese                   ; 日本語の文字数をカウント
  'ediff-vc-plus                    ; Ediffの追加関数
  'exopen                           ; 外部プログラムでファイルを開く
@@ -79,7 +81,7 @@
  )
 
 ;; autoload
-(my-init-set-autoloads
+(listify-set-autoloads
  '(bison-mode "bison-mode" "Major mode for editing bison/yacc files")
  '(crontab-mode "crontab-mode" "Major mode for editing crontab files")
  '(ert-mode "ert-mode" "Major mode for editing ERT files")
@@ -109,14 +111,14 @@
 ;;
 
 ; モード
-(my-init-set-modes
+(listify-set-modes
  ;; 有効にするモード
  '(whitespace-mode 1)             ; 空白を強調表示
  )
 
 ; 変数
 (put 'disabled-command-function 'custom-type '(choice (const nil) function))
-(my-init-custom-set-variables
+(listify-set
  '(Info-additional-directory-list ("~/share/info/ja" "~/share/info" )) ; Infoファイルの場所
  '(auto-compression-mode 1)         ; 圧縮されたファイルを直接編集する
  '(auto-insert-alist nil)           ; auto-insert-alistの初期化
@@ -168,7 +170,7 @@
  )
 
 (when window-system
-  (my-init-custom-set-variables
+  (listify-set
    '(default-frame-alist                ; デフォルトフレーム
       (
        (foreground-color "black")
@@ -178,18 +180,18 @@
        ))))
 
 ; エイリアス
-(my-init-defaliases
+(listify-defaliases
  '(uniq-lines delete-duplicate-lines)  ; uniq-linesを、delete-duplicate-linesの別名に
  '(message-box message)                ; メッセージダイアログボックスは使わない
  )
 
 ;; view-modeの設定
 (with-eval-after-load 'view
-  (my-init-requires
+  (listify-requires
    'set-view-mode                     ; read-onlyファイルをview-modeで開く
    'view-mode-vi-bindings             ; view-modeでviのキーバインド
    )
-  (my-init-custom-set-variables
+  (listify-set
    '(view-read-only 1)
    )
   (set-view-mode-buffers
@@ -204,7 +206,7 @@
 
 ;; uniquify
 (with-eval-after-load 'uniquify
-  (my-init-custom-set-variables
+  (listify-set
    '(uniquify-buffer-name-style post-forward-angle-brackets)
    '(uniquify-ignore-buffers-re "*[^*]+*")))
 
@@ -212,44 +214,56 @@
 (with-eval-after-load 'server
   (unless (server-running-p)
      (server-start))
-  (my-init-custom-set-variables
+  (listify-set
    '(server-window pop-to-buffer)
    ))
 
 ;; compile
 (with-eval-after-load 'compile
-  (my-init-custom-set-variables
+  (listify-set
    '(compilation-scroll-output first-error) ; *compilation*バッファをスクロールして表示
    ))
 
 ;; ChangeLog
 (with-eval-after-load 'add-log
-  (my-init-custom-set-variables
+  (listify-set
    '(change-log-default-name "~/ChangeLog")
    ))
 
 (with-eval-after-load 'vc-hooks
-  (my-init-custom-set-variables
+  (listify-set
    '(vc-follow-symlinks nil)            ; vc-follow-linkを無効にする 参考: https://abicky.net/2014/06/07/175130/
    ))
 
 ;; whitespace
 (with-eval-after-load 'whitespace
-  (my-init-requires
-   'init-whitespace
+  (listify-requires
+   'whitespace-plus
    )
-  (my-init-custom-set-variables
+  ;タブ	、全角スペース　、行末の空白    
+  (listify-set
+   '(whitespace-style nil)
+   '(whitespace-style (face tabs spaces trailing))
+   '(whitespace-space-regexp "\\(　\\)")
+   '(whitespace-trailing-regexp "\\( +$\\)")
    '(whitespace-disabled-major-mode-list
      (
      Custom-mode mew-summary-mode completion-list-mode help-mode
      magit-mode tetris-mode w3m-mode mew-message-mode
-     ))))
+     ))
+   '(after-change-major-mode-hook (init-whitespace-mode))
+   '(view-mode-hook (init-whitespace-mode)))
+  (custom-set-faces
+   '(whitespace-space ((nil ( :box (:line-width 2 :color "orange")))))
+   '(whitespace-tab ((nil (:background "white smoke" :box (:line-width 2 :color "navy")))))
+   '(whitespace-trailing ((nil (:underline "navy"))))
+   ))
 
 ;;
 ;; Ediff
 ;;
 (with-eval-after-load 'ediff
-  (my-init-custom-set-variables
+  (listify-set
    '(ediff-window-setup-function ediff-setup-windows-plain)
    '(ediff-split-window-function split-window-horizontally)
    ))
@@ -258,12 +272,12 @@
 ;; dired
 ;;
 (with-eval-after-load 'dired
-  (my-init-custom-set-variables
+  (listify-set
    '(dired-recursive-copies always)  ; diredでディレクトリーを再帰的にコピーするとき、確認しない
    '(dired-dwim-target 1)             ; 対象ディレクトリーの推測
    '(dired-isearch-filenames t)       ; diredでのisearchの対象をファイル名だけに
    )
-  (my-init-requires
+  (listify-requires
    'dired-x                     ; diredの拡張機能
    'image-dired                 ; サムネイル表示
    'sorter                      ; ソート
@@ -274,13 +288,13 @@
 ;; lisp-mode
 ;;
 (with-eval-after-load 'lisp-mode
-  (my-init-requires
+  (listify-requires
    'emacs-lisp-skeletons
    )
-  (defun my-init-indent-lisp-indent-line ()
+  (defun listify-indent-lisp-indent-line ()
     (set-variable 'indent-line-function 'lisp-indent-line)) ; インデントの設定
-  (my-init-custom-set-variables
-   '(emacs-lisp-mode-hook (my-init-indent-lisp-indent-line turn-on-auto-elc))
+  (listify-set
+   '(emacs-lisp-mode-hook (listify-indent-lisp-indent-line turn-on-auto-elc))
    '(auto-insert-alist (("\\.el\\'" emacs-lisp-template)))
    ))
 
@@ -288,9 +302,9 @@
 ;; Shell-mode
 ;;
 (with-eval-after-load 'shell
-  (my-init-custom-set-variables
+  (listify-set
    '(shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ")) ; プロンプトの表示設定
-  (my-init-requires
+  (listify-requires
    'set-process-query-on-exit
    ))
 
@@ -298,12 +312,12 @@
 ;; CC-Mode
 ;;
 (with-eval-after-load 'cc-mode
-  (my-init-requires
+  (listify-requires
    'cc-mode-plus
    'c-skeletons
    'h-skeletons
    )
-  (my-init-custom-set-variables
+  (listify-set
    '(c-default-style ((c-mode "k&r")))
    '(c-basic-offset 4)
    '(auto-insert-alist (("\\.h\\'" h-template)))
@@ -315,26 +329,26 @@
 ;; tex-mode
 ;;
 (with-eval-after-load 'tex-mode
-  (my-init-requires
+  (listify-requires
    'latex-skeletons
    )
-  (my-init-custom-set-variables
+  (listify-set
    '(auto-insert-alist ((latex-mode latex-template)))
-   '(latex-mode-hook (turn-on-reftex)))
-   )
+   '(latex-mode-hook (turn-on-reftex))
+   ))
 
 ;;
 ;; web-mode
 ;;
 (with-eval-after-load 'web-mode
-  (my-init-requires
+  (listify-requires
    'web-skeletons
    )
-  (my-init-custom-set-variables
+  (listify-set
    '(web-mode-markup-indent-offset 0)     ; HTMLタグのインデントを0に
    '(web-mode-indent-style 1)            ; 1: text at the beginning of line is not indented
    )
-  (my-init-custom-set-variables
+  (listify-set
    '(auto-insert-alist (("\\.[sx]?html?\\(\\.[a-zA-Z_]+\\)?\\'" web-template)))
    )
   (custom-set-faces
@@ -350,7 +364,7 @@
 ;; nxml-mode
 ;;
 (with-eval-after-load 'nxml-mode
-  (my-init-custom-set-variables
+  (listify-set
    '(nxml-child-indent 0)
    '(nxml-attribute-indent 0)
    ))
@@ -359,7 +373,7 @@
 ;; ess-site > R
 ;;
 (with-eval-after-load 'ess-site
-  (my-init-custom-set-variables
+  (listify-set
    '(ess-ask-for-ess-directory nil)
    ))
 
@@ -367,7 +381,7 @@
 ;; bison-mode
 ;;
 (with-eval-after-load 'bison-mode
-  (my-init-custom-set-variables
+  (listify-set
    '(bison-decl-token-column 0)
    '(bison-rule-enumeration-column 8)
    ))
@@ -378,11 +392,11 @@
 (with-eval-after-load 'graphviz-dot-mode
   (defun kill-local-compile-command ()
     (kill-local-variable 'compile-command))
-  (my-init-requires
+  (listify-requires
    'graphviz-dot-skeletons
    )
   (defvar graphviz-dot-mode-hook nil)
-  (my-init-custom-set-variables
+  (listify-set
    '(auto-insert-alist ((graphviz-dot-mode graphviz-dot-template)))
    '(graphviz-dot-mode-hook (kill-local-compile-command))
    ))
@@ -407,7 +421,7 @@
 ;; mpv-ts-mode
 ;;
 (with-eval-after-load 'mpv-ts-mode
-  (my-init-custom-set-variables
+  (listify-set
    '(auto-insert-alist ((mpv-ts-mode "template.ts")) 1 (mpv-ts-mode))))
 
 ;;
@@ -415,52 +429,54 @@
 ;;
 
 ;; magic-mode-alist
-(my-init-set-alist
+(listify-set
  '(magic-mode-alist
-   ("<![Dd][Oo][Cc][Tt][Yy][Pp][Ee] [Hh][Tt][Mm][Ll]" web-mode)
-   ("<\\?xml " nxml-mode)
-   ))
+   (
+    ("<![Dd][Oo][Cc][Tt][Yy][Pp][Ee] [Hh][Tt][Mm][Ll]" web-mode)
+    ("<\\?xml " nxml-mode)
+    )))
 
 ;; auto-mode-alistで、既存のモード設定を上書きする
-(my-init-overwrite-auto-mode-alist
+(listify-overwrite-auto-mode-alist
  '(makefile-gmake-mode makefile-bsdmake-mode)
  '(web-mode html-mode)
  )
 
 ;; 新しいモード設定を追加する
-(my-init-set-alist
+(listify-set
  '(auto-mode-alist
-   ("[Mm]akefile\\(\\.[a-zA-Z0-9]+\\)?\\'" makefile-gmake-mode)
-   ("\\.[rR]\\'" R-mode)
-   ("\\.casl?\\'" asm-mode)
-   ("\\.tsv\\'" tsv-mode)
-   ("\\.d\\'" makefile-gmake-mode)
-   ("\\.ert\\'" ert-mode)
-   ("\\.euk\\'" eukleides-mode)
-   ("\\.gp\\'" gnuplot-mode)
-   ("\\.gv\\'" graphviz-dot-mode)
-   ("\\.ll?\\'" flex-mode)
-   ("\\.md\\'" markdown-mode)
-   ("\\.re\\'" review-mode)
-   ("\\.svg\\'" nxml-mode)
-   ("\\.ts\\'" mpv-ts-mode)
-   ("\\.wiki\\'" mediawiki-mode)
-   ("\\.xml\\'" nxml-mode)
-   ("\\.y?rb\\'" ruby-mode)
-   ("\\.yy?\\'" bison-mode)
-   ("\\`ja.wikipedia.org/w/index.php" mediawiki-mode)
-   ("abbrev_defs" emacs-lisp-mode)
-   ("cmd" shell-script-mode)
-   ("crontab\\(\\.[a-zA-Z0-9]+\\)?" crontab-mode)
-   ("!.+" conf-mode)
-   ))
+   (
+    ("[Mm]akefile\\(\\.[a-zA-Z0-9]+\\)?\\'" makefile-gmake-mode)
+    ("\\.[rR]\\'" R-mode)
+    ("\\.casl?\\'" asm-mode)
+    ("\\.tsv\\'" tsv-mode)
+    ("\\.d\\'" makefile-gmake-mode)
+    ("\\.ert\\'" ert-mode)
+    ("\\.euk\\'" eukleides-mode)
+    ("\\.gp\\'" gnuplot-mode)
+    ("\\.gv\\'" graphviz-dot-mode)
+    ("\\.ll?\\'" flex-mode)
+    ("\\.md\\'" markdown-mode)
+    ("\\.re\\'" review-mode)
+    ("\\.svg\\'" nxml-mode)
+    ("\\.ts\\'" mpv-ts-mode)
+    ("\\.wiki\\'" mediawiki-mode)
+    ("\\.xml\\'" nxml-mode)
+    ("\\.y?rb\\'" ruby-mode)
+    ("\\.yy?\\'" bison-mode)
+    ("\\`ja.wikipedia.org/w/index.php" mediawiki-mode)
+    ("abbrev_defs" emacs-lisp-mode)
+    ("cmd" shell-script-mode)
+    ("/crontab\\(\\.[a-zA-Z0-9]+\\)?" crontab-mode)
+    ("!.+" conf-mode)
+   )))
 
 ;;
 ;; キーバインド
 ;;
 
 ;; global-key
-(my-init-global-set-keys
+(listify-global-set-keys
  '("<M-down>" windmove-down)
  '("<M-f9>" gnuplot-make-buffer)
  '("<M-left>" windmove-left)
@@ -522,7 +538,7 @@
 (ffap-bindings)
 
 ;; 無効にするキーバインド
-(my-init-global-unset-keys
+(listify-global-unset-keys
  "C-x C-d"                         ; ffap-list-directory を無効に
  "C-x 4 0"                         ; kill-buffer-and-window を無効に
  "M-`"                             ; tmm-menubar を無効に
@@ -530,7 +546,7 @@
 
 ;; モードごとのキーバインドを設定
 ;; リストの形式は、(mode-library mode-hook mode-map-name ((key1 function1) (key2 function2)))
-(my-init-modemap-set-keys
+(listify-modemap-set-keys
  '(text-mode-map "text-mode" nil
    (
     ("C-M-i" dabbrev-expand) ; ispell 起動を無効にし、dabbrev-expand を設定
@@ -604,7 +620,7 @@
 ;;
 ;; システムごとの初期化ファイルの設定
 ;;
-(my-init-requires-by-system
+(listify-requires-by-system
  '(system-type gnu/linux init-linux)
  '(system-type darwin init-darwin)
  '(window-system mac init-mac-gui)
@@ -613,14 +629,14 @@
  )
 
 ;; フックの設定
-(my-init-custom-set-variables
+(listify-set
  '(find-file-hook (auto-insert))
  '(kill-buffer-query-functions (not-kill-but-bury-buffer))
  )
 
 (with-eval-after-load 'session
-  (my-init-custom-set-variables
-   '(after-init-hook (session-initialize my-init-message-startup-time))
+  (listify-set
+   '(after-init-hook (session-initialize message-startup-time))
    '(find-file-hook (session-set-file-name-history))
    '(exopen-file-hook (session-set-file-name-history))
    '(session-before-save-hook

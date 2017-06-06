@@ -3,15 +3,15 @@
 
 (message "Start of loading %s." load-file-name)
 
-(require 'my-init)
+(require 'listify)
 
-(my-init-requires
+(listify-requires
  'fontset-set
  'mac-ime-cursor
  )
 
 ;; 環境変数の設定
-(my-init-setenv
+(listify-setenv
  '("LANG" "en_US.UTF-8")
  '("PAGER" "cat")
  '("MANPAGER" "cat")
@@ -19,7 +19,7 @@
  '("VISUAL" "emacsclient")
  )
 
-(my-init-custom-set-variables
+(listify-set
  `(default-frame-alist                  ; デフォルトフレーム
     (
      (font
@@ -40,7 +40,7 @@
 
 ;; view-modeの設定
 (with-eval-after-load 'view
-  (my-init-custom-set-variables
+  (listify-set
    '(set-view-mode-read-write-directory-patterns
      (
       "~/Documents/201[4-9]_[01][0-9]"
@@ -51,7 +51,7 @@
 (mac-ime-cursor-add-hook)
 
 ;; Mac OS Xのキー設定
-(my-init-global-set-keys
+(listify-global-set-keys
  '("<M-f1>" other-frame)    ; Mac OS Xの他アプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする
  )
 

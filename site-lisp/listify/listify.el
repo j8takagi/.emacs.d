@@ -1,9 +1,9 @@
-;;; my-init.el --- 
+;;; listify.el --- Listify Emacs initialization files.
 
-;; Copyright (C) 2016 by Kazubito Takagi
+;; Copyright (C) 2017 by Kazubito Takagi
 
 ;; Authors: Kazubito Takagi
-;; Keywords: 
+;; Keywords: init
 
 ;;; Commentary:
 ;;; Code:
@@ -30,7 +30,7 @@ Each VALUE-NEW-OLD-ALIST has the form (VALUE-NEW . VALUE-OLD)."
         (setf (cdr acell) (car newold))))
     alst))
 
-(defun my-init-validate-custom-variable-type (custom-variable &optional value)
+(defun listify-validate-custom-variable-type (custom-variable &optional value)
   "Varidate VALUES is match CUSTOM-VARIABLE to custom-variable-type in symbol property.
 If VALUE matches custom-variable-type in symbol properties list, t.
 When VALUE is ommited or nil, current value of CUSTOM-VARIABLE is validated."
@@ -40,11 +40,16 @@ When VALUE is ommited or nil, current value of CUSTOM-VARIABLE is validated."
     (when (setq atype (custom-variable-type custom-variable))
       (widget-apply (widget-convert atype) :match value))))
 
+;; Emacs開始にかかった時間をメッセージに表示
+(defun message-startup-time ()
+  "Message Duration of the Emacs initialization time."
+  (message "Duration of the Emacs initialization - %s" (emacs-init-time)))
+
 (defvar system-name-simple
   (replace-regexp-in-string "\\..*\\'" "" (system-name))
   "The simple host name of the machine Emacs is running on, which is without domain information.")
 
-(defun my-init-requires (&rest feature)
+(defun listify-requires (&rest feature)
   "Require FEATURE, and the result is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
   (dolist (afeat feature)
     (if (featurep afeat)
@@ -57,20 +62,20 @@ When VALUE is ommited or nil, current value of CUSTOM-VARIABLE is validated."
               (message "Feature `%s' is required." afeat))
           (error (message "Warning: Fails to require feature `%s'.\n%s: %s" afeat (car err) (cadr err))))))))
 
-(defun my-init-requires-by-system (&rest sys-features)
-  "If current system type or window system got by VARIABLE is match to SYSTEM, Require FEATURE by `my-init-requires' in SYS-FEATURES.
+(defun listify-requires-by-system (&rest sys-features)
+  "If current system type or window system got by VARIABLE is match to SYSTEM, Require FEATURE by `listify-requires' in SYS-FEATURES.
 Each element of SYS-FEATURES has the form (VARIABLE SYSTEM FEATURE)."
   (dolist (asysfeat sys-features)
     (when (equal (eval (car asysfeat)) (cadr asysfeat))
-      (my-init-requires (nth 2 asysfeat)))))
+      (listify-requires (nth 2 asysfeat)))))
 
-(defun my-init-add-package-archives (&rest archives)
+(defun listify-add-package-archives (&rest archives)
   "Add package archives to `package-archives'.
 Each element of ARCHIVES has the form (ID LOCATION)."
   (dolist (aarch archives)
     (update-or-add-alist 'package-archives (car aarch) (cadr aarch))))
 
-(defun my-init-install-packages (pkg &optional pkg-from)
+(defun listify-install-packages (pkg &optional pkg-from)
   "Check whether PKG is installed. When not installed, the installation begins.
 If the package requires other packages, installation of the packges begin recursively.
 This function returns the list of (`package' `required package')."
@@ -87,17 +92,17 @@ This function returns the list of (`package' `required package')."
     (when (setq pkg-desc (assq pkg package-alist))
       (add-to-list 'pkgs `(,pkg ,pkg-from) 1)
       (dolist (req-pkg (mapcar 'car (package-desc-reqs (cadr pkg-desc))))
-        (dolist (rp (my-init-install-packages req-pkg pkg))
+        (dolist (rp (listify-install-packages req-pkg pkg))
           (add-to-list 'pkgs rp 1))))
     pkgs))
 
-(defun my-init-check-packages (&rest package)
+(defun listify-check-packages (&rest package)
   "Check whether PACKAGE is installed, updated, or
 packages not in PACKAGE is installed."
   (let (pkgs real-pkgs update-pkgs)
     ;; If PACKAGE is not installed, install.
     (dolist (req-pkg package)
-      (dolist (pkg (my-init-install-packages req-pkg))
+      (dolist (pkg (listify-install-packages req-pkg))
         (when (and (cadr pkg) (not (member (car pkg) pkgs)))
           (message "Package `%s' is required from `%s'." (car pkg) (cadr pkg)))
         (add-to-list 'pkgs (car pkg))))
@@ -116,7 +121,7 @@ packages not in PACKAGE is installed."
     (when real-pkgs
       (message "Info: Unexpected installed packages %s"  (reverse real-pkgs)))))
 
-(defun my-init-set-autoloads (&rest func-file-doc)
+(defun listify-set-autoloads (&rest func-file-doc)
   "Define autoload functions from FUNC-FILE-DOC.
 Each FUNC-FILE-DOC has the form (FUNCTION FILE DOC).
 
@@ -136,32 +141,7 @@ If FUNCTION is void or FILE is not found, warning message is printed into the `*
         (message "Autoload functions is not defined.")
       (message "Autoload functions are defined. - %s" (reverse funcs)))))
 
-(defun my-init-set-default-variables (&rest var-val)
-  "Set default values to variables in VAR-VAL.
-Each VAR-VAL has the form (VARIABLE VALUE)."
-  (dolist (avarval var-val)
-    (set-default (car avarval) (cadr avarval))))
-
-(defun my-init-set-variables (&rest var-val)
-  "Set variables in VAR-VAL.
-Each VAR-VAL has the form (VARIABLE VALUE)."
-  (let (avar)
-    (dolist (avarval var-val)
-      (if (not (setq avar (car avarval)))
-          (message "Variable %s is not defined." avar)
-        (set-variable avar (cadr avarval))))))
-
-(defun my-init-set-alist (&rest alist-key-val)
-  "Set ALIST-KEY-VAL value to the alist.
-Each ALIST-KEY-VAL has the form (ALIST-NAME (KEY1 VALUE1) (KEY2 VALUE2) ...)."
-  (let (asym)
-  (dolist (aalist alist-key-val)
-    (setq asym (car aalist))
-    (dolist (akeyval (cdr aalist))
-      (update-or-add-alist asym (car akeyval) (cadr akeyval)))
-    (message "%s alist is set." (symbol-name asym)))))
-
-(defun my-init-custom-set-alist (&rest alist-args)
+(defun listify-set-alist (&rest alist-args)
   "Custom set ALIST-ARGS value to the alist.
 Each ALIST-ARGS has the form (ALIST-NAME ((KEY1 VALUE1) (KEY2 VALUE2) ...)[ NOW[ REQUEST[ COMMENT]]])."
   (let (asym keyvals anow areq acomm)
@@ -169,22 +149,13 @@ Each ALIST-ARGS has the form (ALIST-NAME ((KEY1 VALUE1) (KEY2 VALUE2) ...)[ NOW[
       (setq asym (car alst) keyvals (symbol-value asym))
       (dolist (akeyval (cadr alst))
         (update-or-add-alist 'keyvals (car akeyval) (cadr akeyval)))
-      (if (null (my-init-validate-custom-variable-type asym keyvals))
+      (if (null (listify-validate-custom-variable-type asym keyvals))
           (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
                    asym (custom-variable-type asym) keyvals)
         (unless (eq keyvals (symbol-value asym))
           (custom-set-variables `(,asym ',keyvals ,anow ,areq ,acomm)))))))
 
-(defun my-init-set-list (&rest list-val)
-  "Set LIST-VAL value to the list.
-Each LIST-VAL has the form (LIST-NAME (VALUE1 VALUE2 ...))."
-  (let (asym)
-    (dolist (lst list-val)
-      (dolist (val (cadr lst))
-        (add-to-list (setq asym (car lst)) val))
-      (message "%s list is set." (symbol-name asym)))))
-
-(defun my-init-custom-set-list (&rest list-val)
+(defun listify-set-list (&rest list-val)
   "Set LIST-VAL value to the list.
 Each LIST-VAL has the form (LIST-NAME (VALUE1 VALUE2 ...)[ NOW[ REQUEST[ COMMENT]]])."
   (let (vals exps asym)
@@ -194,14 +165,14 @@ Each LIST-VAL has the form (LIST-NAME (VALUE1 VALUE2 ...)[ NOW[ REQUEST[ COMMENT
       (setq asym (car lst) exps (symbol-value asym))
       (dolist (aval vals)
         (add-to-list 'exps aval))
-      (if (null (my-init-validate-custom-variable-type asym vals))
+      (if (null (listify-validate-custom-variable-type asym vals))
           (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
                    asym (custom-variable-type asym) exps)
         (unless (eq vals (symbol-value asym))
           (custom-set-variables `(,asym ',exps
                                         ,(nth 2 lst) ,(nth 3 lst) ,(nth 4 lst))))))))
 
-(defun my-init-custom-set-variables (&rest args)
+(defun listify-set (&rest args)
   "Custom set variable values specified in ARGS.
 Each ARGS has form (SYMBOL EXP [NOW [REQUEST [COMMENT]]]).
 The ARGS form is same to `custom-set-variables'.
@@ -212,15 +183,15 @@ update or add each element when EXP is association list (alist)."
     (dolist (arg args)
       (setq
        asym (nth 0 arg) aexp (nth 1 arg) anow (nth 2 arg) areq (nth 3 arg)
-       acomm (my-init-create-variable-comment asym (nth 4 arg)))
+       acomm (listify-create-variable-comment asym (nth 4 arg)))
       (if (custom-variable-p asym)
           (push asym cusvars)
         (push asym ovars))
       (if (and (not (null aexp)) (listp aexp))
           (if (listp (car aexp))
-              (my-init-custom-set-alist `(,asym ,aexp ,anow ,areq ,acomm))
-            (my-init-custom-set-list `(,asym ,aexp ,anow ,areq ,acomm)))
-        (if (null (my-init-validate-custom-variable-type asym aexp))
+              (listify-set-alist `(,asym ,aexp ,anow ,areq ,acomm))
+            (listify-set-list `(,asym ,aexp ,anow ,areq ,acomm)))
+        (if (null (listify-validate-custom-variable-type asym aexp))
             (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
                      asym (custom-variable-type asym) aexp)
           (if (and (not (null aexp)) (symbolp aexp))
@@ -231,21 +202,21 @@ update or add each element when EXP is association list (alist)."
     (when ovars
       (message (format "Other variables are set: %s" ovars)))))
 
-(defun my-init-create-variable-comment (var &optional add-comment)
+(defun listify-create-variable-comment (var &optional add-comment)
   "Create variable comment of VAR by loading file or buffer file and ADD-COMMENT."
   (let (acomm afile)
     (when (setq afile (or load-file-name buffer-file-name (buffer-name)))
       (setq acomm (concat (format "set in `%s'." afile))))
     (when add-comment
       (setq acomm (concat acomm (when acomm " ") add-comment)))
-    (when (equal (my-init-variable-comment var) acomm)
+    (when (equal (listify-variable-comment var) acomm)
        (setq acomm nil))
      acomm))
 
-(defun my-init-variable-comment (var)
+(defun listify-variable-comment (var)
   (get var 'variable-comment))
 
-(defun my-init-defaliases (&rest sym-def)
+(defun listify-defaliases (&rest sym-def)
   "Set SYMBOL’s function definition to DEFINITION in SYM-DEF.
 Each SYM-DEF has the form (SYMBOL DEFINITION &optional DOCSTRING)."
   (let (asym adef)
@@ -257,7 +228,7 @@ Each SYM-DEF has the form (SYMBOL DEFINITION &optional DOCSTRING)."
        (defalias asym adef (nth 3 asymdef))
        (message "`%s' is defined as alias of `%s'." asym adef)))))
 
-(defun my-init-global-set-keys (&rest key-func)
+(defun listify-global-set-keys (&rest key-func)
   "Give global binding as KEY-FUNC by global-set-key.
 Each KEY-FUNC form is (KEY FUNCTION).
 
@@ -269,11 +240,11 @@ or the standard error stream in batch mode."
           (message "Warning: In setting keybind, function `%s' is void." afunc)
         (global-set-key (kbd (car akeyfunc)) afunc)))))
 
-(defun my-init-global-unset-keys (&rest keys)
+(defun listify-global-unset-keys (&rest keys)
   (dolist (akey keys)
     (global-unset-key (kbd akey))))
 
-(defun my-init-modemap-set-keys (&rest modemap)
+(defun listify-modemap-set-keys (&rest modemap)
   "Give KEY binding of MODEMAP as MAPKEYS after LIBRARY is loaded.
 MODEMAP form is (MODEMAP LIBRARY HOOK ((KEY1 FUNCTION1) (KEY2 FUNCTION2) ... )).
 
@@ -298,11 +269,11 @@ If function in MAPKEYS is void, warning message is printed into the `*Messages' 
            ((not ahook)
             (eval funcdef))
            (t
-            (let ((func-add-keybind (read (concat "my-init-" amapname "-keybind"))))
+            (let ((func-add-keybind (read (concat "listify-" amapname "-keybind"))))
               (fset func-add-keybind funcdef)
               `(add-hook ',ahook ',func-add-keybind)))))))))
 
-(defun my-init-set-modes (&rest modeval)
+(defun listify-set-modes (&rest modeval)
   "Set MODE. MODE format is assumed as `(FUNCTION 1)' to enable the mode, or `(FUNCTION 0)' to disable the mode. FUNCTION presents minor mode.
 
 If FUNCTION in MODE is void, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
@@ -312,7 +283,7 @@ If FUNCTION in MODE is void, warning message is printed into the `*Messages' buf
           (message "Warning: In setting minor mode, function `%s' is void." amode)
         (eval amodeval)))))
 
-(defun my-init-overwrite-auto-mode-alist (&rest mode-new-old)
+(defun listify-overwrite-auto-mode-alist (&rest mode-new-old)
   (let (anew aold alst)
     (dolist (newold mode-new-old)
       (cond
@@ -325,7 +296,7 @@ If FUNCTION in MODE is void, warning message is printed into the `*Messages' buf
     (overwrite-values-alist 'auto-mode-alist alst)
     (message "auto-mode-alist is overwritten.")))
 
-(defun my-init-set-hooks (&rest hook-func)
+(defun listify-set-hooks (&rest hook-func)
   "Add function to hooks by list of (FUNCTION HOOK).
 If FUNCTION or HOOK is void, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
   (let (ahook afunc)
@@ -338,16 +309,11 @@ If FUNCTION or HOOK is void, warning message is printed into the `*Messages' buf
        (t
           (add-hook ahook afunc))))))
 
-(defun my-init-setenv (&rest env-val)
+(defun listify-setenv (&rest env-val)
   "Add system environment variables to values by list of ENV-VAL.
 Each ENV-VAL form is (ENVIRONMENT VALUE)."
   (dolist (aenvval env-val)
     (setenv (car aenvval) (cadr aenvval))))
 
-;; Emacs開始にかかった時間をメッセージに表示
-(defun my-init-message-startup-time ()
-  "Message Duration of the Emacs initialization time."
-  (message "Duration of the Emacs initialization - %s" (emacs-init-time)))
-
-(provide 'my-init)
-;;; my-init.el ends here
+(provide 'listify)
+;;; listify.el ends here
