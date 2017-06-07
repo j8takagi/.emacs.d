@@ -204,7 +204,7 @@ update or add each element when EXP is association list (alist)."
       (setq
        asym (nth 0 arg) aexp (nth 1 arg) anow (nth 2 arg) areq (nth 3 arg)
        acomm (listify-create-variable-comment asym (nth 4 arg)))
-      (if (and (not (null aexp)) (listp aexp))
+      (if (and (not (null aexp)) (listp aexp) (listp (cdr aexp)))
           (setq vars
                 (append
                  vars
@@ -217,7 +217,7 @@ update or add each element when EXP is association list (alist)."
           (when (not (equal (symbol-value asym) aexp))
             (custom-set-variables
              `(,asym
-               ,(if (and (not (null aexp)) (symbolp aexp)) (quote aexp) aexp)
+               ,(if (and (not (null aexp)) (or (symbolp aexp) (listp aexp))) 'aexp aexp)
                ,anow ,areq ,acomm))
             (setq vars (append vars (list asym)))))))
     (when vars
