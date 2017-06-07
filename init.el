@@ -250,7 +250,7 @@
    '(whitespace-disabled-major-mode-list
      (
      Custom-mode mew-summary-mode completion-list-mode help-mode
-     magit-mode tetris-mode w3m-mode mew-message-mode
+     magit-mode tetris-mode w3m-mode mew-message-mode shell-mode
      ))
    '(after-change-major-mode-hook (init-whitespace-mode))
    '(view-mode-hook (init-whitespace-mode)))
