@@ -14,11 +14,6 @@
 ;;;
 ;;; パッケージ
 ;;;
-
-(listify-requires
- 'package
- )
-
 (listify-add-package-archives
  '("melpa-stable" "http://stable.melpa.org/packages/")
  )
@@ -276,7 +271,6 @@
   (listify-set
    '(dired-recursive-copies always)  ; diredでディレクトリーを再帰的にコピーするとき、確認しない
    '(dired-dwim-target 1)             ; 対象ディレクトリーの推測
-   '(dired-isearch-filenames t)       ; diredでのisearchの対象をファイル名だけに
    )
   (listify-requires
    'dired-x                     ; diredの拡張機能
