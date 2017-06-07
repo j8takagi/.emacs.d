@@ -66,6 +66,7 @@
  'count-japanese                   ; 日本語の文字数をカウント
  'ediff-vc-plus                    ; Ediffの追加関数
  'exopen                           ; 外部プログラムでファイルを開く
+ 'ffap-plus
  'ime-cursor                       ; IMEをオンにしたときにカーソルの色を変える
  'japanese-plus                    ; 全角半角変換
  'list-fontfamilies-display        ; フォントファミリー一覧作成コマンド
