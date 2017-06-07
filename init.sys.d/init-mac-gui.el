@@ -34,6 +34,7 @@
      (top 23)
      (left 0)
      ))
+ '(face-font-rescale-alist (("Hiragino Sans" 1.167)))
  '(mac-command-modifier meta)        ; commandキーをEmacsのMetaキーに
  '(mac-auto-ascii-mode 1)             ; ミニバッファへのカーソル移動時、日本語IMEを自動オフ
  )
