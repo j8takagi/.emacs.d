@@ -33,14 +33,11 @@ get-abbrev:
 
 install: install-init install-init.sys.d install-site-lisp install-insert
 
-install-init: $(INSTALLDIR) $(INSTALLDIR)/init.el~ init
+install-init: $(INSTALLDIR) init
 	@$(RSYNC) $(RSYNCFLAG) init.el init.elc $(INSTALLDIR)/ | $(CLEAN.rsync)
 
-$(INSTALLDIR)/init.el~: $(INSTALLDIR)/init.el
-	@$(CP) $< $@
-
 install-init.sys.d: init.sys.d $(INSTALLDIR)/init.sys.d
-	@$(MAKE) -sC init.sys.d install
+	$(MAKE) -sC init.sys.d install
 
 $(INSTALLDIR)/init.sys.d: $(INSTALLDIR)
 	@(if $(TEST) ! -d $@; then $(MKDIR) $@; fi)

@@ -8,13 +8,13 @@ ELCFILES := $(addsuffix c,$(ELFILES))
 
 RSYNC := rsync
 RSYNCFLAG := -avz --delete
-RSYNCEXCLUDE := --exclude "Makefile*" --exclude "set-compile.el*"
-GREPV := grep -v
-CLEAN.rsync := $(GREPV) "^\(sent\)\|\(total\)\|\(sending\)\|\(./\)"
-ECHO := echo
+RSYNCEXCLUDE := --exclude "Makefile*" --exclude "set-compile.el*" --exclude "README"
+
 SED := sed
 
 INSTALL-SITELISP := ~/.emacs.d/site-lisp
+
+CLEAN.rsync := $(SED) -e 's%sending incremental file list%Install $(PACKAGENAME) to $(INSTALL-SITELISP)%' -e '/^sent/d' -e '/^total/d' -e 's~^\./~~' -e '/^$$/d'
 
 .PHONY: all install clean
 
@@ -24,7 +24,7 @@ $(INSTALL-SITELISP)/$(PACKAGENAME):
 	(MKDIR) $@
 
 install: $(INSTALL-SITELISP) all
-	@($(ECHO) "Installing $(PACKAGENAME) to $(INSTALL-SITELISP)/$(PACKAGENAME)"; $(RSYNC) $(RSYNCFLAG) $(RSYNCEXCLUDE) ./ $(INSTALL-SITELISP)/$(PACKAGENAME)/ | $(CLEAN.rsync))
+	@($(RSYNC) $(RSYNCFLAG) $(RSYNCEXCLUDE) ./ $(INSTALL-SITELISP)/$(PACKAGENAME)/ | $(CLEAN.rsync))
 
 %.elc: %.el
 	$(COMPILE.el) $<

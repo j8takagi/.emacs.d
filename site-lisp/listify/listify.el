@@ -30,6 +30,22 @@ Each VALUE-NEW-OLD-ALIST has the form (VALUE-NEW . VALUE-OLD)."
         (setf (cdr acell) (car newold))))
     alst))
 
+(defun replace-regexp-last-history ()
+  (interactive)
+  (let ((ato (car query-replace-history)) (afrom (cadr query-replace-history)))
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward afrom nil t)
+        (replace-match ato)))))
+
+(defun replace-string-last-history ()
+  (interactive)
+  (let ((ato (car query-replace-history)) (afrom (cadr query-replace-history)))
+    (save-excursion
+      (goto-char (point-min))
+      (while (search-forward afrom nil t)
+        (replace-match ato nil 1)))))
+
 (defun listify-validate-custom-variable-type (custom-variable &optional value)
   "Varidate VALUES is match CUSTOM-VARIABLE to custom-variable-type in symbol property.
 If VALUE matches custom-variable-type in symbol properties list, t.
@@ -144,7 +160,7 @@ If FUNCTION is void or FILE is not found, warning message is printed into the `*
 (defun listify-set-alist (&rest alist-args)
   "Custom set ALIST-ARGS value to the alist.
 Each ALIST-ARGS has the form (ALIST-NAME ((KEY1 VALUE1) (KEY2 VALUE2) ...)[ NOW[ REQUEST[ COMMENT]]])."
-  (let (asym keyvals anow areq acomm)
+  (let (asym keyvals alsts)
     (dolist (alst alist-args)
       (setq asym (car alst) keyvals (symbol-value asym))
       (dolist (akeyval (cadr alst))
@@ -153,12 +169,14 @@ Each ALIST-ARGS has the form (ALIST-NAME ((KEY1 VALUE1) (KEY2 VALUE2) ...)[ NOW[
           (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
                    asym (custom-variable-type asym) keyvals)
         (unless (eq keyvals (symbol-value asym))
-          (custom-set-variables `(,asym ',keyvals ,anow ,areq ,acomm)))))))
+          (custom-set-variables `(,asym ',keyvals ,(nth 2 alst) ,(nth 3 alst) ,(nth 4 alst)))
+          (push asym alsts))))
+    alsts))
 
 (defun listify-set-list (&rest list-val)
   "Set LIST-VAL value to the list.
 Each LIST-VAL has the form (LIST-NAME (VALUE1 VALUE2 ...)[ NOW[ REQUEST[ COMMENT]]])."
-  (let (vals exps asym)
+  (let (vals exps asym lsts)
     (dolist (lst list-val)
       (unless (listp (setq vals (cadr lst)))
         (error (format "The 2nd arg is not list.\nArg: %s" vals)))
@@ -170,7 +188,9 @@ Each LIST-VAL has the form (LIST-NAME (VALUE1 VALUE2 ...)[ NOW[ REQUEST[ COMMENT
                    asym (custom-variable-type asym) exps)
         (unless (eq vals (symbol-value asym))
           (custom-set-variables `(,asym ',exps
-                                        ,(nth 2 lst) ,(nth 3 lst) ,(nth 4 lst))))))))
+                                        ,(nth 2 lst) ,(nth 3 lst) ,(nth 4 lst)))
+          (push asym lsts))))
+    lsts))
 
 (defun listify-set (&rest args)
   "Custom set variable values specified in ARGS.
@@ -179,28 +199,29 @@ The ARGS form is same to `custom-set-variables'.
 Except EXP need no quote when EXP is SYMBOL,
 and/or add each element when EXP is list,
 update or add each element when EXP is association list (alist)."
-  (let (asym aexp anow areq acomm prevcomm newcomm afile cusvars ovars)
+  (let (asym aexp anow areq acomm vars)
     (dolist (arg args)
       (setq
        asym (nth 0 arg) aexp (nth 1 arg) anow (nth 2 arg) areq (nth 3 arg)
        acomm (listify-create-variable-comment asym (nth 4 arg)))
-      (if (custom-variable-p asym)
-          (push asym cusvars)
-        (push asym ovars))
       (if (and (not (null aexp)) (listp aexp))
-          (if (listp (car aexp))
-              (listify-set-alist `(,asym ,aexp ,anow ,areq ,acomm))
-            (listify-set-list `(,asym ,aexp ,anow ,areq ,acomm)))
+          (setq vars
+                (append
+                 vars
+                 (funcall
+                  (if (consp (car aexp)) 'listify-set-alist 'listify-set-list)
+                  `(,asym ,aexp ,anow ,areq ,acomm))))
         (if (null (listify-validate-custom-variable-type asym aexp))
             (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
                      asym (custom-variable-type asym) aexp)
-          (if (and (not (null aexp)) (symbolp aexp))
-              (custom-set-variables `(,asym ',aexp ,anow ,areq ,acomm))
-            (custom-set-variables `(,asym ,aexp ,anow ,areq ,acomm))))))
-    (when cusvars
-      (message (format "Custom variables are set: %s" cusvars)))
-    (when ovars
-      (message (format "Other variables are set: %s" ovars)))))
+          (when (not (equal (symbol-value asym) aexp))
+            (custom-set-variables
+             `(,asym
+               ,(if (and (not (null aexp)) (symbolp aexp)) (quote aexp) aexp)
+               ,anow ,areq ,acomm))
+            (setq vars (append vars (list asym)))))))
+    (when vars
+      (message (format "Variables are set: %s" vars)))))
 
 (defun listify-create-variable-comment (var &optional add-comment)
   "Create variable comment of VAR by loading file or buffer file and ADD-COMMENT."
@@ -253,25 +274,22 @@ If function in MAPKEYS is void, warning message is printed into the `*Messages' 
   (let (amap alib ahook amapname funcdef)
     (dolist (amodemap modemap)
       (setq
-       amap (car amodemap) alib (cadr amodemap) ahook (nth 2 amodemap)
-       keyfuncs (nth 3 amodemap))
+       amap (car amodemap) alib (cadr amodemap)
+       ahook (nth 2 amodemap) keyfuncs (nth 3 amodemap)
+       funcdef
+       `(lambda ()
+          (dolist (keyfunc ',keyfuncs)
+            (let ((akey (car keyfunc)) (afunc (cadr keyfunc)))
+              (if (not (fboundp afunc))
+                  (message
+                   ,(concat "Warning: In setting `" (setq amapname (symbol-name amap)) "' keybind, function `%s' is void.") afunc)
+                (define-key ,amap (kbd akey) afunc))))))
       (eval-after-load alib
-        (progn
-          (setq funcdef
-                `(lambda ()
-                   (dolist (keyfunc ',keyfuncs)
-                     (let ((akey (car keyfunc)) (afunc (cadr keyfunc)))
-                       (if (not (fboundp afunc))
-                           (message
-                            ,(concat "Warning: In setting `" (setq amapname (symbol-name amap)) "' keybind, function `%s' is void.") afunc)
-                         (define-key ,amap (kbd akey) afunc))))))
-          (cond
-           ((not ahook)
-            (eval funcdef))
-           (t
-            (let ((func-add-keybind (read (concat "listify-" amapname "-keybind"))))
-              (fset func-add-keybind funcdef)
-              `(add-hook ',ahook ',func-add-keybind)))))))))
+        (if (null ahook)
+            (eval funcdef)
+          (let ((func-add-keybind (read (concat "listify-" amapname "-keybind"))))
+            (fset func-add-keybind funcdef)
+            `(add-hook ',ahook ',func-add-keybind)))))))
 
 (defun listify-set-modes (&rest modeval)
   "Set MODE. MODE format is assumed as `(FUNCTION 1)' to enable the mode, or `(FUNCTION 0)' to disable the mode. FUNCTION presents minor mode.

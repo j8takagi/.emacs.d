@@ -4,8 +4,8 @@ INSTALL-SITELISP := ~/.emacs.d/site-lisp
 RSYNC := rsync
 RSYNCFLAG := -avz --delete
 RSYNCEXCLUDE := --exclude "Makefile*" --exclude "set-compile.el*"
-GREPV := grep -v
-CLEAN.rsync := $(GREPV) "^\(sent\)\|\(total\)\|\(sending\)\|\(\./\)"
+
+SED := sed
 
 .PHONY: all install clean distclean
 
@@ -13,8 +13,7 @@ all:
 	@($(foreach dir,$(SITELISPS),$(MAKE) -sC $(dir) all; ))
 
 install: all
-	@($(RSYNC) -auvz --delete --existing --ignore-non-existing ./ $(INSTALL-SITELISP)/ | $(CLEAN.rsync))
-	@($(foreach dir,$(SITELISPS),$(MAKE) -sC $(dir) install; ))
+	@($(foreach dir,$(SITELISPS),$(MAKE) -C $(dir) install; ))
 
 clean:
 	$(foreach dir,$(SITELISPS),$(MAKE) -C $(dir) clean; )

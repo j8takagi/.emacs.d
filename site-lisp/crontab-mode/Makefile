@@ -1,4 +1,4 @@
-PACKAGENAME := "crontab-mode"
+PACKAGENAME := crontab-mode
 
 EMACS := emacs
 COMPILE.el := $(EMACS) -batch -f batch-byte-compile
@@ -9,23 +9,22 @@ ELCFILES := $(addsuffix c,$(ELFILES))
 RSYNC := rsync
 RSYNCFLAG := -avz --delete
 RSYNCEXCLUDE := --exclude "Makefile*" --exclude "set-compile.el*"
-GREPV := grep -v
-CLEAN.rsync := $(GREPV) "^\(sent\)\|\(total\)\|\(sending\)\|\(./\)"
-ECHO := echo
-MKDIR := mkdir -p
-TEST := test
+
+SED := sed
 
 INSTALL-SITELISP := ~/.emacs.d/site-lisp
+
+CLEAN.rsync := $(SED) -e 's%sending incremental file list%Install $(PACKAGENAME) to $(INSTALL-SITELISP)%' -e '/^sent/d' -e '/^total/d' -e 's~^\./~~' -e '/^$$/d'
 
 .PHONY: all install clean
 
 all: $(ELCFILES)
 
-$(INSTALL-SITELISP)/$(PACKAGENAME): $(INSTALL-SITELISP)
-	@(if $(TEST) ! -e $@; then $(MKDIR) $@; fi)
+$(INSTALL-SITELISP)/$(PACKAGENAME):
+	(MKDIR) $@
 
-install: $(INSTALL-SITELISP)/$(PACKAGENAME) all
-	@($(ECHO) "Installing $(PACKAGENAME) to $(INSTALL-SITELISP)/$(PACKAGENAME)"; $(RSYNC) $(RSYNCFLAG) $(RSYNCEXCLUDE) ./ $(INSTALL-SITELISP)/$(PACKAGENAME)/ | $(CLEAN.rsync))
+install: $(INSTALL-SITELISP) all
+	@($(RSYNC) $(RSYNCFLAG) $(RSYNCEXCLUDE) ./ $(INSTALL-SITELISP)/$(PACKAGENAME)/ | $(CLEAN.rsync))
 
 %.elc: %.el
 	$(COMPILE.el) $<
