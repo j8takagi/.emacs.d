@@ -5,8 +5,9 @@
 (message (emacs-version))
 
 ;; user-emacs-directory(~/.emacs.d)のサブディレクトリーをload-pathに追加
-(let ((default-directory (expand-file-name user-emacs-directory)))
-  (normal-top-level-add-subdirs-to-load-path))
+(unless noninteractive
+  (let ((default-directory (expand-file-name user-emacs-directory)))
+    (normal-top-level-add-subdirs-to-load-path)))
 
 (require 'listify)
 
