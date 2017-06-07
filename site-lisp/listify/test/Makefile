@@ -1,5 +1,5 @@
 EMACS := /usr/local/bin/emacs
-EMACSFLAGS := -Q -batch -l cus-edit -l *.el
+EMACSFLAGS := -Q -batch -l *.el
 .PHONY: check test
 
 check:
