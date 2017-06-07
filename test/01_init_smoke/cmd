@@ -1,1 +1,1 @@
-emacs -Q -batch -l ~/.emacs.d/init.el 2>&1 | tail -1
+emacs -Q -batch -l set-loadpath.el  -l ../../init.el 2>&1 | tee message.log | tail -1
