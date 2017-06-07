@@ -468,7 +468,7 @@
     ("\\`ja.wikipedia.org/w/index.php" mediawiki-mode)
     ("abbrev_defs" emacs-lisp-mode)
     ("cmd" shell-script-mode)
-    ("/crontab\\(\\.[a-zA-Z0-9]+\\)?" crontab-mode)
+    ("/crontab\\(\\.[a-zA-Z0-9]+\\)?\\'" crontab-mode)
     ("!.+" conf-mode)
    )))
 
