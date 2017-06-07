@@ -62,7 +62,6 @@
  ;; ~/.emacs.d/site-lisp
  'auto-elc-mode                    ; .elファイルの自動コンパイル
  'buffer-window-plus               ; バッファとウィンドウの操作関数
- 'cc-mode-plus                     ; cc-modeの追加関数
  'count-japanese                   ; 日本語の文字数をカウント
  'ediff-vc-plus                    ; Ediffの追加関数
  'exopen                           ; 外部プログラムでファイルを開く
