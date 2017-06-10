@@ -21,7 +21,7 @@
     (font
      ,(fontset-set
        '(
-         (ascii . (font-spec :family "Consolas" :weight 'normal :size 14))
+         (ascii . (font-spec :family "Consolas" :weight 'normal :size 12))
          (unicode . (font-spec :family "メイリオ"))
          )
        "mydefault_w32"))
@@ -35,6 +35,7 @@
  '(default-file-name-coding-system cp932) ; 日本語ファイル名を正常に処理
  '(default-process-coding-system (utf-8 . cp932)) ; 日本語ファイル名を正常に処理
  '(default-input-method "W32-IME")              ; IMEの設定
+ '(face-font-rescale-alist (("游ゴシック" 1.167)))
  )
 
 ;; Shell-modeの文字コード設定
