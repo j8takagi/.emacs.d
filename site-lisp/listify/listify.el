@@ -220,8 +220,19 @@ update or add each element when EXP is association list (alist)."
                ,(if (and (not (null aexp)) (or (symbolp aexp) (listp aexp))) 'aexp aexp)
                ,anow ,areq ,acomm))
             (setq vars (append vars (list asym)))))))
-    (when vars
-      (message (format "Variables are set: %s" vars)))))
+    (listify-message-variables vars)))
+
+(defun listify-message-variables(vars)
+  (let (cusvars ovars)
+    (dolist (avar vars)
+      (if (custom-variable-p avar)
+          (setq cusvars (append cusvars (list avar)))
+        (setq ovars (append ovars (list avar)))))
+    (message
+     (concat
+      (when cusvars (format "Custom variables are set: %s" cusvars))
+      (when (and cusvars ovars) "\n")
+      (when ovars (format "Variables are set: %s" ovars))))))
 
 (defun listify-create-variable-comment (var &optional add-comment)
   "Create variable comment of VAR by loading file or buffer file and ADD-COMMENT."
