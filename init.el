@@ -69,6 +69,7 @@
  'not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
  'scroll-one-line                  ; 1行スクロール
  'session
+ 'set-view-mode
  'temp-buffer                      ; 一時バッファの作成
  'window-control                   ; ウィンドウとフレームのサイズを調整
  'xlfd-at                          ; フォント情報の表示
