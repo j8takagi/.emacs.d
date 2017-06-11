@@ -266,8 +266,11 @@
 ;;
 (with-eval-after-load 'ediff
   (listify-set
-   '(ediff-window-setup-function ediff-setup-windows-plain)
+   '(ediff-before-setup-hook ediff-save-window-configuration)
+   '(ediff-quit-hook ediff-restore-window-configuration)
    '(ediff-split-window-function split-window-horizontally)
+   '(ediff-suspend-hook ediff-restore-window-configuration)
+   '(ediff-window-setup-function ediff-setup-windows-plain)
    ))
 
 ;;

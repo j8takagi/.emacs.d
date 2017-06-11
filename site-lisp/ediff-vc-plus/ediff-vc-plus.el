@@ -84,19 +84,4 @@ temporarily reverses the meaning of this variable."
     (ediff-really-quit reverse-default-keep-variants)
     (kill-buffer buf)))
 
-;;;###autoload
-(dolist
-    (hookfunc                           ; フックに設定するファンクション
-     '(
-       (ediff-before-setup-hook ediff-save-window-configuration)
-       (ediff-quit-hook ediff-restore-window-configuration)
-       (ediff-suspend-hook ediff-restore-window-configuration)
-       ))
-  (let ((hook (car hookfunc)) (func (cadr hookfunc)))
-    (cond
-     ((not (boundp hook)) (message "hook `%s' is void." hook))
-     ((not (fboundp func)) (message "function `%s' is void." func))
-     (t
-      (add-hook hook func)))))
-
 (provide 'ediff-vc-plus)
