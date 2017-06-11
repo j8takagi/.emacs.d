@@ -118,53 +118,57 @@
 (put 'disabled-command-function 'custom-type '(choice (const nil) function))
 (listify-set
  '(Info-additional-directory-list ("~/share/info/ja" "~/share/info" )) ; Infoファイルの場所
- '(auto-compression-mode 1)         ; 圧縮されたファイルを直接編集する
+ '(auto-compression-mode t)         ; 圧縮されたファイルを直接編集する
  '(auto-insert-alist nil)           ; auto-insert-alistの初期化
  '(auto-insert-directory "~/.emacs.d/insert/") ; auto-insertテンプレートディレクトリ
  '(auto-insert-query nil)                      ; auto-insertでユーザーに尋ねない
  '(backup-directory-alist (("." "~/backup")))
  '(blink-cursor-mode nil)                      ; カーソルは点滅しない
  '(case-replace nil)                ; 置換時に大文字小文字を区別しない
- '(column-number-mode 1)            ; 列番号を表示
- '(completion-ignored-extensions (".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" "_prev" ".idx" ".ind" ".ilg" ".tmp" ".synctex.gz" ".dplg" ".dslg" ".dSYM/" ".DS_Store" ":com.dropbox.attributes:$DATA")) ; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
+ '(column-number-mode t)            ; 列番号を表示
+ '(completion-ignored-extensions ; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
+   (".bak" ".d" ".fls" ".log" ".dvi" ".xbb"
+    ".out" ".prev" "_prev" ".idx" ".ind" ".ilg"
+    ".tmp" ".synctex.gz" ".dplg" ".dslg" ".dSYM/"
+    ".DS_Store" ":com.dropbox.attributes:$DATA"))
  '(custom-file "~/.emacs.d/.emacs-custom.el") ;カスタムの設定値を書き込むファイル
- '(delete-by-moving-to-trash 1)      ;  ファイルの削除で、ゴミ箱を使う
- '(delete-old-versions 1) ; 古いバックアップファイルを自動的に削除する
+ '(delete-by-moving-to-trash t)      ;  ファイルの削除で、ゴミ箱を使う
+ '(delete-old-versions t) ; 古いバックアップファイルを自動的に削除する
  '(disabled-command-function nil) ; すべてのコマンドの使用制限を解除する
  '(display-buffer-alist (("^\\*shell\\*$" (display-buffer-same-window)) ("^\\*magit: .+" (display-buffer-same-window)))) ; バッファの表示方法
  '(electric-indent-mode nil) ; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
- '(enable-recursive-minibuffers 1)      ; 再帰的にミニバッファを使う
+ '(enable-recursive-minibuffers t)      ; 再帰的にミニバッファを使う
  '(eval-expression-print-length nil)    ; evalした結果を全部表示する
- '(global-font-lock-mode 1)       ; メジャーモードに合わせた色を付ける
- '(history-delete-duplicates 1)   ; 重複する履歴は削除
+ '(global-font-lock-mode t)       ; メジャーモードに合わせた色を付ける
+ '(history-delete-duplicates t)   ; 重複する履歴は削除
  '(history-length t)              ; 履歴の数を無制限に
  '(indent-line-function indent-to-left-margin) ; インデント用のファンクション
  '(indent-tabs-mode nil)          ; タブをスペースに展開
- '(inhibit-startup-screen 1)      ; 起動時の画面を表示しない
+ '(inhibit-startup-screen t)      ; 起動時の画面を表示しない
  '(initial-scratch-message nil)   ; *scratch* にメッセージを表示しない
- '(line-number-mode 1)            ; 行番号を表示
- '(make-backup-files 1)           ; バックアップファイルを作成する
+ '(line-number-mode t)            ; 行番号を表示
+ '(make-backup-files t)           ; バックアップファイルを作成する
  '(menu-bar-mode nil)             ; メニューバーを表示しない
  '(next-line-add-newlines nil) ; ファイル末尾での改行で、end of bufferエラーが発生しないように
  '(read-mail-command mew)      ; メールを読むときにmewを使う
- '(save-interprogram-paste-before-kill 1) ; 他アプリのコピーバッファをkill-ringに保存する
+ '(save-interprogram-paste-before-kill t) ; 他アプリのコピーバッファをkill-ringに保存する
  '(scroll-conservatively 1) ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
  '(session-file-name-history-exclude-regexps ("\\.emacs\\.d/" "~$" "COMMIT_EDITMSG")) ; sessionで、file-name-historyから除外するファイル
  '(session-restore-last-point-exclude-regexps ("COMMIT_EDITMSG")) ; session-restore-last-pointから除外するファイル
- '(show-paren-mode 1)             ; 括弧の対応を表示
+ '(show-paren-mode t)             ; 括弧の対応を表示
  '(skeleton-end-hook nil)         ; skeletonの挿入後、改行しない
- '(skeleton-pair 1)              ; skeleton-pairにより括弧挿入を自動化
+ '(skeleton-pair t)              ; skeleton-pairにより括弧挿入を自動化
  '(tab-width 4)                  ; タブ幅は4
  '(tool-bar-mode nil)            ; ツールバーを表示しない
- '(transient-mark-mode 1)        ; リージョンをハイライト
+ '(transient-mark-mode t)        ; リージョンをハイライト
  '(truncate-lines nil)           ; 継続行を表示しない
  '(truncate-partial-width-windows nil)  ; 行を切り捨てない
  '(use-dialog-box nil)                  ; ダイアログボックスは使わない
  '(user-mail-address "j8takagi@nifty.com") ; ChangeLogなどで用いるメールアドレスの設定
- '(version-control 1)   ; バックアップファイルにバージョン番号を付ける
- '(visible-bell 1) ; エラー時、音が鳴るのではなく、画面が点滅するように
+ '(version-control t)   ; バックアップファイルにバージョン番号を付ける
+ '(visible-bell t) ; エラー時、音が鳴るのではなく、画面が点滅するように
  '(yank-excluded-properties t)  ; ヤンクで、テキストプロパティは捨てる
- '(yank-pop-change-selection 1) ; yank-popを有効にする
+ '(yank-pop-change-selection t) ; yank-popを有効にする
  )
 
 (when window-system
@@ -190,7 +194,7 @@
    'view-mode-vi-bindings             ; view-modeでviのキーバインド
    )
   (listify-set
-   '(view-read-only 1)
+   '(view-read-only t)
    )
   (set-view-mode-buffers
    "\\*Messages\\*"                     ; *Messages*バッファをview-modeに
@@ -271,8 +275,8 @@
 ;;
 (with-eval-after-load 'dired
   (listify-set
-   '(dired-recursive-copies always)  ; diredでディレクトリーを再帰的にコピーするとき、確認しない
-   '(dired-dwim-target 1)             ; 対象ディレクトリーの推測
+   '(dired-recursive-copies always) ; diredでディレクトリーを再帰的にコピーするとき、確認しない
+   '(dired-dwim-target t)           ; 対象ディレクトリーの推測
    )
   (listify-requires
    'dired-x                     ; diredの拡張機能
