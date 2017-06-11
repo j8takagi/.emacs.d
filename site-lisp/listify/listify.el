@@ -67,16 +67,16 @@ When VALUE is ommited or nil, current value of CUSTOM-VARIABLE is validated."
 
 (defun listify-requires (&rest feature)
   "Require FEATURE, and the result is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
-  (dolist (afeat feature)
-    (if (featurep afeat)
-        (message "Info: Feature `%s' is already required." afeat)
-      (if (not (locate-library (symbol-name afeat)))
-          (message "Warning: Feature `%s' is NOT found." afeat)
-        (condition-case err
-            (progn
-              (require afeat)
-              (message "Feature `%s' is required." afeat))
-          (error (message "Warning: Fails to require feature `%s'.\n%s: %s" afeat (car err) (cadr err))))))))
+  (let (feats)
+    (dolist (afeat feature)
+      (if (featurep afeat)
+          (message "Info: Feature `%s' is already required." afeat)
+        (if (not (locate-library (symbol-name afeat)))
+            (message "Warning: Feature `%s' is NOT found." afeat)
+          (if (null (require afeat nil 1))
+              (message "Warning: Fails to require feature - %s" afeat)
+            (setq feats (append feats (list afeat)))))))
+    (message "Features are required - %s" feats)))
 
 (defun listify-requires-by-system (&rest sys-features)
   "If current system type or window system got by VARIABLE is match to SYSTEM, Require FEATURE by `listify-requires' in SYS-FEATURES.
