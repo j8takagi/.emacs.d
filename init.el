@@ -1,5 +1,6 @@
 ;;;-*-Emacs-Lisp-*-
-(setq minibuffer-message-timeout 0)
+(unless noninteractive
+  (setq inhibit-message 1))
 
 (message "Start of loading %s at %s." load-file-name (format-time-string "%Y/%m/%d %T"))
 
@@ -647,6 +648,6 @@
      (session-cleanup-file-name-history-exclude-regexp))
    ))
 
-(setq minibuffer-message-timeout 2)
+(setq inhibit-message nil)
 
 (message "End of loading init.el.")
