@@ -26,6 +26,9 @@ install: all
 %.elc: %.el
 	$(COMPILE.el) $<
 
+check:
+	$(MAKE) -sC test
+
 clean:
 	$(RM) $(ELCFILES)
 
