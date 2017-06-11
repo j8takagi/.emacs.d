@@ -230,9 +230,9 @@ update or add each element when EXP is association list (alist)."
         (setq ovars (append ovars (list avar)))))
     (message
      (concat
-      (when cusvars (format "Custom variables are set: %s" cusvars))
+      (when cusvars (format "Custom variables are set. - %s" cusvars))
       (when (and cusvars ovars) "\n")
-      (when ovars (format "Variables are set: %s" ovars))))))
+      (when ovars (format "Variables are set. - %s" ovars))))))
 
 (defun listify-create-variable-comment (var &optional add-comment)
   "Create variable comment of VAR by loading file or buffer file and ADD-COMMENT."
