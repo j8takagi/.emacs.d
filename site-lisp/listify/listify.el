@@ -210,15 +210,16 @@ update or add each element when EXP is association list (alist)."
                  vars
                  (funcall
                   (if (consp (car aexp)) 'listify-set-alist 'listify-set-list)
-                  `(,asym ,aexp ,anow ,areq ,acomm))))
+                  (list asym aexp anow areq acomm))))
         (if (null (listify-validate-custom-variable-type asym aexp))
             (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
                      asym (custom-variable-type asym) aexp)
           (when (not (equal (symbol-value asym) aexp))
             (custom-set-variables
-             `(,asym
-               ,(if (and (not (null aexp)) (or (symbolp aexp) (listp aexp))) 'aexp aexp)
-               ,anow ,areq ,acomm))
+             (list
+              asym
+              (if (and (not (null aexp)) (not (eq aexp t)) (or (symbolp aexp) (listp aexp))) `(quote ,aexp) aexp)
+              anow areq acomm))
             (setq vars (append vars (list asym)))))))
     (listify-message-variables vars)))
 
