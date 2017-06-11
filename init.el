@@ -277,16 +277,21 @@
 ;; dired
 ;;
 (with-eval-after-load 'dired
-  (listify-set
-   '(dired-recursive-copies always) ; diredでディレクトリーを再帰的にコピーするとき、確認しない
-   '(dired-dwim-target t)           ; 対象ディレクトリーの推測
-   )
   (listify-requires
    'dired-x                             ; diredの拡張機能
    'image-dired                         ; サムネイル表示
    'sorter                              ; ソート
    'wdired                              ; ファイル名編集
+   )
+  (listify-set
+   '(dired-listing-switches "-alh")     ; lsのオプションにhを追加
+   '(dired-recursive-copies always) ; diredでディレクトリーを再帰的にコピーするとき、確認しない
+   '(dired-dwim-target t)           ; 対象ディレクトリーの推測
    ))
+
+(with-eval-after-load 'find-dired
+  (listify-set '(find-ls-option ("-exec ls -ldh {} +" . "-al")))
+  )
 
 ;;
 ;; lisp-mode
