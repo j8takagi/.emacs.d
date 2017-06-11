@@ -69,7 +69,6 @@
  'not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
  'scroll-one-line                  ; 1行スクロール
  'session
- 'set-view-mode
  'temp-buffer                      ; 一時バッファの作成
  'window-control                   ; ウィンドウとフレームのサイズを調整
  'xlfd-at                          ; フォント情報の表示
@@ -282,10 +281,10 @@
    '(dired-dwim-target t)           ; 対象ディレクトリーの推測
    )
   (listify-requires
-   'dired-x                     ; diredの拡張機能
-   'image-dired                 ; サムネイル表示
-   'sorter                      ; ソート
-   'wdired                      ; ファイル名編集
+   'dired-x                             ; diredの拡張機能
+   'image-dired                         ; サムネイル表示
+   'sorter                              ; ソート
+   'wdired                              ; ファイル名編集
    ))
 
 ;;
@@ -306,10 +305,11 @@
 ;; Shell-mode
 ;;
 (with-eval-after-load 'shell
-  (listify-set
-   '(shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ")) ; プロンプトの表示設定
   (listify-requires
    'set-process-query-on-exit
+   )
+  (listify-set
+   '(shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ") ; プロンプトの表示設定
    ))
 
 ;;
