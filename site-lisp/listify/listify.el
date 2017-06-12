@@ -85,57 +85,70 @@ Each element of SYS-FEATURES has the form (VARIABLE SYSTEM FEATURE)."
     (when (equal (eval (car asysfeat)) (cadr asysfeat))
       (listify-requires (nth 2 asysfeat)))))
 
-(defun listify-add-package-archives (&rest archives)
+(defun listify-packages-add-archives (&rest archives)
   "Add package archives to `package-archives'.
 Each element of ARCHIVES has the form (ID LOCATION)."
   (dolist (aarch archives)
     (update-or-add-alist 'package-archives (car aarch) (cadr aarch))))
 
-(defun listify-install-packages (pkg &optional pkg-from)
+(defun listify-packages-install (pkg)
+  (if (not (assq pkg package-archive-contents))
+      (message "Warning: Package `%s' is NOT found on archives." pkg)
+    (message "Installation of package `%s' begins." pkg)
+    (condition-case err
+        (package-install pkg)
+      (error (message "Warining: Fails to install package `%s'.\n%s: %s" pkg (car err) (cadr err))))))
+
+(defun listify-packages-required (pkg)
+  (let (pkgdesc)
+    (when (setq pkgdesc (assq pkg package-alist))
+      (mapcar 'car (package-desc-reqs (cadr pkgdesc))))))
+
+(defun listify-packages-list-installed (pkg &optional pkg-from)
   "Check whether PKG is installed. When not installed, the installation begins.
 If the package requires other packages, installation of the packges begin recursively.
 This function returns the list of (`package' `required package')."
   (let (pkgs req-pkgs pkg-desc)
     (unless (package-installed-p pkg)
-      (if pkg-from
-          (message "Package `%s' required from `%s' is not installed." pkg pkg-from))
-      (if (not (assq pkg package-archive-contents))
-          (message "Warning: Package `%s' is NOT found on archives." pkg)
-        (message "Installation of package `%s' begins." pkg)
-        (condition-case err
-            (package-install pkg)
-          (error (message "Warining: Fails to install package `%s'.\n%s: %s" pkg (car err) (cadr err))))))
-    (when (setq pkg-desc (assq pkg package-alist))
-      (add-to-list 'pkgs `(,pkg ,pkg-from) 1)
-      (dolist (req-pkg (mapcar 'car (package-desc-reqs (cadr pkg-desc))))
-        (dolist (rp (listify-install-packages req-pkg pkg))
-          (add-to-list 'pkgs rp 1))))
+      (when pkg-from
+        (message "Package `%s' required from `%s' is not installed." pkg pkg-from))
+      (listify-packages-install pkg))
+    (push (cons pkg pkg-from) pkgs)
+    (dolist (req-pkg (listify-packages-required pkg))
+      (dolist (rp (listify-packages-list-installed req-pkg pkg))
+        (push rp pkgs)))
     pkgs))
 
-(defun listify-check-packages (&rest package)
+(defun listify-packages-msg-update (pkgs)
+  (package-menu--refresh pkgs)
+  (dolist (pkg (package-menu--find-upgrades))
+    (message "Info: Package %s is updated. Version %s is available."
+             (car pkg) (package-desc-version (cdr pkg)))))
+
+(defun listify-packages-msg-unexpected (pkgs real-pkgs)
+  (dolist (pkg pkgs)
+    (setq real-pkgs (delete pkg real-pkgs)))
+  (when real-pkgs
+    (message "Info: Unexpected installed packages %s" real-pkgs)))
+
+(defun listify-packages-check (&rest package)
   "Check whether PACKAGE is installed, updated, or
 packages not in PACKAGE is installed."
   (let (pkgs real-pkgs update-pkgs)
-    ;; If PACKAGE is not installed, install.
-    (dolist (req-pkg package)
-      (dolist (pkg (listify-install-packages req-pkg))
-        (when (and (cadr pkg) (not (member (car pkg) pkgs)))
-          (message "Package `%s' is required from `%s'." (car pkg) (cadr pkg)))
-        (add-to-list 'pkgs (car pkg))))
     (message "Required packages - %s" package)
-    (setq real-pkgs (mapcar 'car package-alist))
-    (message "Installed packages - %s" (reverse real-pkgs))
+    (dolist (req-pkg package)
+      (push req-pkg pkgs)
+      (dolist (pkg (listify-packages-list-installed req-pkg))
+        (when (and (cdr pkg) (not (member (car pkg) pkgs)) (null (package-built-in-p (car pkg))))
+          (message "Package `%s' is required from `%s'." (car pkg) (cdr pkg))
+          (push (car pkg) pkgs))))
+    (message "Installed packages - %s"
+             (setq real-pkgs (nreverse (mapcar 'car package-alist))))
     ;; updated packages
-    (package-menu--refresh real-pkgs)
-    (dolist (update-pkg (package-menu--find-upgrades))
-      (message "Info: Package %s is updated. Version %s is available."
-               (car update-pkg)
-               (package-desc-version (cdr update-pkg))))
+    (listify-packages-msg-update real-pkgs)
     ;; installed packages not in REQ-PKG-LIST
-    (dolist (pkg pkgs)
-      (setq real-pkgs (delete pkg real-pkgs)))
-    (when real-pkgs
-      (message "Info: Unexpected installed packages %s"  (reverse real-pkgs)))))
+    (listify-packages-msg-unexpected pkgs real-pkgs)
+    real-pkgs))
 
 (defun listify-set-autoloads (&rest func-file-doc)
   "Define autoload functions from FUNC-FILE-DOC.

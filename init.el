@@ -16,17 +16,15 @@
 ;;;
 ;;; パッケージ
 ;;;
-(listify-add-package-archives
- '("melpa-stable" "http://stable.melpa.org/packages/")
- )
-
 ;; パッケージ初期化
 (package-initialize)
 
-;; (message "Debug: auto-mode-alist just after package initialize - %s" auto-mode-alist)
+(listify-packages-add-archives
+ '("melpa-stable" "http://stable.melpa.org/packages/")
+ )
 
 ;; インストールを確認するパッケージ
-(listify-check-packages
+(listify-packages-check
  'csv-mode
  'ess
  'ggtags
