@@ -88,7 +88,7 @@ Each element of ARCHIVES has the form (ID LOCATION)."
     (when (setq pkgdesc (assq pkg package-alist))
       (mapcar 'car (package-desc-reqs (cadr pkgdesc))))))
 
-(defun listify-packages-list-installed (pkg &optional pkg-from)
+(defun listify-packages-list-dependent (pkg &optional pkg-from)
   "Check whether PKG is installed. When not installed, the installation begins.
 If the package requires other packages, installation of the packges begin recursively.
 This function returns the list of (`package' `required package')."
@@ -99,17 +99,17 @@ This function returns the list of (`package' `required package')."
       (listify-packages-install pkg))
     (push (cons pkg pkg-from) pkgs)
     (dolist (req-pkg (listify-packages-required pkg))
-      (dolist (rp (listify-packages-list-installed req-pkg pkg))
+      (dolist (rp (listify-packages-list-dependent req-pkg pkg))
         (push rp pkgs)))
     pkgs))
 
-(defun listify-packages-msg-update (pkgs)
+(defun listify-packages-message-update (pkgs)
   (package-menu--refresh pkgs)
   (dolist (pkg (package-menu--find-upgrades))
     (message "Info: Package %s is updated. Version %s is available."
              (car pkg) (package-desc-version (cdr pkg)))))
 
-(defun listify-packages-msg-unexpected (pkgs real-pkgs)
+(defun listify-packages-message-unexpected (pkgs real-pkgs)
   (dolist (pkg pkgs)
     (setq real-pkgs (delete pkg real-pkgs)))
   (when real-pkgs
@@ -129,12 +129,11 @@ packages not in PACKAGE is installed."
     (message "Installed packages - %s"
              (setq real-pkgs (nreverse (mapcar 'car package-alist))))
     ;; updated packages
-    (listify-packages-msg-update real-pkgs)
+    (listify-packages-message-update real-pkgs)
     ;; installed packages not in REQ-PKG-LIST
-    (listify-packages-msg-unexpected pkgs real-pkgs)
-    real-pkgs))
+    (listify-packages-message-unexpected pkgs real-pkgs)
 
-(defun listify-set-autoloads (&rest func-file-doc)
+(defun listify-autoloads-set (&rest func-file-doc)
   "Define autoload functions from FUNC-FILE-DOC.
 Each FUNC-FILE-DOC has the form (FUNCTION FILE DOC).
 
@@ -239,11 +238,11 @@ update or add each element when EXP is association list (alist)."
       (setq acomm (concat (format "set in `%s'." afile))))
     (when add-comment
       (setq acomm (concat acomm (when acomm " ") add-comment)))
-    (when (equal (listify-variable-comment var) acomm)
+    (when (equal (listify-get-variable-comment var) acomm)
        (setq acomm nil))
      acomm))
 
-(defun listify-variable-comment (var)
+(defun listify-get-variable-comment (var)
   (get var 'variable-comment))
 
 (defun listify-defaliases (&rest sym-def)
