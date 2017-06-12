@@ -1859,6 +1859,24 @@ this function to `after-init-hook'."
   (put 'session-initialize :initilized-with nil)
   (custom-set-variables '(session-use-package t nil (session))))
 
+;;;###autoload
+(defun replace-regexp-last-history ()
+  (interactive)
+  (let ((ato (car query-replace-history)) (afrom (cadr query-replace-history)))
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward afrom nil t)
+        (replace-match ato)))))
+
+;;;###autoload
+(defun replace-string-last-history ()
+  (interactive)
+  (let ((ato (car query-replace-history)) (afrom (cadr query-replace-history)))
+    (save-excursion
+      (goto-char (point-min))
+      (while (search-forward afrom nil t)
+        (replace-match ato nil 1)))))
+
 (provide 'session)
 
 ;;; session.el ends here

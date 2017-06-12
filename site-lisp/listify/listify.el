@@ -30,22 +30,6 @@ Each VALUE-NEW-OLD-ALIST has the form (VALUE-NEW . VALUE-OLD)."
         (setf (cdr acell) (car newold))))
     alst))
 
-(defun replace-regexp-last-history ()
-  (interactive)
-  (let ((ato (car query-replace-history)) (afrom (cadr query-replace-history)))
-    (save-excursion
-      (goto-char (point-min))
-      (while (re-search-forward afrom nil t)
-        (replace-match ato)))))
-
-(defun replace-string-last-history ()
-  (interactive)
-  (let ((ato (car query-replace-history)) (afrom (cadr query-replace-history)))
-    (save-excursion
-      (goto-char (point-min))
-      (while (search-forward afrom nil t)
-        (replace-match ato nil 1)))))
-
 (defun listify-validate-custom-variable-type (custom-variable &optional value)
   "Varidate VALUES is match CUSTOM-VARIABLE to custom-variable-type in symbol property.
 If VALUE matches custom-variable-type in symbol properties list, t.
