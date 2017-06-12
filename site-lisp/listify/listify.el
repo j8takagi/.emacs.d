@@ -92,7 +92,7 @@ Each element of ARCHIVES has the form (ID LOCATION)."
   "Check whether PKG is installed. When not installed, the installation begins.
 If the package requires other packages, installation of the packges begin recursively.
 This function returns the list of (`package' `required package')."
-  (let (pkgs req-pkgs pkg-desc)
+  (let (pkgs req-pkgs)
     (unless (package-installed-p pkg)
       (when pkg-from
         (message "Package `%s' required from `%s' is not installed." pkg pkg-from))
@@ -116,22 +116,24 @@ This function returns the list of (`package' `required package')."
     (message "Info: Unexpected installed packages %s" real-pkgs)))
 
 (defun listify-packages-check (&rest package)
-  "Check whether PACKAGE is installed, updated, or
-packages not in PACKAGE is installed."
-  (let (pkgs real-pkgs update-pkgs)
+  "Check the packages in PACKAGE, packages and dependent packages are
+installed and updated, and unexpected packages are not installed."
+  (let (pkgs deps real-pkgs update-pkgs)
     (message "Required packages - %s" package)
     (dolist (req-pkg package)
       (push req-pkg pkgs)
-      (dolist (pkg (listify-packages-list-installed req-pkg))
-        (when (and (cdr pkg) (not (member (car pkg) pkgs)) (null (package-built-in-p (car pkg))))
-          (message "Package `%s' is required from `%s'." (car pkg) (cdr pkg))
+      (dolist (pkg (listify-packages-list-dependent req-pkg))
+        (when (and (cdr pkg) (null (member (car pkg) pkgs)) (null (package-built-in-p (car pkg))))
+          (push pkg deps)
           (push (car pkg) pkgs))))
+    (message "Package and require package - %s" deps)
     (message "Installed packages - %s"
              (setq real-pkgs (nreverse (mapcar 'car package-alist))))
     ;; updated packages
     (listify-packages-message-update real-pkgs)
     ;; installed packages not in REQ-PKG-LIST
     (listify-packages-message-unexpected pkgs real-pkgs)
+    pkgs))
 
 (defun listify-autoloads-set (&rest func-file-doc)
   "Define autoload functions from FUNC-FILE-DOC.
