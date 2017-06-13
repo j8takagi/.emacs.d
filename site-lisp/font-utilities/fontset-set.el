@@ -10,6 +10,18 @@
 
 ;;; Code:
 
+(defvar buffer-fontset-history nil
+  "History list for buffer fontset set.")
+
+(defun buffer-fontset-set (fontset)
+  (interactive
+   (let ((completion-ignore-case t))
+     (list
+      (completing-read
+       "Fontset name: " (fontset-list) nil t nil 'buffer-fontset-history))))
+  (set-frame-font (frame-parameter nil 'font))
+  (buffer-face-set (font-face-attributes fontset)))
+
 (defun fontset-set-font-spec (fontset charset fontspec)
   "Use FONTSPEC for character set CHARSET."
   (if (not (member charset charset-list))
