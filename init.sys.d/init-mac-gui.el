@@ -36,7 +36,20 @@
      ))
  '(face-font-rescale-alist (("Hiragino Sans" 1.167)))
  '(mac-command-modifier meta)        ; commandキーをEmacsのMetaキーに
- '(mac-auto-ascii-mode t)             ; ミニバッファへのカーソル移動時、日本語IMEを自動オフ
+ '(mac-auto-ascii-mode t)            ; ミニバッファへのカーソル移動時、日本語IMEを自動オフ
+ )
+
+
+(fontsets-set
+ '((
+    (unicode . (font-spec :family "Hiragino Mincho ProN" :weight 'normal :slant 'normal :size 14))
+    ) "my_mincho")
+ '((
+    (unicode . (font-spec :family "YuGothic" :weight 'normal :slant 'normal :size 14))
+    ) "my_yugothic")
+ '((
+    (unicode . (font-spec :family "Hiragino Maru Gothic ProN" :weight 'normal :slant 'normal :size 14))
+    ) "my_marugothic")
  )
 
 ;; view-modeの設定

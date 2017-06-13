@@ -68,5 +68,18 @@ It returns a name of the created fontset."
     (fontset-set-charset-font afontset charset-font-alist)
     afontset))
 
+(defun fontsets-set (&rest fontset-spec)
+  "create fontset using FONTSET-SPEC.
+Each FONTSET-SPEC has the form  (CHARSET-FONT-ALIST FONTSET-BASENAME).
+CHARSET-FONT-ALIST is association list of (TARGET . FONTSPEC).
+FONTSET-BASENAME is string.
+
+If CHARSET-FONT-ALIST is nil, `fontset-set-charset-font-alist' to the fontset.
+
+It returns a name of the created fontset."
+  (interactive)
+  (dolist (fs fontset-spec)
+    (fontset-set (car fs) (cadr fs))))
+
 (provide 'fontset-set)
 ;;; fontset-set.el ends here
