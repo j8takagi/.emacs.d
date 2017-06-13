@@ -8,7 +8,7 @@
 
 ;; メジャーモード設定後、バッファーが読み取り専用の場合と、
 ;; whitespaceを無効にするメジャーモードの場合以外、whitespaceを有効にする
-(defun init-whitespace-mode ()
+(defun set-whitespace-mode ()
   "Enable whitespace mode unless the buffer is read only or the major mode is in the disabled list."
   (if (or buffer-read-only (member major-mode whitespace-disabled-major-mode-list))
       (whitespace-mode 0)

@@ -251,8 +251,8 @@
      Custom-mode mew-summary-mode completion-list-mode help-mode
      magit-mode tetris-mode w3m-mode mew-message-mode shell-mode
      ))
-   '(after-change-major-mode-hook (init-whitespace-mode))
-   '(view-mode-hook (init-whitespace-mode)))
+   '(after-change-major-mode-hook (set-whitespace-mode))
+   '(view-mode-hook (set-whitespace-mode)))
   (custom-set-faces
    '(whitespace-space ((nil ( :box (:line-width 2 :color "orange")))))
    '(whitespace-tab ((nil (:background "white smoke" :box (:line-width 2 :color "navy")))))
@@ -597,11 +597,11 @@
     ("(" skeleton-pair-insert-maybe)
     ("'" skeleton-pair-insert-maybe)
     ))
- '(prog-mode-map nil nil
+ '(prog-mode-map "prog-mode" nil
    (
     ("'" skeleton-pair-insert-maybe)
     ))
- '(lisp-mode-shared-map nil nil
+ '(lisp-mode-shared-map "lisp-mode" nil
    (
     ("'" self-insert-command)
     ))
