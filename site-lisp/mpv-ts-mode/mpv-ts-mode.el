@@ -54,6 +54,9 @@
   "*mpv*"
   "the name of buffer associate with mpv process.")
 
+(defvar mpv-ts-speaker-history nil
+  "History list for buffer fontset set.")
+
 (defvar mpv-ts-mode-map nil)
 
 (defun mpv-ts-second-to-time (second)
@@ -128,7 +131,7 @@
     (setq mpv-ts-speakers (mpv-ts-speakers)))
   (completing-read
    "発言者? "
-   mpv-ts-speakers nil t nil 'mpv-ts-speakers))
+   mpv-ts-speakers nil t nil 'mpv-ts-speaker-history))
 
 (defun mpv-ts-replace-current-line-speaker ()
   (interactive)
