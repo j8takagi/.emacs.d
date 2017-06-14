@@ -31,6 +31,18 @@
     (left 0)
     )))
 
+(fontsets-set
+ '((
+    (unicode . (font-spec :family "游明朝" :weight 'normal :slant 'normal :size 14))
+    ) "my_mincho")
+ '((
+    (unicode . (font-spec :family "游ゴシック" :weight 'normal :slant 'normal))
+    ) "my_yugothic")
+ '((
+    (ascii . (font-spec :family "源ノ角ゴシック Code JP R" :weight 'normal :slant 'normal :size 12))
+    ) "my_sourcehancode")
+ )
+
 (listify-set
  '(default-file-name-coding-system cp932) ; 日本語ファイル名を正常に処理
  '(default-process-coding-system (utf-8 . cp932)) ; 日本語ファイル名を正常に処理
