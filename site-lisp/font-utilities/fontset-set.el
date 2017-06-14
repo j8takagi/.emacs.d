@@ -59,7 +59,6 @@
   "create fontset using FONTSET-BASENAME, then set font in CHARSET-FONT-ALIST.
 if CHARSET-FONT-ALIST is nil, `fontset-set-charset-font-alist' to the fontset.
 It returns a name of the created fontset."
-  (interactive)
   (let (afontset)
     (setq afontset
           (fontset-set-create-fontset
@@ -77,9 +76,15 @@ FONTSET-BASENAME is string.
 If CHARSET-FONT-ALIST is nil, `fontset-set-charset-font-alist' to the fontset.
 
 It returns a name of the created fontset."
-  (interactive)
+  (let (fontsets)
   (dolist (fs fontset-spec)
-    (fontset-set (car fs) (cadr fs))))
+    (setq fontsets
+          (append
+           fontsets
+           (list (fontset-set (car fs) (cadr fs))))))
+  (if (cdr fontsets)
+      fontsets
+    (car fontsets))))
 
 (provide 'fontset-set)
 ;;; fontset-set.el ends here
