@@ -33,7 +33,7 @@
      (top 23)
      (left 0)
      ))
- '(face-font-rescale-alist (("Hiragino Sans" 1.167) ("YuGothic" 1.167)))
+; '(face-font-rescale-alist (("Hiragino Sans" 1.167) ("YuGothic" 1.167)))
  '(mac-command-modifier meta)        ; commandキーをEmacsのMetaキーに
  '(mac-auto-ascii-mode t) ; ミニバッファへのカーソル移動時、日本語IMEを自動オフ
  )
@@ -44,30 +44,34 @@
     (unicode . (font-spec :family "Hiragino Mincho ProN" :weight 'normal :slant 'normal :size 14))
     ) "my_mincho")
  '((
+    (unicode . (font-spec :family "YuKyokasho" :weight 'normal :slant 'normal :size 14))
+    ) "my_yukyokasho")
+ '((
+    (unicode . (font-spec :family "YuMincho" :weight 'normal :slant 'normal :size 14))
+    ) "my_yumincho")
+ '((
+    (ascii . (font-spec :family "Menlo" :weight 'normal :slant 'normal))
     (unicode . (font-spec :family "YuGothic" :weight 'normal :slant 'normal))
     ) "my_yugothic")
  '((
     (unicode . (font-spec :family "Hiragino Maru Gothic ProN" :weight 'normal :slant 'normal :size 14))
     ) "my_marugothic")
  '((
-    (unicode . (font-spec :family "Yuppy TC" :weight 'normal :slant 'normal :size 14))
-    ) "my_yuppy")
+    (unicode . (font-spec :family "Klee" :weight 'normal :slant 'normal :size 14))
+    ) "my_klee")
  '((
-    (ascii . (font-spec :family "Source Han Code JP" :weight 'normal :slant 'normal :size 12))
+    (unicode . (font-spec :family "Source Han Code JP" :weight 'normal :slant 'normal :size 12))
     ) "my_sourcehancode")
  )
 
 ;; view-modeの設定
-(with-eval-after-load 'view
+(with-eval-after-load 'set-view-mode
   (listify-set
    '(set-view-mode-read-write-directory-patterns
      (
       "~/Documents/201[4-9]_[01][0-9]"
       "~/.emacs.d/elpa" "/tmp" "/var"
       ))))
-
-; IMEのオンとオフにあわせ、カーソルの色を変える
-(mac-ime-cursor-add-hook)
 
 ;; Mac OS Xのキー設定
 (listify-global-set-keys
@@ -81,4 +85,5 @@
 
 (cd "~")
 
+(message "%s" (fontset-list))
 (provide 'init-mac-gui)

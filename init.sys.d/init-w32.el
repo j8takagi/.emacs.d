@@ -39,7 +39,7 @@
     (unicode . (font-spec :family "游ゴシック" :weight 'normal :slant 'normal))
     ) "my_yugothic")
  '((
-    (ascii . (font-spec :family "源ノ角ゴシック Code JP R" :weight 'normal :slant 'normal :size 12))
+    (unicode . (font-spec :family "源ノ角ゴシック Code JP R" :weight 'normal :slant 'normal :size 12))
     ) "my_sourcehancode")
  )
 
@@ -47,7 +47,7 @@
  '(default-file-name-coding-system cp932) ; 日本語ファイル名を正常に処理
  '(default-process-coding-system (utf-8 . cp932)) ; 日本語ファイル名を正常に処理
  '(default-input-method "W32-IME")              ; IMEの設定
- '(face-font-rescale-alist (("游ゴシック" 1.167)))
+ ;; '(face-font-rescale-alist (("メイリオ" 1.167)))
  )
 
 ;; Shell-modeの文字コード設定
