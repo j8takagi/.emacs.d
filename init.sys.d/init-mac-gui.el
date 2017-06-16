@@ -74,6 +74,11 @@
  '("<M-f1>" other-frame)    ; Mac OS Xの他アプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする
  )
 
+(listify-set
+ '(mac-selected-keyboard-input-source-change-hook mac-ime-cursor-change-color)
+ '(focus-in-hook mac-ime-cursor-change-color)
+ )
+
 (cd "~")
 
 (provide 'init-mac-gui)

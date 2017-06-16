@@ -27,15 +27,5 @@
         (throw 'match t)))
     (ime-cursor-unset-color)))
 
-(defun mac-ime-cursor-add-hook ()
-  "カーソル色を、IMの変更時とEmacsの画面を表示したときに変えるように設定する"
-  (let (afunc)
-    (dolist (ahook
-         '(
-           mac-selected-keyboard-input-source-change-hook
-           focus-in-hook
-           ))
-      (add-hook ahook 'mac-ime-cursor-change-color))))
-
 (provide 'mac-ime-cursor)
 ;;; mac-ime-cursor.el ends here
