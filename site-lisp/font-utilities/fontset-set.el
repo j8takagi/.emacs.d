@@ -19,8 +19,18 @@
      (list
       (completing-read
        "Fontset name: " (fontset-list) nil t nil 'buffer-fontset-history))))
-  (set-frame-font (frame-parameter nil 'font))
-  (buffer-face-set (font-face-attributes fontset)))
+  (let (aface)
+    (setq aface (intern (concat "buffer-fontset" fontset)))
+    (set-face-attribute aface (selected-frame) :font fontset :fontset fontset)
+    (buffer-face-set aface)))
+
+(defun frame-fontset-set (fontset)
+  (interactive
+   (let ((completion-ignore-case t))
+     (list
+      (completing-read
+       "Fontset name: " (fontset-list) nil t nil 'buffer-fontset-history))))
+  (set-face-attribute 'default (selected-frame) :font fontset :fontset fontset))
 
 (defun fontset-set-font-spec (fontset charset fontspec)
   "Use FONTSPEC for character set CHARSET."
@@ -63,7 +73,8 @@ It returns a name of the created fontset."
     (setq afontset
           (fontset-set-create-fontset
            fontset-basename
-           (font-xlfd-name (eval (cdr (car charset-font-alist))))))
+           (font-xlfd-name
+            (eval (cdr (car charset-font-alist))))))
     (fontset-set-charset-font afontset charset-font-alist)
     afontset))
 
