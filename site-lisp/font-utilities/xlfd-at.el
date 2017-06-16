@@ -13,16 +13,11 @@
   "Return X logical font description (XLFD) of the font at POSITION in the current buffer."
   (if (not (display-graphic-p))
       (message "Display is not graphic. So font is not used.")
-    (let (fontobj)
-      (setq fontobj (format "%s" (font-at position)))
-      (string-match "#<font-object \\(.+\\)>" fontobj)
-      (match-string 1 fontobj))))
+    (font-xlfd-name (font-at position))))
 
 (defun xlfd-at-xlfd2family (xlfd)
   "Return font family name from X logical font description (XLFD)."
-  (if (not (string-match "-[^-]+-\\([^-]+?\\)-.+" xlfd))
-      (error "Argument is not xlfd.")
-    (match-string 1 xlfd)))
+  (aref (x-decompose-font-name xlfd) xlfd-regexp-family-subnum))
 
 (defun xlfd-at-fontfamily-position (position)
   "Return fontfamily name of the font at POSITION in the current buffer."
