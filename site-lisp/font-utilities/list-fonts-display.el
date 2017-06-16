@@ -100,14 +100,11 @@ The sample text is a string that comes from the variable.
     (switch-to-buffer (get-buffer-create abuf))
     (with-help-window abuf
       (setq truncate-lines t)
-      (catch 'nextfont)
       (dolist (afont fontslist)
         (insert (propertize (format line-format afont) 'face (list :overline t)))
         (setq aface (intern (concat "list-fonts-" afont)))
         (condition-case aerr
-            (set-face-attribute aface (selected-frame)
-                                :width 'normal :weight 'normal
-                                :slant 'normal :font afont)
+            (set-face-attribute aface (selected-frame) :font afont)
           (error
            (set-face-attribute aface (selected-frame)
                                :foreground
