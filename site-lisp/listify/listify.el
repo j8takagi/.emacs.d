@@ -17,7 +17,7 @@ Unless, cons cell (KEY . VALUE) is added."
   (let (acell (alst (symbol-value alist-var)))
    (if (setq acell (assoc key alst))
        (unless (equal (cdr acell) value)
-         (setf (cdr acell) value))
+         (setcdr acell value))
      (set alist-var (push (cons key value) alst)))
    alst))
 
@@ -27,7 +27,7 @@ Each VALUE-NEW-OLD-ALIST has the form (VALUE-NEW . VALUE-OLD)."
   (let ((alst (symbol-value alist-var)))
     (dolist (newold value-new-old-alist)
       (while (setq acell (rassoc (cdr newold) alst))
-        (setf (cdr acell) (car newold))))
+        (setcdr acell (car newold))))
     alst))
 
 (defun listify-validate-custom-variable-type (custom-variable &optional value)
