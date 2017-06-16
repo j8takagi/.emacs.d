@@ -155,6 +155,7 @@
  '(session-restore-last-point-exclude-regexps ("COMMIT_EDITMSG")) ; session-restore-last-pointから除外するファイル
  '(show-paren-mode t)             ; 括弧の対応を表示
  '(skeleton-end-hook nil)         ; skeletonの挿入後、改行しない
+ '(skeleton-end-newline nil)      ; skeletonの挿入後、改行しない
  '(skeleton-pair t)              ; skeleton-pairにより括弧挿入を自動化
  '(tab-width 4)                  ; タブ幅は4
  '(tool-bar-mode nil)            ; ツールバーを表示しない
