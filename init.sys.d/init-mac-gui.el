@@ -27,37 +27,42 @@
         '((
           (ascii . (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
           (unicode . (font-spec :family "Hiragino Sans"))
-          ) "mydefault_mac")))
+          ) "my_default_mac")))
      (width 180)
      (height 56)
      (top 23)
      (left 0)
      ))
-; '(face-font-rescale-alist (("Hiragino Sans" 1.167) ("YuGothic" 1.167)))
+ '(face-font-rescale-alist (("Hiragino Sans" 1.167) ("YuGothic" 1.167)))
  '(mac-command-modifier meta)        ; commandキーをEmacsのMetaキーに
  '(mac-auto-ascii-mode t) ; ミニバッファへのカーソル移動時、日本語IMEを自動オフ
  )
 
-
 (fontsets-set
  '((
-    (unicode . (font-spec :family "Hiragino Mincho ProN" :weight 'normal :slant 'normal :size 14))
+    (unicode . (font-spec :family "Hiragino Sans" :weight 'normal :slant 'normal :size 12))
+    ) "my_gothic")
+ '((
+    (unicode . (font-spec :family "Hiragino Mincho ProN" :weight 'normal :slant 'normal :size 12))
     ) "my_mincho")
  '((
-    (unicode . (font-spec :family "YuKyokasho" :weight 'normal :slant 'normal :size 14))
-    ) "my_yukyokasho")
+    (unicode . (font-spec :family "YuKyokasho" :weight 'normal :slant 'normal :size 12))
+    ) "my_yu_kyokasho")
  '((
-    (unicode . (font-spec :family "YuMincho" :weight 'normal :slant 'normal :size 14))
-    ) "my_yumincho")
+    (unicode . (font-spec :family "YuMincho" :weight 'normal :slant 'normal :size 12))
+    ) "my_yu_mincho")
  '((
-    (ascii . (font-spec :family "Menlo" :weight 'normal :slant 'normal))
+    (ascii . (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
     (unicode . (font-spec :family "YuGothic" :weight 'normal :slant 'normal))
-    ) "my_yugothic")
+    ) "my_yu_gothic")
  '((
-    (unicode . (font-spec :family "Hiragino Maru Gothic ProN" :weight 'normal :slant 'normal :size 14))
-    ) "my_marugothic")
+    (unicode . (font-spec :family "Toppan Bunkyu Gothic" :weight 'normal :slant 'normal :size 12))
+    ) "my_bunkyu_gothic")
  '((
-    (unicode . (font-spec :family "Klee" :weight 'normal :slant 'normal :size 14))
+    (unicode . (font-spec :family "Hiragino Maru Gothic ProN" :weight 'normal :slant 'normal :size 12))
+    ) "my_maru_gothic")
+ '((
+    (unicode . (font-spec :family "Klee" :weight 'normal :slant 'normal :size 12))
     ) "my_klee")
  '((
     (unicode . (font-spec :family "Source Han Code JP" :weight 'normal :slant 'normal :size 12))
