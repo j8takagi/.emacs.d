@@ -90,5 +90,4 @@
 
 (cd "~")
 
-(message "%s" (fontset-list))
 (provide 'init-mac-gui)
