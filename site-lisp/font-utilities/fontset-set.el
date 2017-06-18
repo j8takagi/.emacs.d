@@ -10,7 +10,7 @@
 
 ;;; Code:
 
-(defvar buffer-fontset-history nil
+(defvar fontset-history nil
   "History list for buffer fontset set.")
 
 (defun buffer-fontset-set (fontset)
@@ -18,18 +18,18 @@
    (let ((completion-ignore-case t))
      (list
       (completing-read
-       "Fontset name: " (fontset-list) nil t nil 'buffer-fontset-history))))
   (let (aface)
     (setq aface (intern (concat "buffer-fontset" fontset)))
     (set-face-attribute aface (selected-frame) :font fontset :fontset fontset)
     (buffer-face-set aface)))
+       "Fontset name: " (fontset-list) nil t nil 'fontset-history))))
 
 (defun frame-fontset-set (fontset)
   (interactive
    (let ((completion-ignore-case t))
      (list
       (completing-read
-       "Fontset name: " (fontset-list) nil t nil 'buffer-fontset-history))))
+       "Fontset name: " (fontset-list) nil t nil 'fontset-history))))
   (set-face-attribute 'default (selected-frame) :font fontset :fontset fontset))
 
 (defun fontset-set-font-spec (fontset charset fontspec)
