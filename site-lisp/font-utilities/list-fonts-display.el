@@ -102,7 +102,7 @@ The sample text is a string that comes from the variable.
       (setq truncate-lines t)
       (dolist (afont fontslist)
         (insert (propertize (format line-format afont) 'face (list :overline t)))
-        (setq aface (intern (concat "list-fonts-" afont)))
+        (setq aface (make-local-variable (intern (concat "list-fonts-" afont "-face"))))
         (condition-case aerr
             (set-face-attribute aface (selected-frame) :font afont)
           (error

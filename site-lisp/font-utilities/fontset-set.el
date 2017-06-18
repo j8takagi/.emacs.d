@@ -18,11 +18,10 @@
    (let ((completion-ignore-case t))
      (list
       (completing-read
-  (let (aface)
-    (setq aface (intern (concat "buffer-fontset" fontset)))
-    (set-face-attribute aface (selected-frame) :font fontset :fontset fontset)
-    (buffer-face-set aface)))
        "Fontset name: " (fontset-list) nil t nil 'fontset-history))))
+  (make-local-variable 'buffer-fontset-face)
+  (set-face-attribute 'buffer-fontset-face (selected-frame) :font fontset :fontset fontset)
+  (buffer-face-set 'buffer-fontset-face))
 
 (defun frame-fontset-set (fontset)
   (interactive
