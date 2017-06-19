@@ -13,23 +13,28 @@
 (defvar fontset-history nil
   "History list for buffer fontset set.")
 
+(defun set-face-fontset (face fontset)
+    (set-face-attribute face (selected-frame) :font fontset :fontset fontset))
+
 (defun buffer-fontset-set (fontset)
+  "Set buffer font to FONTSET."
   (interactive
    (let ((completion-ignore-case t))
      (list
       (completing-read
        "Fontset name: " (fontset-list) nil t nil 'fontset-history))))
   (make-local-variable 'buffer-fontset-face)
-  (set-face-attribute 'buffer-fontset-face (selected-frame) :font fontset :fontset fontset)
+  (set-face-fontset 'buffer-fontset-face fontset)
   (buffer-face-set 'buffer-fontset-face))
 
 (defun frame-fontset-set (fontset)
+  "Set frame font to FONTSET."
   (interactive
    (let ((completion-ignore-case t))
      (list
       (completing-read
        "Fontset name: " (fontset-list) nil t nil 'fontset-history))))
-  (set-face-attribute 'default (selected-frame) :font fontset :fontset fontset))
+  (set-face-fontset 'default fontset))
 
 (defun fontset-set-font-spec (fontset charset fontspec)
   "Use FONTSPEC for character set CHARSET."
@@ -44,14 +49,14 @@
     (fontset-set-font-spec fontset charset (font-spec :family fontfamily))))
 
 (defun fontset-set-create-fontset (&optional basename asciifont)
-  "create fontset. It returns a name of the created fontset."
+  "Create fontset. It returns a name of the created fontset."
   (interactive)
   (unless asciifont
     (setq asciifont (frame-parameter nil 'font)))
   (create-fontset-from-ascii-font asciifont nil basename))
 
 (defun fontset-set-charset-font (fontset charset-font-alist)
-  "set font in CHARSET-FONT-ALIST to the FONTSET."
+  "Set font in CHARSET-FONT-ALIST to the FONTSET."
   (interactive)
   (unless fontset
     (error "Argument FONTSET is nil"))
@@ -65,7 +70,7 @@
              (setq charsetfonts (cdr charsetfonts))))))
 
 (defun fontset-set (charset-font-alist &optional fontset-basename)
-  "create fontset using FONTSET-BASENAME, then set font in CHARSET-FONT-ALIST.
+  "Create fontset using FONTSET-BASENAME, then set font in CHARSET-FONT-ALIST.
 if CHARSET-FONT-ALIST is nil, `fontset-set-charset-font-alist' to the fontset.
 It returns a name of the created fontset."
   (let (afontset)
@@ -78,7 +83,7 @@ It returns a name of the created fontset."
     afontset))
 
 (defun fontsets-set (&rest fontset-spec)
-  "create fontset using FONTSET-SPEC.
+  "Create fontset using FONTSET-SPEC.
 Each FONTSET-SPEC has the form  (CHARSET-FONT-ALIST FONTSET-BASENAME).
 CHARSET-FONT-ALIST is association list of (TARGET . FONTSPEC).
 FONTSET-BASENAME is string.
