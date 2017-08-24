@@ -243,7 +243,7 @@
   "mpvプロセスのウィンドウを削除"
   (unless (eq major-mode 'mpv-ts-mode)
       (let ((proc-win (get-buffer-window mpv-ts-process-buffer-name)))
-        (when proc-win
+        (when (and proc-win (window-parent proc-win))
           (delete-window proc-win)))))
 
 (defun mpv-ts-delete-process-change-mode ()
