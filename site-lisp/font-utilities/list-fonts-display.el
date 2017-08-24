@@ -42,8 +42,10 @@ KEY must be a valid font property name listed below:
 ‘:family’, ‘:weight’, ‘:slant’, ‘:width’,
 `:foundry', `:adstyle', `:registry', `:size', `:name',
 `:script', `:lang', `:otf'"
-  (interactive (list (and current-prefix-arg
-                          (read-regexp "List font families matching regexp"))))
+  (interactive
+   (list
+    (and current-prefix-arg
+         (read-regexp "List font families matching regexp"))))
   (let (saved-fontset aalist)
     (setq saved-fontset (face-attribute 'default :fontset))
     (set-frame-font

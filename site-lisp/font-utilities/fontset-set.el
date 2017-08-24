@@ -11,13 +11,24 @@
 ;;; Code:
 
 (defvar fontset-history nil
-  "History list for buffer fontset set.")
+  "History list for fontset.")
 
-(defun set-face-fontset (face fontset)
-    (set-face-attribute face (selected-frame) :font fontset :fontset fontset))
+(defvar fontfailies-history nil
+  "History list for font families.")
+
+(defcustom default-fontset "-*-*-*-*-*-*-*-*-*-*-*-*-fontset-default"
+  "Default fontset."
+  :type 'string
+  :group 'display)
+
+(defun set-face-fontset (face fontset &optional frame)
+  (unless frame
+    (setq frame (selected-frame)))
+  (set-face-attribute face frame :font fontset :fontset fontset))
+
 
 (defun buffer-fontset-set (fontset)
-  "Set buffer font to FONTSET."
+  "Set buffer font and fontset to FONTSET."
   (interactive
    (let ((completion-ignore-case t))
      (list
@@ -48,12 +59,10 @@
       (message "Warning: In setting font family, font family %s is not available." fontfamily)
     (fontset-set-font-spec fontset charset (font-spec :family fontfamily))))
 
-(defun fontset-set-create-fontset (&optional basename asciifont)
+(defun fontset-set-create-fontset (basename)
   "Create fontset. It returns a name of the created fontset."
   (interactive)
-  (unless asciifont
-    (setq asciifont (frame-parameter nil 'font)))
-  (create-fontset-from-ascii-font asciifont nil basename))
+  (create-fontset-from-fontset-spec (concat "-*-*-*-*-*-*-*-*-*-*-*-*-fontset-" basename)))
 
 (defun fontset-set-charset-font (fontset charset-font-alist)
   "Set font in CHARSET-FONT-ALIST to the FONTSET."
@@ -69,16 +78,13 @@
              (fontset-set-font-spec fontset (car acharsetfont) (eval (cdr acharsetfont)))
              (setq charsetfonts (cdr charsetfonts))))))
 
-(defun fontset-set (charset-font-alist &optional fontset-basename)
+(defun fontset-set (charset-font-alist basename)
   "Create fontset using FONTSET-BASENAME, then set font in CHARSET-FONT-ALIST.
 if CHARSET-FONT-ALIST is nil, `fontset-set-charset-font-alist' to the fontset.
 It returns a name of the created fontset."
   (let (afontset)
     (setq afontset
-          (fontset-set-create-fontset
-           fontset-basename
-           (font-xlfd-name
-            (eval (cdr (car charset-font-alist))))))
+          (fontset-set-create-fontset basename))
     (fontset-set-charset-font afontset charset-font-alist)
     afontset))
 
