@@ -185,6 +185,7 @@
 (listify-defaliases
  '(uniq-lines delete-duplicate-lines)  ; uniq-linesを、delete-duplicate-linesの別名に
  '(message-box message)                ; メッセージダイアログボックスは使わない
+ '(s2n string-to-number)               ; 置換時の関数名入力省力化
  )
 
 ;; view-modeの設定
