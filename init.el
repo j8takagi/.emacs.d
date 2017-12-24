@@ -441,6 +441,15 @@
   (listify-set
    '(auto-insert-alist ((mpv-ts-mode "template.ts")) 1 (mpv-ts-mode))))
 
+;;; 一行あたりの文字数を指定してfill-regionする関数
+;;; http://d.hatena.ne.jp/hack-3/20090604/1244100952
+(defun fill-region-with-N (num)
+  ""
+  (interactive "nfill-column value? ")
+  (let ((fill-column num))
+    (fill-region (region-beginning) (region-end)))
+  )
+
 ;;
 ;; ファイルの自動判定
 ;;
