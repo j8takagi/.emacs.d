@@ -62,6 +62,7 @@
  'exopen                           ; 外部プログラムでファイルを開く
  'ffap-plus
  'ime-cursor                       ; IMEをオンにしたときにカーソルの色を変える
+ 'jaword                           ; 日本語の単語をきちんと扱うための minor-mode https://github.com/zk-phi/jaword
  'japanese-plus                    ; 全角半角変換
  'list-fontfamilies-display        ; フォントファミリー一覧作成コマンド
  'list-fonts-display               ; フォント一覧作成コマンド
