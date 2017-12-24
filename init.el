@@ -130,7 +130,7 @@
     ".out" ".prev" "_prev" ".idx" ".ind" ".ilg"
     ".tmp" ".synctex.gz" ".dplg" ".dslg" ".dSYM/"
     ".DS_Store" ":com.dropbox.attributes:$DATA"))
- '(custom-file (locate-user-emacs-file ".emacs-custom.el")) ;カスタムの設定値を書き込むファイル
+ `(custom-file ,(locate-user-emacs-file ".emacs-custom.el")) ;カスタムの設定値を書き込むファイル
  '(delete-by-moving-to-trash t)      ;  ファイルの削除で、ゴミ箱を使う
  '(delete-old-versions t) ; 古いバックアップファイルを自動的に削除する
  '(disabled-command-function nil) ; すべてのコマンドの使用制限を解除する
