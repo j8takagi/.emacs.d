@@ -113,6 +113,11 @@
     (setq diff 1))
   (mpv-ts-current-line-time-forward (- diff)))
 
+(defun mpv-ts-current-line-time-forward-5 ()
+  "現在の行の再生開始時刻を5秒先に進める"
+  (interactive)
+  (mpv-ts-current-line-time-forward 5))
+
 (defun mpv-ts-current-line-speaker ()
   "発言者を現在行から取得する"
   (save-excursion
@@ -406,6 +411,7 @@
          ("<C-S-return>" mpv-ts-insert-new-speak-line)
          ("<S-return>" mpv-ts-insert-speak-line)
          ("C-+" mpv-ts-current-line-time-forward)
+         ("C-%" mpv-ts-current-line-time-forward-5)
          ("C-S-SPC" mpv-ts-play-current-line)
          ("C-S-a" mpv-ts-move-beginning-of-scription)
          ("C-S-j" mpv-ts-join-next-line)
