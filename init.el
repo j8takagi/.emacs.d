@@ -25,6 +25,7 @@
 
 ;; インストールを確認するパッケージ
 (listify-packages-check
+ 'browse-kill-ring
  'csv-mode
  'ess
  'ggtags
