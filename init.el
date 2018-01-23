@@ -16,9 +16,12 @@
 ;;;
 ;;; パッケージ
 ;;;
+(listify-requires 'listify-packages)
+
 ;; パッケージ初期化
 (package-initialize)
 
+;; パッケージアーカイブの指定
 (listify-packages-add-archives
  '("melpa-stable" "http://stable.melpa.org/packages/")
  )
