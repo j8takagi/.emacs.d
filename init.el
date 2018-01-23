@@ -302,10 +302,10 @@
   (listify-requires
    'emacs-lisp-skeletons
    )
-  (defun listify-indent-lisp-indent-line ()
+  (defun init-lisp-indent-line ()
     (set-variable 'indent-line-function 'lisp-indent-line)) ; インデントの設定
   (listify-set
-   '(emacs-lisp-mode-hook (listify-indent-lisp-indent-line turn-on-auto-elc))
+   '(emacs-lisp-mode-hook (init-lisp-indent-line turn-on-auto-elc))
    '(auto-insert-alist (("\\.el\\'" emacs-lisp-template)))
    ))
 
