@@ -292,7 +292,7 @@
    ))
 
 (with-eval-after-load 'find-dired
-  (listify-set '(find-ls-option ("-exec ls -ldh {} +" . "-al")))
+  (listify-set '(find-ls-option ("-exec ls -ldh {} +" . "-alh")))
   )
 
 ;;
