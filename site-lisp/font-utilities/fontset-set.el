@@ -49,9 +49,9 @@
 
 (defun fontset-set-font-spec (fontset charset fontspec)
   "Use FONTSPEC for character set CHARSET."
-  (if (not (member charset charset-list))
-      (message "Warning: character set %s is not defined." charset)
-    (set-fontset-font fontset charset fontspec nil 'append)))
+  (unless (member charset charset-list)
+      (message "Warning: character set %s is not defined." charset))
+  (set-fontset-font fontset charset fontspec nil 'append))
 
 (defun fontset-set-fontfamily (fontset charset fontfamily)
   "Use FONTFAMILY for character set CHARSET."
@@ -71,12 +71,12 @@
     (error "Argument FONTSET is nil"))
   (unless charset-font-alist
     (error "Argument CHARSET-FONT-ALIST is nil"))
-  (let (charsetfonts acharsetfont)
-    (setq charsetfonts charset-font-alist)
-    (while (progn
-             (setq acharsetfont (car charsetfonts))
-             (fontset-set-font-spec fontset (car acharsetfont) (eval (cdr acharsetfont)))
-             (setq charsetfonts (cdr charsetfonts))))))
+  (let ((charsetfonts charset-font-alist) acharsetfont)
+    (while
+        (progn
+          (setq acharsetfont (car charsetfonts))
+          (fontset-set-font-spec fontset (car acharsetfont) (eval (cdr acharsetfont)))
+          (setq charsetfonts (cdr charsetfonts))))))
 
 (defun fontset-set (charset-font-alist basename)
   "Create fontset using FONTSET-BASENAME, then set font in CHARSET-FONT-ALIST.
@@ -92,20 +92,17 @@ It returns a name of the created fontset."
   "Create fontset using FONTSET-SPEC.
 Each FONTSET-SPEC has the form  (CHARSET-FONT-ALIST FONTSET-BASENAME).
 CHARSET-FONT-ALIST is association list of (TARGET . FONTSPEC).
-FONTSET-BASENAME is string.
+FONTSET-BASENAME is a string.
 
-If CHARSET-FONT-ALIST is nil, `fontset-set-charset-font-alist' to the fontset.
+If CHARSET-FONT-ALIST is nil, `fontset-set-charset-font-alist' is set to the fontset.
 
 It returns a name of the created fontset."
   (let (fontsets)
-  (dolist (fs fontset-spec)
-    (setq fontsets
-          (append
-           fontsets
-           (list (fontset-set (car fs) (cadr fs))))))
-  (if (cdr fontsets)
-      fontsets
-    (car fontsets))))
+    (dolist (fs fontset-spec)
+      (setq fontsets
+            (append fontsets
+                    (list (fontset-set (car fs) (cadr fs))))))
+    fontsets))
 
 (provide 'fontset-set)
 ;;; fontset-set.el ends here
