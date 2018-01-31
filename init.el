@@ -653,7 +653,7 @@
 (listify-requires-by-system
  '(system-type gnu/linux init-linux)
  '(system-type darwin init-darwin)
- '(window-system mac init-mac-gui)
+ '(window-system ns init-ns-gui)
  '(window-system x init-x)
  '(window-system w32 init-w32)
  )
