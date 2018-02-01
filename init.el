@@ -301,6 +301,19 @@
    '(dired-dwim-target t)           ; 対象ディレクトリーの推測
    ))
 
+(defun revert-dired-buffers ()
+  (interactive)
+  (dolist (b (buffer-list))
+    (set-buffer b)
+    (when (eq major-mode 'dired-mode)
+      (condition-case err
+          (progn
+            (revert-buffer nil 1)
+            (message "dired buffer %s is reverted." (buffer-name b)))
+        (error (message "Error when buffer %s revert." (buffer-name b)))))))
+
+;; (advice-add 'shell-command :after 'revert-dired-buffers)
+
 (with-eval-after-load 'find-dired
   (listify-set '(find-ls-option ("-exec ls -ldh {} +" . "-alh")))
   )
