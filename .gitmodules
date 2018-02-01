@@ -1,0 +1,3 @@
+[submodule "site-lisp/browse-kill-ring"]
+	path = site-lisp/browse-kill-ring
+	url = https://github.com/j8takagi/browse-kill-ring.git
