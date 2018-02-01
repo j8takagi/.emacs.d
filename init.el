@@ -327,8 +327,16 @@
    'set-process-query-on-exit
    )
   (listify-set
-   '(shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ") ; プロンプトの表示設定
-   ))
+   '(shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ") ; プロンプトの表示設定
+   )
+  (defun typescript (dir)
+    (interactive "D")
+    (let ((afile (concat dir "/typescript")) (anum 0))
+      (while (file-exists-p afile)
+          (setq anum (+ anum 1))
+          (setq afile (concat dir "/typescript" (number-to-string anum)))
+      (switch-to-buffer (find-file-noselect afile))
+      (shell (current-buffer))))))
 
 ;;
 ;; CC-Mode
