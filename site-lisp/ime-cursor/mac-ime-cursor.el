@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2017 by j8takagi
 
-;; Authors: j9takagi
+;; Authors: j8takagi
 ;; Keywords: ime cursor mac
 
 ;;; Commentary:
@@ -22,7 +22,7 @@
            "^com\\.apple\\.inputmethod\\.Kotoeri\\.Japanese"
            "^com\\.google\\.inputmethod\\.Japanese"
            ))
-      (when (string-match imptn (mac-input-source))
+      (when (string-match imptn (mac-get-current-input-source))
         (ime-cursor-set-color)
         (throw 'match t)))
     (ime-cursor-unset-color)))
