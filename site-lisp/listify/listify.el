@@ -276,5 +276,12 @@ Each ENV-VAL form is (ENVIRONMENT VALUE)."
   (dolist (aenvval env-val)
     (setenv (car aenvval) (cadr aenvval))))
 
+(defun listify-eval-buffer ()
+  "Execute the accessible portion of current buffer as Lisp code
+by `eval-buffer' and message evaluted."
+  (interactive)
+  (eval-buffer)
+  (message "%s is evaluted." (buffer-file-name)))
+
 (provide 'listify)
 ;;; listify.el ends here
