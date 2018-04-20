@@ -370,15 +370,17 @@
 
 (defun mpv-ts-create-simple-text ()
   (interactive)
-  (save-excursion
-    (let
-        (new-buf
-         (prev-speaker "") speaker)
+  (let
+      (new-buf
+       (prev-speaker "") speaker)
+    (save-excursion
       (setq new-buf (create-file-buffer (concat (buffer-file-name) ".txt")))
       (copy-to-buffer new-buf (point-min) (point-max))
       (set-buffer new-buf)
       (mpv-ts-join-line-or-delete-time-buffer)
-      (mpv-ts-delete-local-variables))))
+      (mpv-ts-delete-local-variables)
+      (goto-char (point-min)))
+    (display-buffer new-buf)))
 
 ;;; Font lock
 (require 'font-lock)
