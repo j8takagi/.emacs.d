@@ -477,11 +477,17 @@
 ;;; 一行あたりの文字数を指定してfill-regionする関数
 ;;; http://d.hatena.ne.jp/hack-3/20090604/1244100952
 (defun fill-region-with-N (num)
-  ""
+  "1行あたりの文字数を指定してfill-regionする"
   (interactive "nfill-column value? ")
   (let ((fill-column num))
     (fill-region (region-beginning) (region-end)))
   )
+
+(defun fill-region-with-40 ()
+  "1行あたり40字でfill-regionする"
+  (interactive)
+  (let ((fill-column 40))
+    (fill-region (region-beginning) (region-end))))
 
 ;;
 ;; ファイルの自動判定
