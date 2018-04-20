@@ -186,6 +186,13 @@
        (cursor-type box)
        ))))
 
+; ヤンク履歴コマンド
+(defun yank-pop-or-browse-kill-ring ()
+  (interactive)
+  (if (not (eq last-command 'yank))
+      (browse-kill-ring)
+    (yank-pop)))
+
 ; エイリアス
 (listify-defaliases
  '(uniq-lines delete-duplicate-lines)  ; uniq-linesを、delete-duplicate-linesの別名に
@@ -278,13 +285,6 @@
    '(ediff-suspend-hook ediff-restore-window-configuration)
    '(ediff-window-setup-function ediff-setup-windows-plain)
    ))
-
-;;
-;; browse-kill-ring
-;;
-(with-eval-after-load 'browse-kill-ring
-  (listify-set
-   '(browse-kill-ring-show-preview nil)))
 
 ;;
 ;; dired
@@ -591,6 +591,7 @@
  '("M-]" forward-paragraph)
  '("M-p" call-last-kbd-macro)
  '("M-s M-s" isearch-edit-string)
+ '("M-y" yank-pop-or-browse-kill-ring)
  '("RET" newline-and-indent)
  )
 
