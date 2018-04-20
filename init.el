@@ -642,7 +642,7 @@
    (
     ;; ("<M-return>" noexist)      ; デバッグ用
     ("<M-return>" completion-at-point)
-    ("C-c e" eval-buffer)
+    ("C-c e" listify-eval-buffer)
     ))
  '(mediawiki-mode-map "mediawiki" nil
    (
