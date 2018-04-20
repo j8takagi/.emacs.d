@@ -71,6 +71,7 @@
  'list-fontfamilies-display        ; フォントファミリー一覧作成コマンド
  'list-fonts-display               ; フォント一覧作成コマンド
  'not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
+ 'replace-plus                     ; 置換機能の拡張
  'scroll-one-line                  ; 1行スクロール
  'session
  'temp-buffer                      ; 一時バッファの作成
@@ -620,6 +621,8 @@
     ("E" dired-ediff-vc-latest-current)
     ("r" dired-exopen-file)
     ("s" dired-toggle-sort)
+    (";" replace-plus-dired-string-files)
+    ("'" replace-plus-dired-regexp-files)
     ))
  '(latex-mode-map "tex-mode" nil
    (
