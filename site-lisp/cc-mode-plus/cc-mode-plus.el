@@ -1,4 +1,5 @@
 (require 'cc-mode)
+(require 'ggtags)
 
 (defun init-cc-ggtags-mode-on ()
   (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)

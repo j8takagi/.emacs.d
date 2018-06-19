@@ -1,7 +1,7 @@
 PACKAGENAME := cc-mode-plus
 
 EMACS := emacs
-COMPILE.el := $(EMACS) -batch -f batch-byte-compile
+COMPILE.el := $(EMACS) -batch -l set-compile.el -f batch-byte-compile
 
 ELFILES := $(wildcard *.el)
 ELCFILES := $(addsuffix c,$(ELFILES))
