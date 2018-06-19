@@ -1,9 +1,9 @@
 PACKAGENAME := listify
 
 EMACS := emacs
-COMPILE.el := $(EMACS) -batch -f batch-byte-compile
+COMPILE.el := $(EMACS) -batch -l set-compile.el -f batch-byte-compile
 
-ELFILES := $(wildcard *.el)
+ELFILES := listify.el listify-packages.el
 ELCFILES := $(addsuffix c,$(ELFILES))
 
 RSYNC := rsync
