@@ -120,7 +120,6 @@
 ; 変数
 (put 'disabled-command-function 'custom-type '(choice (const nil) function))
 (listify-set
- '(Info-additional-directory-list ("~/share/info/ja" "~/share/info" )) ; Infoファイルの場所
  '(auto-compression-mode t)         ; 圧縮されたファイルを直接編集する
  '(auto-insert-alist nil)           ; auto-insert-alistの初期化
  '(auto-insert-directory "~/.emacs.d/insert/") ; auto-insertテンプレートディレクトリ
@@ -160,9 +159,6 @@
  '(session-file-name-history-exclude-regexps ("\\.emacs\\.d/" "~$" "COMMIT_EDITMSG")) ; sessionで、file-name-historyから除外するファイル
  '(session-restore-last-point-exclude-regexps ("COMMIT_EDITMSG")) ; session-restore-last-pointから除外するファイル
  '(show-paren-mode t)             ; 括弧の対応を表示
- '(skeleton-end-hook nil)         ; skeletonの挿入後、改行しない
- '(skeleton-end-newline nil)      ; skeletonの挿入後、改行しない
- '(skeleton-pair t)              ; skeleton-pairにより括弧挿入を自動化
  '(tab-width 4)                  ; タブ幅は4
  '(tool-bar-mode nil)            ; ツールバーを表示しない
  '(transient-mark-mode t)        ; リージョンをハイライト
@@ -203,6 +199,20 @@
    )
   (set-view-mode-buffers
    "\\*Messages\\*"                     ; *Messages*バッファをview-modeに
+   ))
+
+;; infoの設定
+(with-eval-after-load 'info
+  (listify-set
+   '(Info-additional-directory-list ("~/share/info/ja" "~/share/info" )) ; Infoファイルの場所
+   ))
+
+;; skeletonの設定
+(with-eval-after-load 'skeleton
+  (listify-set
+   '(skeleton-end-hook nil)         ; skeletonの挿入後、改行しない
+   '(skeleton-end-newline nil)      ; skeletonの挿入後、改行しない
+   '(skeleton-pair t)              ; skeleton-pairにより括弧挿入を自動化
    ))
 
 ;; *Messages*の警告が目立つように
@@ -447,7 +457,7 @@
 ;;
 ;; magit
 ;;
-(defvar with-editor-file-name-history-exclude 1) ; "run-hooks: Symbol’s function definition is void: git-commit-setup-check-buffer" エラー対策
+;; (defvar with-editor-file-name-history-exclude 1) ; "run-hooks: Symbol’s function definition is void: git-commit-setup-check-buffer" エラー対策
 
 ;;
 ;; mew
