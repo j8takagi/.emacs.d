@@ -351,6 +351,17 @@
           (setq afile (concat dir "/typescript" (number-to-string anum)))
       (switch-to-buffer (find-file-noselect afile))
       (shell (current-buffer))))))
+;;
+;; asm-mode
+;;
+(defun set-tab-width-8()
+  (interactive)
+  (setq tab-width 8))
+
+(with-eval-after-load 'asm-mode
+  (listify-set
+   '(asm-mode-hook
+     (set-tab-width-8 overwrite-mode))))
 
 ;;
 ;; CC-Mode
