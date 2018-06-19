@@ -23,7 +23,7 @@ Unless, cons cell (KEY . VALUE) is added."
 (defun overwrite-values-alist (alist-var value-new-old-alist)
   "Overwrite ALIST-VAR alist by VALUE-NEW-OLD alist.
 Each VALUE-NEW-OLD-ALIST has the form (VALUE-NEW . VALUE-OLD)."
-  (let ((alst (symbol-value alist-var)))
+  (let ((alst (symbol-value alist-var)) acell)
     (dolist (newold value-new-old-alist)
       (while (setq acell (rassoc (cdr newold) alst))
         (setcdr acell (car newold))))
@@ -214,7 +214,7 @@ MODEMAP form is (MODEMAP LIBRARY HOOK ((KEY1 FUNCTION1) (KEY2 FUNCTION2) ... )).
 
 If HOOK is not nil, the binding is via the HOOK.
 If function in MAPKEYS is void, warning message is printed into the `*Messages' buffer, or  the standard error stream in batch mode."
-  (let (amap alib ahook amapname funcdef)
+  (let (amap alib ahook keyfuncs amapname funcdef)
     (dolist (amodemap modemap)
       (setq
        amap (car amodemap) alib (cadr amodemap)
