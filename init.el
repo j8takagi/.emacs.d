@@ -138,7 +138,7 @@
  '(delete-by-moving-to-trash t)      ;  ファイルの削除で、ゴミ箱を使う
  '(delete-old-versions t) ; 古いバックアップファイルを自動的に削除する
  '(disabled-command-function nil) ; すべてのコマンドの使用制限を解除する
- '(display-buffer-alist (("^\\*shell\\*$" (display-buffer-same-window)) ("^\\*magit: .+" (display-buffer-same-window)))) ; バッファの表示方法
+ '(display-buffer-alist (("^\\*shell\\*$" (display-buffer-same-window)) ("^\\*?magit: .+" (display-buffer-same-window)))) ; バッファの表示方法
  '(electric-indent-mode nil) ; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
  '(enable-recursive-minibuffers t)      ; 再帰的にミニバッファを使う
  '(eval-expression-print-length nil)    ; evalした結果を全部表示する
