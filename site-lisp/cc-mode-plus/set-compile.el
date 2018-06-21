@@ -6,6 +6,9 @@
 (require 'server)
 
 (add-to-list 'load-path default-directory)
+(add-to-list 'load-path "../gtags")
+
+(require 'gtags)
 
 ;; Local Variables:
 ;; no-byte-compile: t

@@ -30,7 +30,6 @@
 (listify-packages-check
  'csv-mode
  'ess
- 'ggtags
  'gitignore-mode
  'gnuplot
  'graphviz-dot-mode
@@ -89,6 +88,7 @@
  '(ert-mode "ert-mode" "Major mode for editing ERT files")
  '(eukleides-mode "eukleides" "Major mode for editing Eukleides files")
  '(flex-mode "flex-mode" "Major mode for editing flex files")
+ '(gtags-mode "gtags")
  '(mediawiki-mode "mediawiki" "Major mode for editing Mediawiki articles")
  '(mpv-ts-mode "mpv-ts-mode" "Major mode for editing transcription using mpv")
  '(review-mode "review-mode" "Re:VIEW text editing mode")
@@ -387,7 +387,7 @@
    '(c-basic-offset 4)
    '(auto-insert-alist (("\\.h\\'" h-template)))
    '(c-mode-common-hook
-     (init-cc-ggtags-mode-on init-cc-require-gnu-mp init-cc-disable-electric-state))
+     (init-cc-gtags-mode-on init-cc-require-gnu-mp init-cc-disable-electric-state))
    ))
 
 ;;
