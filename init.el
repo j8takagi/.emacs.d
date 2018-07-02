@@ -130,7 +130,7 @@
  '(case-replace nil)                ; 置換時に大文字小文字を区別しない
  '(column-number-mode t)            ; 列番号を表示
  '(completion-ignored-extensions ; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
-   (".bak" ".d" ".fls" ".log" ".dvi" ".xbb"
+   (".bak" ".d" ".fls" ".dvi" ".xbb"
     ".out" ".prev" "_prev" ".idx" ".ind" ".ilg"
     ".tmp" ".synctex.gz" ".dplg" ".dslg" ".dSYM/"
     ".DS_Store" ":com.dropbox.attributes:$DATA"))
@@ -138,7 +138,7 @@
  '(delete-by-moving-to-trash t)      ;  ファイルの削除で、ゴミ箱を使う
  '(delete-old-versions t) ; 古いバックアップファイルを自動的に削除する
  '(disabled-command-function nil) ; すべてのコマンドの使用制限を解除する
- '(display-buffer-alist (("^\\*shell\\*$" (display-buffer-same-window)) ("^\\*magit: .+" (display-buffer-same-window)))) ; バッファの表示方法
+ '(display-buffer-alist (("^\\*shell\\*$" (display-buffer-same-window)) ("^magit: .+" (display-buffer-same-window)))) ; バッファの表示方法
  '(electric-indent-mode nil) ; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
  '(enable-recursive-minibuffers t)      ; 再帰的にミニバッファを使う
  '(eval-expression-print-length nil)    ; evalした結果を全部表示する
