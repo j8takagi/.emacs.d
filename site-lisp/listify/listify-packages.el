@@ -16,7 +16,8 @@
   "Add package archives to `package-archives'.
 Each element of ARCHIVES has the form (ID LOCATION)."
   (dolist (aarch archives)
-    (update-or-add-alist 'package-archives (car aarch) (cadr aarch))))
+    (update-or-add-alist 'package-archives (car aarch) (cadr aarch)))
+  (package-refresh-contents))
 
 (defun listify-packages-install (pkg)
   (if (not (assq pkg package-archive-contents))
