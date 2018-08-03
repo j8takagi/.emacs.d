@@ -104,17 +104,14 @@ And, delete the next window."
   (quit-window nil (next-window)))
 
 ;; シェルにカレントディレクトリへのcdコマンドを送る
-(defun shell-send-cd (&optional directory)
+(defun shell-send-cd ()
   "Send cd command of default directory to shell."
   (interactive)
-  (when (directory-name-p directory)
-    (setq default-directory
-          (expand-file-name directory)))
   (when (get-buffer "*shell*")
     (with-current-buffer "*shell*"
       (goto-char (point-max))
       (comint-kill-input)
-      (insert (concat "cd '" default-directory "'"))
+      (insert (concat "cd '" (expand-file-name default-directory) "'"))
       (comint-send-input)
       (goto-char (point-max)))))
 

@@ -130,7 +130,7 @@
  '(case-replace nil)                ; 置換時に大文字小文字を区別しない
  '(column-number-mode t)            ; 列番号を表示
  '(completion-ignored-extensions ; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
-   (".bak" ".d" ".fls" ".log" ".dvi" ".xbb"
+   (".bak" ".d" ".fls" ".dvi" ".xbb"
     ".out" ".prev" "_prev" ".idx" ".ind" ".ilg"
     ".tmp" ".synctex.gz" ".dplg" ".dslg" ".dSYM/"
     ".DS_Store" ":com.dropbox.attributes:$DATA"))
