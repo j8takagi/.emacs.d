@@ -308,8 +308,8 @@
    )
   (listify-set
    '(dired-listing-switches "-alh")     ; lsのオプションにhを追加
-   '(dired-recursive-copies always) ; diredでディレクトリーを再帰的にコピーするとき、確認しない
-   '(dired-dwim-target t)           ; 対象ディレクトリーの推測
+   '(dired-recursive-copies always)     ; diredでディレクトリーを再帰的にコピーするとき、確認しない
+   '(dired-dwim-target t)               ; 対象ディレクトリーの推測
    ))
 
 (defun revert-dired-buffers ()
@@ -320,10 +320,9 @@
       (condition-case err
           (progn
             (revert-buffer nil 1)
-            (message "dired buffer %s is reverted." (buffer-name b)))
-        (error (message "Error when buffer %s revert." (buffer-name b)))))))
+            (message "dired buffer %s is reverted." (buffer-name b)))))))
 
-;; (advice-add 'shell-command :after 'revert-dired-buffers)
+;(advice-add 'shell-command :after 'revert-dired-buffers)
 
 (with-eval-after-load 'find-dired
   (listify-set '(find-ls-option ("-exec ls -ldh {} +" . "-alh")))
@@ -352,6 +351,7 @@
    )
   (listify-set
    '(shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ") ; プロンプトの表示設定
+   '(shell-mode-hook (ansi-color-for-comint-mode-on))
    )
   (defun typescript (dir)
     (interactive "D")
@@ -547,7 +547,7 @@
     ("\\.yy?\\'" bison-mode)
     ("\\`ja.wikipedia.org/w/index.php" mediawiki-mode)
     ("abbrev_defs" emacs-lisp-mode)
-    ("cmd" shell-script-mode)
+    ("/cmd\\'" shell-script-mode)
     ("/crontab\\(\\.[a-zA-Z0-9]+\\)?\\'" crontab-mode)
     ("!.+" conf-mode)
    )))
