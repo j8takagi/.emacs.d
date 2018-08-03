@@ -30,7 +30,6 @@
 (listify-packages-check
  'csv-mode
  'ess
- 'ggtags
  'gitignore-mode
  'gnuplot
  'graphviz-dot-mode
@@ -89,6 +88,7 @@
  '(ert-mode "ert-mode" "Major mode for editing ERT files")
  '(eukleides-mode "eukleides" "Major mode for editing Eukleides files")
  '(flex-mode "flex-mode" "Major mode for editing flex files")
+ '(gtags-mode "gtags")
  '(mediawiki-mode "mediawiki" "Major mode for editing Mediawiki articles")
  '(mpv-ts-mode "mpv-ts-mode" "Major mode for editing transcription using mpv")
  '(review-mode "review-mode" "Re:VIEW text editing mode")
@@ -130,7 +130,7 @@
  '(case-replace nil)                ; 置換時に大文字小文字を区別しない
  '(column-number-mode t)            ; 列番号を表示
  '(completion-ignored-extensions ; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
-   (".bak" ".d" ".fls" ".dvi" ".xbb"
+   (".bak" ".d" ".fls" ".log" ".dvi" ".xbb"
     ".out" ".prev" "_prev" ".idx" ".ind" ".ilg"
     ".tmp" ".synctex.gz" ".dplg" ".dslg" ".dSYM/"
     ".DS_Store" ":com.dropbox.attributes:$DATA"))
@@ -138,7 +138,7 @@
  '(delete-by-moving-to-trash t)      ;  ファイルの削除で、ゴミ箱を使う
  '(delete-old-versions t) ; 古いバックアップファイルを自動的に削除する
  '(disabled-command-function nil) ; すべてのコマンドの使用制限を解除する
- '(display-buffer-alist (("^\\*shell\\*$" (display-buffer-same-window)) ("^magit: .+" (display-buffer-same-window)))) ; バッファの表示方法
+ '(display-buffer-alist (("^\\*shell\\*$" (display-buffer-same-window)) ("^\\*?magit: .+" (display-buffer-same-window)))) ; バッファの表示方法
  '(electric-indent-mode nil) ; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
  '(enable-recursive-minibuffers t)      ; 再帰的にミニバッファを使う
  '(eval-expression-print-length nil)    ; evalした結果を全部表示する
@@ -308,8 +308,8 @@
    )
   (listify-set
    '(dired-listing-switches "-alh")     ; lsのオプションにhを追加
-   '(dired-recursive-copies always) ; diredでディレクトリーを再帰的にコピーするとき、確認しない
-   '(dired-dwim-target t)           ; 対象ディレクトリーの推測
+   '(dired-recursive-copies always)     ; diredでディレクトリーを再帰的にコピーするとき、確認しない
+   '(dired-dwim-target t)               ; 対象ディレクトリーの推測
    ))
 
 (defun revert-dired-buffers ()
@@ -320,10 +320,9 @@
       (condition-case err
           (progn
             (revert-buffer nil 1)
-            (message "dired buffer %s is reverted." (buffer-name b)))
-        (error (message "Error when buffer %s revert." (buffer-name b)))))))
+            (message "dired buffer %s is reverted." (buffer-name b)))))))
 
-;; (advice-add 'shell-command :after 'revert-dired-buffers)
+;(advice-add 'shell-command :after 'revert-dired-buffers)
 
 (with-eval-after-load 'find-dired
   (listify-set '(find-ls-option ("-exec ls -ldh {} +" . "-alh")))
@@ -352,6 +351,7 @@
    )
   (listify-set
    '(shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ") ; プロンプトの表示設定
+   '(shell-mode-hook (ansi-color-for-comint-mode-on))
    )
   (defun typescript (dir)
     (interactive "D")
@@ -387,7 +387,7 @@
    '(c-basic-offset 4)
    '(auto-insert-alist (("\\.h\\'" h-template)))
    '(c-mode-common-hook
-     (init-cc-ggtags-mode-on init-cc-require-gnu-mp init-cc-disable-electric-state))
+     (init-cc-gtags-mode-on init-cc-require-gnu-mp init-cc-disable-electric-state))
    ))
 
 ;;
@@ -547,7 +547,7 @@
     ("\\.yy?\\'" bison-mode)
     ("\\`ja.wikipedia.org/w/index.php" mediawiki-mode)
     ("abbrev_defs" emacs-lisp-mode)
-    ("cmd" shell-script-mode)
+    ("/cmd\\'" shell-script-mode)
     ("/crontab\\(\\.[a-zA-Z0-9]+\\)?\\'" crontab-mode)
     ("!.+" conf-mode)
    )))
