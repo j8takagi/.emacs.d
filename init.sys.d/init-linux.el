@@ -6,6 +6,7 @@
 ;; 環境変数LANGの設定
 (listify-setenv
  '("LANG" "en_US.UTF-8")
+ '("LANGUAGE" "en")
  '("PAGER" "cat")
  '("MANPAGER" "cat")
  '("EDITOR" "emacsclient")

@@ -24,14 +24,14 @@
      (height 45)
      (top 0)
      (left 0)
-    )))
+     )))
 
 ;; view-modeの設定
 (with-eval-after-load 'view
   (listify-set
    '(set-view-mode-read-write-directory-patterns
      (
-      "/media/.+/Documents/" "~/.emacs.d/elpa" "/tmp" "/var"
+      "~" "/tmp" "/var"
       ))))
 
 (provide 'init-x)
