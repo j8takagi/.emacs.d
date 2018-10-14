@@ -30,6 +30,7 @@
 (listify-packages-check
  'csv-mode
  'ess
+ 'exec-path-from-shell
  'gitignore-mode
  'gnuplot
  'graphviz-dot-mode
@@ -361,6 +362,7 @@
           (setq afile (concat dir "/typescript" (number-to-string anum)))
       (switch-to-buffer (find-file-noselect afile))
       (shell (current-buffer))))))
+
 ;;
 ;; asm-mode
 ;;

@@ -6,8 +6,11 @@
 (require 'listify)
 
 (listify-requires
+ 'exec-path-from-shell
  'fontset-set
  )
+
+(exec-path-from-shell-initialize)
 
 ;; 標準のフォントサイズとフォントファミリーの設定
 (listify-set
@@ -16,7 +19,7 @@
      (font
       ,(fontset-set
         '(
-          (ascii . (font-spec :family "Noto Sans Mono" :weight 'normal :slant 'normal :size 12))
+          (ascii . (font-spec :family "Inconsolata" :weight 'normal :slant 'normal :size 15))
           (unicode . (font-spec :family "Noto Sans CJK JP"))
           )
         "mydefault_x"))
