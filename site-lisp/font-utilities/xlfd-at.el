@@ -9,29 +9,25 @@
 
 
 ;;; Code:
-(defun xlfd-at-position (position)
-  "Return X logical font description (XLFD) of the font at POSITION in the current buffer."
+(defun xlfd-at (pos)
+  "Return X logical font description (XLFD) of the font at POS in the current buffer."
   (if (not (display-graphic-p))
       (message "Display is not graphic. So font is not used.")
-    (font-xlfd-name (font-at position))))
+    (font-xlfd-name (font-at pos))))
 
-(defun xlfd-at-xlfd2family (xlfd)
+(defun xlfd2fontfamily (xlfd)
   "Return font family name from X logical font description (XLFD)."
   (aref (x-decompose-font-name xlfd) xlfd-regexp-family-subnum))
 
-(defun xlfd-at-fontfamily-position (position)
-  "Return fontfamily name of the font at POSITION in the current buffer."
-  (xlfd-at-xlfd2family (xlfd-at-position position)))
-
-(defun xlfd-at-fontfamily ()
+(defun fontfamily-cursor-position (pos)
   "Return font-family of the font at the point."
-  (interactive)
-  (message (xlfd-at-fontfamily-position (point))))
+  (interactive "d")
+  (message (xlfd2fontfamily (xlfd-at pos))))
 
-(defun xlfd-at ()
+(defun xlfd-cursor-position (pos)
   "Return X logical font description (XLFD) of the font at the point."
-  (interactive)
-  (message (xlfd-at-position (point))))
+  (interactive "d")
+  (message (xlfd-at pos)))
 
 (provide 'xlfd-at)
 ;;; xlfd-at.el ends here
