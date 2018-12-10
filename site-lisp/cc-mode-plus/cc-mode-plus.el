@@ -2,7 +2,8 @@
 
 (defun init-cc-gtags-mode-on ()
   (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-    (gtags-mode 1)))
+    (gtags-mode 1)
+    (setq gtags-suggested-key-mapping t)))
 
 (defun init-cc-require-gnu-mp ()
   (when (derived-mode-p 'c-mode 'c++-mode)
