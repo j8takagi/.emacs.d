@@ -220,7 +220,7 @@
   (listify-set
    '(skeleton-end-hook nil)         ; skeletonの挿入後、改行しない
    '(skeleton-end-newline nil)      ; skeletonの挿入後、改行しない
-   '(skeleton-pair t)              ; skeleton-pairにより括弧挿入を自動化
+   '(skeleton-pair t)               ; skeleton-pairにより括弧挿入を自動化
    ))
 
 ;; *Messages*の警告が目立つように
