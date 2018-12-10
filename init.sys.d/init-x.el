@@ -20,7 +20,7 @@
       ,(fontset-set
         '(
           (ascii . (font-spec :family "Inconsolata" :weight 'normal :slant 'normal :size 15))
-          (unicode . (font-spec :family "Noto Sans CJK JP"))
+          (unicode . (font-spec :family "Noto Sans CJK JP" :weight 'light))
           )
         "mydefault_x"))
      (width 160)
