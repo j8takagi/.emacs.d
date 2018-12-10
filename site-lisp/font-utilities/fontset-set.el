@@ -34,8 +34,7 @@
      (list
       (completing-read
        "Fontset name: " (fontset-list) nil t nil 'fontset-history))))
-  (make-local-variable 'buffer-fontset-face)
-  (set-face-fontset 'buffer-fontset-face fontset)
+  (set-face-fontset (make-local-variable 'buffer-fontset-face) fontset)
   (buffer-face-set 'buffer-fontset-face))
 
 (defun frame-fontset-set (fontset)
@@ -60,7 +59,7 @@
     (fontset-set-font-spec fontset charset (font-spec :family fontfamily))))
 
 (defun fontset-set-create-fontset (basename)
-  "Create fontset. It returns a name of the created fontset."
+  "Create fontset from BASENAME. It returns the created fontset name."
   (interactive)
   (create-fontset-from-fontset-spec (concat "-*-*-*-*-*-*-*-*-*-*-*-*-fontset-" basename)))
 
