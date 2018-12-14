@@ -135,24 +135,32 @@ update or add each element when EXP is association list (alist)."
       (setq
        asym (nth 0 arg) aexp (nth 1 arg) anow (nth 2 arg) areq (nth 3 arg)
        acomm (listify-create-variable-comment asym (nth 4 arg)))
-      (if (and (not (null aexp)) (listp aexp) (listp (cdr aexp)))
+      (if (and aexp (listp aexp) (listp (cdr aexp)))
           (setq vars
                 (append
                  vars
                  (funcall
-                  (if (consp (car aexp)) 'listify-set-alist 'listify-set-list)
+                  (if (consp (car aexp))
+                      'listify-set-alist
+                    'listify-set-list)
                   (list asym aexp anow areq acomm))))
-        (if (null (listify-validate-custom-variable-type asym aexp))
-            (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
-                     asym (custom-variable-type asym) aexp)
-          (when (not (equal (symbol-value asym) aexp))
-            (custom-set-variables
-             (list
-              asym
-              (if (and (not (null aexp)) (not (eq aexp t)) (or (symbolp aexp) (listp aexp))) `(quote ,aexp) aexp)
-              anow areq acomm))
-            (setq vars (append vars (list asym)))))))
-    (listify-message-variables vars)))
+        (unless (listify-validate-custom-variable-type asym aexp)
+          (message
+           "%s: Variable type is mismatch.\nType: %s\nValue: %s"
+           asym (custom-variable-type asym) aexp))
+        (unless (equal (symbol-value asym) aexp)
+          (custom-set-variables
+           (list
+            asym
+            (if (and aexp (not (eq aexp t)) (or (symbolp aexp) (listp aexp)))
+                `(quote ,aexp)
+              aexp)
+            anow
+            areq
+            acomm)))
+        (setq vars (append vars (list asym)))))
+    (listify-message-variables vars)
+    vars))
 
 (defun listify-message-variables(vars)
   (let (cusvars ovars)
