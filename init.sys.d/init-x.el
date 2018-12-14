@@ -6,8 +6,11 @@
 (require 'listify)
 
 (listify-requires
+ 'exec-path-from-shell
  'fontset-set
  )
+
+(exec-path-from-shell-initialize)
 
 ;; 標準のフォントサイズとフォントファミリーの設定
 (listify-set
