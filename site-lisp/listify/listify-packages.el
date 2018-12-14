@@ -15,17 +15,23 @@
 (defun listify-packages-add-archives (&rest archives)
   "Add package archives to `package-archives'.
 Each element of ARCHIVES has the form (ID LOCATION)."
+  (unless package--initialized
+    (package-initialize))
   (dolist (aarch archives)
     (update-or-add-alist 'package-archives (car aarch) (cadr aarch)))
   (package-refresh-contents))
 
 (defun listify-packages-install (pkg)
+  (unless package--initialized
+    (package-initialize))
   (if (not (assq pkg package-archive-contents))
       (message "Warning: Package `%s' is NOT found on archives." pkg)
     (message "Installation of package `%s' begins." pkg)
     (condition-case err
         (package-install pkg)
-      (error (message "Warining: Fails to install package `%s'.\n%s: %s" pkg (car err) (cadr err))))))
+      (error
+       (message "Warining: Fails to install package `%s'.\n%s: %s"
+                pkg (car err) (cadr err))))))
 
 (defun listify-packages-required (pkg)
   (let ((pkgdesc (assq pkg package-alist)))
@@ -62,6 +68,8 @@ This function returns the list of (`package' `required package')."
 (defun listify-packages-check (&rest package)
   "Check the packages in PACKAGE, packages and dependent packages are
 installed and updated, and unexpected packages are not installed."
+  (unless package--initialized
+    (package-initialize))
   (let (pkgs deps real-pkgs update-pkgs)
     (message "Required packages - %s" package)
     (dolist (req-pkg package)
