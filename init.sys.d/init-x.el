@@ -19,8 +19,8 @@
      (font
       ,(fontset-set
         '(
-          (ascii . (font-spec :family "Ubuntu Mono" :weight 'normal :slant 'normal :size 16))
-          (unicode . (font-spec :family "Noto Sans CJK JP"))
+          (ascii . (font-spec :family "Inconsolata" :weight 'normal :slant 'normal :size 15))
+          (unicode . (font-spec :family "Noto Sans CJK JP" :weight 'light))
           )
         "mydefault_x"))
      (width 160)
