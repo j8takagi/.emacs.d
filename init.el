@@ -13,13 +13,10 @@
 
 (require 'listify)
 
-;;;
-;;; パッケージ
-;;;
+;;
+;; パッケージ
+;;
 (listify-requires 'listify-packages)
-
-;; パッケージ初期化
-(package-initialize)
 
 ;; パッケージアーカイブの指定
 (listify-packages-add-archives
@@ -119,7 +116,6 @@
  )
 
 ; 変数
-(put 'disabled-command-function 'custom-type '(choice (const nil) function))
 (listify-set
  '(auto-compression-mode t)         ; 圧縮されたファイルを直接編集する
  '(auto-insert-alist nil)           ; auto-insert-alistの初期化
@@ -138,7 +134,9 @@
  '(delete-by-moving-to-trash t)      ;  ファイルの削除で、ゴミ箱を使う
  '(delete-old-versions t) ; 古いバックアップファイルを自動的に削除する
  '(disabled-command-function nil) ; すべてのコマンドの使用制限を解除する
- '(display-buffer-alist (("^\\*shell\\*$" (display-buffer-same-window)) ("^\\*?magit: .+" (display-buffer-same-window)))) ; バッファの表示方法
+ '(display-buffer-alist
+   (("^\\*shell\\*$" (display-buffer-same-window))
+    ("^\\*?magit: .+" (display-buffer-same-window)))) ; バッファの表示方法
  '(electric-indent-mode nil) ; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
  '(enable-recursive-minibuffers t)      ; 再帰的にミニバッファを使う
  '(eval-expression-print-length nil)    ; evalした結果を全部表示する
@@ -343,14 +341,14 @@
           (setq afile (concat dir "/typescript" (number-to-string anum)))
       (switch-to-buffer (find-file-noselect afile))
       (shell (current-buffer))))))
+
 ;;
 ;; asm-mode
 ;;
-(defun set-tab-width-8()
-  (interactive)
-  (setq tab-width 8))
-
 (with-eval-after-load 'asm-mode
+  (defun set-tab-width-8()
+    (interactive)
+    (setq tab-width 8))
   (listify-set
    '(asm-mode-hook
      (set-tab-width-8 overwrite-mode))))

@@ -21,8 +21,8 @@
     (font
      ,(fontset-set
        '(
-         (ascii . (font-spec :family "Consolas" :weight 'normal :size 12))
-         (unicode . (font-spec :family "メイリオ"))
+         (ascii (font-spec :family "Consolas" :weight 'normal :size 12))
+         (unicode (font-spec :family "メイリオ"))
          )
        "mydefault_w32"))
     (width 160)
@@ -33,13 +33,13 @@
 
 (fontsets-set
  '((
-    (unicode . (font-spec :family "游明朝" :weight 'normal :slant 'normal :size 14))
+    (unicode (font-spec :family "游明朝" :weight 'normal :slant 'normal :size 14))
     ) "my_mincho")
  '((
-    (unicode . (font-spec :family "游ゴシック" :weight 'normal :slant 'normal))
+    (unicode (font-spec :family "游ゴシック" :weight 'normal :slant 'normal))
     ) "my_yugothic")
  '((
-    (unicode . (font-spec :family "源ノ角ゴシック Code JP R" :weight 'normal :slant 'normal :size 12))
+    (unicode (font-spec :family "源ノ角ゴシック Code JP R" :weight 'normal :slant 'normal :size 12))
     ) "my_sourcehancode")
  )
 

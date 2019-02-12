@@ -29,8 +29,8 @@
      (font
       ,(fontsets-set
         '((
-          (ascii . (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
-          (unicode . (font-spec :family "Hiragino Sans"))
+          (ascii (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
+          (unicode (font-spec :family "Hiragino Sans"))
           ) "my_default_mac")))
      ))
 ; '(face-font-rescale-alist (("Hiragino Sans" 1.167) ("YuGothic" 1.167)))
@@ -40,48 +40,48 @@
 
 (fontsets-set
  '((
-    (ascii . (font-spec :family "Menlo" :weight 'bold :slant 'normal :size 12))
-    (unicode . (font-spec :family "Hiragino Sans" :weight 'bold :slant 'normal))
+    (ascii (font-spec :family "Menlo" :weight 'bold :slant 'normal :size 12))
+    (unicode (font-spec :family "Hiragino Sans" :weight 'bold :slant 'normal))
     ) "my_bold")
  '((
-    (ascii . (font-spec :weight 'normal :slant 'italic))
-    (unicode . (font-spec :family "Hiragino Sans" :weight 'semibold :slant 'normal))
+    (ascii (font-spec :weight 'normal :slant 'italic))
+    (unicode (font-spec :family "Hiragino Sans" :weight 'semibold :slant 'normal))
     ) "my_italic")
  '((
-    (ascii . (font-spec :family "Menlo" :weight 'bold :slant 'italic :size 12))
-    (unicode . (font-spec :family "Hiragino Sans" :weight 'bold :slant 'normal))
+    (ascii (font-spec :family "Menlo" :weight 'bold :slant 'italic :size 12))
+    (unicode (font-spec :family "Hiragino Sans" :weight 'bold :slant 'normal))
     ) "my_bold_italic")
  '((
-    (unicode . (font-spec :family "Hiragino Sans" :weight 'normal :slant 'normal :size 12))
+    (unicode (font-spec :family "Hiragino Sans" :weight 'normal :slant 'normal :size 12))
     ) "my_gothic")
  '((
-    (unicode . (font-spec :family "Hiragino Mincho ProN" :weight 'normal :slant 'normal :size 12))
+    (unicode (font-spec :family "Hiragino Mincho ProN" :weight 'normal :slant 'normal :size 12))
     ) "my_mincho")
  '((
-    (unicode . (font-spec :family "YuKyokasho" :weight 'normal :slant 'normal :size 12))
+    (unicode (font-spec :family "YuKyokasho" :weight 'normal :slant 'normal :size 12))
     ) "my_yu_kyokasho")
  '((
-    (unicode . (font-spec :family "YuMincho" :weight 'normal :slant 'normal :size 12))
+    (unicode (font-spec :family "YuMincho" :weight 'normal :slant 'normal :size 12))
     ) "my_yu_mincho")
  '((
-    (ascii . (font-spec :family "Menlo" :weight 'normal))
-    (unicode . (font-spec :family "YuGothic"))
+    (ascii (font-spec :family "Menlo" :weight 'normal))
+    (unicode (font-spec :family "YuGothic"))
     ) "my_yu_gothic")
  '((
-    (unicode . (font-spec :family "Toppan Bunkyu Gothic"))
+    (unicode (font-spec :family "Toppan Bunkyu Gothic"))
     ) "my_bunkyu_gothic")
  '((
-    (unicode . (font-spec :family "Hiragino Maru Gothic ProN"))
+    (unicode (font-spec :family "Hiragino Maru Gothic ProN"))
     ) "my_maru_gothic")
  '((
-    (unicode . (font-spec :family "Klee"))
+    (unicode (font-spec :family "Klee"))
     ) "my_klee")
  '((
-    (unicode . (font-spec :family "Source Han Code JP"))
+    (unicode (font-spec :family "Source Han Code JP"))
     ) "my_sourcehancode")
  '((
-   (ascii . (font-spec :family "Source Han Code JP" :weight 'normal :slant 'normal :size 12))
-   (unicode . (font-spec :family "Toppan Bunkyu Gothic" :weight 'normal :slant 'normal))
+   (ascii (font-spec :family "Source Han Code JP" :weight 'normal :slant 'normal :size 12))
+   (unicode (font-spec :family "Toppan Bunkyu Gothic" :weight 'normal :slant 'normal))
     ) "my_alternative")
  )
 
