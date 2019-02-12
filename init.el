@@ -182,13 +182,6 @@
        (cursor-type box)
        ))))
 
-; ヤンク履歴コマンド
-(defun yank-pop-or-browse-kill-ring ()
-  (interactive)
-  (if (not (eq last-command 'yank))
-      (browse-kill-ring)
-    (yank-pop)))
-
 ; エイリアス
 (listify-defaliases
  '(uniq-lines delete-duplicate-lines)  ; uniq-linesを、delete-duplicate-linesの別名に
