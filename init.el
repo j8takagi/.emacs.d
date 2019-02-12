@@ -296,6 +296,7 @@
   (listify-requires
    'dired-x                             ; diredの拡張機能
    'image-dired                         ; サムネイル表示
+   'revert-dired-buffers                ; diredバッファの自動更新
    'sorter                              ; ソート
    'wdired                              ; ファイル名編集
    )
@@ -304,18 +305,6 @@
    '(dired-recursive-copies always)     ; diredでディレクトリーを再帰的にコピーするとき、確認しない
    '(dired-dwim-target t)               ; 対象ディレクトリーの推測
    ))
-
-(defun revert-dired-buffers ()
-  (interactive)
-  (dolist (b (buffer-list))
-    (set-buffer b)
-    (when (eq major-mode 'dired-mode)
-      (condition-case err
-          (progn
-            (revert-buffer nil 1)
-            (message "dired buffer %s is reverted." (buffer-name b)))))))
-
-;(advice-add 'shell-command :after 'revert-dired-buffers)
 
 (with-eval-after-load 'find-dired
   (listify-set '(find-ls-option ("-exec ls -ldh {} +" . "-alh")))
