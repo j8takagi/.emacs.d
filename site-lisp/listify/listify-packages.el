@@ -12,18 +12,20 @@
 (require 'package)
 (require 'listify)
 
+(unless package--initialized
+  (package-initialize))
+
 (defun listify-packages-add-archives (&rest archives)
   "Add package archives to `package-archives'.
 Each element of ARCHIVES has the form (ID LOCATION)."
-  (unless package--initialized
-    (package-initialize))
   (dolist (aarch archives)
     (update-or-add-alist 'package-archives (car aarch) (cadr aarch)))
-  (package-refresh-contents))
+  (condition-case err
+      (package-refresh-contents 1)
+    (error
+     (message "Warining: Fails to download package descriptions."))))
 
 (defun listify-packages-install (pkg)
-  (unless package--initialized
-    (package-initialize))
   (if (not (assq pkg package-archive-contents))
       (message "Warning: Package `%s' is NOT found on archives." pkg)
     (message "Installation of package `%s' begins." pkg)
