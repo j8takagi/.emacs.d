@@ -27,6 +27,7 @@
 (listify-packages-check
  'csv-mode
  'ess
+ 'exec-path-from-shell
  'gitignore-mode
  'gnuplot
  'graphviz-dot-mode
