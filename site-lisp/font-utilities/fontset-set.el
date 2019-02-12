@@ -26,7 +26,6 @@
     (setq frame (selected-frame)))
   (set-face-attribute face frame :font fontset :fontset fontset))
 
-
 (defun buffer-fontset-set (fontset)
   "Set buffer font and fontset to FONTSET."
   (interactive
@@ -58,6 +57,11 @@
       (message "Warning: In setting font family, font family %s is not available." fontfamily)
     (fontset-set-font-spec fontset charset (font-spec :family fontfamily))))
 
+(defun fontset-set-alias2spec (alias)
+  "Get fontset-spec from ALIAS of fontset."
+  (query-fontset (concat "fontset-" alias))
+  )
+
 (defun fontset-set-create-fontset (basename)
   "Create fontset from BASENAME. It returns the created fontset name."
   (interactive)
@@ -70,22 +74,17 @@
     (error "Argument FONTSET is nil"))
   (unless charset-font-alist
     (error "Argument CHARSET-FONT-ALIST is nil"))
-  (let ((charsetfonts charset-font-alist) acharsetfont)
-    (while
-        (progn
-          (setq acharsetfont (car charsetfonts))
-          (fontset-set-font-spec fontset (car acharsetfont) (eval (cdr acharsetfont)))
-          (setq charsetfonts (cdr charsetfonts))))))
+  (dolist (acharfont charset-font-alist)
+    (fontset-set-font-spec fontset (car acharfont) (eval (cadr acharfont))))
+  fontset)
 
 (defun fontset-set (charset-font-alist basename)
   "Create fontset using FONTSET-BASENAME, then set font in CHARSET-FONT-ALIST.
 if CHARSET-FONT-ALIST is nil, `fontset-set-charset-font-alist' to the fontset.
 It returns a name of the created fontset."
-  (let (afontset)
-    (setq afontset
-          (fontset-set-create-fontset basename))
-    (fontset-set-charset-font afontset charset-font-alist)
-    afontset))
+  (fontset-set-charset-font
+   (fontset-set-create-fontset basename)
+   charset-font-alist))
 
 (defun fontsets-set (&rest fontset-spec)
   "Create fontset using FONTSET-SPEC.

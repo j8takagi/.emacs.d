@@ -17,13 +17,6 @@
   :group 'display
   )
 
-(defcustom list-fonts-sample-text
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789 !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
-  "Text string to display as the sample text for `list-fonts-display'."
-  :type 'string
-  :group 'display
-  )
-
 (defun list-fonts-display (&optional regexp &rest fontspecs)
   "List available fonts, using the same sample text in each.
 The sample text is a string that comes from the variable
@@ -89,7 +82,7 @@ KEY must be a valid font property name listed below:
 
 (defun list-fonts-list-display (fontslist)
   "List fonts in FONTLIST, using the same sample text in each.
-The sample text is a string that comes from the variable.
+The sample text is a string that comes from the variable
 `list-fonts-sample-text'."
   (let
       ((max-length 0) (abuf "*Fonts*")
