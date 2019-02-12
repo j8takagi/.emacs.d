@@ -3,7 +3,9 @@
 
 (define-abbrev-table 'apropos-mode-abbrev-table '())
 
-(define-abbrev-table 'awk-mode-abbrev-table '())
+(define-abbrev-table 'awk-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'c++-mode-abbrev-table
   '(
@@ -14,14 +16,14 @@
 
 (define-abbrev-table 'c-mode-abbrev-table
   '(
-    ("case" "" c-case 0)
-    ("do" "" c-dowhile 0)
-    ("elsee" "" c-else 0)
     ("elseif" "" c-elseif 0)
-    ("for" "" c-for 0)
+    ("elsee" "" c-else 0)
     ("if" "" c-if 0)
-    ("switch" "" c-switch 0)
+    ("for" "" c-for 0)
     ("while" "" c-while 0)
+    ("do" "" c-dowhile 0)
+    ("switch" "" c-switch 0)
+    ("case" "" c-case 0)
    ))
 
 (define-abbrev-table 'change-log-mode-abbrev-table '())
@@ -47,10 +49,6 @@
 (define-abbrev-table 'diff-mode-abbrev-table '())
 
 (define-abbrev-table 'edebug-eval-mode-abbrev-table '())
-
-(define-abbrev-table 'edit-abbrevs-mode-abbrev-table '())
-
-(define-abbrev-table 'elisp-byte-code-mode-abbrev-table '())
 
 (define-abbrev-table 'emacs-lisp-byte-code-mode-abbrev-table '())
 
@@ -130,8 +128,7 @@ draw(F); draw(D); draw(C)
 
 (define-abbrev-table 'global-abbrev-table
   '(
-    ("git" "www.j8takagi.net:/home/git" nil 0)
-   ))
+    ("git" "www.j8takagi.net:/home/git")))
 
 (define-abbrev-table 'graphviz-dot-mode-abbrev-table '())
 
@@ -174,8 +171,6 @@ draw(F); draw(D); draw(C)
 (define-abbrev-table 'mediawiki-draft-mode-abbrev-table '())
 
 (define-abbrev-table 'mediawiki-mode-abbrev-table '())
-
-(define-abbrev-table 'messages-buffer-mode-abbrev-table '())
 
 (define-abbrev-table 'nxml-mode-abbrev-table '())
 

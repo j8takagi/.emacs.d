@@ -28,10 +28,10 @@ insert:
 site-lisp:
 	$(MAKE) -sC $@
 
-get-abbrev:
-	$(RSYNC) $(RSYNCFLAG) $(INSTALLDIR)/abbrev_defs ./
+save-abbrev:
+	$(EMACS) -batch -l save-abbrev.el
 
-install: install-init install-init.sys.d install-site-lisp install-insert
+install: install-init install-init.sys.d install-site-lisp install-insert save-abbrev
 
 install-init: $(INSTALLDIR) init
 	@$(RSYNC) $(RSYNCFLAG) init.el init.elc $(INSTALLDIR)/ | $(CLEAN.rsync)
