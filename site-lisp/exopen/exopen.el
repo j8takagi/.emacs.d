@@ -75,7 +75,7 @@ functions are called."
 ;;; exopen-std-cmdで指定されたプログラムを使用
 (defun exopen-file (file)
   "Open a file in external program."
-  (let ((process-connection-type nil) (cmd) (cmdargs))
+  (let ((process-connection-type nil) cmd cmdargs)
     (if exopen-suffix-cmd
         (setq cmd (cdr (assoc (file-name-extension file 1) exopen-suffix-cmd))))
     (unless cmd
