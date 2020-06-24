@@ -17,14 +17,17 @@
 
 (defcustom mpv-ts-default-pace 5
   "再生ペースの初期値。秒単位。時刻挿入時と再生時に用いられる"
+  :type 'integer
   :group 'mpv-ts-mode)
 
 (defcustom mpv-ts-speakers nil
   "発言者のリスト"
+  :type '(list string)
   :group 'mpv-ts-mode)
 
 (defcustom mpv-ts-speakers-string nil
   "発言者のリストの文字列"
+  :type 'string
   :group 'mpv-ts-mode)
 
 (make-variable-buffer-local 'mpv-ts-speakers-string)
@@ -32,6 +35,7 @@
 
 (defcustom mpv-ts-audio-file nil
   "再生する音声ファイル"
+  :type 'file
   :group 'mpv-ts-mode)
 
 (make-variable-buffer-local 'mpv-ts-audio-file)
@@ -145,6 +149,7 @@
     (when speaker
       (save-excursion
         (forward-line 0)
+        (insert "\n")
         (when (looking-at mpv-ts-time-speaker-pattern)
           (goto-char (match-beginning 5))
           (delete-region (match-beginning 5) (match-end 5))
@@ -168,6 +173,18 @@
       (insert "\n")
       (mpv-ts-insert-speak-prefix start-time speaker)
       (mpv-ts-play mpv-ts-audio-file start-time (mpv-ts-time-add start-time pace)))))
+
+(defun mpv-ts-insert-speak-lines (&optional num)
+  "再生開始時刻と発言者を複数行挿入する。
+挿入する再生時刻は、`mpv-ts-default-pace'で設定する。"
+  (interactive "P")
+  (let ((dnum 36))
+    (when (null num)
+      (setq num dnum))
+    (let ((i 0))
+      (while (< i num)
+        (mpv-ts-insert-speak-line)
+        (setq i (+ i 1))))))
 
 (defun mpv-ts-insert-new-speak-line (&optional pace)
   "再生開始時刻と新しい発言者を新しい行に挿入する。
@@ -235,6 +252,7 @@
         (set-window-buffer (next-window) mpv-ts-process-buffer-name)
         (setq proc-win (next-window)))
       (set-window-point proc-win (point-max))
+      (insert "\n")
       (select-window curr-win))))
 
 (defun mpv-ts-delete-process-window ()
