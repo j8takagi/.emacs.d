@@ -66,5 +66,7 @@
   (japanese-plus-normal-alnum-region from to)
   (japanese-plus-zenkaku-kana-region from to))
 
+(defalias 'japanese-plus-normal-all 'japanese-plus-normal-alnum-kana-region)
+
 (provide 'japanese-plus)
 ;;; japanese-plus.el ends here
