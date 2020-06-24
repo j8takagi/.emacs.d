@@ -520,6 +520,7 @@
     ("\\.ll?\\'" flex-mode)
     ("\\.md\\'" markdown-mode)
     ("\\.re\\'" review-mode)
+    ("\\.s\\'" asm-mode)
     ("\\.svg\\'" nxml-mode)
     ("\\.ts\\'" mpv-ts-mode)
     ("\\.wiki\\'" mediawiki-mode)
