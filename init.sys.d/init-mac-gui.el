@@ -92,7 +92,7 @@
   (listify-set
    '(set-view-mode-read-write-directory-patterns
      (
-      "~/Documents/201[4-9]_[01][0-9]"
+      "~/Documents"
       "~/.emacs.d/elpa" "/tmp" "/var"
       ))))
 
