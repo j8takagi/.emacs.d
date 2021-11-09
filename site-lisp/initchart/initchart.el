@@ -41,9 +41,6 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'cl-lib))
-
 (defun initchart-log (name start-time end-time &optional sub-name)
   (when (get-buffer "*initchart*")
     (with-current-buffer "*initchart*"

@@ -11,7 +11,7 @@
 ;;; Code:
 
 (defgroup ert-mode nil
-  "Transcription using mpv."
+  "ert-mnode for editing ERT files."
   :prefix "ert-"
   :group 'wp)
 

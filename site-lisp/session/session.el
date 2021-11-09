@@ -125,7 +125,6 @@
 
 ;; General Emacs/XEmacs-compatibility compile-time macros
 (eval-when-compile
-  (require 'cl)
   (defmacro cond-emacs-xemacs (&rest args)
     (cond-emacs-xemacs-macfn
      args "`cond-emacs-xemacs' must return exactly one element"))
@@ -1786,7 +1785,7 @@ this function to `after-init-hook'."
       ;; `session-restore-last-point' should be *very* late in `find-file-hook',
       ;; esp. if some package, e.g. crypt, iso-cvt, change the buffer contents:
       (add-hook 'find-file-hook 'session-restore-last-point t)
-      (add-hook 'find-file-not-found-hooks 'session-find-file-not-found-hook t)
+      (add-hook 'find-file-not-found-functions 'session-find-file-not-found-hook t)
       (add-hook 'kill-buffer-hook 'session-kill-buffer-hook)
       (if session-register-swap-out
       (add-hook 'kill-buffer-hook session-register-swap-out)))

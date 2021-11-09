@@ -33,8 +33,6 @@
 
 ;;; Code:
 
-(require 'cl-lib)
-
 (defvar tseg-patterns
   '(("[一二三四五六七八九十百千万億兆]" . "M")
     ("[一-龠々〆ヵヶ]" . "H")

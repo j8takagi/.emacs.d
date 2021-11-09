@@ -52,7 +52,7 @@ functions are called."
 (defvar exopen-std-cmd nil
   "Command name used when opening file external.")
 
-(defvar exopen-std-cmdargs nil
+(defvar exopen-std-cmdarg nil
   "Command arguments used when opening file external.")
 
 ;; システム別にexopen-std-cmdを設定する
@@ -63,8 +63,8 @@ functions are called."
        ((eq window-system 'mac) "open")
        ((eq window-system 'w32) "start")))
 
-;; システム別にexopen-std-cmdargsを設定する
-(setq exopen-std-cmdargs
+;; システム別にexopen-std-cmdargを設定する
+(setq exopen-std-cmdarg
       (cond
        ((eq window-system 'w32) "\"\"")))
 
@@ -75,17 +75,19 @@ functions are called."
 ;;; exopen-std-cmdで指定されたプログラムを使用
 (defun exopen-file (file)
   "Open a file in external program."
-  (let ((process-connection-type nil) cmd cmdargs)
+  (let ((process-connection-type nil) cmd cmdarg)
     (if exopen-suffix-cmd
         (setq cmd (cdr (assoc (file-name-extension file 1) exopen-suffix-cmd))))
     (unless cmd
       (setq cmd exopen-std-cmd)
-      (setq cmdargs exopen-std-cmdargs))
-    (let
+      (setq cmdarg exopen-std-cmdarg))
+    (let*
         (
-         (cmdstr (concat cmd " " cmdargs " \"" file "\""))
-         (proc (concat "exopen at " (format-time-string "%Y/%m/%d %H:%M:%S"))))
-      (message cmdstr)
+         (filequote (concat "\"" file "\""))
+         (cmdstr (mapconcat 'identity (list cmd cmdarg filequote) " "))
+         (msg (concat "exopen at " (format-time-string "%Y/%m/%d %H:%M:%S") ": " cmdstr ))
+         (proc "emacs-exopen"))
+      (message msg)
       (start-process-shell-command proc nil cmdstr)))
   (run-hooks 'exopen-file-hook))
 
