@@ -14,7 +14,7 @@
 (define-skeleton latex-template
   "template of LaTeX file."
   nil
-  "\\documentclass{jsarticle}" n
+  "\\documentclass[11pt, a4paper, uplatex]{jsarticle}" n
   "\\usepackage[dvipdfm,pdftitle={}]{hyperref}" n
   "\\usepackage{pxjahyper}" n
   "\\usepackage[dvipdfmx]{graphicx}" n
