@@ -21,7 +21,7 @@
     (font
      ,(fontset-set
        '(
-         (ascii (font-spec :family "Consolas" :weight 'normal :size 12))
+         (ascii (font-spec :family "Consolas" :weight 'normal :size 24))
          (unicode (font-spec :family "メイリオ"))
          )
        "mydefault_w32"))
@@ -58,7 +58,7 @@
 (with-eval-after-load 'view
   (listify-set
    '(set-view-mode-read-write-directory-patterns
-     ("E:/Documents/201[4-9]_[01][0-9]" "~/.emacs.d/elpa"
+     ("/Documents/"
       ))))
 
 (listify-global-set-keys
@@ -69,8 +69,8 @@
 ;; フックの設定
 (listify-set
  '(shell-mode-hook (set-buffer-process-coding-system-cp932))
- '(w32-ime-on-hook (ime-cursor-set-color))
- '(w32-ime-off-hook (ime-cursor-unset-color))
+ ;; '(w32-ime-on-hook (ime-cursor-set-color))
+ ;; '(w32-ime-off-hook (ime-cursor-unset-color))
  )
 
 (cd "~")
