@@ -19,6 +19,37 @@
  '("VISUAL" "emacsclient")
  )
 
+;; フレームの設定
+(my-init-set-default-frame-alist
+ `(
+   (font
+    ,(fontset-set
+      '(
+        (unicode . (font-spec :family "Source Han Code JP" :weight 'normal :slant 'normal :size 11))
+        )
+      "mydefault_mac"))
+   (width 180)
+   (height 52)
+   (top 23)
+   (left 0)
+   ))
+
+(defun mac-set-ime-cursor-color ()
+  "IMEのオンとオフにあわせ、カーソルの色を変える"
+  (interactive)
+  (catch 'match
+    (dolist
+        (imptn
+         '(
+           "^com\\.justsystems.inputmethod.atok[0-9]+\\.Japanese"
+           "^com\\.apple\\.inputmethod\\.Kotoeri\\.Japanese"
+           "^com\\.google\\.inputmethod\\.Japanese"
+           ))
+      (when (string-match imptn (mac-input-source))
+        (ime-cursor-set-color)
+        (throw 'match t)))
+    (ime-cursor-unset-color)))
+
 (listify-set
  `(default-frame-alist                  ; デフォルトフレーム
     (
