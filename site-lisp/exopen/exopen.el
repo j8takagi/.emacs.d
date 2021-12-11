@@ -1,6 +1,6 @@
 ;;; exopen-mode.el
 
-;; Copyright (C) 2015, 2013  j8takagi
+;; Copyright (C) 2021, 2015, 2013  j8takagi
 
 ;; Author: j8takagi <j8takagi@nifty.com>
 ;; Keywords: Emacs external program 外部プログラム
@@ -37,6 +37,7 @@
 ;; Windowシステム上でEmacsが動作している場合、exopen-mode は自動的に有効になります。
 ;;
 ;; ■hook
+
 (require 'dired)
 
 ;; hook
@@ -47,48 +48,30 @@ functions are called."
   :group 'find-file
   :type 'hook)
 
-;; exopen-std-cmd: OSやWindowで設定された関連付けをもとに
-;; ファイルを開くプログラムコマンドとオプション
-(defvar exopen-std-cmd nil
-  "Command name used when opening file external.")
-
-(defvar exopen-std-cmdarg nil
-  "Command arguments used when opening file external.")
-
-;; システム別にexopen-std-cmdを設定する
-(setq exopen-std-cmd
-      (cond
-       ((eq window-system 'x) "xdg-open")
-       ((eq window-system 'ns) "open")
-       ((eq window-system 'mac) "open")
-       ((eq window-system 'w32) "start")))
-
-;; システム別にexopen-std-cmdargを設定する
-(setq exopen-std-cmdarg
-      (cond
-       ((eq window-system 'w32) "\"\"")))
-
-;; exopen-modeでの拡張子とプログラムの関連付けリスト
-(defvar exopen-suffix-cmd nil)
-
 ;;; ファイルを外部プログラムでオープン
-;;; exopen-std-cmdで指定されたプログラムを使用
 (defun exopen-file (file)
-  "Open a file in external program."
-  (let ((process-connection-type nil) cmd cmdarg)
-    (if exopen-suffix-cmd
-        (setq cmd (cdr (assoc (file-name-extension file 1) exopen-suffix-cmd))))
-    (unless cmd
-      (setq cmd exopen-std-cmd)
-      (setq cmdarg exopen-std-cmdarg))
-    (let*
-        (
-         (filequote (concat "\"" file "\""))
-         (cmdstr (mapconcat 'identity (list cmd cmdarg filequote) " "))
-         (msg (concat "exopen at " (format-time-string "%Y/%m/%d %H:%M:%S") ": " cmdstr ))
-         (proc "emacs-exopen"))
-      (message msg)
-      (start-process-shell-command proc nil cmdstr)))
+  "Open a file with external program."
+  ;;; 指定したファイルが実在しない場合はエラー終了
+  (unless (file-exists-p file)
+    (error "%s: File does not exist." file))
+  (let (
+        ;; システム別の外部プログラムオープンコマンド
+        (opencmd-alist
+         '(
+           (gnu/linux . ("xdg-open"))
+           (gnu/kfreebsd . ("xdg-open"))
+           (darwin . ("open"))
+           (windows-nt . ("start" "\"\""))))
+        ;; xdg-open用の設定
+        ;; 参照: https://emacs.stackexchange.com/questions/19344/why-does-xdg-open-not-work-in-eshell
+        (process-connection-type nil)
+        opencmd cmdstr)
+    (unless (car (setq opencmd (cdr (assoc system-type opencmd-alist))))
+      (error "There is no external open command on this `%s' system." system-type))
+    (setq opencmd (append opencmd (list (shell-quote-argument file))))
+    (setq cmdstr (mapconcat 'identity opencmd " "))
+    (message "exopen at %s: %s" (format-time-string "%Y/%m/%d %H:%M:%S") cmdstr)
+    (start-process-shell-command "emacs-exopen" nil cmdstr))
   (run-hooks 'exopen-file-hook))
 
 ;;; バッファで開いているファイルを外部プログラムでオープン
@@ -108,7 +91,7 @@ functions are called."
     (setq afile (concat (file-name-sans-extension (buffer-file-name)) suffix))
     (if (file-exists-p afile)
         (exopen-file afile)
-      (error (concat afile ": file not found")))))
+      (error "%s: file not found" afile))))
 
 ;;; 指定したファイルと同名のPDFファイルを外部プログラムでオープン
 (defun exopen-buffer-pdffile ()
@@ -137,15 +120,21 @@ functions are called."
       (exopen-buffer-file)
     (exopen-file (expand-file-name (read-file-name "Find external open file: " buffer-file-name)))))
 
-;; カーソル下のファイルやディレクトリーを外部プログラムで開く
+;; 現在のディレクトリーを外部プログラムで開く
+(defun exopen-default-directory ()
+  "Open current directory in external program"
+  (interactive)
+  (exopen-file (expand-file-name default-directory)))
+
+;; dired-modeでカーソル下のファイルやディレクトリーを外部プログラムで開く
 (defun dired-exopen-file ()
   "Open file mentioned on this line in external program"
   (interactive)
   (exopen-file (dired-get-filename)))
 
-;; 現在のディレクトリーを外部プログラムで開く
+;; diredで現在のディレクトリーを外部プログラムで開く
 (defun dired-exopen-current-directory ()
-  "Open current directory in external program"
+  "Open dired current directory in external program"
   (interactive)
   (exopen-file (expand-file-name dired-directory)))
 
