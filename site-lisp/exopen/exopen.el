@@ -65,13 +65,14 @@ functions are called."
         ;; xdg-open用の設定
         ;; 参照: https://emacs.stackexchange.com/questions/19344/why-does-xdg-open-not-work-in-eshell
         (process-connection-type nil)
+        (procname "exopen")
         opencmd cmdstr)
     (unless (car (setq opencmd (cdr (assoc system-type opencmd-alist))))
       (error "There is no external open command on this `%s' system." system-type))
     (setq opencmd (append opencmd (list (shell-quote-argument file))))
     (setq cmdstr (mapconcat 'identity opencmd " "))
-    (message "exopen at %s: %s" (format-time-string "%Y/%m/%d %H:%M:%S") cmdstr)
-    (start-process-shell-command "emacs-exopen" nil cmdstr))
+    (message "Process %s starts at %s: %s" procname (format-time-string "%Y/%m/%d %H:%M:%S") cmdstr)
+    (start-process-shell-command procname (messages-buffer) cmdstr))
   (run-hooks 'exopen-file-hook))
 
 ;;; バッファで開いているファイルを外部プログラムでオープン
