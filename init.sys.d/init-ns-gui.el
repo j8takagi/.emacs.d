@@ -49,6 +49,7 @@
      ))
 ; '(face-font-rescale-alist (("Hiragino Sans" 1.167) ("YuGothic" 1.167)))
  '(ns-command-modifier meta)        ; commandキーをEmacsのMetaキーに
+ '(ns-alternate-modifier none)
 ; '(mac-auto-ascii-mode t) ; ミニバッファへのカーソル移動時、日本語IMEを自動オフ
  )
 
