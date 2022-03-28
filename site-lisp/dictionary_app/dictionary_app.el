@@ -20,8 +20,5 @@
   (interactive)
   (dictionary_app (word-at-point)))
 
-(global-set-key (kbd "C-c w") 'dictionary_app)
-(global-set-key (kbd "C-c W") 'dictionary_app-at-point)
-
 (provide 'dictionary_app)
 ;;; dictionary_app.el ends here

@@ -110,19 +110,19 @@
       "~/.emacs.d/elpa" "/tmp" "/var"
       ))))
 
-(require 'dictionary_app)
+(listify-requires 'dictionary_app)
 
 ;; Mac OS Xのキー設定
 (listify-global-set-keys
  '("<M-f1>" other-frame)    ; Mac OS Xの他アプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする
+ '("C-c C-M-d" dictionary_app)
  '("C-c C-d" dictionary_app-at-point)
- '("C-c C-w" dictionary_app)
  )
 
-;; (listify-set
-;;  '(mac-selected-keyboard-input-source-change-hook mac-ime-cursor-change-color)
-;;  '(focus-in-hook mac-ime-cursor-change-color)
-;;  )
+(listify-modemap-set-keys
+ '(dired-mode-map "dired" nil
+   (
+    ("SPC" dired-quicklookup))))
 
 (remove-hook 'first-change-hook 'ns-unselect-line)
 
