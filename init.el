@@ -58,6 +58,7 @@
  'browse-kill-ring                 ; For when 'C-y M-y M-y M-y' gets you down https://github.com/j8takagi/browse-kill-ring
  'buffer-window-plus               ; バッファとウィンドウの操作関数
  'count-japanese                   ; 日本語の文字数をカウント
+ 'daily-log                        ; 毎日のログ
  'ediff-vc-plus                    ; Ediffの追加関数
  'exopen                           ; 外部プログラムでファイルを開く
  'ffap-plus
@@ -554,6 +555,7 @@
  '("C-M-g" keyboard-escape-quit)
  '("C-`" expand-abbrev)
  '("C-c +" make-directory)
+ '("C-c 1" daily-log-open)
  '("C-c C-c" comment-region)
  '("C-c C-u" uncomment-region)
  '("C-c C-v" view-mode)
