@@ -30,7 +30,7 @@
   (interactive)
   (let ((save-silently 1)
         (dbuf (get-file-buffer (daily-log-file nil))))
-    (when (buffer-modified-p dbuf)
+    (when (and dbuf (buffer-modified-p dbuf))
       ;; (message "[Debug] Daily log file:%s is saved." daily-log-file)
       (set-buffer dbuf)
       (basic-save-buffer))))
