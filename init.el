@@ -31,6 +31,7 @@
  'gnuplot
  'graphviz-dot-mode
  'inf-ruby
+ 'js2-mode
  'magit
  'markdown-mode
  'mediawiki
