@@ -72,7 +72,6 @@
  'not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
  'replace-plus                     ; 置換機能の拡張
  'scroll-one-line                  ; 1行スクロール
- 'session
  'temp-buffer                      ; 一時バッファの作成
  'window-control                   ; ウィンドウとフレームのサイズを調整
  'xlfd-at                          ; フォント情報の表示
@@ -136,6 +135,7 @@
  `(custom-file ,(locate-user-emacs-file ".emacs-custom.el")) ;カスタムの設定値を書き込むファイル
  '(delete-by-moving-to-trash t)      ;  ファイルの削除で、ゴミ箱を使う
  '(delete-old-versions t) ; 古いバックアップファイルを自動的に削除する
+ '(desktop-save-mode 1)
  '(disabled-command-function nil) ; すべてのコマンドの使用制限を解除する
  '(display-buffer-alist
    (("^\\*shell\\*$" (display-buffer-same-window))
@@ -158,8 +158,6 @@
  '(ring-bell-function ignore)  ; エラー時、なにもしない
  '(save-interprogram-paste-before-kill t) ; 他アプリのコピーバッファをkill-ringに保存する
  '(scroll-conservatively 1) ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
- '(session-file-name-history-exclude-regexps ("\\.emacs\\.d/" "~$" "COMMIT_EDITMSG")) ; sessionで、file-name-historyから除外するファイル
- '(session-restore-last-point-exclude-regexps ("COMMIT_EDITMSG")) ; session-restore-last-pointから除外するファイル
  '(show-paren-mode t)             ; 括弧の対応を表示
  '(tab-width 4)                  ; タブ幅は4
  '(tool-bar-mode nil)            ; ツールバーを表示しない
