@@ -35,7 +35,6 @@
  'magit
  'markdown-mode
  'mediawiki
- 'mew
  'pandoc
  'sokoban
  'swift-mode
@@ -154,7 +153,6 @@
  '(make-backup-files t)           ; バックアップファイルを作成する
  '(menu-bar-mode nil)             ; メニューバーを表示しない
  '(next-line-add-newlines nil) ; ファイル末尾での改行で、end of bufferエラーが発生しないように
- '(read-mail-command mew)      ; メールを読むときにmewを使う
  '(ring-bell-function ignore)  ; エラー時、なにもしない
  '(save-interprogram-paste-before-kill t) ; 他アプリのコピーバッファをkill-ringに保存する
  '(scroll-conservatively 1) ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
@@ -265,8 +263,8 @@
    '(whitespace-trailing-regexp "\\( +$\\)")
    '(whitespace-disabled-major-mode-list
      (
-     Custom-mode mew-summary-mode completion-list-mode help-mode
-     magit-mode tetris-mode w3m-mode mew-message-mode shell-mode
+     Custom-mode completion-list-mode help-mode
+     magit-mode tetris-mode w3m-mode shell-mode
      ))
    '(after-change-major-mode-hook (set-whitespace-mode))
    '(view-mode-hook (set-whitespace-mode)))
@@ -446,17 +444,6 @@
    '(auto-insert-alist ((graphviz-dot-mode graphviz-dot-template)))
    '(graphviz-dot-mode-hook (kill-local-compile-command))
    ))
-
-;;
-;; mew
-;;
-(define-mail-user-agent
-  'mew-user-agent
-  'mew-user-agent-compose
-  'mew-draft-send-message
-  'mew-draft-kill
-  'mew-send-hook
-  )
 
 ;; markdown-mode
 (with-eval-after-load 'markdown-mode
