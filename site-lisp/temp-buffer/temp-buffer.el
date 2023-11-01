@@ -4,7 +4,7 @@
   (interactive)
   ;; バッファ名は現在の日時
   (switch-to-buffer
-   (generate-new-buffer (format-time-string "%m-%d")))
+   (generate-new-buffer (format-time-string "*temporary buffer %m-%d %H:%M*")))
   ;; text-modeを設定
   (text-mode))
 
