@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;;; jaword.el --- Minor-mode for handling Japanese words better
 
 ;; Copyright (C) 2014-2015 zk_phi
@@ -17,9 +18,9 @@
 ;; Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 ;; Author: zk_phi
-;; URL: http://hins11.yu-yake.com/
-;; Version: 1.0.0
-;; Package-Requires: ((tinysegmenter "0.1"))
+;; URL: http://zk-phi.github.io/
+;; Version: 1.0.1
+;; Package-Requires: ((tinysegmenter "0.1") (emacs "25.1"))
 
 ;;; Commentary:
 
@@ -44,6 +45,7 @@
 ;;; Change Log:
 
 ;; 1.0.0 first released
+;; 1.0.1 Migrate to nadvice.el (now requires Emacs 25.1 or later)
 
 ;;; Code:
 
@@ -61,21 +63,23 @@
 (defcustom jaword-buffer-size 50
   "size of text passed to the segmenter. set larger for better
 accuracy, but slower speed."
-  :group 'jaword)
+  :group 'jaword
+  :type 'integer)
 
 (defcustom jaword-enable-subword t
   "when non-nil, handle subwords like `subword-mode'."
-  :group 'jaword)
+  :group 'jaword
+  :type 'boolean)
 
 ;; + internal functions
 
 (defun jaword--segment-around-point ()
   (let* ((back (buffer-substring-no-properties
-                (max (point-min) (- (point) (lsh jaword-buffer-size -1)))
+                (max (point-min) (- (point) (ash jaword-buffer-size -1)))
                 (point)))
          (forward (buffer-substring-no-properties
                    (point)
-                   (min (point-max) (+ (point) (lsh jaword-buffer-size -1)))))
+                   (min (point-max) (+ (point) (ash jaword-buffer-size -1)))))
          (_ (when (> (length forward) 0) ; mark the beginning of "forward"
               (put-text-property 0 1 'base-pos t forward)))
          (str (concat back forward))
@@ -105,7 +109,7 @@ accuracy, but slower speed."
       (dotimes (_ arg)
         (cond ((and (progn
                       (skip-chars-backward "\s\t\n")
-                      (looking-back "\\Ca"))
+                      (looking-back "\\Ca" (point-min)))
                     (setq segment (car (jaword--segment-around-point))))
                (search-backward
                 (replace-regexp-in-string "^[\s\t\n]*" "" segment)))
@@ -201,7 +205,7 @@ accuracy, but slower speed."
 ;; + isearch support
 
 ;;;###autoload
-(defadvice isearch-yank-word-or-char (around jaword-support-isearch activate)
+(define-advice isearch-yank-word-or-char (:around (fn &rest args) jaword-support-isearch)
   "Add support for jaword."
   (if (bound-and-true-p jaword-mode)
       (isearch-yank-internal
@@ -211,25 +215,24 @@ accuracy, but slower speed."
              (jaword-forward 1)
            (forward-char 1))
          (point)))
-    ad-do-it))
+    (apply fn args)))
 
 ;;;###autoload
-(defadvice isearch-yank-word (around jaword-support-isearch activate)
+(define-advice isearch-yank-word (:around (fn &rest args) jaword-support-isearch)
   "Add support for jaword."
   (if (bound-and-true-p jaword-mode)
       (isearch-yank-internal (lambda () (jaword-forward 1) (point)))
-    ad-do-it))
+    (apply fn args)))
 
 ;; + subword workaround
 
 ;; `subword-backward' by default sometimes moves cursor too far. for
 ;; example, after "ほげ1", `backward-word' moves cursor between "げ"
 ;; and "1", but `subword-backward' moves before "ほ"
-(defadvice subword-backward (around jaword-fix-subword (arg) activate)
+(define-advice subword-backward (:around (fn &rest args) jaword-fix-subword)
   "Don't move cursor further than `forward-word'."
-  (interactive "^p")
-  (goto-char (max (save-excursion (backward-word arg) (point))
-                  (save-excursion ad-do-it (point)))))
+  (goto-char (max (save-excursion (backward-word (car args)) (point))
+                  (save-excursion (apply fn args) (point)))))
 
 ;; + provide
 
