@@ -56,7 +56,6 @@
  'whitespace
  ;; ~/.emacs.d/site-lisp
  'auto-elc-mode                    ; .elファイルの自動コンパイル
- 'browse-kill-ring                 ; For when 'C-y M-y M-y M-y' gets you down https://github.com/j8takagi/browse-kill-ring
  'buffer-window-plus               ; バッファとウィンドウの操作関数
  'count-japanese                   ; 日本語の文字数をカウント
  'daily-log                        ; 毎日のログ
