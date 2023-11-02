@@ -1,4 +1,4 @@
-TARGET := sh-revert-dired-buffers         # "set this parameter, or error."
+TARGET := revert-dired-buffers         # "set this parameter, or error."
 TARGETDIR := $(TARGET)
 
 EMACS := emacs
