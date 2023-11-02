@@ -40,21 +40,6 @@ Each element of ARCHIVES has the form (ID LOCATION)."
     (when pkgdesc
       (mapcar 'car (package-desc-reqs (cadr pkgdesc))))))
 
-(defun listify-packages-list-dependent (pkg &optional pkg-from)
-  "Check whether PKG is installed. When not installed, the installation begins.
-If the package requires other packages, installation of the packges begin recursively.
-This function returns the list of (`package' `required package')."
-  (let (pkgs req-pkgs)
-    (unless (package-installed-p pkg)
-      (when pkg-from
-        (message "Package `%s' required from `%s' is not installed." pkg pkg-from))
-      (listify-packages-install pkg))
-    (push (cons pkg pkg-from) pkgs)
-    (dolist (req-pkg (listify-packages-required pkg))
-      (dolist (rp (listify-packages-list-dependent req-pkg pkg))
-        (push rp pkgs)))
-    pkgs))
-
 (defun listify-packages-message-update (pkgs)
   (package-menu--refresh pkgs)
   (dolist (pkg (package-menu--find-upgrades))
