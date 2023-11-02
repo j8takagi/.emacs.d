@@ -4,6 +4,7 @@
 (message "Start of loading %s." load-file-name)
 
 (require 'listify)
+(require 'dired)
 
 (listify-requires
  'fontset-set
