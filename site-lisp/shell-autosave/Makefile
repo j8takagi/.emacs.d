@@ -1,4 +1,4 @@
-TARGET := ffap-plus         # "set this parameter, or error."
+TARGET := shell-autosave        # "set this parameter, or error."
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

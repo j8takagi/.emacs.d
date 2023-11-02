@@ -1,4 +1,4 @@
-TARGET := ffap-plus         # "set this parameter, or error."
+TARGET := sh-revert-dired-buffers         # "set this parameter, or error."
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

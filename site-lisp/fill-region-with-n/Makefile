@@ -1,4 +1,4 @@
-TARGET := ffap-plus         # "set this parameter, or error."
+TARGET := fill-region-with-n         # "set this parameter, or error."
 TARGETDIR := $(TARGET)
 
 EMACS := emacs
