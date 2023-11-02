@@ -15,4 +15,4 @@ mode is in the disabled list."
       (whitespace-mode 0)
     (whitespace-mode 1)))
 
-(provide 'whitespace-plus)
+(provide 'whitespace-set)

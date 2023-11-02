@@ -1,4 +1,4 @@
-TARGET := whitespace-plus         # "set this parameter, or error."
+TARGET := whitespace-set         # "set this parameter, or error."
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

@@ -252,7 +252,7 @@
 ;; whitespace
 (with-eval-after-load 'whitespace
   (listify-requires
-   'whitespace-plus
+   'whitespace-set
    )
   ;タブ	、全角スペース　、行末の空白    
   (listify-set
