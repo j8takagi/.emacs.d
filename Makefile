@@ -10,14 +10,18 @@ RSYNC := rsync
 RSYNCFLAG := -avz --delete
 
 COMPILE.el := $(EMACS) -batch -l set-compile.el -f batch-byte-compile
+NATIVE-COMPILE.el := $(EMACS) -batch -l set-compile.el -l native-compile.el -f init-native-compile
 CLEAN.rsync := $(GREPV) "^\(sent\)\|\(total\)\|\(sending\)"
 INSTALLDIR := ~/.emacs.d
 
-.PHONY: all init site-lisp install install-init.sys.d install-site-lisp check test
+.PHONY: all init native-compile site-lisp install install-init.sys.d install-site-lisp check test
 
-all: init init.sys.d insert install-site-lisp
+all: init native-compile init.sys.d insert install-site-lisp
 
-init: init.elc
+init: init.elc native-compile
+
+native-compile: init.el
+	$(NATIVE-COMPILE.el) $<
 
 init.sys.d:
 	$(MAKE) -C $@
