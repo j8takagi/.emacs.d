@@ -10,7 +10,7 @@
 
 ;;; Code:
 
-(defun revert-dired-buffers (command &optional output-buffer error-buffer)
+(defun revert-dired-buffers (&optional command output-buffer error-buffer)
   (interactive)
   (dolist (b (buffer-list))
     (set-buffer b)
@@ -18,7 +18,8 @@
       (condition-case err
             (revert-buffer nil 1)))))
 
-;(advice-add 'shell-command :after 'revert-dired-buffers)
+(advice-add 'shell-command :after 'revert-dired-buffers)
+(advice-add 'switch-to-buffer :after 'revert-dired-buffers)
 
 ;(advice-add 'dired-mode :after 'auto-revert-mode)
 
