@@ -9,8 +9,11 @@
 
 
 ;;; Code:
+(require 'fontset)
+
 (defun xlfd-at (pos)
-  "Return X logical font description (XLFD) of the font at POS in the current buffer."
+  "Return X logical font description (XLFD) of
+the font at POS in the current buffer."
   (if (not (display-graphic-p))
       (message "Display is not graphic. So font is not used.")
     (font-xlfd-name (font-at pos))))

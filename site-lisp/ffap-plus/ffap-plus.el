@@ -9,6 +9,8 @@
 
 
 ;;; Code:
+(require 'ffap)
+
 (defun find-file-at-point-immediate ()
   (interactive)
   (let (afile)

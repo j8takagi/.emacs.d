@@ -44,7 +44,8 @@ Or, input FILE as 'FILE.~REVISON~' and FILE and REVISION is specified."
 
 ;;;###autoload
 (defun dired-ediff-vc-latest-current ()
-  "Run Ediff of file named on this line by comparing the latest version and current."
+  "Run Ediff of file named on this line by comparing the latest
+  version and current."
   (interactive)
   (let ((find-file-run-dired nil))
     (find-file (dired-get-file-for-visit))

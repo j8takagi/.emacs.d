@@ -9,6 +9,8 @@
 ;;; Code:
 
 ;;;###autoload
+(require 'thingatpt)
+
 (defun dictionary_app (word)
   "Mac OSの辞書.appを開き、WORDの単語を調べる"
   (interactive "sWord:")

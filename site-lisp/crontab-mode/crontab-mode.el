@@ -165,7 +165,7 @@ Sets up command `font-lock-mode'.
     (erase-buffer)
     (crontab-mode)
     (crontab-insert host)
-    (not-modified)
+    (set-buffer-modified-p 1)
     (setq crontab-host host)) )
 
 (defun crontab-insert (&optional host)
@@ -213,7 +213,7 @@ Sets up command `font-lock-mode'.
 (defun crontab-host ()
   "Return the hostname as a string, defaulting to the local host.
 The variable `crontab-host' could be a symbol or a string."
-  (format "%s" (or crontab-host system-name)) )
+  (format "%s" (or crontab-host (system-name))) )
 
 ;;
 (defun crontab-after-save ()

@@ -9,6 +9,8 @@
 
 
 ;;; Code:
+(require 'japan-util)
+
 (defun japanese-plus-hankaku-region (regexp from to)
   "Convert REGEXP `zenkaku' chars in the region to `hankaku' chars."
   (save-restriction
@@ -61,7 +63,9 @@
 
 ;;;###autoload
 (defun japanese-plus-normal-alnum-kana-region (from to)
-  "Convert `zenkaku' letters and digits to normal letters and digits and Japanese `hankaku kana' chars in the region to `zenkaku kana' chars in the region."
+  "Convert `zenkaku' letters and digits to normal letters and digits
+and Japanese `hankaku kana' chars in the region to `zenkaku kana'
+chars in the region."
   (interactive "r")
   (japanese-plus-normal-alnum-region from to)
   (japanese-plus-zenkaku-kana-region from to))

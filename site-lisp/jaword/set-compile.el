@@ -1,11 +1,5 @@
-(normal-top-level-add-subdirs-to-load-path)
-
-(require 'package)
-(package-initialize)
-
-(require 'server)
-
 (add-to-list 'load-path default-directory)
+(add-to-list 'load-path (concat default-directory "/../tinysegmenter"))
 
 ;; Local Variables:
 ;; no-byte-compile: t

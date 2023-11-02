@@ -33,8 +33,8 @@
 (defun rdoc-fill-paragraph (&rest args)
   "Fills paragraph, except for cited region"
   (interactive (progn
-		 (barf-if-buffer-read-only)
-		 (list (if current-prefix-arg 'full))))
+         (barf-if-buffer-read-only)
+         (list (if current-prefix-arg 'full))))
   (save-excursion
     (beginning-of-line)
     (unless (looking-at "^ +")

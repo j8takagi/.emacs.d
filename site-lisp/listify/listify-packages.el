@@ -1,6 +1,6 @@
-;;; listify-packages.el --- 
+;;; listify-packages.el ---
 
-;; Copyright (C) 2018 by Kazubito Takagi
+;; Copyright (C) 2018-2023 by Kazubito Takagi
 
 ;; Authors: Kazubito Takagi
 ;; Keywords: 
@@ -62,27 +62,49 @@ This function returns the list of (`package' `required package')."
              (car pkg) (package-desc-version (cdr pkg)))))
 
 (defun listify-packages-message-unexpected (pkgs real-pkgs)
-  (dolist (pkg pkgs)
-    (setq real-pkgs (delete pkg real-pkgs)))
-  (when real-pkgs
-    (message "Info: Unexpected installed packages %s" real-pkgs)))
+  (dolist (real-pkg real-pkgs)
+    (unless (member real-pkg pkgs)
+      (message "Info: Package %s is installed, but unexpected." real-pkg))))
 
-(defun listify-packages-check (&rest package)
+(defun listify-packages-dependent-alist (pkg &optional pkg-from)
+  "Return the list of dependent packages alist.
+alist form is :
+(`package' . `dependent package') ..."
+  (let (pkgs req-pkgs)
+    (unless (package-installed-p pkg)
+      (when pkg-from
+        (message "Package `%s' required from `%s' is not installed." pkg pkg-from))
+      (listify-packages-install pkg))
+    (unless (equal pkg 'emacs)
+      (push (cons pkg pkg-from) pkgs)
+      (dolist (req-pkg (listify-packages-required pkg))
+        (dolist (rp (listify-packages-dependent-alist req-pkg pkg))
+          (push rp pkgs))))
+    (delete-dups pkgs)))
+
+(defun listify-packages-dependent-list (pkg-from)
+  (let (pkgs)
+    (dolist (pkg
+             (delete-dups
+              (mapcar 'car (listify-packages-dependent-alist pkg-from))))
+      (push pkg pkgs))
+    pkgs))
+
+(defun listify-packages-check (&rest packages)
   "Check the packages in PACKAGE, packages and dependent packages are
 installed and updated, and unexpected packages are not installed."
   (unless package--initialized
     (package-initialize))
-  (let (pkgs deps real-pkgs update-pkgs)
-    (message "Required packages - %s" package)
-    (dolist (req-pkg package)
-      (push req-pkg pkgs)
-      (dolist (pkg (listify-packages-list-dependent req-pkg))
-        (when (and (cdr pkg) (null (member (car pkg) pkgs)) (null (package-built-in-p (car pkg))))
-          (push pkg deps)
-          (push (car pkg) pkgs))))
-    (message "Package and require package - %s" deps)
-    (message "Installed packages - %s"
-             (setq real-pkgs (nreverse (mapcar 'car package-alist))))
+  (let (real-pkgs pkgs)
+    (message "Specified packages - %s" packages)
+    (setq real-pkgs (nreverse (mapcar 'car package-alist)))
+    (message "Installed packages - %s" real-pkgs)
+    (dolist (pkg-from packages)
+      (dolist (pkg (listify-packages-dependent-list pkg-from))
+        (unless (equal pkg pkg-from)
+          (message "Package `%s' is required from `%s'." pkg pkg-from))
+        (push pkg pkgs)))
+    (delete-dups pkgs)
     ;; updated packages
     (listify-packages-message-update real-pkgs)
     ;; installed packages not in REQ-PKG-LIST

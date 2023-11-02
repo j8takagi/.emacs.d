@@ -24,6 +24,7 @@
 
 ;; (require 'sorter)
 ;; (setq insert-directory-program "~/GNUls"))
+(require 'dired)
 
 (defun dired-toggle-sort ()
   "Toggle between sort by name/date/extension/size and refresh the dired."

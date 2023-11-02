@@ -82,7 +82,7 @@
 ;;}}}
 ;;{{{ TODO:
 
-;;    - PostScript printer  (Done 7 June 2006)
+;;    - Postscript Printer  (Done 7 June 2006)
 ;;    - Code translator
 
 ;;}}}
@@ -90,7 +90,7 @@
 ;;; Code:
 
 (eval-when-compile
-  (require 'cl))
+  (require 'cl-lib))
 
 (require 'derived)
 ;; (require 'completer)
@@ -101,6 +101,7 @@
 
 (defgroup eukleides nil
   "Group to customize eukleides major mode."
+  :group 'languages
   :version eukleides-version
   :link '(url-link "http://www.emacswiki.org/cgi-bin/wiki/eukleides.el")
   :prefix "eukleides-"
@@ -111,13 +112,13 @@
   :type 'boolean
   :group 'eukleides)
 
-;; (defcustom eukleides-image-type (cdar image-formats-alist)
-;;   "Image type used to display sketch."
-;;   :type (list 'choice
-;;               (mapcar (lambda (fmt)
-;;                         (list 'const fmt))
-;;                       image-formats-alist))
-;;   :group 'eukleides)
+(defcustom eukleides-image-type (cdar image-formats-alist)
+  "Image type used to display sketch."
+  :type (list 'choice
+              (mapcar (lambda (fmt)
+                        (list 'const fmt))
+                      image-format-suffixes))
+  :group 'eukleides)
 
 (defcustom eukleides-scale-factor 2.0
   "Scale value."
@@ -177,8 +178,8 @@
     (modify-syntax-entry ?= "." st)
 
     ;; PSTricks uses square brackets
-    (modify-syntax-entry ?[ "(" st)
-    (modify-syntax-entry ?] ")" st)
+    (modify-syntax-entry ?\[ "(" st)
+    (modify-syntax-entry ?\] ")" st)
     st)
   "Syntax table for `eukleides-mode'.")
 
@@ -741,7 +742,7 @@ An angular parameter is a number valued expression followed by `:'
 (font-lock-add-keywords
  'eukleides-mode
  (mapcar
-  '(lambda (keyword)
+  #'(lambda (keyword)
      (cons (concat "\\<" keyword "\\>") 'font-lock-keyword-face))
   '("abs" "abscissa" "acos" "altitude" "and" "angle" "append" "area"
     "arg" "arrow" "arrows" "asin" "atan" "back" "barycenter" "bisector"
@@ -804,7 +805,7 @@ START and END specifies point restrictions."
   (save-restriction
     (narrow-to-region start end)
     (nreverse
-     (delete-duplicates
+     (delete-dups
       ;; Reverse the list, so if duplicates are removed the last
       ;; definition is reminded, after removing duplicates nreverse
       ;; again, so most recent variables occurs first in returned list
@@ -818,11 +819,11 @@ START and END specifies point restrictions."
                     (push (cons (match-string 2) (match-beginning 2)) ret))
                   ret))
               (mapcar #'eukleides-imenu-create-mexp
-                      (loop for kw in eukleides-keywords
-                        when (and (consp (eukleides-keyword-type kw))
-                                  (eq 'list (car (eukleides-keyword-type kw))))
-                        collect kw))))
-      :key 'car :test 'string=))))
+                      (dolist (kw eukleides-keywords)
+                        (when (and (consp (eukleides-keyword-type kw))
+                                   (eq 'list (car (eukleides-keyword-type kw))))
+                        (collect kw))))))))
+      :key 'car :test 'string=))
 
 (defun eukleides-imenu-create-function ()
   "Imenu generator for Eukleides files."
@@ -873,10 +874,7 @@ package. Note that the latest (S)XEmacs releases contain this package.")
   (when (ignore-errors (require 'imenu))
     (setq imenu-create-index-function 'eukleides-imenu-create-function)
     (if (fboundp 'imenu-add-to-menubar)
-	(imenu-add-to-menubar (format "%s-%s" "IM" mode-name))))
-  ;; Add menu
-  (if eukleides-menu
-      (easy-menu-add eukleides-menu))
+    (imenu-add-to-menubar (format "%s-%s" "IM" mode-name))))
   )
 
 (defun eukleides-indent-line ()
@@ -901,8 +899,8 @@ package. Note that the latest (S)XEmacs releases contain this package.")
   "Return beginning of current statement."
   (save-excursion
     (save-restriction
-      (narrow-to-region (point-at-bol) (point-at-eol))
-      (let ((sl (scan-lists (point) -1 1 nil t))
+      (narrow-to-region (pos-bol) (pos-eol))
+      (let ((sl (scan-lists (point) -1 1))
             (sc (and (or (search-backward ";" nil t)
                          (search-backward "=" nil t))
                      (match-end 0))))
@@ -913,7 +911,7 @@ package. Note that the latest (S)XEmacs releases contain this package.")
                (backward-word)
                (point))
               ((and (not sc) (not sl))
-               (point-at-bol))
+               (pos-bol))
               ((and (not sl) sc)
                (goto-char sc)
                (and (looking-at "\\s-*\\(.\\)")
@@ -963,11 +961,11 @@ package. Note that the latest (S)XEmacs releases contain this package.")
                 (let ((ms (or (match-string 1) (match-string 2)))
                       (masreg
                        (regexp-opt
-                        (loop for kw in eukleides-keywords
-                          when (and (consp (eukleides-keyword-type kw))
-                                    (eq 'list
-                                        (car (eukleides-keyword-type kw))))
-                          collect (eukleides-keyword-name kw)))))
+                        (dolist (kw eukleides-keywords)
+                          (when (and (consp (eukleides-keyword-type kw))
+                                     (eq 'list
+                                         (car (eukleides-keyword-type kw))))
+                            (collect (eukleides-keyword-name kw)))))))
                   (and (string-match masreg ms) :point))))
             ))))
 
@@ -994,8 +992,8 @@ package. Note that the latest (S)XEmacs releases contain this package.")
 Return list in form:
 \(number-of-args point-at-arg arg1 arg2 ..\)"
   (let* ((cp (point))                   ; current point
-         (abp (scan-lists (point) -1 1 nil t)) ; args beginning point
-         (aep (scan-lists (point) 1 1 nil t)) ; args ending point
+         (abp (scan-lists (point) -1 1)) ; args beginning point
+         (aep (scan-lists (point) 1 1)) ; args ending point
          (last-point abp)
          (args nil) (args-count 0) (paa nil))
     ;; AEP is not necessary, only ABP is required
@@ -1004,7 +1002,7 @@ Return list in form:
         (goto-char (1+ abp))
         (while (and (> (point) last-point) (or (null aep) (< (point) aep))
                     (or (and
-                         (let ((gp (scan-lists (point) 1 0 nil t)))
+                         (let ((gp (scan-lists (point) 1 0)))
                            (when (and gp (or (null aep) (< gp aep)))
                              (save-excursion
                                (goto-char gp)
@@ -1176,7 +1174,7 @@ ARGS in form (number-of-args point-at-arg arg1 arg2 ..)."
     (insert "eukleides " (file-name-nondirectory srcfile) "\n")
     (insert (file-name-nondirectory srcfile) ": ")
 
-    (insert-file compfile)
+    (insert-file-contents compfile)
     (goto-char (point-min))
     ;; Convert warning/error messages to supported format
     (while (re-search-forward " \\(?:Error\\|Warning\\) at line \\([0-9]+\\): \
@@ -1192,7 +1190,7 @@ curve\\|invalid length\\)" nil t)
             compilation-directory-stack (list default-directory))
       (compilation-set-window-height outwin)
       ;; Make it so the next C-x ` will use this buffer.
-      (setq compilation-last-buffer (current-buffer)))))
+      (setq next-error-last-buffer (current-buffer)))))
 
 (defun eukleides-euk-to-tex (eukfile)
   "Convert Eukleides file EUKFILE to TeX."
@@ -1261,29 +1259,29 @@ Returns a list of bounding box, width, and height."
   "Scale the eps image in FILE with factor SCALE.
 BB is the bounding box of the image.  Returns a list of new bounding
 box, width, and height."
-  (multiple-value-bind (llx lly urx ury) (append bb nil)
+  (cl-multiple-value-bind (llx lly urx ury) (append bb nil)
     (let ((x (round (* (- urx llx) scale)))
           (y (round (* (- ury lly) scale)))
-	  (buff (find-file-noselect file)))
+      (buff (find-file-noselect file)))
       (unwind-protect
-	  (with-current-buffer buff
-	    (goto-char (point-min))
-	    (search-forward "%%BoundingBox")
-	    (delete-region (line-beginning-position) (line-end-position))
-	    (insert (format "%%%%BoundingBox: 0 0 %d %d\n" x y))
-	    (search-forward "%%EndComments")
-	    (forward-line)
-	    (insert "%%BeginProcSet: eukleides 1 0\ngsave\n")
-	    (insert (format "%f %f translate\n"
-			    (- (* llx scale))
-			    (- (* lly scale))))
-	    (insert (format "%f %f scale\n" scale scale))
-	    (insert "%%EndProcSet\n")
-	    (goto-char (point-max))
-	    (insert "\ngrestore")
+      (with-current-buffer buff
+        (goto-char (point-min))
+        (search-forward "%%BoundingBox")
+        (delete-region (line-beginning-position) (line-end-position))
+        (insert (format "%%%%BoundingBox: 0 0 %d %d\n" x y))
+        (search-forward "%%EndComments")
+        (forward-line)
+        (insert "%%BeginProcSet: eukleides 1 0\ngsave\n")
+        (insert (format "%f %f translate\n"
+                (- (* llx scale))
+                (- (* lly scale))))
+        (insert (format "%f %f scale\n" scale scale))
+        (insert "%%EndProcSet\n")
+        (goto-char (point-max))
+        (insert "\ngrestore")
             (let ((executing-kbd-macro [])) ; XXX avoid "Wrote .." messages
               (basic-save-buffer)))
-	(kill-buffer buff))
+    (kill-buffer buff))
       (list (vector 0 0 x y) x y))))
 
 (defun eukleides-eps-to-image (epsfile)
@@ -1438,7 +1436,7 @@ List of elements in form \(STATE VALUE INCREMENT LOWER UPPER\).")
                        (nival (list istate val inc nil nil)))
                   (push nival sivals)
                   (replace-match (format "%S" (second nival)))))))
-          (buffer-substring))
+          (buffer-string))
       (dolist (siv (nreverse sivals))
         (push siv eukleides-interactive-values)))))
 

@@ -143,8 +143,8 @@
    mpv-ts-speakers nil t nil 'mpv-ts-speaker-history))
 
 (defun mpv-ts-replace-current-line-speaker ()
-  (interactive)
   "現在行の発言者を別の発言者に置換する"
+  (interactive)
   (let ((speaker (mpv-ts-read-speaker)))
     (when speaker
       (save-excursion
@@ -376,7 +376,7 @@
   (let ((kill-whole-line 1) in-lvar)
     (goto-char (point-min))
     (while (not (eobp))
-      (when (looking-at ";; Local Variables:")
+      (when (looking-at (concat ";; Local " "Variables:"))
         (setq in-lvar t)
         (when (looking-back "\n\\(\n+\\)" 1 1)
               (delete-region (match-beginning 1) (match-end 1))))

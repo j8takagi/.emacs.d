@@ -153,7 +153,8 @@ to shell of default directory in current buffer."
 
 (defun toggle-split-next-window ()
   "Toggle split between selected window and next window.
-If selected window and next window is splitted vertically, split them horizontally.
+If selected window and next window is splitted vertically,
+split them horizontally.
 If splitted horizontally, vice versa."
   (interactive)
   (let ((selected-edges (window-edges (selected-window)))

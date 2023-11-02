@@ -9,6 +9,7 @@
 
 
 ;;; Code:
+(require 'fontset)
 
 (defvar fontset-history nil
   "History list for fontset.")
@@ -88,11 +89,17 @@ It returns a name of the created fontset."
 
 (defun fontsets-set (&rest fontset-spec)
   "Create fontset using FONTSET-SPEC.
-Each FONTSET-SPEC has the form  (CHARSET-FONT-ALIST FONTSET-BASENAME).
-CHARSET-FONT-ALIST is association list of (TARGET . FONTSPEC).
+Each FONTSET-SPEC has the form:
+
+(CHARSET-FONT-ALIST FONTSET-BASENAME).
+
+CHARSET-FONT-ALIST is association list of:
+
+(TARGET . FONTSPEC).
 FONTSET-BASENAME is a string.
 
-If CHARSET-FONT-ALIST is nil, `fontset-set-charset-font-alist' is set to the fontset.
+If CHARSET-FONT-ALIST is nil,
+`fontset-set-charset-font-alist' is set to the fontset.
 
 It returns a name of the created fontset."
   (let (fontsets)

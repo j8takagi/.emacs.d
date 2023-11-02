@@ -9,6 +9,8 @@
 
 
 ;;; Code:
+(require 'dired)
+
 ;;;###autoload
 (defun replace-plus-do-regexp (regexp replacements &optional start end)
   (let ((replace-count 0))
