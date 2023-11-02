@@ -1,3 +1,6 @@
 [submodule "site-lisp/browse-kill-ring"]
 	path = site-lisp/browse-kill-ring
 	url = https://github.com/j8takagi/browse-kill-ring.git
+[submodule "site-lisp/undohist"]
+	path = site-lisp/undohist
+	url = https://github.com/emacsorphanage/undohist.git
