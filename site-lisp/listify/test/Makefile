@@ -1,5 +1,5 @@
-EMACS := /usr/local/bin/emacs
-EMACSFLAGS := -Q -batch -l *.el
+EMACS := emacs
+EMACSFLAGS := -Q -batch -l test_update-or-add-alist.el
 .PHONY: check test
 
 check:
