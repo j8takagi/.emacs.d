@@ -120,19 +120,23 @@ Each ALIST-ARGS has the form:
 Each LIST-VAL has the form
 
 (LIST-NAME (VALUE1 VALUE2 ...)[ NOW[ REQUEST[ COMMENT]]])."
-  (let (vals exps asym lsts)
+  (let (vals newval oldval asym lsts)
     (dolist (lst list-val)
       (unless (listp (setq vals (cadr lst)))
         (error (format "The 2nd arg is not list.\nArg: %s" vals)))
-      (setq asym (car lst) exps (symbol-value asym))
+      (setq asym (car lst) newval (symbol-value asym) oldval newval)
       (dolist (aval vals)
-        (add-to-list 'exps aval))
-      (if (null (listify-validate-custom-variable-type asym vals))
+        (unless (member aval newval)
+          (push aval newval)))
+      (if (null (listify-validate-custom-variable-type asym newval))
           (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
-                   asym (custom-variable-type asym) exps)
-        (unless (eq vals (symbol-value asym))
-          (custom-set-variables `(,asym ',exps
-                                        ,(nth 2 lst) ,(nth 3 lst) ,(nth 4 lst)))
+                   asym (custom-variable-type asym) newval)
+        (if (equal newval oldval)
+            (message "Info: list variable `%s': value `%s' is not changed.\n" asym oldval)
+          (custom-set-variables
+           `(,asym ',newval ,(nth 2 lst) ,(nth 3 lst) ,(nth 4 lst)))
+          (message "List variable `%s': value `%s' is changed to `%s'."
+                   asym oldval (symbol-value asym))
           (push asym lsts))))
     lsts))
 
