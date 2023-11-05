@@ -1,3 +1,4 @@
+;;; -*- lexical-binding:t -*-
 ;;; listify.el --- Listify Emacs initialization files.
 
 ;; Copyright (C) 2017 by Kazubito Takagi
@@ -82,7 +83,7 @@ Each FUNC-FILE-DOC has the form (FUNCTION FILE DOC).
 If FUNCTION is void or FILE is not found,
 warning message is printed into the `*Messages' buffer,
 or the standard error stream in batch mode."
-  (let (funcs ffd)
+  (let (funcs)
     (dolist (ffd func-file-doc)
       (let ((afunc (car ffd)) (afile (cadr ffd)) (adoc (nth 2 ffd)))
         (if (not (locate-library afile))
