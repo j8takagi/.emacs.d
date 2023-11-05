@@ -1,4 +1,3 @@
-;;; -*- lexical-binding:t -*-
 ;;; listify.el --- Listify Emacs initialization files.
 
 ;; Copyright (C) 2017 by Kazubito Takagi
