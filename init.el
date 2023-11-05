@@ -1,4 +1,4 @@
-;;;-*-Emacs-Lisp-*-
+;;; -*- lexical-binding:t -*-
 (unless noninteractive
   (setq inhibit-message 1))
 
@@ -25,6 +25,7 @@
 
 ;; インストールを確認するパッケージ
 (listify-packages-check
+ 'bison-mode
  'csv-mode
  'ess
  'gitignore-mode
@@ -55,22 +56,23 @@
  'server
  'whitespace
  ;; ~/.emacs.d/site-lisp
- 'auto-elc-mode                    ; .elファイルの自動コンパイル
  'buffer-window-plus               ; バッファとウィンドウの操作関数
  'count-japanese                   ; 日本語の文字数をカウント
  'daily-log                        ; 毎日のログ
  'ediff-vc-plus                    ; Ediffの追加関数
  'exopen                           ; 外部プログラムでファイルを開く
+ 'fill-region-with-n               ; 1行あたりの文字数を指定してfill-region
  'ffap-plus
- 'ime-cursor                       ; IMEをオンにしたときにカーソルの色を変える
- 'jaword                           ; 日本語の単語をきちんと扱うための minor-mode https://github.com/zk-phi/jaword
+ 'jaword                           ; 日本語の単語をきちんと扱う
  'japanese-plus                    ; 全角半角変換
  'list-fontfamilies-display        ; フォントファミリー一覧作成コマンド
  'list-fonts-display               ; フォント一覧作成コマンド
  'not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
  'replace-plus                     ; 置換機能の拡張
+ 'set-savehist                     ; 履歴を保存するsavehist-modeの設定
  'scroll-one-line                  ; 1行スクロール
  'temp-buffer                      ; 一時バッファの作成
+ 'undohist                         ; undohist
  'window-control                   ; ウィンドウとフレームのサイズを調整
  'xlfd-at                          ; フォント情報の表示
  ;; ~/.emacs.d/insert
@@ -80,18 +82,15 @@
 
 ;; autoload
 (listify-autoloads-set
- '(bison-mode "bison-mode" "Major mode for editing bison/yacc files")
  '(crontab-mode "crontab-mode" "Major mode for editing crontab files")
  '(ert-mode "ert-mode" "Major mode for editing ERT files")
  '(eukleides-mode "eukleides" "Major mode for editing Eukleides files")
- '(flex-mode "flex-mode" "Major mode for editing flex files")
  '(gtags-mode "gtags")
  '(mediawiki-mode "mediawiki" "Major mode for editing Mediawiki articles")
  '(mpv-ts-mode "mpv-ts-mode" "Major mode for editing transcription using mpv")
  '(review-mode "review-mode" "Re:VIEW text editing mode")
  '(rubydb "rubydb3x" "ruby debug")
  '(svg-clock "svg-clock" "Start/stop svg-clock")
- '(tsv-mode "tsv-mode" "Major mode for TSV files")
  '(ucs-normalize-NFC-buffer "ucs-normalize-plus" "Normalize current buffer by the Unicode NFC")
  )
 
@@ -109,64 +108,76 @@
 ;; 一般
 ;;
 
-; モード
-(listify-set-modes
- ;; 有効にするモード
- '(whitespace-mode 1)             ; 空白を強調表示
- )
+; マイナーモード
+(listify-set-minor-modes
+ '(blink-cursor-mode -1)              ; カーソルは点滅しない
+ '(column-number-mode 1)              ; 列番号を表示
+ '(desktop-save-mode 1)               ; 終了時の状態を永続的に保存
+ '(electric-indent-mode -1)           ; 改行時の自動インデントを無効に
+ '(global-auto-revert-mode 1)         ; すべてのバッファで、外部のファイル変更を反映
+ '(jaword-mode 1)                     ; 日本語の単語をきちんと扱う
+ '(menu-bar-mode -1)                  ; メニューバーを表示しない
+ '(savehist-mode 1)                   ; 履歴を永続的に保存
+ '(tool-bar-mode -1)                  ; ツールバーを表示しない
+ '(whitespace-mode 1)                 ; 空白を強調表示
+)
 
 ; 変数
 (listify-set
- '(auto-compression-mode t)         ; 圧縮されたファイルを直接編集する
- '(auto-insert-alist nil)           ; auto-insert-alistの初期化
- '(auto-insert-directory "~/.emacs.d/insert/") ; auto-insertテンプレートディレクトリ
- '(auto-insert-query nil)                      ; auto-insertでユーザーに尋ねない
- '(backup-directory-alist (("." "~/backup")))
- '(blink-cursor-mode nil)                      ; カーソルは点滅しない
- '(case-replace nil)                ; 置換時に大文字小文字を区別しない
- '(column-number-mode t)            ; 列番号を表示
- '(completion-ignored-extensions ; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
-   (".bak" ".d" ".fls" ".log" ".dvi" ".xbb"
-    ".out" ".prev" "_prev" ".idx" ".ind" ".ilg"
-    ".tmp" ".synctex.gz" ".dplg" ".dslg" ".dSYM/"
-    ".DS_Store" ":com.dropbox.attributes:$DATA"))
- `(custom-file ,(locate-user-emacs-file ".emacs-custom.el")) ;カスタムの設定値を書き込むファイル
- '(delete-by-moving-to-trash t)      ;  ファイルの削除で、ゴミ箱を使う
- '(delete-old-versions t) ; 古いバックアップファイルを自動的に削除する
- '(desktop-save-mode 1)
- '(disabled-command-function nil) ; すべてのコマンドの使用制限を解除する
- '(display-buffer-alist
-   (("^\\*shell\\*$" (display-buffer-same-window))
-    ("^\\*?magit: .+" (display-buffer-same-window)))) ; バッファの表示方法
- '(electric-indent-mode nil) ; 改行時の自動インデントを無効に（Emacs24から、初期値が有効）
+ '(auto-insert-alist nil)               ; auto-insert-alistの初期化
+ `(auto-insert-directory ,(locate-user-emacs-file "insert")) ; auto-insertテンプレートディレクトリ
+ '(auto-insert-query nil)               ; auto-insertでユーザーに尋ねない
+ '(backup-directory-alist (("." "~/backup"))) ; バックアップディレクトリ
+ '(case-replace nil)                    ; 置換時に大文字小文字を区別しない
+ '(completion-ignored-extensions (".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" "_prev" ".idx" ".ind" ".ilg" ".tmp" ".synctex.gz" ".dplg" ".dslg" ".dSYM/" ".DS_Store" ":com.dropbox.attributes:$DATA")) ; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
+ '(delete-by-moving-to-trash t)         ; ファイルの削除で、ゴミ箱を使う
+ '(delete-old-versions t)               ; 古いバックアップファイルを自動的に削除する
+ '(dired-always-read-filesystem)        ; ディレクトリ変更を検索前に反映
+ '(dired-auto-revert-buffer t)          ; ディレクトリ変更を反映
+ '(disabled-command-function nil)       ; すべてのコマンドの使用制限を解除する
+ '(display-buffer-alist (("^\\*shell\\*$" (display-buffer-same-window)) ("^\\*?magit: .+" (display-buffer-same-window)))) ; バッファの表示方法
  '(enable-recursive-minibuffers t)      ; 再帰的にミニバッファを使う
  '(eval-expression-print-length nil)    ; evalした結果を全部表示する
- '(global-font-lock-mode t)       ; メジャーモードに合わせた色を付ける
- '(history-delete-duplicates t)   ; 重複する履歴は削除
- '(history-length t)              ; 履歴の数を無制限に
+ '(history-delete-duplicates t)         ; 重複する履歴は削除
+ '(history-length t)                    ; 履歴の数を無制限に
  '(indent-line-function indent-to-left-margin) ; インデント用のファンクション
- '(indent-tabs-mode nil)          ; タブをスペースに展開
- '(inhibit-startup-screen t)      ; 起動時の画面を表示しない
- '(initial-scratch-message nil)   ; *scratch* にメッセージを表示しない
- '(line-number-mode t)            ; 行番号を表示
- '(make-backup-files t)           ; バックアップファイルを作成する
- '(menu-bar-mode nil)             ; メニューバーを表示しない
- '(next-line-add-newlines nil) ; ファイル末尾での改行で、end of bufferエラーが発生しないように
- '(ring-bell-function ignore)  ; エラー時、なにもしない
+ '(indent-tabs-mode nil)                ; インデントにタブを使わない
+ '(inhibit-startup-screen t)            ; 起動時の画面を表示しない
+ '(initial-scratch-message nil)         ; *scratch* にメッセージを表示しない
+ '(make-backup-files t)                 ; バックアップファイルを作成する
+ '(next-line-add-newlines nil)          ; ファイル末尾での改行でend of bufferエラーを発生させない
+ '(ring-bell-function ignore)           ; エラー時、なにもしない
  '(save-interprogram-paste-before-kill t) ; 他アプリのコピーバッファをkill-ringに保存する
- '(scroll-conservatively 1) ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
- '(show-paren-mode t)             ; 括弧の対応を表示
- '(tab-width 4)                  ; タブ幅は4
- '(tool-bar-mode nil)            ; ツールバーを表示しない
- '(transient-mark-mode t)        ; リージョンをハイライト
- '(truncate-lines nil)           ; 継続行を表示しない
+ '(scroll-conservatively 1)             ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
+ '(tab-width 4)                         ; タブ幅は4
+ '(truncate-lines nil)                  ; 継続行を表示しない
  '(truncate-partial-width-windows nil)  ; 行を切り捨てない
  '(use-dialog-box nil)                  ; ダイアログボックスは使わない
  '(user-mail-address "j8takagi@nifty.com") ; ChangeLogなどで用いるメールアドレスの設定
- '(version-control t)   ; バックアップファイルにバージョン番号を付ける
- '(yank-excluded-properties t)  ; ヤンクで、テキストプロパティは捨てる
- '(yank-pop-change-selection t) ; yank-popを有効にする
+ '(version-control t)                   ; バックアップファイルにバージョン番号を付ける
+ '(yank-excluded-properties t)          ; ヤンクで、テキストプロパティは捨てる
+ '(yank-pop-change-selection t)         ; yank-popを有効にする
+ `(custom-file ,(locate-user-emacs-file ".emacs-custom.el")) ; カスタムの設定値を書き込むファイル
  )
+
+;; フック
+(listify-set-hooks
+ '(after-init-hook (message-startup-time))
+ '(find-file-hook (auto-insert))
+ )
+
+; エイリアス
+(listify-defaliases
+ '(uniq-lines delete-duplicate-lines)  ; uniq-linesを、delete-duplicate-linesの別名に
+ '(message-box message)                ; メッセージダイアログボックスは使わない
+ '(s2n string-to-number)               ; 置換時の関数名入力省力化
+ )
+
+;; undohist
+(undohist-initialize)
+(with-eval-after-load 'undohist
+  (listify-set
+   '(undohist-ignored-files ("/.git/COMMIT_EDITMSG\\'"))))
 
 (when window-system
   (listify-set
@@ -178,13 +189,6 @@
        (cursor-type box)
        ))))
 
-; エイリアス
-(listify-defaliases
- '(uniq-lines delete-duplicate-lines)  ; uniq-linesを、delete-duplicate-linesの別名に
- '(message-box message)                ; メッセージダイアログボックスは使わない
- '(s2n string-to-number)               ; 置換時の関数名入力省力化
- )
-
 ;; view-modeの設定
 (with-eval-after-load 'view
   (listify-requires
@@ -192,13 +196,13 @@
    'view-mode-vi-bindings             ; view-modeでviのキーバインド
    )
   (listify-set
-   '(view-read-only t)
+   '(view-read-only 1)                  ; view-modeで開いたファイルをread-onlyに
    )
   (set-view-mode-buffers
    "\\*Messages\\*"                     ; *Messages*バッファをview-modeに
    ))
 
-;; infoの設定
+;; Infoの設定
 (with-eval-after-load 'info
   (listify-set
    '(Info-additional-directory-list ("~/share/info/ja" "~/share/info" )) ; Infoファイルの場所
@@ -207,16 +211,16 @@
 ;; skeletonの設定
 (with-eval-after-load 'skeleton
   (listify-set
-   '(skeleton-end-hook nil)         ; skeletonの挿入後、改行しない
    '(skeleton-end-newline nil)      ; skeletonの挿入後、改行しない
    '(skeleton-pair t)               ; skeleton-pairにより括弧挿入を自動化
-   ))
+   )
+  )
 
 ;; *Messages*の警告が目立つように
-(font-lock-add-keywords 'messages-buffer-mode
-                        '(("^\\(\\(Warning\\|Error\\):?\\) .*" 1 font-lock-warning-face t)))
-(when (>= emacs-major-version 25)
-    (with-current-buffer "*Messages*" (font-lock-ensure)))
+(with-current-buffer "*Messages*"
+  (font-lock-mode 1)
+  (font-lock-ensure)
+  (font-lock-add-keywords nil '(("^\\(\\(Warning\\|Error\\):?\\) .*" 1 font-lock-warning-face t))))
 
 ;; uniquify
 (with-eval-after-load 'uniquify
@@ -265,24 +269,29 @@
      Custom-mode completion-list-mode help-mode
      magit-mode tetris-mode w3m-mode shell-mode
      ))
-   '(after-change-major-mode-hook (set-whitespace-mode))
    '(view-mode-hook (set-whitespace-mode)))
   (custom-set-faces
    '(whitespace-space ((nil ( :box (:line-width 2 :color "orange")))))
    '(whitespace-tab ((nil (:background "white smoke" :box (:line-width 2 :color "navy")))))
    '(whitespace-trailing ((nil (:underline "navy"))))
-   ))
+   )
+  (listify-set-hooks
+   '(after-change-major-mode-hook (set-whitespace-mode))
+   )
+  )
 
 ;;
 ;; Ediff
 ;;
 (with-eval-after-load 'ediff
   (listify-set
-   '(ediff-before-setup-hook ediff-save-window-configuration)
-   '(ediff-quit-hook ediff-restore-window-configuration)
-   '(ediff-split-window-function split-window-horizontally)
-   '(ediff-suspend-hook ediff-restore-window-configuration)
    '(ediff-window-setup-function ediff-setup-windows-plain)
+   '(ediff-split-window-function split-window-horizontally)
+   )
+  (listify-set-hooks
+   '(ediff-before-setup-hook (ediff-save-window-configuration))
+   '(ediff-quit-hook (ediff-restore-window-configuration))
+   '(ediff-suspend-hook (ediff-restore-window-configuration))
    ))
 
 ;;
@@ -290,21 +299,35 @@
 ;;
 (with-eval-after-load 'dired
   (listify-requires
+   'dired-aux                           ; diredの拡張機能
    'dired-x                             ; diredの拡張機能
    'image-dired                         ; サムネイル表示
-   'revert-dired-buffers                ; diredバッファの自動更新
    'sorter                              ; ソート
    'wdired                              ; ファイル名編集
    )
   (listify-set
+   '(dired-dwim-target t)               ; 対象ディレクトリーの推測
    '(dired-listing-switches "-alh")     ; lsのオプションにhを追加
    '(dired-recursive-copies always)     ; diredでディレクトリーを再帰的にコピーするとき、確認しない
-   '(dired-dwim-target t)               ; 対象ディレクトリーの推測
+   '(dired-recursive-deletes always)    ; diredでディレクトリーを再帰的に削除するとき、確認しない
+   )
+  (defun init-turn-on-auto-revert-mode ()
+    (auto-revert-mode 1)
+    (setq-local auto-revert-verbose nil))
+  (listify-set-hooks
+   '(dired-mode-hook (init-turn-on-auto-revert-mode))
+   )
+  )
+
+(with-eval-after-load 'dired-aux
+  (listify-set
+   '(dired-do-revert-buffer t)          ; dired-do操作のあと、diredバッファを更新
    ))
 
 (with-eval-after-load 'find-dired
-  (listify-set '(find-ls-option ("-exec ls -ldh {} +" . "-alh")))
-  )
+  (listify-set
+   '(find-ls-option ("-exec ls -ldh {} +" . "-alh"))
+  ))
 
 ;;
 ;; lisp-mode
@@ -312,13 +335,19 @@
 (with-eval-after-load 'lisp-mode
   (listify-requires
    'emacs-lisp-skeletons
+   'auto-elc-mode                    ; .elファイルの自動コンパイル
    )
   (defun init-lisp-indent-line ()
     (set-variable 'indent-line-function 'lisp-indent-line)) ; インデントの設定
+  (defun init-turn-on-auto-elc ()
+    (auto-elc-mode 1))
   (listify-set
-   '(emacs-lisp-mode-hook (init-lisp-indent-line turn-on-auto-elc))
    '(auto-insert-alist (("\\.el\\'" emacs-lisp-template)))
-   ))
+   )
+  (listify-set-hooks
+   '(emacs-lisp-mode-hook (init-lisp-indent-line init-turn-on-auto-elc))
+   )
+  )
 
 ;;
 ;; Shell-mode
@@ -329,44 +358,39 @@
    )
   (listify-set
    '(shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ") ; プロンプトの表示設定
+   )
+  (listify-set-hooks
    '(shell-mode-hook (ansi-color-for-comint-mode-on))
    )
-  (defun typescript (dir)
-    (interactive "D")
-    (let ((afile (concat dir "/typescript")) (anum 0))
-      (while (file-exists-p afile)
-          (setq anum (+ anum 1))
-          (setq afile (concat dir "/typescript" (number-to-string anum)))
-      (switch-to-buffer (find-file-noselect afile))
-      (shell (current-buffer))))))
+  )
 
 ;;
 ;; asm-mode
 ;;
 (with-eval-after-load 'asm-mode
-  (defun set-tab-width-8()
+  (defun init-set-tab-width-8()
     (interactive)
     (setq tab-width 8))
-  (listify-set
+  (listify-set-hooks
    '(asm-mode-hook
-     (set-tab-width-8 overwrite-mode))))
+     (init-set-tab-width-8 overwrite-mode))))
 
 ;;
 ;; CC-Mode
 ;;
 (with-eval-after-load 'cc-mode
   (listify-requires
-   'cc-mode-plus
    'c-skeletons
    'h-skeletons
+   'gtags
    )
   (listify-set
-   '(c-default-style ((c-mode "k&r")))
-   '(c-basic-offset 4)
    '(auto-insert-alist (("\\.h\\'" h-template)))
-   '(c-mode-common-hook
-     (init-cc-gtags-mode-on init-cc-require-gnu-mp init-cc-disable-electric-state))
-   ))
+   '(c-basic-offset 4)
+   '(c-default-style ((c-mode "k&r")))
+   )
+; (c-toggle-electric-state -1)
+  )
 
 ;;
 ;; tex-mode
@@ -377,8 +401,11 @@
    )
   (listify-set
    '(auto-insert-alist ((latex-mode latex-template)))
+   )
+  (listify-set-hooks
    '(latex-mode-hook (turn-on-reftex))
-   ))
+   )
+  )
 
 ;;
 ;; web-mode
@@ -433,7 +460,7 @@
 ;; graphviz-dot-mode
 ;;
 (with-eval-after-load 'graphviz-dot-mode
-  (defun kill-local-compile-command ()
+  (defun init-unset-compile-command ()
     (kill-local-variable 'compile-command))
   (listify-requires
    'graphviz-dot-skeletons
@@ -441,8 +468,11 @@
   (defvar graphviz-dot-mode-hook nil)
   (listify-set
    '(auto-insert-alist ((graphviz-dot-mode graphviz-dot-template)))
-   '(graphviz-dot-mode-hook (kill-local-compile-command))
-   ))
+   )
+  (listify-set-hooks
+   '(graphviz-dot-mode-hook (init-unset-compile-command))
+   )
+  )
 
 ;; markdown-mode
 (with-eval-after-load 'markdown-mode
@@ -457,21 +487,6 @@
   (listify-set
    '(auto-insert-alist ((mpv-ts-mode "template.ts")) 1 (mpv-ts-mode))))
 
-;;; 一行あたりの文字数を指定してfill-regionする関数
-;;; http://d.hatena.ne.jp/hack-3/20090604/1244100952
-(defun fill-region-with-N (num)
-  "1行あたりの文字数を指定してfill-regionする"
-  (interactive "nfill-column value? ")
-  (let ((fill-column num))
-    (fill-region (region-beginning) (region-end)))
-  )
-
-(defun fill-region-with-40 ()
-  "1行あたり40字でfill-regionする"
-  (interactive)
-  (let ((fill-column 40))
-    (fill-region (region-beginning) (region-end))))
-
 ;;
 ;; ファイルの自動判定
 ;;
@@ -484,13 +499,13 @@
     ("<\\?xml " nxml-mode)
     )))
 
-;; auto-mode-alistで、既存のモード設定を上書きする
+;; auto-mode-alistで、既存のメジャーモード設定を上書きする
 (listify-overwrite-auto-mode-alist
  '(makefile-gmake-mode makefile-bsdmake-mode)
  '(web-mode html-mode)
  )
 
-;; 新しいモード設定を追加する
+;; 新しいメジャーモード設定を追加する
 (listify-set
  '(auto-mode-alist
    (
@@ -582,7 +597,6 @@
  '("M-]" forward-paragraph)
  '("M-p" call-last-kbd-macro)
  '("M-s M-s" isearch-edit-string)
- '("M-y" yank-pop-or-browse-kill-ring)
  '("RET" newline-and-indent)
  )
 
@@ -596,7 +610,7 @@
  "M-`"                             ; tmm-menubar を無効に
  )
 
-;; モードごとのキーバインドを設定
+;; メジャーモードごとのキーバインド設定
 ;; リストの形式は、(mode-library mode-hook mode-map-name ((key1 function1) (key2 function2)))
 (listify-modemap-set-keys
  '(text-mode-map "text-mode" nil
@@ -681,21 +695,6 @@
  '(window-system x init-x)
  '(window-system w32 init-w32)
  )
-
-;; フックの設定
-(listify-set
- '(find-file-hook (auto-insert))
- '(kill-buffer-query-functions (not-kill-but-bury-buffer))
- )
-
-(with-eval-after-load 'session
-  (listify-set
-   '(after-init-hook (session-initialize message-startup-time))
-   '(find-file-hook (session-set-file-name-history))
-   '(exopen-file-hook (session-set-file-name-history))
-   '(session-before-save-hook
-     (session-cleanup-file-name-history-exclude-regexp))
-   ))
 
 (setq inhibit-message nil)
 
