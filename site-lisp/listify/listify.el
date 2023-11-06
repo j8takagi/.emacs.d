@@ -102,16 +102,19 @@ or the standard error stream in batch mode."
 Each ALIST-ARGS has the form:
 
 (ALIST-NAME ((KEY1 VALUE1) (KEY2 VALUE2) ...)[ NOW[ REQUEST[ COMMENT]]])."
-  (let (asym keyvals alsts)
+  (let (asym newval oldval alsts)
     (dolist (alst alist-args)
-      (setq asym (car alst) keyvals (symbol-value asym))
+      (setq asym (car alst) newval (symbol-value asym) oldval newval)
       (dolist (akeyval (cadr alst))
-        (update-or-add-alist 'keyvals (car akeyval) (cadr akeyval)))
-      (if (null (listify-validate-custom-variable-type asym keyvals))
+        (update-or-add-alist 'newval (car akeyval) (cadr akeyval)))
+      (if (null (listify-validate-custom-variable-type asym newval))
           (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
-                   asym (custom-variable-type asym) keyvals)
-        (unless (eq keyvals (symbol-value asym))
-          (custom-set-variables `(,asym ',keyvals ,(nth 2 alst) ,(nth 3 alst) ,(nth 4 alst)))
+                   asym (custom-variable-type asym) newval)
+        (if (equal newval oldval)
+            (message "Info: alists variable `%s': value `%s' is not changed.\n" asym oldval)
+          (custom-set-variables `(,asym ',newval ,(nth 2 alst) ,(nth 3 alst) ,(nth 4 alst)))
+          (message "ALists variable `%s': value `%s' is changed to `%s'."
+                   asym oldval (symbol-value asym))
           (push asym alsts))))
     alsts))
 
@@ -312,7 +315,7 @@ or the standard error stream in batch mode."
     (message "Warning: In setting hook, function `%s' is void." func))
    (t
     (if (member func (eval hook))
-        (message "hook - `%s': function `%s' is already member." hook func)
+        (message "Hook - `%s': function `%s' is already a member." hook func)
       (add-hook hook func)))))
 
 (defun listify-set-hooks (&rest hook-funcs)
@@ -329,8 +332,8 @@ or the standard error stream in batch mode."
         (setq oldval (eval ahook))
         (listify-set-hook ahook afunc))
       (if (equal oldval (setq newval (eval ahook)))
-          (message "hook `%s' is not changed." ahook)
-        (message "hook `%s': value `%s' is changed to `%s'." ahook oldval newval)))))
+          (message "Hook `%s' is not changed." ahook)
+        (message "Hook `%s': value `%s' is changed to `%s'." ahook oldval newval)))))
 
 (defun listify-setenv (&rest env-val)
   "Add system environment variables to values by list of ENV-VAL.
