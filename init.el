@@ -220,7 +220,7 @@
 (with-current-buffer "*Messages*"
   (font-lock-mode 1)
   (font-lock-ensure)
-  (font-lock-add-keywords nil '(("^\\(\\(Warning\\|Error\\):?\\) .*" 1 font-lock-warning-face t))))
+  (font-lock-add-keywords nil '(("\\`\\(\\(Warning\\|Error\\):?\\) .*" 1 font-lock-warning-face t))))
 
 ;; uniquify
 (with-eval-after-load 'uniquify
@@ -268,14 +268,14 @@
      (
      Custom-mode completion-list-mode help-mode
      magit-mode tetris-mode w3m-mode shell-mode
-     ))
-   '(view-mode-hook (set-whitespace-mode)))
+     )))
   (custom-set-faces
    '(whitespace-space ((nil ( :box (:line-width 2 :color "orange")))))
    '(whitespace-tab ((nil (:background "white smoke" :box (:line-width 2 :color "navy")))))
    '(whitespace-trailing ((nil (:underline "navy"))))
    )
   (listify-set-hooks
+   '(view-mode-hook (set-whitespace-mode))
    '(after-change-major-mode-hook (set-whitespace-mode))
    )
   )
