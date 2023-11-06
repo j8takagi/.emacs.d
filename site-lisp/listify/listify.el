@@ -106,7 +106,7 @@ Each ALIST-ARGS has the form:
     (dolist (alst alist-args)
       (setq asym (car alst) newval (symbol-value asym) oldval newval)
       (dolist (akeyval (cadr alst))
-        (update-or-add-alist 'newval (car akeyval) (cadr akeyval)))
+        (setq newval (update-or-add-alist 'newval (car akeyval) (cadr akeyval))))
       (if (null (listify-validate-custom-variable-type asym newval))
           (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
                    asym (custom-variable-type asym) newval)
