@@ -1,6 +1,6 @@
 CP := cp -v
 ECHO := echo
-EMACS := emacs
+EMACS := /Applications/MacPorts/Emacs.app/Contents/MacOS/Emacs
 GREPV := grep -v
 INSTALL = install
 MKDIR := mkdir

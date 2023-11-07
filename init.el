@@ -132,7 +132,7 @@
  '(completion-ignored-extensions (".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" "_prev" ".idx" ".ind" ".ilg" ".tmp" ".synctex.gz" ".dplg" ".dslg" ".dSYM/" ".DS_Store" ":com.dropbox.attributes:$DATA")) ; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
  '(delete-by-moving-to-trash t)         ; ファイルの削除で、ゴミ箱を使う
  '(delete-old-versions t)               ; 古いバックアップファイルを自動的に削除する
- '(dired-always-read-filesystem)        ; ディレクトリ変更を検索前に反映
+ '(dired-always-read-filesystem t)      ; ディレクトリ変更を検索前に反映
  '(dired-auto-revert-buffer t)          ; ディレクトリ変更を反映
  '(disabled-command-function nil)       ; すべてのコマンドの使用制限を解除する
  '(display-buffer-alist (("^\\*shell\\*$" (display-buffer-same-window)) ("^\\*?magit: .+" (display-buffer-same-window)))) ; バッファの表示方法
@@ -502,7 +502,7 @@
 ;; auto-mode-alistで、既存のメジャーモード設定を上書きする
 (listify-overwrite-auto-mode-alist
  '(makefile-gmake-mode makefile-bsdmake-mode)
- '(web-mode html-mode)
+ '(web-mode mhtml-mode)
  )
 
 ;; 新しいメジャーモード設定を追加する
