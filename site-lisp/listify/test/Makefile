@@ -1,8 +1,11 @@
+TARGETS := test_listify-set-alists test_listify-set test_update-or-add-alist
 EMACS := emacs
-EMACSFLAGS := -Q -batch -l test_update-or-add-alist.el
+EMACSFLAGS := -Q -batch
 .PHONY: check test
 
-check:
-	@$(EMACS) $(EMACSFLAGS) -f ert-run-tests-batch-and-exit 2>&1 | tee result.log
+check: $(addsuffix .log,$(TARGETS)
 
 test: check
+
+%.log: %.el
+	$(EMACS) $(EMACSFLAGS) -l $< -f ert-run-tests-batch-and-exit 2>&1 >$@
