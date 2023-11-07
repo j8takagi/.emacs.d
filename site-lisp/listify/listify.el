@@ -99,54 +99,60 @@ or the standard error stream in batch mode."
         (message "Autoload functions is not defined.")
       (message "Autoload functions are defined. - %s" (reverse funcs)))))
 
-(defun listify-set-alists (&rest alist-args)
-  "Custom set ALIST-ARGS value to the alist.
-Each ALIST-ARGS has the form:
+(defun listify-set-alists (sym exp now req comment)
+  "Add or update alist values of a custom variable.
+Variable value must be a alist list type.
+Arguments form:
 
-(ALIST-NAME ((KEY1 VALUE1) (KEY2 VALUE2) ...)[ NOW[ REQUEST[ COMMENT]]])."
-  (let (asym newval oldval alsts)
-    (dolist (alst alist-args)
-      (setq asym (car alst) newval (symbol-value asym) oldval newval)
-      (dolist (akeyval (cadr alst))
-        (setq newval (update-or-add-alist 'newval (car akeyval) (cadr akeyval))))
-      (if (null (listify-validate-custom-variable-type asym newval))
-          (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
-                   asym (custom-variable-type asym) newval)
-        (if (equal newval oldval)
-            (message "Info: alists variable `%s': value `%s' is not changed.\n" asym oldval)
-          (custom-set-variables `(,asym ',newval ,(nth 2 alst) ,(nth 3 alst) ,(nth 4 alst)))
-          (message "ALists variable `%s': value `%s' is changed to `%s'."
-                   asym oldval (symbol-value asym))
-          (push asym alsts))))
-    alsts))
+ALIST-NAME ((KEY1 VALUE1) (KEY2 VALUE2) ...)[ NOW[ REQUEST[ COMMENT]]]."
+  (let ((newval nil) (oldval nil))
+    (unless (boundp 'sym)
+      (error (format "%s -- the 1st argument is not a symbol." sym)))
+    (unless (listp exp)
+      (error (format "The 2nd argument is not list.\nArgument: %s" exp)))
+    (setq newval (symbol-value sym) oldval newval)
+    (dolist (akeyval exp)
+      (unless (consp akeyval)
+        (error (format "Element in the 2nd argument is not cons cell.\nElement: %s; argument: %s" akeyval exp)))
+      (setq newval (update-or-add-alist 'newval (car akeyval) (cadr akeyval))))
+    (if (null (listify-validate-custom-variable-type sym newval))
+        (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
+                 sym (custom-variable-type sym) newval)
+      (if (equal newval oldval)
+          (message "Info: alists variable `%s': value `%s' is not changed.\n" sym oldval)
+        (custom-set-variables `(,sym ',newval ,now ,req ,comment))
+        (message "ALists variable `%s': value `%s' is changed to `%s'."
+                 sym oldval (symbol-value sym))))
+    sym))
 
-(defun listify-set-list (&rest list-val)
-  "Set LIST-VAL value to the list.
-Each LIST-VAL has the form
+(defun listify-add-list (sym exp now req comment)
+  "Add values of a custom variable.
+Variable value must be a list type.
+Arguments form:
 
-(LIST-NAME (VALUE1 VALUE2 ...)[ NOW[ REQUEST[ COMMENT]]])."
-  (let (vals newval oldval asym lsts)
-    (dolist (lst list-val)
-      (unless (listp (setq vals (cadr lst)))
-        (error (format "The 2nd arg is not list.\nArg: %s" vals)))
-      (setq asym (car lst) newval (symbol-value asym) oldval newval)
-      (dolist (aval vals)
-        (unless (member aval newval)
-          (push aval newval)))
-      (if (null (listify-validate-custom-variable-type asym newval))
-          (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
-                   asym (custom-variable-type asym) newval)
-        (if (equal newval oldval)
-            (message "Info: list variable `%s': value `%s' is not changed.\n" asym oldval)
-          (custom-set-variables
-           `(,asym ',newval ,(nth 2 lst) ,(nth 3 lst) ,(nth 4 lst)))
-          (message "List variable `%s': value `%s' is changed to `%s'."
-                   asym oldval (symbol-value asym))
-          (push asym lsts))))
-    lsts))
+LIST-VARIABLE-NAME (VALUE1 VALUE2 ...)[ NOW[ REQUEST[ COMMENT]]]."
+  (let ((newval nil) (oldval nil))
+    (unless (boundp 'sym)
+      (error (format "%s -- the 1st argument is not a symbol." sym)))
+    (unless (listp exp)
+      (error (format "The 2nd argument is not list.\nArgument: %s" exp)))
+    (setq newval (symbol-value sym) oldval newval)
+    (dolist (aexp exp)
+      (unless (member aexp newval)
+        (push aexp newval)))
+    (if (null (listify-validate-custom-variable-type sym newval))
+        (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
+                 sym (custom-variable-type sym) newval)
+      (if (equal newval oldval)
+          (message "Info: list variable `%s': value `%s' is not changed.\n" sym oldval)
+        (custom-set-variables
+         `(,sym ',newval ,now ,req ,comment))
+        (message "List variable `%s': value `%s' is changed to `%s'."
+                 sym oldval (symbol-value sym))))
+    sym))
 
 (defun listify-set (&rest args)
-  "Custom set variable values specified in ARGS.
+  "Set custom variable values specified in ARGS.
 Each ARGS has form (SYMBOL EXP [NOW [REQUEST [COMMENT]]]).
 The ARGS form is same to `custom-set-variables'.
 Except EXP need no quote when EXP is SYMBOL,
@@ -160,14 +166,15 @@ update or add each element when EXP is association list (alist)."
       (setq oldval (eval asym))
       (unless (equal newval oldval)
         (if (and newval (listp newval) (listp (cdr newval)))
-            (setq vars
-                  (append
-                   vars
-                   (funcall
-                    (if (consp (car newval))
-                        'listify-set-alists
-                      'listify-set-list)
-                    (list asym newval anow areq acomm))))
+            (setq
+             vars
+             (push
+              (funcall
+               (if (consp (car newval))
+                   'listify-set-alists
+                 'listify-add-list)
+               asym newval anow areq acomm)
+              vars))
           (unless (listify-validate-custom-variable-type asym newval)
             (message
              "%s: Variable type is mismatch.\nType: %s\nValue: %s"
