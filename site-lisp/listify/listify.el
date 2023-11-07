@@ -13,12 +13,14 @@
   "If KEY in ALIST, update VALUE of the KEY.
 Unless, cons cell (KEY . VALUE) is added."
   (interactive)
-  (let (acell (alst (symbol-value alist-var)))
-   (if (setq acell (assoc key alst))
-       (unless (equal (cdr acell) value)
-         (setcdr acell value))
-     (set alist-var (push (cons key value) alst)))
-   alst))
+  (let (acell (alst nil))
+    (when (boundp alist-var)
+      (setq alst (symbol-value alist-var)))
+    (if (setq acell (assoc key alst))
+        (unless (equal (cdr acell) value)
+          (setcdr acell value))
+      (set alist-var (push (cons key value) alst)))
+    alst))
 
 (defun overwrite-values-alist (alist-var value-new-old-alist)
   "Overwrite ALIST-VAR alist by VALUE-NEW-OLD alist.
@@ -97,7 +99,7 @@ or the standard error stream in batch mode."
         (message "Autoload functions is not defined.")
       (message "Autoload functions are defined. - %s" (reverse funcs)))))
 
-(defun listify-set-alist (&rest alist-args)
+(defun listify-set-alists (&rest alist-args)
   "Custom set ALIST-ARGS value to the alist.
 Each ALIST-ARGS has the form:
 
@@ -150,34 +152,34 @@ The ARGS form is same to `custom-set-variables'.
 Except EXP need no quote when EXP is SYMBOL,
 and/or add each element when EXP is list,
 update or add each element when EXP is association list (alist)."
-  (let (asym aexp anow areq acomm vars oldval)
+  (let (asym newval anow areq acomm vars oldval)
     (dolist (arg args)
       (setq
-       asym (nth 0 arg) aexp (nth 1 arg) anow (nth 2 arg) areq (nth 3 arg)
+       asym (nth 0 arg) newval (nth 1 arg) anow (nth 2 arg) areq (nth 3 arg)
        acomm (listify-create-variable-comment asym (nth 4 arg)))
       (setq oldval (eval asym))
-      (unless (equal aexp oldval)
-        (if (and aexp (listp aexp) (listp (cdr aexp)))
+      (unless (equal newval oldval)
+        (if (and newval (listp newval) (listp (cdr newval)))
             (setq vars
                   (append
                    vars
                    (funcall
-                    (if (consp (car aexp))
-                        'listify-set-alist
+                    (if (consp (car newval))
+                        'listify-set-alists
                       'listify-set-list)
-                    (list asym aexp anow areq acomm))))
-          (unless (listify-validate-custom-variable-type asym aexp)
+                    (list asym newval anow areq acomm))))
+          (unless (listify-validate-custom-variable-type asym newval)
             (message
              "%s: Variable type is mismatch.\nType: %s\nValue: %s"
-             asym (custom-variable-type asym) aexp))
-          (if (equal (symbol-value asym) aexp)
-              (message "Variable `%s': value `%s' is not changed." asym oldval)
+             asym (custom-variable-type asym) newval))
+          (if (equal oldval newval)
+              (message "Variable `%s': value `%s' is not changed." asym newval)
             (custom-set-variables
              (list
               asym
-              (if (and aexp (not (eq aexp t)) (or (symbolp aexp) (listp aexp)))
-                  `(quote ,aexp)
-                aexp)
+              (if (and newval (not (eq newval t)) (or (symbolp newval) (listp newval)))
+                  `(quote ,newval)
+                newval)
               anow
               areq
               acomm)))
