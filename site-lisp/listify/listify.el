@@ -107,13 +107,13 @@ Arguments form:
 ALIST-NAME ((KEY1 VALUE1) (KEY2 VALUE2) ...)[ NOW[ REQUEST[ COMMENT]]]."
   (let ((newval nil) (oldval nil))
     (unless (boundp 'sym)
-      (error (format "%s -- the 1st argument is not a symbol." sym)))
+      (error (format "In listify-set-alists, the 1st argument: `%'s is not a symbol." sym)))
     (unless (listp exp)
-      (error (format "The 2nd argument is not list.\nArgument: %s" exp)))
+      (error (format "In listify-set-alists, the 2nd argument is not list.\nArgument: %s" exp)))
     (setq newval (symbol-value sym) oldval newval)
     (dolist (akeyval exp)
       (unless (consp akeyval)
-        (error (format "Element in the 2nd argument is not cons cell.\nElement: %s; argument: %s" akeyval exp)))
+        (error (format "In listify-set-alists, element in the 2nd argument is not cons cell.\nElement: %s; argument: %s" akeyval exp)))
       (setq newval (update-or-add-alist 'newval (car akeyval) (cadr akeyval))))
     (if (null (listify-validate-custom-variable-type sym newval))
         (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
@@ -129,13 +129,12 @@ ALIST-NAME ((KEY1 VALUE1) (KEY2 VALUE2) ...)[ NOW[ REQUEST[ COMMENT]]]."
   "Add values of a custom variable.
 Variable value must be a list type.
 Arguments form:
-
 LIST-VARIABLE-NAME (VALUE1 VALUE2 ...)[ NOW[ REQUEST[ COMMENT]]]."
   (let ((newval nil) (oldval nil))
     (unless (boundp 'sym)
-      (error (format "%s -- the 1st argument is not a symbol." sym)))
+      (error (format "In listify-add-list, the 1st argument: `%'s is not a symbol." sym)))
     (unless (listp exp)
-      (error (format "The 2nd argument is not list.\nArgument: %s" exp)))
+      (error (format "In listify-add-list, the 2nd argument is not list.\nArgument: %s" exp)))
     (setq newval (symbol-value sym) oldval newval)
     (dolist (aexp exp)
       (unless (member aexp newval)
@@ -149,6 +148,22 @@ LIST-VARIABLE-NAME (VALUE1 VALUE2 ...)[ NOW[ REQUEST[ COMMENT]]]."
          `(,sym ',newval ,now ,req ,comment))
         (message "List variable `%s': value `%s' is changed to `%s'."
                  sym oldval (symbol-value sym))))
+    sym))
+
+(defun listify-set-atom (sym exp now req comment)
+  "Set custom variable values specified in ARGS.
+ARGS has form: (SYMBOL EXP [NOW [REQUEST [COMMENT]]]).
+The ARGS form is same to `custom-set-variables'."
+  (let (oldval)
+    (setq oldval (symbol-value sym))
+    (unless (listify-validate-custom-variable-type sym exp)
+      (message
+       "%s: Variable type is mismatch.\nType: %s\nValue: %s"
+       sym (custom-variable-type sym) exp))
+    (if (equal exp oldval)
+        (message "Variable `%s': value `%s' is not changed." sym oldval)
+      (custom-set-variables `(,sym ',exp ,now ,req ,comment))
+      (message "Variable `%s': value `%s' is changed to `%s'." sym oldval (eval sym)))
     sym))
 
 (defun listify-set (&rest args)
@@ -165,33 +180,16 @@ update or add each element when EXP is association list (alist)."
        acomm (listify-create-variable-comment asym (nth 4 arg)))
       (setq oldval (eval asym))
       (unless (equal newval oldval)
-        (if (and newval (listp newval) (listp (cdr newval)))
-            (setq
-             vars
-             (push
-              (funcall
-               (if (consp (car newval))
-                   'listify-set-alists
-                 'listify-add-list)
-               asym newval anow areq acomm)
-              vars))
-          (unless (listify-validate-custom-variable-type asym newval)
-            (message
-             "%s: Variable type is mismatch.\nType: %s\nValue: %s"
-             asym (custom-variable-type asym) newval))
-          (if (equal oldval newval)
-              (message "Variable `%s': value `%s' is not changed." asym newval)
-            (custom-set-variables
-             (list
-              asym
-              (if (and newval (not (eq newval t)) (or (symbolp newval) (listp newval)))
-                  `(quote ,newval)
-                newval)
-              anow
-              areq
-              acomm)))
-          (message "Variable `%s': value `%s' is changed to `%s'." asym oldval (eval asym))
-          (setq vars (append vars (list asym))))))
+        (setq vars
+              (push
+               (funcall
+                (if (and newval (listp newval) (listp (cdr newval)))
+                    (if (consp (car newval))
+                        'listify-set-alists
+                      'listify-add-list)
+                  'listify-set-atom)
+                asym newval anow areq acomm)
+               vars))))
     (listify-message-variables vars)
     vars))
 
