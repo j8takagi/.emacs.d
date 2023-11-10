@@ -40,7 +40,6 @@
  'sokoban
  'swift-mode
  'web-mode
- 'xbm-life
  'xpm
  )
 
