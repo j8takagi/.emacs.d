@@ -493,13 +493,26 @@
     ("<\\?xml " nxml-mode)
     )))
 
-;; auto-mode-alistで、既存のメジャーモード設定を上書きする
-(listify-overwrite-auto-mode-alist
- '(makefile-gmake-mode makefile-bsdmake-mode)
- '(web-mode mhtml-mode)
- )
+;; auto-mode-alistのデータを検証できるようにcustom-typeを設定
+(put 'auto-mode-alist 'custom-type
+     '(repeat
+       (choice
+        (cons
+         (regexp :tag Regexp matching file name)
+         (symbol :tag Major mode))
+        (list
+         (regexp :tag Regexp matching file name)
+         (symbol :tag Function)
+         (sexp :tag NON-NIL stands for anything that is not nil)))))
 
-;; 新しいメジャーモード設定を追加する
+;; auto-mode-alistで、既存のメジャーモード設定を上書きする
+(listify-update-cdrs-variable
+ 'auto-mode-alist
+ '(
+   (makefile-gmake-mode makefile-bsdmake-mode)
+   (web-mode mhtml-mode)
+   ))
+
 (listify-set
  '(auto-mode-alist
    (
