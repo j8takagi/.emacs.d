@@ -143,13 +143,10 @@
  '(indent-tabs-mode nil)                ; インデントにタブを使わない
  '(inhibit-startup-screen t)            ; 起動時の画面を表示しない
  '(initial-scratch-message nil)         ; *scratch* にメッセージを表示しない
- '(make-backup-files t)                 ; バックアップファイルを作成する
- '(next-line-add-newlines nil)          ; ファイル末尾での改行でend of bufferエラーを発生させない
  '(ring-bell-function ignore)           ; エラー時、なにもしない
  '(save-interprogram-paste-before-kill t) ; 他アプリのコピーバッファをkill-ringに保存する
  '(scroll-conservatively 1)             ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
  '(tab-width 4)                         ; タブ幅は4
- '(truncate-lines nil)                  ; 継続行を表示しない
  '(truncate-partial-width-windows nil)  ; 行を切り捨てない
  '(use-dialog-box nil)                  ; ダイアログボックスは使わない
  '(user-mail-address "j8takagi@nifty.com") ; ChangeLogなどで用いるメールアドレスの設定
@@ -224,7 +221,6 @@
 ;; uniquify
 (with-eval-after-load 'uniquify
   (listify-set
-   '(uniquify-buffer-name-style post-forward-angle-brackets)
    '(uniquify-ignore-buffers-re "*[^*]+*")))
 
 ;; emacsclient
@@ -388,7 +384,6 @@
    '(c-basic-offset 4)
    '(c-default-style ((c-mode "k&r")))
    )
-; (c-toggle-electric-state -1)
   )
 
 ;;
