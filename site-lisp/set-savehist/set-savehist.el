@@ -12,11 +12,12 @@
 (require 'savehist)
 
 (defun set-savehist-additional-variables (&optional file)
-    "Set all history/ring variables,
+    "Set all history or ring variables,
 except variables in `desktop-globals-to-save',
 load-history and :prompt-history to savehist-additional-variables
 so that variabels are saved to `savehist-file'."
-    (let (histvars)
+    (let ((oldval nil) (addval nil) (histvars nil) (inhibit-message 1) (loadmsg nil))
+      (setq oldval (copy-alist (symbol-value 'savehist-additional-variables)))
       (setq histvars
             (apropos-internal "-\\(\\(history\\)\\|\\(ring\\)\\)$" 'boundp))
       (mapc
@@ -25,15 +26,26 @@ so that variabels are saved to `savehist-file'."
                (delete elt histvars)))
        (append
         savehist-minibuffer-history-variables
-        (when (boundp 'desktop-globals-to-save)
+        (when (and desktop-save-mode (boundp 'desktop-globals-to-save))
           desktop-globals-to-save)
         '(:prompt-history load-history)
         ))
       (mapc
        (lambda (elt)
-         (unless (memq elt savehist-additional-variables)
-           (push elt savehist-additional-variables)))
+         (unless (member elt savehist-additional-variables)
+           (push elt addval)))
        histvars)
+      (when addval
+        (if file
+          (setq loadmsg (format "After loading `%s', set in set-savehist; " file))
+        (setq loadmsg "Set in set-savehist; "))
+        (message (concat loadmsg (format "List variable savehist-additional-variables value is added: %s." addval)))
+        (custom-set-variables
+         `(
+           savehist-additional-variables
+           ',(append addval savehist-additional-variables)
+           nil nil ,loadmsg
+           )))
       savehist-additional-variables))
 
 (mapc
