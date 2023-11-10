@@ -1,35 +1,60 @@
+;;; -*- lexical-binding:t -*-
 ;;; listify.el --- Listify Emacs initialization files.
 
-;; Copyright (C) 2017 by Kazubito Takagi
+;; Copyright (C) 2017-2023 by Kazubito Takagi
 
 ;; Authors: Kazubito Takagi
 ;; Keywords: init
 
 ;;; Commentary:
 ;;; Code:
+(require 'custom)
 (require 'cus-edit)
+(require 'wid-edit)
 
-(defun update-or-add-alist (alist-var key value)
-  "If KEY in ALIST, update VALUE of the KEY.
+(defun listify-add-or-update-alist (alist key value)
+  "return ALIST which value is updated or added.
+If KEY exists in ALIST, update VALUE of the KEY.
 Unless, cons cell (KEY . VALUE) is added."
-  (interactive)
-  (let (acell (alst nil))
-    (when (boundp alist-var)
-      (setq alst (symbol-value alist-var)))
-    (if (setq acell (assoc key alst))
+  (let ((newalist (copy-alist alist)) (acell nil))
+    (if (setq acell (assoc key newalist))
         (unless (equal (cdr acell) value)
           (setcdr acell value))
-      (set alist-var (push (cons key value) alst)))
-    alst))
+      (setq newalist (push (cons key value) newalist)))
+    newalist))
 
-(defun overwrite-values-alist (alist-var value-new-old-alist)
-  "Overwrite ALIST-VAR alist by VALUE-NEW-OLD alist.
-Each VALUE-NEW-OLD-ALIST has the form (VALUE-NEW . VALUE-OLD)."
-  (let ((alst (symbol-value alist-var)) acell)
-    (dolist (newold value-new-old-alist)
-      (while (setq acell (rassoc (cdr newold) alst))
+(defun listify-update-cdrs (alist cdrs-new-old)
+  "Update cdrs of ALIST using CDRS-NEW-OLD alist.
+Arguments has the form:
+
+    SYM ((CDR-NEW1 . CDR-OLD1) (CDR-NEW2 . CDR-OLD2)) ..."
+  (let ((newalist (copy-alist alist)) (old nil) (acell nil))
+    (dolist (newold cdrs-new-old)
+      (if (listp (cdr newold))
+          (setq old (cadr newold))
+        (setq old (cdr newold)))
+      (while (setq acell (rassoc old newalist))
         (setcdr acell (car newold))))
-    alst))
+    newalist))
+
+(defun listify-get-variable-comment (var)
+  (get var 'variable-comment))
+
+(defun listify-message-variable-comment (var)
+  (interactive "vVariable name: ")
+  (message (get var 'variable-comment)))
+
+(defun listify-create-variable-comment (var &optional add-comment)
+  "Create variable comment of VAR by loading file or buffer file and ADD-COMMENT."
+  (let (acomm afile oldcomm)
+    (when (setq afile (or load-file-name buffer-file-name (buffer-name)))
+      (setq acomm (concat (format "set in `%s'." afile))))
+    (when add-comment
+      (setq acomm (concat acomm (when acomm " ") add-comment)))
+    (setq oldcomm (listify-get-variable-comment var))
+    (if (and oldcomm (null (equal acomm oldcomm)))
+       (setq acomm (concat acomm " " oldcomm)))
+     acomm))
 
 (defun listify-validate-custom-variable-type (custom-variable &optional value)
   "Varidate VALUES is match CUSTOM-VARIABLE to
@@ -42,6 +67,142 @@ CUSTOM-VARIABLE is validated."
       (setq value (symbol-value custom-variable)))
     (when (setq atype (custom-variable-type custom-variable))
       (widget-apply (widget-convert atype) :match value))))
+
+(defun listify-message-variables(vars)
+  (let (cusvars ovars)
+    (dolist (avar vars)
+      (if (custom-variable-p avar)
+          (setq cusvars (append cusvars (list avar)))
+        (setq ovars (append ovars (list avar)))))
+    (message
+     (concat
+      (when cusvars (format "Custom variables are set. - %s" cusvars))
+      (when (and cusvars ovars) "\n")
+      (when ovars (format "Variables are set. - %s" ovars))))))
+
+(defun listify-set-alist (sym exp now req comment)
+  "Add or update alist values of a custom variable.
+Variable value must be a alist list type.
+Arguments form:
+
+ALIST-NAME ((KEY1 VALUE1) (KEY2 VALUE2) ...)[ NOW[ REQUEST[ COMMENT]]]."
+  (let ((newval nil) (oldval nil))
+    (unless (boundp sym)
+      (error (format "In listify-set-alist, the 1st argument: `%s' is not a symbol." sym)))
+    (unless (listp exp)
+      (error (format "In listify-set-alist, the 2nd argument is not list.\nArgument: %s" exp)))
+    (setq newval (symbol-value sym) oldval newval)
+    (dolist (akeyval exp)
+      (unless (consp akeyval)
+        (error (format "In listify-set-alist, element in the 2nd argument is not cons cell.\nElement: %s; argument: %s" akeyval exp)))
+      (setq newval (listify-add-or-update-alist newval (car akeyval) (cadr akeyval))))
+    (if (null (listify-validate-custom-variable-type sym newval))
+        (message "Warning: variable `%s' -- type is mismatch.\nType: %s\nValue: %s"
+                 sym (custom-variable-type sym) newval)
+      (if (equal newval oldval)
+          (message "Info: alist variable `%s': value `%s' is not changed.\n" sym oldval)
+        (custom-set-variables `(,sym ',newval ,now ,req ,comment))
+        (message "Alist variable `%s': value `%s' is changed to `%s'."
+                 sym oldval (symbol-value sym))))
+    sym))
+
+(defun listify-add-list (sym exp now req comment)
+  "Add values of a custom variable.
+Variable value must be a list type.
+Arguments form:
+LIST-VARIABLE-NAME (VALUE1 VALUE2 ...)[ NOW[ REQUEST[ COMMENT]]]."
+  (let ((newval nil) (oldval nil))
+    (unless (boundp sym)
+      (error (format "In listify-add-list, the 1st argument: `%s' is not a symbol." sym)))
+    (unless (listp exp)
+      (error (format "In listify-add-list, the 2nd argument is not list.\nArgument: %s" exp)))
+    (setq newval (symbol-value sym) oldval newval)
+    (dolist (aexp exp)
+      (unless (member aexp newval)
+        (push aexp newval)))
+    (if (null (listify-validate-custom-variable-type sym newval))
+        (message "Warning: variable `%s' -- type is mismatch.\nType: %s\nValue: %s"
+                 sym (custom-variable-type sym) newval)
+      (if (equal newval oldval)
+          (message "Info: list variable `%s': value `%s' is not changed.\n" sym oldval)
+        (custom-set-variables
+         `(,sym ',newval ,now ,req ,comment))
+        (message "List variable `%s': value `%s' is changed to `%s'."
+                 sym oldval (symbol-value sym))))
+    sym))
+
+(defun listify-set-atom (sym exp now req comment)
+  "Set custom variable values specified in ARGS.
+ARGS has form: (SYMBOL EXP [NOW [REQUEST [COMMENT]]]).
+The ARGS form is same to `custom-set-variables'."
+  (let ((newval nil) (oldval nil))
+    (setq oldval (symbol-value sym))
+    (if (null (listify-validate-custom-variable-type sym newval))
+        (message "Warning: variable `%s' -- type is mismatch.\nType: %s\nValue: %s"
+                 sym (custom-variable-type sym) newval)
+      (if (equal exp oldval)
+          (message "Variable `%s': value `%s' is not changed." sym oldval)
+        (custom-set-variables `(,sym ',exp ,now ,req ,comment))
+        (message "Variable `%s': value `%s' is changed to `%s'." sym oldval (eval sym))))
+    sym))
+
+(defun listify-set (&rest args)
+  "Set custom variable values specified in ARGS.
+The arguments should each be a list of the form:
+
+  (SYMBOL EXP [NOW [REQUEST [COMMENT]]])
+
+The ARGS form is same to `custom-set-variables'.
+Except EXP need no quote when EXP is SYMBOL,
+and/or add each element when EXP is list,
+update or add each element when EXP is association list (alist)."
+  (let (asym exp anow areq acomm vars)
+    (dolist (arg args)
+      (setq
+       asym (nth 0 arg) exp (nth 1 arg) anow (nth 2 arg) areq (nth 3 arg)
+       acomm (listify-create-variable-comment asym (nth 4 arg)))
+      (setq vars
+            (push
+             (funcall
+              (if (and exp (listp exp) (listp (cdr exp)))
+                  (if (consp (car exp))
+                      'listify-set-alist
+                    'listify-add-list)
+                'listify-set-atom)
+              asym exp anow areq acomm)
+             vars)))
+    (listify-message-variables vars)
+    vars))
+
+(defun listify-update-cdrs-variable (sym cdrs-new-old)
+  "Update cdrs of alist variable SYM using CDRS-NEW-OLD alist.
+Arguments has the form:
+
+    SYM ((CDR-NEW1 . CDR-OLD1) (CDR-NEW2 . CDR-OLD2)) ..."
+  (let ((newval nil) (oldval nil))
+    (setq
+     oldval (copy-alist (symbol-value sym))
+     newval (listify-update-cdrs auto-mode-alist cdrs-new-old))
+    (if (null (listify-validate-custom-variable-type sym newval))
+        (message "Warning: variable `%s' -- type is mismatch.\nType: %s\nValue: %s"
+                 sym (custom-variable-type sym) newval)
+      (if (equal newval oldval)
+          (message "Alist variable `%s': value `%s' is not changed." sym oldval)
+        (custom-set-variables `(,sym ',newval nil nil ,(listify-create-variable-comment sym "set by update-cdrs-variable")))
+        (message "Variable `auto-mode-alist': value `%s' is changed to `%s'."
+                 oldval (symbol-value sym))))))
+
+(defun listify-defaliases (&rest sym-def)
+  "Set SYMBOL’s function definition to DEFINITION in SYM-DEF.
+Each SYM-DEF has the form (SYMBOL DEFINITION &optional DOCSTRING)."
+  (let (asym adef)
+    (dolist (asymdef sym-def)
+     (when (fboundp (setq asym (car asymdef)))
+       (message "Info: Function `%s' is already defined as %s." asym (indirect-function asym)))
+     (if (not (fboundp (setq adef (cadr asymdef))))
+         (message "Warning: In setting alias, symbol `%s' is not function." adef)
+       (defalias asym adef (nth 3 asymdef))
+       (message "`%s' is defined as alias of `%s'." asym adef)))))
 
 ;; Emacs開始にかかった時間をメッセージに表示
 (defun message-startup-time ()
@@ -99,141 +260,11 @@ or the standard error stream in batch mode."
         (message "Autoload functions is not defined.")
       (message "Autoload functions are defined. - %s" (reverse funcs)))))
 
-(defun listify-set-alists (sym exp now req comment)
-  "Add or update alist values of a custom variable.
-Variable value must be a alist list type.
-Arguments form:
-
-ALIST-NAME ((KEY1 VALUE1) (KEY2 VALUE2) ...)[ NOW[ REQUEST[ COMMENT]]]."
-  (let ((newval nil) (oldval nil))
-    (unless (boundp 'sym)
-      (error (format "In listify-set-alists, the 1st argument: `%'s is not a symbol." sym)))
-    (unless (listp exp)
-      (error (format "In listify-set-alists, the 2nd argument is not list.\nArgument: %s" exp)))
-    (setq newval (symbol-value sym) oldval newval)
-    (dolist (akeyval exp)
-      (unless (consp akeyval)
-        (error (format "In listify-set-alists, element in the 2nd argument is not cons cell.\nElement: %s; argument: %s" akeyval exp)))
-      (setq newval (update-or-add-alist 'newval (car akeyval) (cadr akeyval))))
-    (if (null (listify-validate-custom-variable-type sym newval))
-        (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
-                 sym (custom-variable-type sym) newval)
-      (if (equal newval oldval)
-          (message "Info: alists variable `%s': value `%s' is not changed.\n" sym oldval)
-        (custom-set-variables `(,sym ',newval ,now ,req ,comment))
-        (message "ALists variable `%s': value `%s' is changed to `%s'."
-                 sym oldval (symbol-value sym))))
-    sym))
-
-(defun listify-add-list (sym exp now req comment)
-  "Add values of a custom variable.
-Variable value must be a list type.
-Arguments form:
-LIST-VARIABLE-NAME (VALUE1 VALUE2 ...)[ NOW[ REQUEST[ COMMENT]]]."
-  (let ((newval nil) (oldval nil))
-    (unless (boundp 'sym)
-      (error (format "In listify-add-list, the 1st argument: `%'s is not a symbol." sym)))
-    (unless (listp exp)
-      (error (format "In listify-add-list, the 2nd argument is not list.\nArgument: %s" exp)))
-    (setq newval (symbol-value sym) oldval newval)
-    (dolist (aexp exp)
-      (unless (member aexp newval)
-        (push aexp newval)))
-    (if (null (listify-validate-custom-variable-type sym newval))
-        (message "%s: Variable type is mismatch.\nType: %s\nValue: %s"
-                 sym (custom-variable-type sym) newval)
-      (if (equal newval oldval)
-          (message "Info: list variable `%s': value `%s' is not changed.\n" sym oldval)
-        (custom-set-variables
-         `(,sym ',newval ,now ,req ,comment))
-        (message "List variable `%s': value `%s' is changed to `%s'."
-                 sym oldval (symbol-value sym))))
-    sym))
-
-(defun listify-set-atom (sym exp now req comment)
-  "Set custom variable values specified in ARGS.
-ARGS has form: (SYMBOL EXP [NOW [REQUEST [COMMENT]]]).
-The ARGS form is same to `custom-set-variables'."
-  (let (oldval)
-    (setq oldval (symbol-value sym))
-    (unless (listify-validate-custom-variable-type sym exp)
-      (message
-       "%s: Variable type is mismatch.\nType: %s\nValue: %s"
-       sym (custom-variable-type sym) exp))
-    (if (equal exp oldval)
-        (message "Variable `%s': value `%s' is not changed." sym oldval)
-      (custom-set-variables `(,sym ',exp ,now ,req ,comment))
-      (message "Variable `%s': value `%s' is changed to `%s'." sym oldval (eval sym)))
-    sym))
-
-(defun listify-set (&rest args)
-  "Set custom variable values specified in ARGS.
-Each ARGS has form (SYMBOL EXP [NOW [REQUEST [COMMENT]]]).
-The ARGS form is same to `custom-set-variables'.
-Except EXP need no quote when EXP is SYMBOL,
-and/or add each element when EXP is list,
-update or add each element when EXP is association list (alist)."
-  (let (asym newval anow areq acomm vars oldval)
-    (dolist (arg args)
-      (setq
-       asym (nth 0 arg) newval (nth 1 arg) anow (nth 2 arg) areq (nth 3 arg)
-       acomm (listify-create-variable-comment asym (nth 4 arg)))
-      (setq oldval (eval asym))
-      (unless (equal newval oldval)
-        (setq vars
-              (push
-               (funcall
-                (if (and newval (listp newval) (listp (cdr newval)))
-                    (if (consp (car newval))
-                        'listify-set-alists
-                      'listify-add-list)
-                  'listify-set-atom)
-                asym newval anow areq acomm)
-               vars))))
-    (listify-message-variables vars)
-    vars))
-
-(defun listify-message-variables(vars)
-  (let (cusvars ovars)
-    (dolist (avar vars)
-      (if (custom-variable-p avar)
-          (setq cusvars (append cusvars (list avar)))
-        (setq ovars (append ovars (list avar)))))
-    (message
-     (concat
-      (when cusvars (format "Custom variables are set. - %s" cusvars))
-      (when (and cusvars ovars) "\n")
-      (when ovars (format "Variables are set. - %s" ovars))))))
-
-(defun listify-create-variable-comment (var &optional add-comment)
-  "Create variable comment of VAR by loading file or buffer file and ADD-COMMENT."
-  (let (acomm afile)
-    (when (setq afile (or load-file-name buffer-file-name (buffer-name)))
-      (setq acomm (concat (format "set in `%s'." afile))))
-    (when add-comment
-      (setq acomm (concat acomm (when acomm " ") add-comment)))
-    (when (equal (listify-get-variable-comment var) acomm)
-       (setq acomm nil))
-     acomm))
-
-(defun listify-get-variable-comment (var)
-  (get var 'variable-comment))
-
-(defun listify-defaliases (&rest sym-def)
-  "Set SYMBOL’s function definition to DEFINITION in SYM-DEF.
-Each SYM-DEF has the form (SYMBOL DEFINITION &optional DOCSTRING)."
-  (let (asym adef)
-    (dolist (asymdef sym-def)
-     (when (fboundp (setq asym (car asymdef)))
-       (message "Info: Function `%s' is already defined as %s." asym (indirect-function asym)))
-     (if (not (fboundp (setq adef (cadr asymdef))))
-         (message "Warning: In setting alias, symbol `%s' is not function." adef)
-       (defalias asym adef (nth 3 asymdef))
-       (message "`%s' is defined as alias of `%s'." asym adef)))))
-
 (defun listify-global-set-keys (&rest key-func)
   "Give global binding as KEY-FUNC by global-set-key.
-Each KEY-FUNC form is (KEY FUNCTION).
+Each KEY-FUNC has the form:
+
+    (KEY FUNCTION)
 
 If FUNCTION is void, warning message is printed into the `*Messages' buffer,
 or the standard error stream in batch mode."
@@ -251,7 +282,7 @@ or the standard error stream in batch mode."
   "Give KEY binding of MODEMAP as MAPKEYS after LIBRARY is loaded.
 Each MODEMAP has the form:
 
-(MODEMAP LIBRARY HOOK ((KEY1 FUNCTION1) (KEY2 FUNCTION2) ... )).
+    (MODEMAP LIBRARY HOOK ((KEY1 FUNCTION1) (KEY2 FUNCTION2) ... )).
 
 If HOOK is not nil, the binding is via the HOOK.
 If function in MAPKEYS is void, warning message is printed
@@ -296,19 +327,6 @@ or the standard error stream in batch mode."
         (if (equal oldval newval)
             (message "Info: minor mode - `%s': value `%s' is not changed." amode oldval)
           (message "Minor mode - `%s': value `%s' is changed to `%s'." amode oldval newval))))))
-
-(defun listify-overwrite-auto-mode-alist (&rest mode-new-old)
-  (let (anew aold alst)
-    (dolist (newold mode-new-old)
-      (cond
-       ((not (fboundp (setq anew (car newold))))
-        (message "Warning: In setting auto-mode-alist, mode `%s' overwritten from is void function." anew))
-       ((not (fboundp (setq aold (cadr newold))))
-        (message "Warning: In setting auto-mode-alist, mode `%s' overwritten to is void function." aold))
-       (t
-        (setq alst (push (cons anew aold) alst)))))
-    (overwrite-values-alist 'auto-mode-alist alst)
-    (message "auto-mode-alist: value `%s' is changed to `%s'." aold anew)))
 
 (defun listify-set-hook (hook func)
   "Add a function to hook by list of (HOOK FUNCTION).

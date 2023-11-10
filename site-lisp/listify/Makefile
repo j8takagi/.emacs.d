@@ -1,8 +1,8 @@
 TARGET := listify listify-packages         # "set this parameter, or error."
 TARGETDIR := listify
 
-EMACS := emacs
-COMPILE.el := $(EMACS) -batch -f batch-byte-compile
+EMACS := /Applications/MacPorts/Emacs.app/Contents/MacOS/Emacs
+COMPILE.el := $(EMACS) -batch -l set-compile.el -f batch-byte-compile
 
 NATIVE-COMPILE.el := $(EMACS) -batch -l native-compile.el -l set-compile.el -f init-native-compile
 

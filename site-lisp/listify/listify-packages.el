@@ -1,3 +1,4 @@
+;;; -*- lexical-binding:t -*-
 ;;; listify-packages.el ---
 
 ;; Copyright (C) 2018-2023 by Kazubito Takagi
@@ -19,8 +20,8 @@
   "Add package archives to `package-archives'.
 Each element of ARCHIVES has the form (ID LOCATION)."
   (dolist (aarch archives)
-    (update-or-add-alist 'package-archives (car aarch) (cadr aarch)))
-  (condition-case err
+    (listify-add-or-update-alist package-archives (car aarch) (cadr aarch)))
+  (condition-case nil
       (package-refresh-contents 1)
     (error
      (message "Warining: Fails to download package descriptions."))))
@@ -55,7 +56,7 @@ Each element of ARCHIVES has the form (ID LOCATION)."
   "Return the list of dependent packages alist.
 alist form is :
 (`package' . `dependent package') ..."
-  (let (pkgs req-pkgs)
+  (let (pkgs)
     (unless (package-installed-p pkg)
       (when pkg-from
         (message "Package `%s' required from `%s' is not installed." pkg pkg-from))

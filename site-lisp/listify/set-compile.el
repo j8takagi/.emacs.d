@@ -1,11 +1,11 @@
 (normal-top-level-add-subdirs-to-load-path)
+(add-to-list 'load-path default-directory)
 
 (require 'package)
 (package-initialize)
 
 (require 'server)
 
-(add-to-list 'load-path default-directory)
 
 ;; Local Variables:
 ;; no-byte-compile: t
