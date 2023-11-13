@@ -340,7 +340,7 @@
 ;;
 (with-eval-after-load 'shell
   (listify-requires
-   'set-process-query-on-exit
+   'no-process-query-on-exit
    )
   (listify-set
    '(shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ") ; プロンプトの表示設定
