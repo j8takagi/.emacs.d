@@ -53,25 +53,27 @@
  'autoinsert
  'ediff
  'server
- 'whitespace
  ;; ~/.emacs.d/site-lisp
  'buffer-window-plus               ; バッファとウィンドウの操作関数
  'count-japanese                   ; 日本語の文字数をカウント
  'daily-log                        ; 毎日のログ
  'ediff-vc-plus                    ; Ediffの追加関数
  'exopen                           ; 外部プログラムでファイルを開く
+ ;; 'ffap-plus
  'fill-region-with-n               ; 1行あたりの文字数を指定してfill-region
- 'ffap-plus
- 'jaword                           ; 日本語の単語をきちんと扱う
  'japanese-plus                    ; 全角半角変換
+ 'jaword                           ; 日本語の単語をきちんと扱う
  'list-fontfamilies-display        ; フォントファミリー一覧作成コマンド
  'list-fonts-display               ; フォント一覧作成コマンド
  'not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
- 'replace-plus                     ; 置換機能の拡張
- 'set-savehist                     ; 履歴を保存するsavehist-modeの設定
  'scroll-one-line                  ; 1行スクロール
+ 'set-savehist                     ; 履歴を保存するsavehist-modeの設定
+ 'set-view-mode                    ; read-onlyファイルをview-modeで開く
+ 'set-whitespace                   ; whitespace-modeの設定
+ 'symbol-properties                ; シンボルのプロパティ名リスト取得
  'temp-buffer                      ; 一時バッファの作成
  'undohist                         ; undohist
+ 'view-mode-vi-bindings            ; view-modeでviのキーバインド
  'window-control                   ; ウィンドウとフレームのサイズを調整
  'xlfd-at                          ; フォント情報の表示
  ;; ~/.emacs.d/insert
@@ -118,7 +120,6 @@
  '(menu-bar-mode -1)                  ; メニューバーを表示しない
  '(savehist-mode 1)                   ; 履歴を永続的に保存
  '(tool-bar-mode -1)                  ; ツールバーを表示しない
- '(whitespace-mode 1)                 ; 空白を強調表示
 )
 
 ; 変数
@@ -249,29 +250,19 @@
    ))
 
 ;; whitespace
-(with-eval-after-load 'whitespace
-  (listify-requires
-   'whitespace-set
-   )
-  ;タブ	、全角スペース　、行末の空白    
+(with-eval-after-load 'set-whitespace
+  ; タブ	、全角スペース　、行末の空白  
+  (when (set-whitespace-tabs-spaces-trailing)
+    (listify-set-minor-modes '(whitespace-mode 1)))
   (listify-set
-   '(whitespace-style nil)
-   '(whitespace-style (face tabs spaces trailing))
-   '(whitespace-space-regexp "\\(　\\)")
-   '(whitespace-trailing-regexp "\\( +$\\)")
-   '(whitespace-disabled-major-mode-list
+   '(set-whitespace-disabled-major-mode-list
      (
      Custom-mode completion-list-mode help-mode
      magit-mode tetris-mode w3m-mode shell-mode
      )))
-  (custom-set-faces
-   '(whitespace-space ((nil ( :box (:line-width 2 :color "orange")))))
-   '(whitespace-tab ((nil (:background "white smoke" :box (:line-width 2 :color "navy")))))
-   '(whitespace-trailing ((nil (:underline "navy"))))
-   )
   (listify-set-hooks
-   '(view-mode-hook (set-whitespace-mode))
-   '(after-change-major-mode-hook (set-whitespace-mode))
+   '(view-mode-hook (set-whitespace-enable-mode))
+   '(after-change-major-mode-hook (set-whitespace-enable-mode))
    )
   )
 
@@ -498,12 +489,12 @@
      '(repeat
        (choice
         (cons
-         (regexp :tag Regexp matching file name)
-         (symbol :tag Major mode))
+         (regexp :tag "Regexp matching file name")
+         (symbol :tag "Major mode function"))
         (list
-         (regexp :tag Regexp matching file name)
-         (symbol :tag Function)
-         (sexp :tag NON-NIL stands for anything that is not nil)))))
+         (regexp :tag "Regexp matching file name")
+         (symbol :tag "Function")
+         (sexp :tag "NON-NIL stands for anything that is not nil")))))
 
 ;; auto-mode-alistで、既存のメジャーモード設定を上書きする
 (listify-update-cdrs-variable
