@@ -8,7 +8,8 @@
 
 (listify-requires
  'fontset-set
- ;; 'mac-ime-cursor
+ 'dictionary_app
+ 'quicklookup
  )
 
 ;; Mac OS Xのpath_helperでPATHを取得し、あらためてPATHとして設定
