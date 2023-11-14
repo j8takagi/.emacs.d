@@ -1,6 +1,6 @@
-;;; dictionary_app.el ---
+;;; dictionary_app.el --- -*- lexical-binding: t -*-
 
-;; Copyright (C) 2020 by Kazuhito Takagi
+;; Copyright (C) 2020-2023 by Kazuhito Takagi
 
 ;; Authors: Kazuhito Takagi
 ;; Keywords: dictionary.app mac
