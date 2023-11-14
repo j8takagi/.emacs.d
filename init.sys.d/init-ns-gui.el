@@ -1,12 +1,11 @@
-;; -*- mode: Emacs-Lisp; -*-
-;; Mac OS X GUI用の設定
+;; Mac OS X GUI用の設定 -*- lexical-binding: t -*-
 
 (message "Start of loading %s." load-file-name)
 
 (require 'listify)
-(require 'dired)
 
 (listify-requires
+ 'dired
  'fontset-set
  'dictionary_app
  'quicklook
@@ -47,59 +46,71 @@
         '(
           (ascii (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
           (unicode (font-spec :family "Hiragino Sans"))
-          ) "my_default_mac"))
+          )
+    "my_default_mac"))
      ))
-; '(face-font-rescale-alist (("Hiragino Sans" 1.167) ("YuGothic" 1.167)))
  '(ns-command-modifier meta)        ; commandキーをEmacsのMetaキーに
  '(ns-alternate-modifier none)
-; '(mac-auto-ascii-mode t) ; ミニバッファへのカーソル移動時、日本語IMEを自動オフ
  )
 
 (fontsets-set
  '((
     (ascii (font-spec :family "Menlo" :weight 'bold :slant 'normal :size 12))
     (unicode (font-spec :family "Hiragino Sans" :weight 'bold :slant 'normal))
-    ) "my_bold")
+    )
+   "my_bold")
  '((
     (ascii (font-spec :weight 'normal :slant 'italic))
     (unicode (font-spec :family "Hiragino Sans" :weight 'semibold :slant 'normal))
-    ) "my_italic")
+    )
+   "my_italic")
  '((
     (ascii (font-spec :family "Menlo" :weight 'bold :slant 'italic :size 12))
     (unicode (font-spec :family "Hiragino Sans" :weight 'bold :slant 'normal))
-    ) "my_bold_italic")
+    )
+   "my_bold_italic")
  '((
     (unicode (font-spec :family "Hiragino Sans" :weight 'normal :slant 'normal :size 12))
-    ) "my_gothic")
+    )
+   "my_gothic")
  '((
     (unicode (font-spec :family "Hiragino Mincho ProN" :weight 'normal :slant 'normal :size 12))
-    ) "my_mincho")
+    )
+   "my_mincho")
  '((
     (unicode (font-spec :family "YuKyokasho" :weight 'normal :slant 'normal :size 12))
-    ) "my_yu_kyokasho")
+    ) 
+   "my_yu_kyokasho")
  '((
     (unicode (font-spec :family "YuMincho" :weight 'normal :slant 'normal :size 12))
-    ) "my_yu_mincho")
+    ) 
+   "my_yu_mincho")
  '((
     (ascii (font-spec :family "Menlo" :weight 'normal))
     (unicode (font-spec :family "YuGothic"))
-    ) "my_yu_gothic")
+    ) 
+   "my_yu_gothic")
  '((
     (unicode (font-spec :family "Toppan Bunkyu Gothic"))
-    ) "my_bunkyu_gothic")
+    ) 
+   "my_bunkyu_gothic")
  '((
     (unicode (font-spec :family "Hiragino Maru Gothic ProN"))
-    ) "my_maru_gothic")
+    ) 
+   "my_maru_gothic")
  '((
     (unicode (font-spec :family "Klee"))
-    ) "my_klee")
+    ) 
+   "my_klee")
  '((
     (unicode (font-spec :family "Source Han Code JP"))
-    ) "my_sourcehancode")
+    ) 
+   "my_sourcehancode")
  '((
    (ascii (font-spec :family "Source Han Code JP" :weight 'normal :slant 'normal :size 12))
    (unicode (font-spec :family "Toppan Bunkyu Gothic" :weight 'normal :slant 'normal))
-    ) "my_alternative")
+    ) 
+   "my_alternative")
  )
 
 (set-face-fontset 'italic (fontset-set-alias2spec "my_italic"))
@@ -113,13 +124,6 @@
       "~/.emacs.d/elpa" "/tmp" "/var"
       ))))
 
-(listify-requires 'dictionary_app)
-
-;; (listify-set
-;;  '(mac-selected-keyboard-input-source-change-hook mac-ime-cursor-change-color)
-;;  '(focus-in-hook mac-ime-cursor-change-color)
-;;  )
-
 ;; Mac OS Xのキー設定
 (listify-global-set-keys
  '("<M-f1>" other-frame)    ; Mac OS Xの他アプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする
@@ -130,7 +134,7 @@
 (listify-modemap-set-keys
  '(dired-mode-map "dired" nil
    (
-    ("SPC" dired-quicklookup))))
+    ("SPC" quicklook-dired))))
 
 (remove-hook 'first-change-hook 'ns-unselect-line)
 
