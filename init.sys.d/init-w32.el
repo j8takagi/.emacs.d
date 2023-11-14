@@ -34,25 +34,27 @@
 (fontsets-set
  '((
     (unicode (font-spec :family "游明朝" :weight 'normal :slant 'normal :size 14))
-    ) "my_mincho")
+    )
+   "my_mincho")
  '((
     (unicode (font-spec :family "游ゴシック" :weight 'normal :slant 'normal))
-    ) "my_yugothic")
+    )
+   "my_yugothic")
  '((
     (unicode (font-spec :family "源ノ角ゴシック Code JP R" :weight 'normal :slant 'normal :size 12))
-    ) "my_sourcehancode")
+    )
+   "my_sourcehancode")
  )
 
 (listify-set
  '(default-file-name-coding-system cp932) ; 日本語ファイル名を正常に処理
- '(default-process-coding-system (utf-8 . cp932)) ; 日本語ファイル名を正常に処理
+ '(default-process-coding-system (utf-8 . cp932)) ; プロセスで日本語を正常に処理
  '(default-input-method "W32-IME")              ; IMEの設定
- ;; '(face-font-rescale-alist (("メイリオ" 1.167)))
  )
 
 ;; Shell-modeの文字コード設定
 (defun set-buffer-process-coding-system-cp932 ()
-  (set-buffer-process-coding-system 'cp932 'cp932))
+  (set-process-coding-system 'cp932 'cp932))
 
 ;; view-modeの設定
 (with-eval-after-load 'view
