@@ -1,4 +1,4 @@
-;;; emacs-lisp-skeletons.el --- 
+;;; emacs-lisp-skeletons.el ---
 
 ;; Copyright (C) 2015, 2014 by j8takagi
 
@@ -13,12 +13,12 @@
 (define-skeleton emacs-lisp-template
   "Template of emacs lisp file."
   nil
-  ";;; " (file-name-nondirectory (buffer-file-name)) " --- " ?\n
+  ";;; " (file-name-nondirectory (buffer-file-name)) " --- -*- lexical-binding: t -*-" ?\n
   ?\n
   ";; Copyright (C) " (substring (current-time-string) -4) " by " user-full-name ?\n
   ?\n
   ";; Authors: " user-full-name ?\n
-  ";; Keywords: " ?\n
+  ";; Keywords:" ?\n
   ?\n
   ";;; Commentary:" ?\n
   ?\n
