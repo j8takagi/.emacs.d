@@ -3,7 +3,7 @@
 (defgroup daily-log nil
   "daily-log-mnode for editing daily log."
   :prefix "daily-log-"
-  :group 'wp)
+  :group 'text)
 
 
 (defcustom daily-log-directory "~/Documents/daily_log/"
