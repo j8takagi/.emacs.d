@@ -1,5 +1,4 @@
-;;; -*- lexical-binding:t -*-
-;;; listify-packages.el ---
+;;; listify-packages.el --- -*- lexical-binding:t -*-
 
 ;; Copyright (C) 2018-2023 by Kazubito Takagi
 
