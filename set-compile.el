@@ -34,6 +34,7 @@
 (require 'listify-packages)
 (require 'auto-elc-mode)
 (require 'set-view-mode)
+(require 'set-whitespace)
 
 ;; Local Variables:
 ;; no-byte-compile: t
