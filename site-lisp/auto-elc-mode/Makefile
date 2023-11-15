@@ -11,7 +11,7 @@ ELCFILES := $(addsuffix c,$(ELFILES))
 
 RSYNC := rsync
 RSYNCFLAG := -avz --delete
-RSYNCEXCLUDE := --exclude "Makefile*" --exclude "native-compile.el*" --exclude "test" --exclude ".git*" --exclude "ChangeLog" --exclude "README*"
+RSYNCEXCLUDE := --exclude "Makefile*" --exclude "native-compile.el*" --exclude "test" --exclude ".git*" --exclude "ChangeLog" --exclude "README*" --exclude "*~*~"
 
 MKDIR := mkdir
 SED := sed
