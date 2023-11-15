@@ -1,13 +1,54 @@
+;;; vc-plus.el --- -*- lexical-binding: t -*-
+
+;; Copyright (C) 2023 by Kazubito Takagi
+
+;; Authors: Kazubito Takagi
+;; Keywords:
+
+;;; Commentary:
+
+
+;;; Code:
 (require 'ediff)
 (require 'vc)
 (require 'ediff-vers)
 (require 'dired)
 
+
+
+
+(defcustom vc-plus-delete-revision-buffer t
+  "Non Nil means delete revision buffer after ediff quit."
+  :type 'boolean
+  :group 'ediff)
+
+(defvar vc-plus-revision-buffer nil)
+
+(defvar vc-plus-window-configuration nil)
+
+(defun vc-plus-save-window-configuration ()
+  (setq vc-plus-window-configuration (current-window-configuration)))
+
+(defun vc-plus-restore-window-configuration ()
+    (set-window-configuration vc-plus-window-configuration))
+
+(add-hook 'ediff-before-setup-hook 'vc-plus-save-window-configuration)
+
+(mapc
+ (lambda (hook) (add-hook hook 'vc-plus-restore-window-configuration))
+ '(
+   ediff-suspend-hook
+   ediff-quit-hook
+   ))
+
 ;;;###autoload
-(defun ediff-vc-latest-current ()
-  "Run Ediff of buffer file by comparing the latest and current."
+(defun vc-plus-latest-current (&optional rev)
+  "Run Ediff of buffer file by comparing revision REV and current.
+If rev is omitted or nil, compare latest and current."
   (interactive)
-  (let ((file) (state))
+  (let ((file) (state) (arev ""))
+    (when rev
+      (setq arev rev))
     (setq file (buffer-file-name))
     (unless file
       (error "buffer not visiting file"))
@@ -15,10 +56,10 @@
     (if (member state '(up-to-date added))
         (message "%s: %s" file state)
       (ediff-load-version-control)
-      (ediff-vc-internal "" ""))))
+      (ediff-vc-internal arev ""))))
 
 ;;;###autoload
-(defun find-file-revision (&optional file revision)
+(defun vc-plus-find-file-revision (&optional file revision)
   "find-file FILE REVISION.
 Input FILE first, REVISION then.
 Or, input FILE as 'FILE.~REVISON~' and FILE and REVISION is specified."
@@ -43,16 +84,16 @@ Or, input FILE as 'FILE.~REVISON~' and FILE and REVISION is specified."
   (switch-to-buffer (vc-find-revision file revision)))
 
 ;;;###autoload
-(defun dired-ediff-vc-latest-current ()
+(defun vc-plus-dired-latest-current ()
   "Run Ediff of file named on this line by comparing the latest
   version and current."
   (interactive)
   (let ((find-file-run-dired nil))
     (find-file (dired-get-file-for-visit))
-    (ediff-vc-latest-current)))
+    (vc-plus-latest-current)))
 
 ;;;###autoload
-(defun ediff-redisplay-current-frame ()
+(defun vc-plus-redisplay-current-frame ()
   "Display Ediff Control panel in the current frame"
   (interactive)
   (when (get-buffer "*Ediff Control Panel*")
@@ -60,29 +101,18 @@ Or, input FILE as 'FILE.~REVISON~' and FILE and REVISION is specified."
     (delete-other-windows)
     (ediff-recenter)))
 
-(defvar ediff-saved-window-configuration)
-
-(defun ediff-save-window-configuration ()
-  (setq ediff-saved-window-configuration (current-window-configuration)))
-
-(defun ediff-restore-window-configuration ()
-  (set-window-configuration ediff-saved-window-configuration))
-
-(defun my-ediff-quit (reverse-default-keep-variants)
+;;;###autoload
+(defun vc-plus-quit (reverse-default-keep-variants)
   "Finish an Ediff session and exit Ediff.
 Unselects the selected difference, if any, restores the read-only and modified
 flags of the compared file buffers, kills Ediff buffers for this session
-\(but not buffers A, B, C\).
-
-If `ediff-keep-variants' is nil, the user will be asked whether the buffers
-containing the variants should be removed \(if they haven't been modified\).
-If it is t, they will be preserved unconditionally.  A prefix argument,
-temporarily reverses the meaning of this variable."
+\(but not buffers A, B, C\)."
   (interactive "P")
-  (let (buf)
+  (let (ctlbuf)
     (ediff-barf-if-not-control-buffer)
-    (setq buf (current-buffer))
+    (setq ctlbuf (current-buffer))
     (ediff-really-quit reverse-default-keep-variants)
-    (kill-buffer buf)))
+    (kill-buffer ctlbuf)))
 
-(provide 'ediff-vc-plus)
+(provide 'vc-plus)
+;;; vc-plus.el ends here

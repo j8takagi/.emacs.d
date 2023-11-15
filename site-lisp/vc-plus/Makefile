@@ -1,17 +1,17 @@
-TARGET := ediff-vc-plus         # "set this parameter, or error."
+TARGET := vc-plus         # "set this parameter, or error."
 TARGETDIR := $(TARGET)
 
 EMACS := emacs
 COMPILE.el := $(EMACS) -batch -f batch-byte-compile
 
-NATIVE-COMPILE.el := $(EMACS) -batch -l native-compile.el -f init-native-compile
+NATIVE-COMPILE.el := $(EMACS) -batch -l set-compile.el -l native-compile.el -f init-native-compile
 
 ELFILES := $(addsuffix .el,$(TARGET))
 ELCFILES := $(addsuffix c,$(ELFILES))
 
 RSYNC := rsync
 RSYNCFLAG := -avz --delete
-RSYNCEXCLUDE := --exclude "Makefile*" --exclude "native-compile.el*" --exclude "test" --exclude ".git*" --exclude "ChangeLog" --exclude "README*"
+RSYNCEXCLUDE := --exclude "Makefile*" --exclude "native-compile.el*" --exclude "test" --exclude ".git*" --exclude "ChangeLog" --exclude "README*" --exclude "set-compile.el*" --exclude "*~*~"
 
 MKDIR := mkdir
 SED := sed
