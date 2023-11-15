@@ -296,8 +296,17 @@
    'set-view-mode                     ; read-onlyファイルをview-modeで開く
    'view-mode-vi-bindings             ; view-modeでviのキーバインド
    )
+
+;; C言語ソースの場所
+(with-eval-after-load 'find-func
+  (listify-set-variables-standard-value
+   'find-function-C-source-directory
+  )
   (listify-set
    '(view-read-only 1)                  ; view-modeで開いたファイルをread-onlyに
+   `(find-function-C-source-directory
+     ,(expand-file-name
+       (concat "~/src/emacs-" emacs-version "/src/")))
    )
   (set-view-mode-buffers
    "\\*Messages\\*"                     ; *Messages*バッファをview-modeに
