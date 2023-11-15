@@ -617,13 +617,11 @@
     ))
  '(dired-mode-map "dired" nil
    (
-    ("C-c ." dired-exopen-current-directory)
+    ("C-c ." exopen-dired-current-directory)
     ("C-c e" ediff-revision)
     ("C-c i" image-dired)
-    ("C-c r" dired-exopen-file)
+    ("C-c r" exopen-dired-file)
     ("C-c w" wdired-change-to-wdired-mode)
-    ("E" dired-ediff-vc-latest-current)
-    ("r" dired-exopen-file)
     ("s" dired-toggle-sort)
     (";" replace-plus-dired-string-files)
     ("'" replace-plus-dired-regexp-files)

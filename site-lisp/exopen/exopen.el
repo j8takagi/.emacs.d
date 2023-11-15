@@ -128,13 +128,13 @@ functions are called."
   (exopen-file (expand-file-name default-directory)))
 
 ;; dired-modeでカーソル下のファイルやディレクトリーを外部プログラムで開く
-(defun dired-exopen-file ()
+(defun exopen-dired-file ()
   "Open file mentioned on this line in external program"
   (interactive)
   (exopen-file (dired-get-filename)))
 
 ;; diredで現在のディレクトリーを外部プログラムで開く
-(defun dired-exopen-current-directory ()
+(defun exopen-dired-current-directory ()
   "Open dired current directory in external program"
   (interactive)
   (exopen-file (expand-file-name dired-directory)))
