@@ -4,6 +4,10 @@
 
 (message "Start of loading %s at %s." load-file-name (format-time-string "%Y/%m/%d %T"))
 
+(defun init-message-startup-time ()
+  "Message Duration of the Emacs initialization time."
+  (message "Duration of the Emacs initialization - %s" (emacs-init-time)))
+
 (message (emacs-version))
 
 ;; user-emacs-directory(~/.emacs.d)のサブディレクトリーをload-pathに追加
