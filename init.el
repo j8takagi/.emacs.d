@@ -1,4 +1,4 @@
-;;; -*- lexical-binding:t -*-
+;;; init.el -*- lexical-binding: t -*-
 (unless noninteractive
   (setq inhibit-message 1))
 
@@ -162,7 +162,6 @@
  'count-japanese                   ; 日本語の文字数をカウント
  'daily-log                        ; 毎日のログ
  'exopen                           ; 外部プログラムでファイルを開く
- ;; 'ffap-plus
  'fill-region-with-n               ; 1行あたりの文字数を指定してfill-region
  'japanese-plus                    ; 全角半角変換
  'jaword                           ; 日本語の単語をきちんと扱う
@@ -234,8 +233,11 @@
  '(backup-directory-alist (("." "~/backup"))) ; バックアップディレクトリ
  '(case-replace nil)                    ; 置換時に大文字小文字を区別しない
  '(completion-ignored-extensions (".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" "_prev" ".idx" ".ind" ".ilg" ".tmp" ".synctex.gz" ".dplg" ".dslg" ".dSYM/" ".DS_Store" ":com.dropbox.attributes:$DATA")) ; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
+ `(custom-file ,(locate-user-emacs-file ".emacs-custom.el")) ; カスタムの設定値を書き込むファイル
+ `(default-directory ,(expand-file-name "~")) ; 標準のディレクトリ
  '(delete-by-moving-to-trash t)         ; ファイルの削除で、ゴミ箱を使う
  '(delete-old-versions t)               ; 古いバックアップファイルを自動的に削除する
+ '(desktop-files-not-to-save "\\(\\`/[^/:]*:\\|(ftp)\\'\\)\\|\\(~[0-9a-f]+~\\'\\)")
  '(dired-always-read-filesystem t)      ; ディレクトリ変更を検索前に反映
  '(dired-auto-revert-buffer t)          ; ディレクトリ変更を反映
  '(disabled-command-function nil)       ; すべてのコマンドの使用制限を解除する
@@ -256,9 +258,9 @@
  '(use-dialog-box nil)                  ; ダイアログボックスは使わない
  '(user-mail-address "j8takagi@nifty.com") ; ChangeLogなどで用いるメールアドレスの設定
  '(version-control t)                   ; バックアップファイルにバージョン番号を付ける
+ '(view-read-only 1)                    ; view-modeで開いたファイルをread-onlyに
  '(yank-excluded-properties t)          ; ヤンクで、テキストプロパティは捨てる
  '(yank-pop-change-selection t)         ; yank-popを有効にする
- `(custom-file ,(locate-user-emacs-file ".emacs-custom.el")) ; カスタムの設定値を書き込むファイル
  )
 
 ;; フック
@@ -274,12 +276,6 @@
  '(s2n string-to-number)               ; 置換時の関数名入力省力化
  )
 
-;; undohist
-(undohist-initialize)
-(with-eval-after-load 'undohist
-  (listify-set
-   '(undohist-ignored-files ("/.git/COMMIT_EDITMSG\\'"))))
-
 (when window-system
   (listify-set
    '(default-frame-alist                ; デフォルトフレーム
@@ -290,12 +286,11 @@
        (cursor-type box)
        ))))
 
-;; view-modeの設定
-(with-eval-after-load 'view
-  (listify-requires
-   'set-view-mode                     ; read-onlyファイルをview-modeで開く
-   'view-mode-vi-bindings             ; view-modeでviのキーバインド
-   )
+;; undohist
+(undohist-initialize)
+(with-eval-after-load 'undohist
+  (listify-set
+   '(undohist-ignored-files ("/.git/COMMIT_EDITMSG\\'"))))
 
 ;; C言語ソースの場所
 (with-eval-after-load 'find-func
@@ -303,14 +298,11 @@
    'find-function-C-source-directory
   )
   (listify-set
-   '(view-read-only 1)                  ; view-modeで開いたファイルをread-onlyに
    `(find-function-C-source-directory
      ,(expand-file-name
        (concat "~/src/emacs-" emacs-version "/src/")))
    )
-  (set-view-mode-buffers
-   "\\*Messages\\*"                     ; *Messages*バッファをview-modeに
-   ))
+  )
 
 ;; Infoの設定
 (with-eval-after-load 'info
@@ -326,11 +318,15 @@
    )
   )
 
-;; *Messages*の警告が目立つように
 (with-current-buffer "*Messages*"
+  ;; *Messages*の警告が目立つように
   (font-lock-mode 1)
   (font-lock-ensure)
-  (font-lock-add-keywords nil '(("\\`\\(\\(Warning\\|Error\\):?\\) .*" 1 font-lock-warning-face t))))
+  (font-lock-add-keywords
+   'messages-buffer-mode
+   '(("\\`\\(\\(Warning\\|Error\\):?\\)" 1 font-lock-warning-face t)))
+  ;; *Messages*バッファをview-modeに
+  (view-mode 1))
 
 ;; uniquify
 (with-eval-after-load 'uniquify
@@ -386,11 +382,6 @@
   (listify-set
    '(ediff-window-setup-function ediff-setup-windows-plain)
    '(ediff-split-window-function split-window-horizontally)
-   )
-  (listify-set-hooks
-   '(ediff-before-setup-hook (ediff-save-window-configuration))
-   '(ediff-quit-hook (ediff-restore-window-configuration))
-   '(ediff-suspend-hook (ediff-restore-window-configuration))
    ))
 
 ;;
