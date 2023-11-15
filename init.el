@@ -10,12 +10,112 @@
 
 (message (emacs-version))
 
+(setq load-path
+      (push (concat (expand-file-name user-emacs-directory) "site-lisp/listify") load-path))
+
+(require 'listify)
+
+; general variables
+(listify-set-variables-standard-value
+ 'auto-mode-alist
+ 'default-directory
+ 'disabled-command-function
+ 'file-name-coding-system
+ 'indent-line-function
+ 'locale-coding-system
+ 'magic-mode-alist
+ )
+
+; hooks
+(listify-custom-initialize-hooks
+ 'activate-mark-hook
+ 'after-change-functions
+ 'after-change-major-mode-hook
+ 'after-delete-frame-functions
+ 'after-init-hook
+ 'after-insert-file-functions
+ 'after-make-frame-functions
+ 'after-save-hook
+ 'after-setting-font-hook
+ 'auto-save-hook
+ 'before-change-functions
+ 'before-hack-local-variables-hook
+ 'before-init-hook
+ 'before-make-frame-hook
+ 'before-save-hook
+ 'buffer-access-fontify-functions
+ 'buffer-list-update-hook
+ 'buffer-quit-function
+ 'change-major-mode-after-body-hook
+ 'change-major-mode-hook
+ 'comint-password-function
+ 'command-line-functions
+ 'deactivate-mark-hook
+ 'delayed-warnings-hook
+ 'delete-frame-functions
+ 'delete-terminal-functions
+ 'echo-area-clear-hook
+ 'emacs-startup-hook
+ 'find-file-hook
+ 'find-file-not-found-functions
+ 'first-change-hook
+ 'focus-in-hook
+ 'focus-out-hook
+ 'font-lock-extend-after-change-region-function
+ 'font-lock-extend-region-functions
+ 'font-lock-fontify-buffer-function
+ 'font-lock-fontify-region-function
+ 'font-lock-mark-block-function
+ 'font-lock-syntactic-face-function
+ 'font-lock-unfontify-buffer-function
+ 'font-lock-unfontify-region-function
+ 'fontification-functions
+ 'frame-auto-hide-function
+ 'hack-local-variables-hook
+ 'kill-buffer-hook
+ 'kill-buffer-query-functions
+ 'kill-emacs-hook
+ 'kill-emacs-query-functions
+ 'menu-bar-update-hook
+ 'minibuffer-exit-hook
+ 'minibuffer-setup-hook
+ 'mouse-leave-buffer-hook
+ 'mouse-position-function
+ 'pop-up-frame-function
+ 'post-command-hook
+ 'post-gc-hook
+ 'post-self-insert-hook
+ 'pre-command-hook
+ 'pre-redisplay-functions
+ 'prefix-command-echo-keystrokes-functions
+ 'prefix-command-preserve-state-hook
+ 'quit-window-hook
+ 'resume-tty-functions
+ 'server-after-make-frame-hook
+ 'split-window-preferred-function
+ 'suspend-hook
+ 'suspend-resume-hook
+ 'suspend-tty-functions
+ 'syntax-propertize-extend-region-functions
+ 'syntax-propertize-function
+ 'temp-buffer-setup-hook
+ 'temp-buffer-show-function
+ 'temp-buffer-show-hook
+ 'tty-setup-hook
+ 'window-configuration-change-hook
+ 'window-scroll-functions
+ 'window-setup-hook
+ 'window-size-change-functions
+ 'write-contents-functions
+ 'write-file-functions
+ 'write-region-annotate-functions
+ 'write-region-post-annotation-function
+ )
+
 ;; user-emacs-directory(~/.emacs.d)のサブディレクトリーをload-pathに追加
 (unless noninteractive
   (let ((default-directory (expand-file-name user-emacs-directory)))
     (normal-top-level-add-subdirs-to-load-path)))
-
-(require 'listify)
 
 ;;
 ;; パッケージ
