@@ -263,7 +263,7 @@
 
 ;; フック
 (listify-set-hooks
- '(after-init-hook (message-startup-time))
+ '(after-init-hook (init-message-startup-time listify-message-set-variables))
  '(find-file-hook (auto-insert))
  )
 
