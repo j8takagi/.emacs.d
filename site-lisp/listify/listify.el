@@ -279,23 +279,30 @@ or the standard error stream in batch mode."
         (message "Autoload functions is not defined.")
       (message "Autoload functions are defined. - %s" (reverse funcs)))))
 
-(defun listify-global-set-keys (&rest key-func)
-  "Give global binding as KEY-FUNC by global-set-key.
-Each KEY-FUNC has the form:
+(defun listify-global-set-keys (&rest key-cmd)
+  "Give global binding as KEY-CMD by global-set-key.
+Each KEY-CMD has the form:
 
-    (KEY FUNCTION)
+    (KEY CMD)
 
-If FUNCTION is void, warning message is printed into the `*Messages' buffer,
+If CMD is void, warning message is printed into the `*Messages' buffer,
 or the standard error stream in batch mode."
-  (let (afunc)
-    (dolist (akeyfunc key-func)
-      (if (not (fboundp (setq afunc (cadr akeyfunc))))
-          (message "Warning: In setting keybind, function `%s' is void." afunc)
-        (global-set-key (kbd (car akeyfunc)) afunc)))))
+  (dolist (akeycmd key-cmd)
+    (let ((akey (car akeycmd)) (acmd (cadr akeycmd)) (oldval nil))
+      (setq oldval (keymap-lookup (current-global-map) akey))
+      (if (not (fboundp acmd))
+          (message "Warning: In setting keybind, command `%s' is void." acmd)
+        (if (equal oldval acmd)
+            (message "Key `%s' command `%s' is not changed." akey oldval)
+          ;; (global-set-key (kbd akey) acmd)
+          (keymap-global-set akey acmd)
+          (message "Key `%s' command `%s' is changed to `%s'"
+                   akey oldval (keymap-lookup (current-global-map) akey))
+        )))))
 
 (defun listify-global-unset-keys (&rest keys)
   (dolist (akey keys)
-    (global-unset-key (kbd akey))))
+    (keymap-global-unset akey)))
 
 (defun listify-modemap-set-keys (&rest modemap)
   "Give KEY binding of MODEMAP as MAPKEYS after LIBRARY is loaded.

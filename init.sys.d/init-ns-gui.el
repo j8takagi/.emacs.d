@@ -126,7 +126,7 @@
 
 ;; Mac OS Xのキー設定
 (listify-global-set-keys
- '("<M-f1>" other-frame)    ; Mac OS Xの他アプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする
+ '("M-<f1>" other-frame)    ; Mac OS Xの他アプリと同様に、command + F1でアプリケーションの次のウィンドウを操作対象にする
  '("C-c C-M-d" dictionary_app)
  '("C-c C-d" dictionary_app-at-point)
  )
