@@ -228,12 +228,7 @@ Each SYM-DEF has the form (SYMBOL DEFINITION &optional DOCSTRING)."
        (defalias asym adef (nth 3 asymdef))
        (message "`%s' is defined as alias of `%s'." asym adef)))))
 
-;; Emacs開始にかかった時間をメッセージに表示
-(defun message-startup-time ()
-  "Message Duration of the Emacs initialization time."
-  (message "Duration of the Emacs initialization - %s" (emacs-init-time)))
-
-(defvar system-name-simple
+(defvar listify-system-name-simple
   (replace-regexp-in-string "\\..*\\'" "" (system-name))
   "The simple host name of the machine Emacs is running on,
 which is without domain information.")
