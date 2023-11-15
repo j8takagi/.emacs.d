@@ -652,12 +652,12 @@
 
 ;; global-key
 (listify-global-set-keys
- '("<M-down>" windmove-down)
- '("<M-f9>" gnuplot-make-buffer)
- '("<M-left>" windmove-left)
- '("<M-return>" expand-abbrev)
- '("<M-right>" windmove-right)
- '("<M-up>" windmove-up)
+ '("M-<down>" windmove-down)
+ '("M-<f9>" gnuplot-make-buffer)
+ '("M-<left>" windmove-left)
+ '("M-<return>" expand-abbrev)
+ '("M-<right>" windmove-right)
+ '("M-<up>" windmove-up)
  '("C-' h" windmove-left)
  '("C-' j" windmove-down)
  '("C-' k" windmove-up)
