@@ -37,6 +37,5 @@
 
 (advice-add 'save-buffers-kill-emacs :before 'no-process-query-on-exit-set-processes)
 
-
 (provide 'no-process-query-on-exit)
 ;;; no-process-query-on-exit.el ends here
