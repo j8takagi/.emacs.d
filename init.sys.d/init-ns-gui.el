@@ -5,7 +5,6 @@
 (require 'listify)
 
 (listify-requires
- 'dired
  'fontset-set
  'dictionary_app
  'quicklook

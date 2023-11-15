@@ -14,7 +14,7 @@ ifeq ($(KERNEL),Linux)
   OSFILES := $(wildcard init-linux*.el init-x*.el)
 endif
 ifeq ($(KERNEL),Darwin)
-  OSFILES := $(wildcard init-mac*.el init-ns*.el init-darwin*.el)
+  OSFILES := $(wildcard init-ns*.el init-darwin*.el)
 endif
 
 HOST := $(shell hostname -s)
