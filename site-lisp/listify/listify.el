@@ -381,13 +381,10 @@ If FUNCTION or HOOK is void,
 warning message is printed into the `*Messages' buffer,
 or the standard error stream in batch mode."
   (dolist (ahookfuncs hook-funcs)
-    (let ((ahook (car ahookfuncs)) (funcs (cadr ahookfuncs)) oldval newval)
-      (dolist (afunc funcs)
-        (setq oldval (eval ahook))
-        (listify-set-hook ahook afunc))
-      (if (equal oldval (setq newval (eval ahook)))
-          (message "Hook `%s' is not changed." ahook)
-        (message "Hook `%s': value `%s' is changed to `%s'." ahook oldval newval)))))
+    (let ((ahook (car ahookfuncs)) (funcs (cadr ahookfuncs)))
+      (if (null (listify-custom-initialize-hook ahook))
+          (message "Hook `%s' is not defined." ahook)
+        (listify-set `(,ahook ,funcs))))))
 
 (defun listify-setenv (&rest env-val)
   "Add system environment variables to values by list of ENV-VAL.
