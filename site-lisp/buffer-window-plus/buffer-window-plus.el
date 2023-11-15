@@ -1,6 +1,6 @@
-;;; other-window-bindings.el
+;;; buffer-window-plus.el --- -*- lexical-binding: t -*-
 
-;; Copyright (C) 2015, 2014  j8takagi
+;; Copyright (C) 2014-2023  j8takagi
 
 ;; Author: j8takagi <j8takagi@nifty.com>
 ;; Keywords: Emacs elisp window buffer bindings
@@ -47,10 +47,10 @@
   (delete-kill-next-window-buffer 1))
 
 ;; 隣のウィンドウのバッファを削除する。
-;; 引数kill-buffer-only-pがnon-nilの場合、ウィンドウも閉じる
+;; 引数kill-buffer-only-pがnilの場合、ウィンドウも閉じる
 (defun delete-kill-next-window-buffer (kill-buffer-only-p)
   "kill next window buffer.
-If KILL-BUFFER-ONLY-P is non nil, delete the next window.
+If KILL-BUFFER-ONLY-P is nil, delete the next window.
 Otherwise, the next window is not deleted."
   (interactive "P")
   (if (one-window-p)
