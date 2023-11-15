@@ -354,23 +354,26 @@ or the standard error stream in batch mode."
             (message "Info: minor mode - `%s': value `%s' is not changed." amode oldval)
           (message "Minor mode - `%s': value `%s' is changed to `%s'." amode oldval newval))))))
 
-(defun listify-set-hook (hook func)
-  "Add a function to hook by list of (HOOK FUNCTION).
-If FUNCTION or HOOK is void,
-warning message is printed into the `*Messages' buffer,
-or the standard error stream in batch mode."
-  (cond
-   ((not (boundp hook))
-    (message "Warning: In setting hook, hook `%s' is void." hook))
-   ((not (fboundp func))
-    (message "Warning: In setting hook, function `%s' is void." func))
-   (t
-    (if (member func (eval hook))
-        (message "Hook - `%s': function `%s' is already a member." hook func)
-      (add-hook hook func)))))
+(defun listify-custom-initialize-hooks (&rest hooks)
+  (mapcar (lambda(ahook) (listify-custom-initialize-hook ahook)) hooks)
+  )
+
+(defun listify-custom-initialize-hook (hook)
+  "Initialize HOOK as a custom variable.
+Set properties of standard-value and custom-type
+of variable HOOK, if not set yet.
+If HOOK is not define, return nil.
+In other case, return HOOK."
+  (if (not (boundp hook))
+      nil
+    (unless (custom-variable-p hook)
+      (listify-set-variable-standard-value hook))
+    (unless (get hook 'custom-type)
+      (put hook 'custom-type 'hook))
+    hook))
 
 (defun listify-set-hooks (&rest hook-funcs)
-  "Add a function to hook by list:
+  "Set functions to each hook by list:
 
 (HOOK1 (FUNC11 FUNC12 ...) (HOOK2 (FUNC21 FUNC22 ...) ...)
 
