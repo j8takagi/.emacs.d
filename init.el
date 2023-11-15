@@ -57,7 +57,6 @@
  'buffer-window-plus               ; バッファとウィンドウの操作関数
  'count-japanese                   ; 日本語の文字数をカウント
  'daily-log                        ; 毎日のログ
- 'ediff-vc-plus                    ; Ediffの追加関数
  'exopen                           ; 外部プログラムでファイルを開く
  ;; 'ffap-plus
  'fill-region-with-n               ; 1行あたりの文字数を指定してfill-region
@@ -73,6 +72,7 @@
  'symbol-properties                ; シンボルのプロパティ名リスト取得
  'temp-buffer                      ; 一時バッファの作成
  'undohist                         ; undohist
+ 'vc-plus                          ; vcの追加関数
  'view-mode-vi-bindings            ; view-modeでviのキーバインド
  'window-control                   ; ウィンドウとフレームのサイズを調整
  'xlfd-at                          ; フォント情報の表示
@@ -581,15 +581,16 @@
  '("C-x C-M-b" electric-buffer-list)
  '("C-x C-M-f" exopen-find-file)
  '("C-x C-M-k" delete-kill-current-next-window-buffer)
- '("C-x E" ediff-redisplay-current-frame)
+ '("C-x E" vc-plus-redisplay-current-frame)
  '("C-x K" kill-buffer-and-window)
  '("C-x RET u" ucs-normalize-NFC-buffer)
  '("C-x g" magit-status)
  '("C-x m" man)
  '("C-x p" call-last-kbd-macro)
  '("C-x q" bury-buffer)
- '("C-x v e" ediff-vc-latest-current)
- '("C-x v f" find-file-revision)
+ '("C-x v e" vc-plus-latest-current)
+ '("C-x v f" vc-plus-find-file-revision)
+ '("C-x v -" vc-revision-other-window)
  '("M-?" help)
  '("M-[" backward-paragraph)
  '("M-]" forward-paragraph)
@@ -622,6 +623,7 @@
     ("C-c i" image-dired)
     ("C-c r" exopen-dired-file)
     ("C-c w" wdired-change-to-wdired-mode)
+    ("E" vc-plus-dired-latest-current)
     ("s" dired-toggle-sort)
     (";" replace-plus-dired-string-files)
     ("'" replace-plus-dired-regexp-files)
@@ -645,7 +647,7 @@
     ))
  '(ediff-mode-map "ediff" ediff-keymap-setup-hook
    (
-    ("Q" my-ediff-quit)
+    ("Q" vc-plus-quit)
     ))
  '(c-mode-map "cc-mode" c-mode-common-hook
    (
