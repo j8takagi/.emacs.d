@@ -1,6 +1,4 @@
-;;; -*- lexical-binding:t -*-
-;;; listify.el --- Listify Emacs initialization files.
-
+;;; listify.el --- Listify Emacs initialization files. -*- lexical-binding:t -*-
 ;; Copyright (C) 2017-2023 by Kazubito Takagi
 
 ;; Authors: Kazubito Takagi
@@ -11,6 +9,15 @@
 (require 'custom)
 (require 'cus-edit)
 (require 'wid-edit)
+
+(defgroup listify nil
+  "Emacs start-up utility."
+  :group 'initialization)
+
+(defvar listify-init-set-variables nil
+  "VARIABLES set in listify functions, mainly
+from initialization files."
+)
 
 (defun listify-add-or-update-alist (alist key value)
   "return ALIST which value is updated or added.
@@ -42,19 +49,16 @@ Arguments has the form:
 
 (defun listify-message-variable-comment (var)
   (interactive "vVariable name: ")
-  (message (get var 'variable-comment)))
+  (message (listify-get-variable-comment var)))
 
-(defun listify-create-variable-comment (var &optional add-comment)
+(defun listify-create-variable-comment (&optional add-comment)
   "Create variable comment of VAR by loading file or buffer file and ADD-COMMENT."
-  (let (acomm afile oldcomm)
+  (let (acomm afile)
     (when (setq afile (or load-file-name buffer-file-name (buffer-name)))
-      (setq acomm (concat (format "set in `%s'." afile))))
+      (setq acomm (format "set in `%s'." afile)))
     (when add-comment
-      (setq acomm (concat acomm (when acomm " ") add-comment)))
-    (setq oldcomm (listify-get-variable-comment var))
-    (if (and oldcomm (null (equal acomm oldcomm)))
-       (setq acomm (concat acomm " " oldcomm)))
-     acomm))
+      (setq acomm (concat add-comment (when acomm " ") acomm)))
+    acomm))
 
 (defun listify-validate-custom-variable-type (custom-variable &optional value)
   "Varidate VALUES is match CUSTOM-VARIABLE to
@@ -68,17 +72,20 @@ CUSTOM-VARIABLE is validated."
     (when (setq atype (custom-variable-type custom-variable))
       (widget-apply (widget-convert atype) :match value))))
 
-(defun listify-message-variables(vars)
-  (let (cusvars ovars)
-    (dolist (avar vars)
+(defun listify-message-set-variables()
+  (let ((inhibit-message 1) cusvars ovars)
+    (dolist (avar listify-init-set-variables)
       (if (custom-variable-p avar)
           (setq cusvars (append cusvars (list avar)))
         (setq ovars (append ovars (list avar)))))
     (message
      (concat
-      (when cusvars (format "Custom variables are set. - %s" cusvars))
-      (when (and cusvars ovars) "\n")
-      (when ovars (format "Variables are set. - %s" ovars))))))
+      (when cusvars
+        (format "Custom variables are set. - %s" cusvars))
+      (when (and cusvars ovars)
+        "\n")
+      (when ovars
+        (format "Variables are set. - %s" ovars))))))
 
 (defun listify-set-alist (sym exp now req comment)
   "Add or update alist values of a custom variable.
