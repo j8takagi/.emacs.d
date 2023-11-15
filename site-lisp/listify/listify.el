@@ -318,14 +318,20 @@ into the `*Messages' buffer, or  the standard error stream in batch mode."
       (setq
        amap (car amodemap) alib (cadr amodemap)
        ahook (nth 2 amodemap) keyfuncs (nth 3 amodemap)
+       amapname (symbol-name amap)
        funcdef
        `(lambda ()
           (dolist (keyfunc ',keyfuncs)
-            (let ((akey (car keyfunc)) (afunc (cadr keyfunc)))
+            (let ((akey (car keyfunc)) (afunc (cadr keyfunc)) (amapname nil) (oldval nil))
+              (setq oldval (keymap-lookup ,amap akey))
               (if (not (fboundp afunc))
                   (message
-                   ,(concat "Warning: In setting `" (setq amapname (symbol-name amap)) "' keybind, function `%s' is void.") afunc)
-                (define-key ,amap (kbd akey) afunc))))))
+                   ,(concat "Warning: In setting `" amapname "' keybind, function `%s' is void.") afunc)
+                (keymap-set ,amap akey afunc)
+                (message "Key `%s' command `%s' in global map, `%s' in modemap `%s', is changed to `%s'"
+                         akey
+                         (keymap-lookup (current-global-map) akey) oldval amapname
+                         (keymap-lookup ,amap akey)))))))
       (eval-after-load alib
         (if (null ahook)
             (eval funcdef)
