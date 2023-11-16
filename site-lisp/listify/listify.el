@@ -325,31 +325,31 @@ Each MODEMAP has the form:
 If HOOK is not nil, the binding is via the HOOK.
 If function in MAPKEYS is void, warning message is printed
 into the `*Messages' buffer, or  the standard error stream in batch mode."
-  (let (amap alib ahook keyfuncs amapname funcdef)
+  (let (amap alib ahook keyfuncs amapname funcname funcdef)
     (dolist (amodemap modemap)
       (setq
-       amap (car amodemap) alib (cadr amodemap)
+       amap (nth 0 amodemap) alib (nth 1 amodemap)
        ahook (nth 2 amodemap) keyfuncs (nth 3 amodemap)
        amapname (symbol-name amap)
+       funcname (read (concat "listify-" amapname "-keybind"))
        funcdef
        `(lambda ()
           (dolist (keyfunc ',keyfuncs)
-            (let ((akey (car keyfunc)) (afunc (cadr keyfunc)) (amapname nil) (oldval nil))
+            (let ((inhibit-message 1) (akey (car keyfunc)) (afunc (cadr keyfunc)) (oldval nil))
               (setq oldval (keymap-lookup ,amap akey))
               (if (not (fboundp afunc))
                   (listify-message
                    ,(concat "Warning: In setting `" amapname "' keybind, function `%s' is void.") afunc)
                 (keymap-set ,amap akey afunc)
-                (message "Key `%s' command `%s' in global map, `%s' in modemap `%s', is changed to `%s'"
+                (listify-message "Key `%s' command `%s' in global map, `%s' in modemap `%s', is changed to `%s'"
                          akey
-                         (keymap-lookup (current-global-map) akey) oldval amapname
+                         (keymap-lookup (current-global-map) akey) oldval ,amapname
                          (keymap-lookup ,amap akey)))))))
+      (fset funcname funcdef)
       (eval-after-load alib
         (if (null ahook)
-            (eval funcdef)
-          (let ((func-add-keybind (read (concat "listify-" amapname "-keybind"))))
-            (fset func-add-keybind funcdef)
-            `(add-hook ',ahook ',func-add-keybind)))))))
+            funcname
+          `(add-hook ',ahook ',funcname))))))
 
 (defun listify-set-minor-modes (&rest modeval)
   "Set MODES. MODE format is assumed as `(MINOR-MODE-FUNCTION ARG)'.
