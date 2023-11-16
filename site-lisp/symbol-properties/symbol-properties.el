@@ -3,7 +3,7 @@
 ;; Copyright (C) 2023 by Kazubito Takagi
 
 ;; Authors: Kazubito Takagi
-;; Keywords: 
+;; Keywords: variable property
 
 ;;; Commentary:
 
@@ -11,13 +11,11 @@
 ;;; Code:
 (defun symbol-properties (sym)
   "Return the list of SYMBOL's PROPNAMEs."
-  (let ((props nil) (prop (symbol-plist sym)) (i 0))
-    (while (< i (length prop))
+  (let ((propnames nil) (prop (symbol-plist sym)))
+    (dolist (i (number-sequence 0 (- (length prop) 1)))
       (when (= (% i 2) 0)
-        (push (nth i prop) props))
-      (setq i (+ i 1)))
-    props
-    ))
+        (push (nth i prop) propnames)))
+    propnames))
 
 (provide 'symbol-properties)
 ;;; symbol-properties.el ends here
