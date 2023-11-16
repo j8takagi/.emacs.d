@@ -85,7 +85,7 @@ CUSTOM-VARIABLE is validated."
       (widget-apply (widget-convert atype) :match value))))
 
 (defun listify-message-set-variables()
-  (let ((inhibit-message 1) cusvars ovars)
+  (let ( cusvars ovars)
     (dolist (avar listify-init-set-variables)
       (if (custom-variable-p avar)
           (setq cusvars (append cusvars (list avar)))
