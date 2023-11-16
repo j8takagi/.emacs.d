@@ -364,13 +364,13 @@ or the standard error stream in batch mode."
     (dolist (amodeval modeval)
       (setq amode (car amodeval))
       (if (not (fboundp amode))
-          (message "Warning: In setting minor mode, function `%s' is void." amode)
+          (listify-message "Warning: In setting minor mode, function `%s' is void." amode)
         (setq oldval (eval amode))
         (eval amodeval)
         (setq newval (eval amode))
         (if (equal oldval newval)
-            (message "Info: minor mode - `%s': value `%s' is not changed." amode oldval)
-          (message "Minor mode - `%s': value `%s' is changed to `%s'." amode oldval newval))))))
+            (listify-message "Info: minor mode - `%s': value `%s' is not changed." amode oldval)
+          (listify-message "Minor mode - `%s': value `%s' is changed to `%s'." amode oldval newval))))))
 
 (defun listify-custom-initialize-hooks (&rest hooks)
   (mapcar (lambda(ahook) (listify-custom-initialize-hook ahook)) hooks)
@@ -401,7 +401,7 @@ or the standard error stream in batch mode."
   (dolist (ahookfuncs hook-funcs)
     (let ((ahook (car ahookfuncs)) (funcs (cadr ahookfuncs)))
       (if (null (listify-custom-initialize-hook ahook))
-          (message "Hook `%s' is not defined." ahook)
+          (listify-message "Hook `%s' is not defined." ahook)
         (listify-set `(,ahook ,funcs))))))
 
 (defun listify-setenv (&rest env-val)
@@ -415,7 +415,7 @@ Each ENV-VAL form is (ENVIRONMENT VALUE)."
 by `eval-buffer' and message evaluted."
   (interactive)
   (eval-buffer)
-  (message "%s is evaluted." (buffer-file-name)))
+  (listify-message "%s is evaluted." (buffer-file-name)))
 
 (provide 'listify)
 ;;; listify.el ends here
