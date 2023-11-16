@@ -170,6 +170,7 @@
  'list-fonts-display               ; フォント一覧作成コマンド
  'not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
  'scroll-one-line                  ; 1行スクロール
+ 'replace-plus                     ; 置換の追加機能
  'set-savehist                     ; 履歴を保存するsavehist-modeの設定
  'set-view-mode                    ; read-onlyファイルをview-modeで開く
  'set-whitespace                   ; whitespace-modeの設定
