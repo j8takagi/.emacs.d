@@ -11,12 +11,12 @@
 (require 'wid-edit)
 
 (defgroup listify nil
-  "Emacs start-up utility."
+  "Emacs start-up utilities."
   :group 'initialization)
 
 (defvar listify-init-set-variables nil
-  "VARIABLES set in listify functions, mainly
-from initialization files."
+  "Variables set in listify functions,
+mainly from initialization files."
 )
 
 (defun listify-add-or-update-alist (alist key value)
@@ -81,11 +81,11 @@ CUSTOM-VARIABLE is validated."
     (message
      (concat
       (when cusvars
-        (format "Custom variables are set. - %s" cusvars))
+        (format "Custom variables are set. - %s" (sort cusvars 'string<)))
       (when (and cusvars ovars)
         "\n")
       (when ovars
-        (format "Variables are set. - %s" ovars))))))
+        (format "Variables are set. - %s" (sort ovars 'string<)))))))
 
 (defun listify-set-variable (sym val now req comment)
   "Set a variable using `custom-set-variable'.
