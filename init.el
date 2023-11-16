@@ -160,6 +160,7 @@
  ;; ~/.emacs.d/site-lisp
  'buffer-window-plus               ; バッファとウィンドウの操作関数
  'count-japanese                   ; 日本語の文字数をカウント
+ 'continue-scratch                 ; *scratch*の永続化
  'daily-log                        ; 毎日のログ
  'exopen                           ; 外部プログラムでファイルを開く
  'fill-region-with-n               ; 1行あたりの文字数を指定してfill-region
