@@ -1,4 +1,4 @@
-;;; auto-elc-mode.el
+;;; auto-elc-mode.el -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013  j8takagi
 
