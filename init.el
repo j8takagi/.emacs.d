@@ -720,7 +720,6 @@
  '("C-x RET u" ucs-normalize-NFC-buffer)
  '("C-x g" magit-status)
  '("C-x m" man)
- '("C-x p" call-last-kbd-macro)
  '("C-x q" bury-buffer)
  '("C-x v e" vc-plus-latest-current)
  '("C-x v f" vc-plus-find-file-revision)
