@@ -318,7 +318,7 @@
    )
   )
 
-(with-current-buffer "*Messages*"
+(with-current-buffer (buffer-name (messages-buffer))
   ;; *Messages*の警告が目立つように
   (font-lock-mode 1)
   (font-lock-ensure)
