@@ -15,7 +15,7 @@
     (dolist (i (number-sequence 0 (- (length prop) 1)))
       (when (= (% i 2) 0)
         (push (nth i prop) propnames)))
-    propnames))
+    (reverse propnames)))
 
 (provide 'symbol-properties)
 ;;; symbol-properties.el ends here
