@@ -109,7 +109,7 @@ Arguments form:
 Validation of `listify-validate-custom-variable-type' is done
 before setting. If fail, it cancels setting."
   (let ((oldval (purecopy (symbol-value sym))) (varstruct "Variable"))
-    (when (listp oldval)
+    (when (and oldval (listp oldval))
       (setq varstruct
             (if (consp (car oldval))
                 "Alist variable"
