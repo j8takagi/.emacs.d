@@ -1,4 +1,4 @@
-;;; set-savehist.el ---
+;;; set-savehist.el --- -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2023 by Kazubito Takagi
 
@@ -16,8 +16,7 @@
 except variables in `desktop-globals-to-save',
 load-history and :prompt-history to savehist-additional-variables
 so that variabels are saved to `savehist-file'."
-    (let ((oldval nil) (addval nil) (histvars nil) (inhibit-message 1) (loadmsg nil))
-      (setq oldval (copy-alist (symbol-value 'savehist-additional-variables)))
+    (let ((addval nil) (histvars nil) (inhibit-message 1) (loadmsg nil))
       (setq histvars
             (apropos-internal "-\\(\\(history\\)\\|\\(ring\\)\\)$" 'boundp))
       (mapc
