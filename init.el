@@ -176,7 +176,6 @@
  'set-whitespace                   ; whitespace-modeの設定
  'symbol-properties                ; シンボルのプロパティ名リスト取得
  'temp-buffer                      ; 一時バッファの作成
- 'undohist                         ; undohist
  'toggle-skeleton-pair             ; skeleton-pairのトグル
  'vc-plus                          ; vcの追加関数
  'view-mode-vi-bindings            ; view-modeでviのキーバインド
@@ -241,7 +240,8 @@
  '(delete-by-moving-to-trash t)         ; ファイルの削除で、ゴミ箱を使う
  '(delete-old-versions t)               ; 古いバックアップファイルを自動的に削除する
  '(desktop-files-not-to-save "\\(\\`/[^/:]*:\\|(ftp)\\'\\)\\|\\(~[0-9a-f]+~\\'\\)")
- '(dired-always-read-filesystem t)      ; ディレクトリ変更を検索前に反映
+'(desktop-locals-to-save (buffer-undo-list)) ;undo-listをdesktopで保存
+'(dired-always-read-filesystem t)      ; ディレクトリ変更を検索前に反映
  '(dired-auto-revert-buffer t)          ; ディレクトリ変更を反映
  '(disabled-command-function nil)       ; すべてのコマンドの使用制限を解除する
  '(display-buffer-alist (("^\\*shell\\*$" (display-buffer-same-window)) ("^\\*?magit: .+" (display-buffer-same-window)))) ; バッファの表示方法
@@ -288,12 +288,6 @@
        (cursor-color "DarkOliveGreen")
        (cursor-type box)
        ))))
-
-;; undohist
-(undohist-initialize)
-(with-eval-after-load 'undohist
-  (listify-set
-   '(undohist-ignored-files ("/.git/COMMIT_EDITMSG\\'"))))
 
 ;; C言語ソースの場所
 (eval-when-compile (listify-requires 'find-func))
