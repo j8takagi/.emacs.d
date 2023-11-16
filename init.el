@@ -296,6 +296,7 @@
    '(undohist-ignored-files ("/.git/COMMIT_EDITMSG\\'"))))
 
 ;; C言語ソースの場所
+(eval-when-compile (listify-requires 'find-func))
 (with-eval-after-load 'find-func
   (listify-set-variables-standard-value
    'find-function-C-source-directory
@@ -308,12 +309,14 @@
   )
 
 ;; Infoの設定
+(eval-when-compile (listify-requires 'info))
 (with-eval-after-load 'info
   (listify-set
    '(Info-additional-directory-list ("~/share/info/ja" "~/share/info" )) ; Infoファイルの場所
    ))
 
 ;; skeletonの設定
+(eval-when-compile (listify-requires 'skeleton))
 (with-eval-after-load 'skeleton
   (listify-set
    '(skeleton-end-newline nil)      ; skeletonの挿入後、改行しない
@@ -332,11 +335,13 @@
   (view-mode 1))
 
 ;; uniquify
+(eval-when-compile (listify-requires 'uniquify))
 (with-eval-after-load 'uniquify
   (listify-set
    '(uniquify-ignore-buffers-re "*[^*]+*")))
 
 ;; emacsclient
+(eval-when-compile (listify-requires 'server))
 (with-eval-after-load 'server
   (unless (server-running-p)
      (server-start))
@@ -345,23 +350,27 @@
    ))
 
 ;; compile
+(eval-when-compile (listify-requires 'compile))
 (with-eval-after-load 'compile
   (listify-set
    '(compilation-scroll-output first-error) ; *compilation*バッファをスクロールして表示
    ))
 
 ;; ChangeLog
+(eval-when-compile (listify-requires 'add-log))
 (with-eval-after-load 'add-log
   (listify-set
    '(change-log-default-name "~/ChangeLog")
    ))
 
+(eval-when-compile (listify-requires 'vc-hooks))
 (with-eval-after-load 'vc-hooks
   (listify-set
    '(vc-follow-symlinks nil)            ; vc-follow-linkを無効にする 参考: https://abicky.net/2014/06/07/175130/
    ))
 
 ;; whitespace
+(eval-when-compile (listify-requires 'set-whitespace))
 (with-eval-after-load 'set-whitespace
   ; タブ	、全角スペース　、行末の空白  
   (when (set-whitespace-tabs-spaces-trailing)
@@ -381,6 +390,7 @@
 ;;
 ;; Ediff
 ;;
+(eval-when-compile (listify-requires 'ediff))
 (with-eval-after-load 'ediff
   (listify-set
    '(ediff-window-setup-function ediff-setup-windows-plain)
@@ -390,6 +400,7 @@
 ;;
 ;; dired
 ;;
+(eval-when-compile (listify-requires 'dired))
 (with-eval-after-load 'dired
   (listify-requires
    'dired-aux                           ; diredの拡張機能
@@ -412,11 +423,13 @@
    )
   )
 
+(eval-when-compile (listify-requires 'dired-aux))
 (with-eval-after-load 'dired-aux
   (listify-set
    '(dired-do-revert-buffer t)          ; dired-do操作のあと、diredバッファを更新
    ))
 
+(eval-when-compile (listify-requires 'find-dired))
 (with-eval-after-load 'find-dired
   (listify-set
    '(find-ls-option ("-exec ls -ldh {} +" . "-alh"))
@@ -425,6 +438,7 @@
 ;;
 ;; lisp-mode
 ;;
+(eval-when-compile (listify-requires 'lisp-mode))
 (with-eval-after-load 'lisp-mode
   (listify-requires
    'emacs-lisp-skeletons
@@ -445,6 +459,7 @@
 ;;
 ;; Shell-mode
 ;;
+(eval-when-compile (listify-requires 'shell))
 (with-eval-after-load 'shell
   (listify-requires
    'no-process-query-on-exit
@@ -460,6 +475,7 @@
 ;;
 ;; asm-mode
 ;;
+(eval-when-compile (listify-requires 'asm-mode))
 (with-eval-after-load 'asm-mode
   (defun init-set-tab-width-8()
     (interactive)
@@ -471,6 +487,7 @@
 ;;
 ;; CC-Mode
 ;;
+(eval-when-compile (listify-requires 'cc-mode))
 (with-eval-after-load 'cc-mode
   (listify-requires
    'c-skeletons
@@ -487,6 +504,7 @@
 ;;
 ;; tex-mode
 ;;
+(eval-when-compile (listify-requires 'tex-mode))
 (with-eval-after-load 'tex-mode
   (listify-requires
    'latex-skeletons
@@ -502,6 +520,7 @@
 ;;
 ;; web-mode
 ;;
+(eval-when-compile (listify-requires 'web-mode))
 (with-eval-after-load 'web-mode
   (listify-requires
    'web-skeletons
@@ -525,6 +544,7 @@
 ;;
 ;; nxml-mode
 ;;
+(eval-when-compile (listify-requires 'nxml-mode))
 (with-eval-after-load 'nxml-mode
   (listify-set
    '(nxml-child-indent 0)
@@ -534,6 +554,7 @@
 ;;
 ;; ess-site > R
 ;;
+(eval-when-compile (listify-requires 'ess-site))
 (with-eval-after-load 'ess-site
   (listify-set
    '(ess-ask-for-ess-directory nil)
@@ -542,6 +563,7 @@
 ;;
 ;; bison-mode
 ;;
+(eval-when-compile (listify-requires 'bison-mode))
 (with-eval-after-load 'bison-mode
   (listify-set
    '(bison-decl-token-column 0)
@@ -551,6 +573,7 @@
 ;;
 ;; graphviz-dot-mode
 ;;
+(eval-when-compile (listify-requires 'graphviz-dot-mode))
 (with-eval-after-load 'graphviz-dot-mode
   (defun init-unset-compile-command ()
     (kill-local-variable 'compile-command))
@@ -567,6 +590,7 @@
   )
 
 ;; markdown-mode
+(eval-when-compile (listify-requires 'markdown-mode))
 (with-eval-after-load 'markdown-mode
   (listify-set
    '(markdown-command "pandoc -s --self-contained -t html5 -c ~/.pandoc/github.css") ;markdownからHTML作成
@@ -575,6 +599,7 @@
 ;;
 ;; mpv-ts-mode
 ;;
+(eval-when-compile (listify-requires 'mpv-ts-mode))
 (with-eval-after-load 'mpv-ts-mode
   (listify-set
    '(auto-insert-alist ((mpv-ts-mode "template.ts")) 1 (mpv-ts-mode))))
