@@ -740,15 +740,15 @@
     ))
  '(latex-mode-map "tex-mode" nil
    (
-    ("<M-return>" latex-insert-item) ; latex-insert-itemを再設定
+    ("M-<return>" latex-insert-item) ; latex-insert-itemを再設定
     ("C-c p p" exopen-buffer-pdffile)
     ("C-c p d" exopen-buffer-dvifile)
     ("C-c C-c" comment-region)     ; tex-compileを無効にし、comment-region を設定
     ))
  '(lisp-mode-shared-map "lisp-mode" nil
    (
-    ;; ("<M-return>" noexist)      ; デバッグ用
-    ("<M-return>" completion-at-point)
+    ;; ("M-<return>" noexist)      ; デバッグ用
+    ("M-<return>" completion-at-point)
     ("C-c e" listify-eval-buffer)
     ))
  '(mediawiki-mode-map "mediawiki" nil
@@ -789,7 +789,7 @@
     ))
   '(read-expression-map "simple" eval-expression-minibuffer-setup-hook
     (
-     ("<M-return>" completion-at-point) ; 補完入力
+     ("M-<return>" completion-at-point) ; 補完入力
      ))
   )
 
