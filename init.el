@@ -175,6 +175,7 @@
  'symbol-properties                ; シンボルのプロパティ名リスト取得
  'temp-buffer                      ; 一時バッファの作成
  'undohist                         ; undohist
+ 'toggle-skeleton-pair             ; skeleton-pairのトグル
  'vc-plus                          ; vcの追加関数
  'view-mode-vi-bindings            ; view-modeでviのキーバインド
  'window-control                   ; ウィンドウとフレームのサイズを調整
@@ -649,6 +650,7 @@
  '("M-<return>" expand-abbrev)
  '("M-<right>" windmove-right)
  '("M-<up>" windmove-up)
+ '("C-=" toggle-skeleton-pair)
  '("C-' h" windmove-left)
  '("C-' j" windmove-down)
  '("C-' k" windmove-up)
