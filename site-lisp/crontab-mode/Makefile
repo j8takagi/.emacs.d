@@ -1,4 +1,4 @@
-TARGET := crontab-mode         # "set this parameter, or error."
+TARGET := crontab-mode
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

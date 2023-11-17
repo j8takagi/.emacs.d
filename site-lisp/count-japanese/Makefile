@@ -1,4 +1,4 @@
-TARGET := count-japanese         # "set this parameter, or error."
+TARGET := count-japanese
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

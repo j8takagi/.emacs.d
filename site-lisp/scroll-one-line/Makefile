@@ -1,4 +1,4 @@
-TARGET := scroll-one-line         # "set this parameter, or error."
+TARGET := scroll-one-line
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

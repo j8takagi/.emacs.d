@@ -1,4 +1,4 @@
-TARGET := window-control         # "set this parameter, or error."
+TARGET := window-control
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

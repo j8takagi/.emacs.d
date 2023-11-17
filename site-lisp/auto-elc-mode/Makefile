@@ -1,4 +1,4 @@
-TARGET := auto-elc-mode         # "set this parameter, or error."
+TARGET := auto-elc-mode
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

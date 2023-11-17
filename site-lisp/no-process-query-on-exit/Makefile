@@ -1,4 +1,4 @@
-TARGET := no-process-query-on-exit         # "set this parameter, or error."
+TARGET := no-process-query-on-exit
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

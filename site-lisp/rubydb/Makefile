@@ -1,4 +1,4 @@
-TARGET := rubydb3x         # "set this parameter, or error."
+TARGET := rubydb3x
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

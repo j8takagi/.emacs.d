@@ -1,4 +1,4 @@
-TARGET := japanese-plus         # "set this parameter, or error."
+TARGET := japanese-plus
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

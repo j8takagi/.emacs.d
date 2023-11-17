@@ -1,4 +1,4 @@
-TARGET := buffer-window-plus         # "set this parameter, or error."
+TARGET := buffer-window-plus
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

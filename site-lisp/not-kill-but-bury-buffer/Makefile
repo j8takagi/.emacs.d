@@ -1,4 +1,4 @@
-TARGET := not-kill-but-bury-buffer         # "set this parameter, or error."
+TARGET := not-kill-but-bury-buffer
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

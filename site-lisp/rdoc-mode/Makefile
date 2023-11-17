@@ -1,4 +1,4 @@
-TARGET := rdoc-mode         # "set this parameter, or error."
+TARGET := rdoc-mode
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

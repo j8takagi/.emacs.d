@@ -1,4 +1,4 @@
-TARGET := fill-region-with-n         # "set this parameter, or error."
+TARGET := fill-region-with-n
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

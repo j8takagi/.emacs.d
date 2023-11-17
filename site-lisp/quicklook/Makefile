@@ -1,4 +1,4 @@
-TARGET := quicklook        # "set this parameter, or error."
+TARGET := quicklook
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

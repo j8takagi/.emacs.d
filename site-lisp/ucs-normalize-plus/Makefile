@@ -1,4 +1,4 @@
-TARGET := ucs-normalize-plus         # "set this parameter, or error."
+TARGET := ucs-normalize-plus
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

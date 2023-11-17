@@ -1,4 +1,4 @@
-TARGET := mpv-ts-mode         # "set this parameter, or error."
+TARGET := mpv-ts-mode
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

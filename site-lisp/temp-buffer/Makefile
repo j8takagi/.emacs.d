@@ -1,4 +1,4 @@
-TARGET := temp-buffer         # "set this parameter, or error."
+TARGET := temp-buffer
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

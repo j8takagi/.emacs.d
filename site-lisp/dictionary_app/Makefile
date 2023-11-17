@@ -1,4 +1,4 @@
-TARGET := dictionary_app         # "set this parameter, or error."
+TARGET := dictionary_app
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

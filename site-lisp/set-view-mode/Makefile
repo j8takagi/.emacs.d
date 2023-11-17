@@ -1,4 +1,4 @@
-TARGET := set-view-mode         # "set this parameter, or error."
+TARGET := set-view-mode
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

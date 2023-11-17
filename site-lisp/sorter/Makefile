@@ -1,4 +1,4 @@
-TARGET := sorter         # "set this parameter, or error."
+TARGET := sorter
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

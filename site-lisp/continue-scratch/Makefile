@@ -1,4 +1,4 @@
-TARGET := continue-scratch        # "set this parameter, or error."
+TARGET := continue-scratch
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

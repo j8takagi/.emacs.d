@@ -1,4 +1,4 @@
-TARGET := listify listify-packages         # "set this parameter, or error."
+TARGET := listify listify-packages
 TARGETDIR := listify
 
 EMACS := /Applications/MacPorts/Emacs.app/Contents/MacOS/Emacs

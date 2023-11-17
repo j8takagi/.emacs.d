@@ -1,4 +1,4 @@
-TARGET := view-mode-vi-bindings         # "set this parameter, or error."
+TARGET := view-mode-vi-bindings
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

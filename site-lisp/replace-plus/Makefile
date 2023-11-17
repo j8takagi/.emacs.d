@@ -1,4 +1,4 @@
-TARGET := replace-plus         # "set this parameter, or error."
+TARGET := replace-plus
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

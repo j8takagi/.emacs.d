@@ -1,4 +1,4 @@
-TARGET := fontset-set list-fonts-display list-fontfamilies-display xlfd-at         # "set this parameter, or error."
+TARGET := fontset-set list-fonts-display list-fontfamilies-display xlfd-at
 TARGETDIR := font-utilities
 
 EMACS := /Applications/MacPorts/Emacs.app/Contents/MacOS/Emacs

@@ -1,4 +1,4 @@
-TARGET := ert-mode         # "set this parameter, or error."
+TARGET := ert-mode
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

@@ -1,4 +1,4 @@
-TARGET := exopen         # "set this parameter, or error."
+TARGET := exopen
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

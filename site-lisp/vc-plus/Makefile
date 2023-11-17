@@ -1,4 +1,4 @@
-TARGET := vc-plus         # "set this parameter, or error."
+TARGET := vc-plus
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

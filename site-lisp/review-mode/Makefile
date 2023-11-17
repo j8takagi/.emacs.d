@@ -1,4 +1,4 @@
-TARGET := review-mode         # "set this parameter, or error."
+TARGET := review-mode
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

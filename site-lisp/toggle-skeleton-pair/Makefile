@@ -1,4 +1,4 @@
-TARGET := toggle-skeleton-pair        # "set this parameter, or error."
+TARGET := toggle-skeleton-pair
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

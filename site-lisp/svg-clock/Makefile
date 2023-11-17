@@ -1,4 +1,4 @@
-TARGET := svg-clock         # "set this parameter, or error."
+TARGET := svg-clock
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

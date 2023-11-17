@@ -1,4 +1,4 @@
-TARGET := set-savehist         # "set this parameter, or error."
+TARGET := set-savehist
 TARGETDIR := $(TARGET)
 
 EMACS := emacs
