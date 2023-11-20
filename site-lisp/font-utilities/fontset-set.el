@@ -14,8 +14,8 @@
 (defvar fontset-history nil
   "History list for fontset.")
 
-(defvar fontfailies-history nil
-  "History list for font families.")
+(defvar fontfamily-history nil
+  "History list for font family.")
 
 (defcustom default-fontset "-*-*-*-*-*-*-*-*-*-*-*-*-fontset-default"
   "Default fontset."
@@ -49,13 +49,13 @@
 (defun fontset-set-font-spec (fontset charset fontspec)
   "Use FONTSPEC for character set CHARSET."
   (unless (member charset charset-list)
-      (message "Warning: character set %s is not defined." charset))
+      (warn "Character set `%s' is not defined." charset))
   (set-fontset-font fontset charset fontspec nil 'append))
 
 (defun fontset-set-fontfamily (fontset charset fontfamily)
   "Use FONTFAMILY for character set CHARSET."
   (if (not (member fontfamily (font-family-list)))
-      (message "Warning: In setting font family, font family %s is not available." fontfamily)
+      (warn "Font family `%s' is not available." fontfamily)
     (fontset-set-font-spec fontset charset (font-spec :family fontfamily))))
 
 (defun fontset-set-alias2spec (alias)
@@ -71,13 +71,15 @@
 (defun fontset-set-charset-font (fontset charset-font-alist)
   "Set font in CHARSET-FONT-ALIST to the FONTSET."
   (interactive)
-  (unless fontset
-    (error "Argument FONTSET is nil"))
-  (unless charset-font-alist
-    (error "Argument CHARSET-FONT-ALIST is nil"))
-  (dolist (acharfont charset-font-alist)
-    (fontset-set-font-spec fontset (car acharfont) (eval (cadr acharfont))))
-  fontset)
+  (let ((res nil))
+    (if (null fontset)
+        (warn "Argument FONTSET is nil")
+      (if (null charset-font-alist)
+          (warn "Argument CHARSET-FONT-ALIST is nil")
+        (dolist (acharfont charset-font-alist)
+          (fontset-set-font-spec fontset (car acharfont) (eval (cadr acharfont))))
+        (setq res fontset)))
+    res))
 
 (defun fontset-set (charset-font-alist basename)
   "Create fontset using FONTSET-BASENAME, then set font in CHARSET-FONT-ALIST.
