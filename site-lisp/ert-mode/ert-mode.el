@@ -1,6 +1,6 @@
 ;;; ert-mode.el ---
 
-;; Copyright (C) 2016 by Kazuhito Takagi
+;; Copyright (C) 2016-2023 by Kazuhito Takagi
 
 ;; Authors: Kazuhito Takagi
 ;; Keywords: ert erd database
@@ -75,7 +75,7 @@
   ;;        ))
   ;;   (let ((key (car map)) (func (nth 1 map)))
   ;;     (if (not (functionp func))
-  ;;         (message "Warning: function `%s' is NOT defined." func)
+  ;;         (warn "Function `%s' is NOT defined." func)
   ;;       (define-key ert-mode-map (kbd key) func))))
   (use-local-map ert-mode-map)
   (setq indent-line-function 'indent-relative)
