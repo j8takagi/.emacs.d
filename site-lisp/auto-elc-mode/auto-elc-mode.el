@@ -1,6 +1,6 @@
 ;;; auto-elc-mode.el -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013  j8takagi
+;; Copyright (C) 2013-2023  j8takagi
 
 ;; Author: j8takagi <j8takagi@nifty.com>
 ;; Keywords: Emacs elisp compile
