@@ -27,7 +27,8 @@
 
 (defun set-view-mode-files-read-only ()
   "Set files to enable read-only-mode when opening the files.
-Exceptions are defined as directories in`set-view-mode-read-write-directory-patterns' and
+Exceptions are defined as directories in
+`set-view-mode-read-write-directory-patterns' and
 file patterns in `completion-ignored-extensions'."
   (let ((match nil) (finddir nil) (findext nil))
     (when
