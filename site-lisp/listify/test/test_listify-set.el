@@ -22,11 +22,19 @@
   :group 'test-listify
   :type '(repeat sexp))
 
-(ert-deftest listify-test-set-cus-list ()
-  "Test set integer to custom variable."
-  (custom-set-variables '(listify-test-list nil))
-  (listify-set '(listify-test-list (1 "a" "ab" 2 3 c)))
-  (should (equal listify-test-list (nreverse '(1 "a" "ab" 2 3 c)))))
+(ert-deftest listify-test-set-cus-list_nil ()
+  "Test add list value to null custom variable."
+  (progn
+    (custom-set-variables '(listify-test-list nil))
+    (listify-set '(listify-test-list (1 "a" "ab" 2 3 c))))
+  (should (equal listify-test-list '(1 "a" "ab" 2 3 c))))
+
+(ert-deftest listify-test-set-cus-list_add ()
+  "Test add list value to list custom variable."
+  (progn
+    (custom-set-variables '(listify-test-list '(1 1 2 3)))
+    (listify-set '(listify-test-list (5 8 13 21))))
+  (should (equal listify-test-list '(1 1 2 3 5 8 13 21))))
 
 (ert-deftest listify-test-set-cus-list-add ()
   "Test set integer to custom variable."

@@ -1,9 +1,9 @@
-;;; listify-packages.el --- -*- lexical-binding:t -*-
+;;; listify-packages.el --- -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2018-2023 by Kazubito Takagi
 
 ;; Authors: Kazubito Takagi
-;; Keywords: 
+;; Keywords: listify initialize package
 
 ;;; Commentary:
 
@@ -23,16 +23,16 @@ Each element of ARCHIVES has the form (ID LOCATION)."
   (condition-case nil
       (package-refresh-contents 1)
     (error
-     (message "Warining: Fails to download package descriptions."))))
+     (listify-message "Warning: Fails to download package descriptions."))))
 
 (defun listify-packages-install (pkg)
   (if (not (assq pkg package-archive-contents))
-      (message "Warning: Package `%s' is NOT found on archives." pkg)
-    (message "Installation of package `%s' begins." pkg)
+      (listify-message "Warning: Package `%s' is NOT found on archives." pkg)
+    (listify-message "Installation of package `%s' begins." pkg)
     (condition-case err
         (package-install pkg)
       (error
-       (message "Warining: Fails to install package `%s'.\n%s: %s"
+       (listify-message "Warning: Fails to install package `%s'.\n%s: %s"
                 pkg (car err) (cadr err))))))
 
 (defun listify-packages-required (pkg)
@@ -43,13 +43,13 @@ Each element of ARCHIVES has the form (ID LOCATION)."
 (defun listify-packages-message-update (pkgs)
   (package-menu--refresh pkgs)
   (dolist (pkg (package-menu--find-upgrades))
-    (message "Info: Package %s is updated. Version %s is available."
+    (listify-message "Info: Package %s is updated. Version %s is available."
              (car pkg) (package-desc-version (cdr pkg)))))
 
 (defun listify-packages-message-unexpected (pkgs real-pkgs)
   (dolist (real-pkg real-pkgs)
     (unless (member real-pkg pkgs)
-      (message "Info: Package %s is installed, but unexpected." real-pkg))))
+      (listify-message "Info: Package %s is installed, but unexpected." real-pkg))))
 
 (defun listify-packages-dependent-alist (pkg &optional pkg-from)
   "Return the list of dependent packages alist.
@@ -58,7 +58,7 @@ alist form is :
   (let (pkgs)
     (unless (package-installed-p pkg)
       (when pkg-from
-        (message "Package `%s' required from `%s' is not installed." pkg pkg-from))
+        (listify-message "Package `%s' required from `%s' is not installed." pkg pkg-from))
       (listify-packages-install pkg))
     (unless (equal pkg 'emacs)
       (push (cons pkg pkg-from) pkgs)
@@ -81,13 +81,13 @@ installed and updated, and unexpected packages are not installed."
   (unless package--initialized
     (package-initialize))
   (let (real-pkgs pkgs)
-    (message "Specified packages - %s" packages)
+    (listify-message "Specified packages - %s" packages)
     (setq real-pkgs (nreverse (mapcar 'car package-alist)))
-    (message "Installed packages - %s" real-pkgs)
+    (listify-message "Installed packages - %s" real-pkgs)
     (dolist (pkg-from packages)
       (dolist (pkg (listify-packages-dependent-list pkg-from))
         (unless (equal pkg pkg-from)
-          (message "Package `%s' is required from `%s'." pkg pkg-from))
+          (listify-message "Package `%s' is required from `%s'." pkg pkg-from))
         (push pkg pkgs)))
     (delete-dups pkgs)
     ;; updated packages
