@@ -1,4 +1,4 @@
-;;; fontset-set.el --- 
+;;; fontset-set.el -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2017 by Kazubito Takagi
 
