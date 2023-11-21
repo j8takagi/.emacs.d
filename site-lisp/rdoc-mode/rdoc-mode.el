@@ -8,42 +8,6 @@
 ;; License: Ruby's
 
 (require 'derived)
-(define-derived-mode rdoc-mode text-mode "RDoc"
-  "Major mode for RD editing.
-\\{rdoc-mode-map}"
-  (make-local-variable 'paragraph-separate)
-  (setq paragraph-separate "^\\(=+\\|\\*+\\)[ \t\v\f]*\\|^\\s *$")
-  (make-local-variable 'paragraph-start)
-  (setq paragraph-start paragraph-separate)
-  (make-local-variable 'require-final-newline)
-  (setq require-final-newline t)
-  (make-local-variable 'font-lock-defaults)
-  (setq font-lock-defaults '((rdoc-font-lock-keywords) t nil))
-  (make-local-variable 'font-lock-keywords)
-  (setq font-lock-keywords rdoc-font-lock-keywords)
-  (make-local-variable 'outline-regexp)
-  (setq outline-regexp "^\\(=+\\)[ \t\v\f]*")
-  (outline-minor-mode t)
-  (setq show-trailing-whitespace t)
-  (rdoc-setup-keys)
-  (setq indent-tabs-mode nil)
-  (run-hooks 'rdoc-mode-hook)
-  )
-
-(defun rdoc-fill-paragraph (&rest args)
-  "Fills paragraph, except for cited region"
-  (interactive (progn
-         (barf-if-buffer-read-only)
-         (list (if current-prefix-arg 'full))))
-  (save-excursion
-    (beginning-of-line)
-    (unless (looking-at "^ +")
-      (apply 'fill-paragraph args))))
-
-(defun rdoc-setup-keys ()
-  (interactive)
-  (define-key rdoc-mode-map "\M-q" 'rdoc-fill-paragraph)
-  )
 
 (defvar rdoc-heading1-face 'font-lock-keywordoc-face)
 (defvar rdoc-heading2-face 'font-lock-type-face)
@@ -81,6 +45,43 @@
 	 1 rdoc-description-face)	; labeled | node
    ;(list "^[ \t\v\f]+\\(.*\\)" 1 rdoc-verbatim-face)
    ))
+
+(define-derived-mode rdoc-mode text-mode "RDoc"
+  "Major mode for RD editing.
+\\{rdoc-mode-map}"
+  (make-local-variable 'paragraph-separate)
+  (setq paragraph-separate "^\\(=+\\|\\*+\\)[ \t\v\f]*\\|^\\s *$")
+  (make-local-variable 'paragraph-start)
+  (setq paragraph-start paragraph-separate)
+  (make-local-variable 'require-final-newline)
+  (setq require-final-newline t)
+  (make-local-variable 'font-lock-defaults)
+  (setq font-lock-defaults '((rdoc-font-lock-keywords) t nil))
+  (make-local-variable 'font-lock-keywords)
+  (setq font-lock-keywords rdoc-font-lock-keywords)
+  (make-local-variable 'outline-regexp)
+  (setq outline-regexp "^\\(=+\\)[ \t\v\f]*")
+  (outline-minor-mode t)
+  (setq show-trailing-whitespace t)
+  (rdoc-setup-keys)
+  (setq indent-tabs-mode nil)
+  (run-hooks 'rdoc-mode-hook)
+  )
+
+(defun rdoc-fill-paragraph (&rest args)
+  "Fills paragraph, except for cited region"
+  (interactive (progn
+         (barf-if-buffer-read-only)
+         (list (if current-prefix-arg 'full))))
+  (save-excursion
+    (beginning-of-line)
+    (unless (looking-at "^ +")
+      (apply 'fill-paragraph args))))
+
+(defun rdoc-setup-keys ()
+  (interactive)
+  (define-key rdoc-mode-map "\M-q" 'rdoc-fill-paragraph)
+  )
 
 (defun rdoc-imenu-create-index ()
   (let ((root '(nil . nil))
