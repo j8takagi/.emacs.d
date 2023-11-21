@@ -1,6 +1,6 @@
-;;; window-control.el
+;;; window-control.el -*- lexical-binding: t -*-
 
-;; Copyright (C) 2014, 2017  j8takagi
+;; Copyright (C) 2014, 2017, 2023  j8takagi
 
 ;; Author: j8takagi <j8takagi@nifty.com>
 ;; Keywords: Emacs elisp compile
@@ -42,6 +42,34 @@
 ;;
 ;; from: window-resizer - http://d.hatena.ne.jp/khiker/20100119/window_resize
 
+(defgroup wctl nil
+  "Windows and frame control utilities."
+  :prefix "wctl-"
+  :version "25.2"
+  :group 'windows
+  :group 'convenience
+  )
+
+
+(defcustom wctl-system-display-width 1440
+  "Width pixel unit of system display."
+  :type 'natnum
+  )
+
+(defcustom wctl-system-display-height 672
+  "Height pixel unit of system display."
+  :type 'natnum
+  )
+
+(defcustom wctl-frame-shift-right-size 20
+  "Shift right pixel unit size when new frame opens."
+  :type 'natnum
+  )
+
+(defcustom wctl-frame-shift-down-size 20
+  "Shift down pixel unit size when new frame opens."
+  :type 'natnum
+  )
 
 (defvar wctl-window-resize-hook)
 
@@ -56,7 +84,6 @@
       (error "One window. cannot resize the window."))
   (let
       (
-       (thiswindow (selected-window))
        (start-width (window-width))
        (start-height (window-height))
        (dx (if (= (nth 0 (window-edges)) 0) 1 -1))
@@ -150,7 +177,6 @@
   (interactive)
   (let
       (
-       (thisframe (selected-frame))
        (start-top (frame-parameter nil 'top))
        (start-left (frame-parameter nil 'left))
        (default-top (cdr (assoc 'top default-frame-alist)))
@@ -190,31 +216,65 @@
             (throw 'end-flag t)))))))
       (run-hooks 'wctl-frame-resize-hook))
 
-(add-hook 'before-make-frame-hook 'frame-shift-right)
+(defun wctl-get-frame-font-size ()
+  "Return the font size of the current frame in Emacs."
+  (frame-parameter nil 'font))
 
-(add-hook 'delete-frame-functions
-          (lambda (frame)
-            (frame-shift-left)))
+(defun wctl-xlfd-pixels (xlfd)
+  "Get pixels of font size from font-spec string XLFD."
+  (let ((elmts (split-string xlfd "-")))
+    ;; xlfd 7th element: font
+    (string-to-number (nth 7 elmts))))
 
-(defvar frame-shift-size 20)
+(defun wctl-frame-fontsize ()
+  (let ((fontsize 0))
+    (setq fontsize (wctl-xlfd-pixels (cdr (assoc 'font default-frame-alist))))
+    (when (= fontsize 0)
+      (setq fontsize (wctl-xlfd-pixels (frame-parameter nil 'font))))
+    fontsize))
 
-(defun frame-shift-right ()
-  (let (leftcell topcell)
-  (when (setq leftcell (assoc 'left default-frame-alist))
-    (setcdr leftcell (+ (cdr leftcell) frame-shift-size)))
-  (when (setq topcell (assoc 'top default-frame-alist))
-    (setcdr topcell (+ (cdr topcell) frame-shift-size)))))
+(defun wctl-frame-shift-rightdown (&optional frame)
+  (let
+      (
+       (leftcell (assoc 'left default-frame-alist))
+       (topcell (assoc 'top default-frame-alist))
+       (awidth (cdr (assoc 'width default-frame-alist)))
+       (aheight (cdr (assoc 'height default-frame-alist)))
+       (afontsize (wctl-frame-fontsize))
+       (newleft 0) (newtop 0)
+       )
+    (when frame (ignore))
+    (when (and leftcell awidth)
+      (setq newleft (+ (cdr leftcell) wctl-frame-shift-right-size))
+      (when (<= (+ newleft (* 0.5 afontsize awidth)) wctl-system-display-width)
+        (setcdr leftcell newleft)))
+    (when (and topcell aheight)
+      (setq newtop (+ (cdr topcell) wctl-frame-shift-down-size))
+      (when  (<= (+ newtop (* afontsize aheight)) wctl-system-display-height)
+        (setcdr topcell newtop)))
+    `(,newleft ,newtop)))
 
-(defun frame-shift-left ()
-  (let (leftcell topcell left top)
-    (when (and
-           (setq leftcell (assoc 'left default-frame-alist))
-           (>= (setq left (cdr leftcell)) frame-shift-size))
-      (setcdr leftcell (- left frame-shift-size)))
-    (when (and
-           (setq topcell (assoc 'top default-frame-alist))
-           (>= (setq top (cdr topcell)) frame-shift-size))
-      (setcdr topcell (- top frame-shift-size)))))
+(defun wctl-frame-shift-leftup (&optional frame)
+  (let
+      (
+       (leftcell (assoc 'left default-frame-alist))
+       (topcell (assoc 'top default-frame-alist))
+       (newleft 0) (newtop 0)
+       )
+    (when frame (ignore))
+    (when leftcell
+      (setq newleft (- (cdr leftcell) wctl-frame-shift-right-size))
+      (when (>= newleft 0)
+        (setcdr leftcell newleft))
+    (when topcell
+      (setq newtop (- (cdr topcell) wctl-frame-shift-down-size))
+      (when (>= newtop 0)
+        (setcdr topcell newtop)))
+    `(,newleft ,newtop))))
+
+(add-hook 'before-make-frame-hook 'wctl-frame-shift-rightdown)
+
+(add-hook 'delete-frame-functions 'wctl-frame-shift-leftup)
 
 (define-key global-map "\C-\\" (make-sparse-keymap))     ; C-\ をプリフィックスキーに
 
