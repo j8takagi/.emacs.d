@@ -1,4 +1,4 @@
-;;; crontab-mode.el --- Mode for editing crontab files
+;;; crontab-mode.el --- Mode for editing crontab files -*- lexical-binding: t -*-
 ;;
 ;; ~/share/emacs/pkg/crontab/crontab-mode.el ---
 ;;
