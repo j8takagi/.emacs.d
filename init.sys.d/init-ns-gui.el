@@ -38,7 +38,7 @@
     (
      (width 180)
      (height 56)
-     (top 23)
+     (top 25)
      (left 0)
      (font
       ,(fontset-set
@@ -46,7 +46,7 @@
           (ascii (font-spec :family "Menlo" :weight 'normal :slant 'normal :size 12))
           (unicode (font-spec :family "Hiragino Sans"))
           )
-    "my_default_mac"))
+        "my_default_mac"))
      ))
  '(ns-command-modifier meta)        ; commandキーをEmacsのMetaキーに
  '(ns-alternate-modifier none)
@@ -136,7 +136,5 @@
     ("SPC" quicklook-dired))))
 
 (remove-hook 'first-change-hook 'ns-unselect-line)
-
-(cd "~")
 
 (provide 'init-ns-gui)
