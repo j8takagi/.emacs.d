@@ -1,6 +1,6 @@
-;;; view-mode-vi-bindings.el --- 
+;;; view-mode-vi-bindings.el -*- lexical-binding: t -*-
 
-;; Copyright (C) 2014 by j8takagi
+;; Copyright (C) 2014, 2023 by j8takagi
 
 ;; Authors:Kazuhito Takagi
 ;; Keywords:
