@@ -1,6 +1,6 @@
-;;; replace-plus.el --- 
+;;; replace-plus.el --- -*- lexical-binding: t -*-
 
-;; Copyright (C) 2018 by Kazubito Takagi
+;; Copyright (C) 2018-2023 by Kazubito Takagi
 
 ;; Authors: Kazubito Takagi
 ;; Keywords: 
@@ -97,27 +97,8 @@
    cnt))
 
 ;;;###autoload
-(defun replace-plus-dired-regexp-files (regexp to-string)
-  (interactive
-   (query-replace-read-args "Replace regexp in marked files" t))
-  (let (msg (win (selected-window)))
-    (setq msg
-          (format "replacing regexp in files: `%s' -> `%s'.\n----------------------------------------\n"  regexp to-string))
-    (dolist (afile (dired-map-over-marks (dired-get-filename) nil))
-      (setq msg (concat
-                 msg
-                 (format "%s: %d matches replaced.\n"
-                         afile
-                         (replace-plus-do-regexp-file regexp to-string afile)))))
-    (pop-to-buffer (get-buffer-create "*Dired replace-regexp files*"))
-    (let ((inhibit-read-only t) (buffer-undo-list t))
-      (erase-buffer)
-      (insert msg)
-      (set-buffer-modified-p nil)
-      (select-window win))))
-
-;;;###autoload
 (defun replace-plus-dired-string-files (from-string to-string)
+  "Replace occurrences of FROM-STRING with TO-STRING in all marked files."
   (interactive
    (replace-plus-read-args "Replace string in marked files" nil))
   (let (msg (win (selected-window)))
@@ -130,6 +111,27 @@
                          afile
                          (replace-plus-do-string-file from-string to-string afile)))))
     (pop-to-buffer (get-buffer-create "*Dired replace-string files*"))
+    (let ((inhibit-read-only t) (buffer-undo-list t))
+      (erase-buffer)
+      (insert msg)
+      (set-buffer-modified-p nil)
+      (select-window win))))
+
+;;;###autoload
+(defun replace-plus-dired-regexp-files (regexp to-string)
+  "Replace things matching REGEXP with TO-STRING in all marked files."
+  (interactive
+   (replace-plus-read-args "Replace regexp in marked files" t))
+  (let (msg (win (selected-window)))
+    (setq msg
+          (format "replacing regexp in files: `%s' -> `%s'.\n----------------------------------------\n"  regexp to-string))
+    (dolist (afile (dired-map-over-marks (dired-get-filename) nil))
+      (setq msg (concat
+                 msg
+                 (format "%s: %d matches replaced.\n"
+                         afile
+                         (replace-plus-do-regexp-file regexp to-string afile)))))
+    (pop-to-buffer (get-buffer-create "*Dired replace-regexp files*"))
     (let ((inhibit-read-only t) (buffer-undo-list t))
       (erase-buffer)
       (insert msg)
