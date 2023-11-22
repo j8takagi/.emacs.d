@@ -1,4 +1,4 @@
-;;; test_listify-test.el
+;;; test_listify-test.el -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2017, 2023 by Kazubito Takagi
 

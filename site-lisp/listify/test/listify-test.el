@@ -1,4 +1,4 @@
-;;; listify-test.el
+;;; listify-test.el -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2017 by Kazubito Takagi
 
@@ -13,37 +13,50 @@
 (require 'cus-edit)
 (load-file "../listify.el")
 
-(ert-deftest listify-test-overwrite-value-alist-1 ()
-  "Tests `overwrite-alist'.
+(ert-deftest listify-test-update-cdrs-alist-1 ()
+  "Tests `listify-update-cdrs-alist'.
 overwrite a quoted symbol value. "
   (let ((abc '((1 . a) (2 . "a") (3 . 1))))
-    (should (equal (overwrite-values-alist 'abc '((b . a))) '((1 . b) (2 . "a") (3 . 1))))
+    (should
+     (equal
+      (listify-update-cdrs-alist abc '((b . a)))
+      '((1 . b) (2 . "a") (3 . 1))))
     ))
 
-(ert-deftest listify-test-overwrite-value-alist-2 ()
-  "Tests `overwrite-alist'.
-overwrite a string value."
+(ert-deftest listify-test-update-cdrs-alist-2 ()
+  "Tests `listify-update-cdrs-alist'.
+Update cdr of a string value."
   (let ((abc '((1 . a) (2 . "a") (3 . 1))))
-    (should (equal (overwrite-values-alist 'abc '(("b" . "a"))) '((1 . a) (2 . "b") (3 . 1))))
+    (should
+     (equal
+      (listify-update-cdrs-alist abc '(("b" . "a")))
+      '((1 . a) (2 . "b") (3 . 1))))
     ))
 
-(ert-deftest listify-test-overwrite-value-alist-3 ()
-  "Tests `overwrite-alist'.
-overwrite a integer value."
+(ert-deftest listify-test-update-cdrs-alist-3 ()
+  "Tests `listify-update-cdrs-alist'.
+Update cdr of a integer value."
   (let ((abc '((1 . a) (2 . "a") (3 . 1))))
-    (should (equal (overwrite-values-alist 'abc '((11 . 1))) '((1 . a) (2 . "a") (3 . 11))))
+    (should
+     (equal
+      (listify-update-cdrs-alist abc '((11 . 1)))
+      '((1 . a) (2 . "a") (3 . 11))))
     ))
-(ert-deftest listify-test-validate-custom-variable-type-1 ()
+
+(ert-deftest listify-test-validate-variable-1 ()
   "Tests `validate-custom-variable-type'.
 Validate auto-mode-alist self value."
   (let ((auto-mode-alist '((".txt" . text-mode))))
-    (should (listify-validate-custom-variable-type 'auto-mode-alist))))
+    (should
+     (listify-validate-variable 'auto-mode-alist))))
 
-(ert-deftest listify-test-validate-custom-variable-type-2 ()
+(ert-deftest listify-test-validate-variable-2 ()
   "Tests `validate-custom-variable-type'.
 Validate auto-mode-alist self mismatch value."
   (let ((auto-mode-alist '(".txt" ".html")))
-    (should (null (listify-validate-custom-variable-type 'auto-mode-alist)))))
+    (should
+     (null
+      (listify-validate-custom-variable-type 'auto-mode-alist)))))
 
 (defgroup listify-test-set
   '((test-listify-int custom-variable))
