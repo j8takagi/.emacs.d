@@ -14,9 +14,6 @@
 (require 'ediff-vers)
 (require 'dired)
 
-
-
-
 (defcustom vc-plus-delete-revision-buffer t
   "Non Nil means delete revision buffer after ediff quit."
   :type 'boolean
@@ -42,21 +39,33 @@
    ))
 
 ;;;###autoload
-(defun vc-plus-latest-current (&optional rev)
+(defun vc-plus-ediff (&optional rev)
   "Run Ediff of buffer file by comparing revision REV and current.
 If rev is omitted or nil, compare latest and current."
   (interactive)
-  (let ((file) (state) (arev ""))
-    (when rev
-      (setq arev rev))
-    (setq file (buffer-file-name))
-    (unless file
-      (error "buffer not visiting file"))
-    (setq state (vc-state file))
-    (if (member state '(up-to-date added))
-        (message "%s: %s" file state)
-      (ediff-load-version-control)
-      (ediff-vc-internal arev ""))))
+  (let (
+        (afile (buffer-file-name)) (arev nil)
+        (currbuf (current-buffer)) arevbuf afunc
+        )
+    (if (null afile)
+        (error "buffer not visiting file")
+      (if (null (vc-backend afile))
+          (error (format "%s is not under version control." afile))
+        (setq arev (or rev (vc-working-revision afile)))
+        (save-excursion
+          (setq
+           arevbuf (vc-find-revision-no-save afile arev)
+           afunc (read
+                  (concat
+                   "vc-plus-kill-"
+                   (file-name-nondirectory
+                    (vc-version-backup-file-name afile arev)))))
+          (fset afunc
+                `(lambda ()
+                   (kill-buffer ,arevbuf)
+                   (remove-hook 'ediff-quit-hook ',afunc)))
+          (add-hook 'ediff-quit-hook afunc)
+          (ediff-buffers-internal arevbuf currbuf nil nil 'vc-plus-ediff))))))
 
 ;;;###autoload
 (defun vc-plus-find-file-revision (&optional file revision)
@@ -67,7 +76,7 @@ Or, input FILE as 'FILE.~REVISON~' and FILE and REVISION is specified."
   (unless (stringp file)
     (setq file (expand-file-name (read-file-name "Find version controled file: "))))
   ;; find-file FILE REVISION by 'FILE.~REVISION~'."
-  (when (string-match "\\(.+\\)\\.~\\(.+\\)~$" file)
+  (when (string-match "\\(.+\\)\\.~\\(.+\\)~\\'" file)
     (setq revision (substring file (match-beginning 2) (match-end 2)))
     (setq file (substring file (match-beginning 1) (match-end 1))))
   (unless (vc-backend file)
@@ -84,13 +93,17 @@ Or, input FILE as 'FILE.~REVISON~' and FILE and REVISION is specified."
   (switch-to-buffer (vc-find-revision file revision)))
 
 ;;;###autoload
-(defun vc-plus-dired-latest-current ()
+(defun vc-plus-dired-ediff ()
   "Run Ediff of file named on this line by comparing the latest
   version and current."
   (interactive)
-  (let ((find-file-run-dired nil))
+  (let (
+        (find-file-run-dired nil)
+        (aframe (make-frame-command))
+        )
+    (select-frame-set-input-focus aframe)
     (find-file (dired-get-file-for-visit))
-    (vc-plus-latest-current)))
+    (vc-plus-ediff)))
 
 ;;;###autoload
 (defun vc-plus-redisplay-current-frame ()
