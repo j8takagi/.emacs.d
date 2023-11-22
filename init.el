@@ -10,112 +10,11 @@
 
 (message (emacs-version))
 
-(setq load-path
-      (push (concat (expand-file-name user-emacs-directory) "site-lisp/listify") load-path))
+;; user-emacs-directory(~/.emacs.d)のサブディレクトリーをload-pathに追加
+(let ((default-directory (expand-file-name user-emacs-directory)))
+    (normal-top-level-add-subdirs-to-load-path))
 
 (require 'listify)
-
-; general variables
-(listify-set-variables-standard-value
- 'auto-mode-alist
- 'default-directory
- 'disabled-command-function
- 'file-name-coding-system
- 'indent-line-function
- 'locale-coding-system
- 'magic-mode-alist
- )
-
-; hooks
-(listify-custom-initialize-hooks
- 'activate-mark-hook
- 'after-change-functions
- 'after-change-major-mode-hook
- 'after-delete-frame-functions
- 'after-init-hook
- 'after-insert-file-functions
- 'after-make-frame-functions
- 'after-save-hook
- 'after-setting-font-hook
- 'auto-save-hook
- 'before-change-functions
- 'before-hack-local-variables-hook
- 'before-init-hook
- 'before-make-frame-hook
- 'before-save-hook
- 'buffer-access-fontify-functions
- 'buffer-list-update-hook
- 'buffer-quit-function
- 'change-major-mode-after-body-hook
- 'change-major-mode-hook
- 'comint-password-function
- 'command-line-functions
- 'deactivate-mark-hook
- 'delayed-warnings-hook
- 'delete-frame-functions
- 'delete-terminal-functions
- 'echo-area-clear-hook
- 'emacs-startup-hook
- 'find-file-hook
- 'find-file-not-found-functions
- 'first-change-hook
- 'focus-in-hook
- 'focus-out-hook
- 'font-lock-extend-after-change-region-function
- 'font-lock-extend-region-functions
- 'font-lock-fontify-buffer-function
- 'font-lock-fontify-region-function
- 'font-lock-mark-block-function
- 'font-lock-syntactic-face-function
- 'font-lock-unfontify-buffer-function
- 'font-lock-unfontify-region-function
- 'fontification-functions
- 'frame-auto-hide-function
- 'hack-local-variables-hook
- 'kill-buffer-hook
- 'kill-buffer-query-functions
- 'kill-emacs-hook
- 'kill-emacs-query-functions
- 'menu-bar-update-hook
- 'minibuffer-exit-hook
- 'minibuffer-setup-hook
- 'mouse-leave-buffer-hook
- 'mouse-position-function
- 'pop-up-frame-function
- 'post-command-hook
- 'post-gc-hook
- 'post-self-insert-hook
- 'pre-command-hook
- 'pre-redisplay-functions
- 'prefix-command-echo-keystrokes-functions
- 'prefix-command-preserve-state-hook
- 'quit-window-hook
- 'resume-tty-functions
- 'server-after-make-frame-hook
- 'split-window-preferred-function
- 'suspend-hook
- 'suspend-resume-hook
- 'suspend-tty-functions
- 'syntax-propertize-extend-region-functions
- 'syntax-propertize-function
- 'temp-buffer-setup-hook
- 'temp-buffer-show-function
- 'temp-buffer-show-hook
- 'tty-setup-hook
- 'window-configuration-change-hook
- 'window-scroll-functions
- 'window-setup-hook
- 'window-size-change-functions
- 'write-contents-functions
- 'write-file-functions
- 'write-region-annotate-functions
- 'write-region-post-annotation-function
- )
-
-;; user-emacs-directory(~/.emacs.d)のサブディレクトリーをload-pathに追加
-(unless noninteractive
-  (let ((default-directory (expand-file-name user-emacs-directory)))
-    (normal-top-level-add-subdirs-to-load-path)))
 
 ;;
 ;; パッケージ
@@ -236,12 +135,12 @@
  '(case-replace nil)                    ; 置換時に大文字小文字を区別しない
  '(completion-ignored-extensions (".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" "_prev" ".idx" ".ind" ".ilg" ".tmp" ".synctex.gz" ".dplg" ".dslg" ".dSYM/" ".DS_Store" ":com.dropbox.attributes:$DATA")) ; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
  `(custom-file ,(locate-user-emacs-file ".emacs-custom.el")) ; カスタムの設定値を書き込むファイル
- `(default-directory ,(expand-file-name "~")) ; 標準のディレクトリ
+ `(default-directory ,(expand-file-name "~")) ; カレントディレクトリ
  '(delete-by-moving-to-trash t)         ; ファイルの削除で、ゴミ箱を使う
  '(delete-old-versions t)               ; 古いバックアップファイルを自動的に削除する
  '(desktop-files-not-to-save "\\(\\`/[^/:]*:\\|(ftp)\\'\\)\\|\\(~[0-9a-f]+~\\'\\)")
-'(desktop-locals-to-save (buffer-undo-list)) ;undo-listをdesktopで保存
-'(dired-always-read-filesystem t)      ; ディレクトリ変更を検索前に反映
+ '(desktop-locals-to-save (buffer-undo-list compile-history)) ;undo-listをdesktopで保存
+ '(dired-always-read-filesystem t)      ; ディレクトリ変更を検索前に反映
  '(dired-auto-revert-buffer t)          ; ディレクトリ変更を反映
  '(disabled-command-function nil)       ; すべてのコマンドの使用制限を解除する
  '(display-buffer-alist (("^\\*shell\\*$" (display-buffer-same-window)) ("^\\*?magit: .+" (display-buffer-same-window)))) ; バッファの表示方法
@@ -293,7 +192,7 @@
 ;; C言語ソースの場所
 (eval-when-compile (listify-requires 'find-func))
 (with-eval-after-load 'find-func
-  (listify-set-variables-standard-value
+  (listify-set-standard-values
    'find-function-C-source-directory
   )
   (listify-set
@@ -338,6 +237,9 @@
 ;; emacsclient
 (eval-when-compile (listify-requires 'server))
 (with-eval-after-load 'server
+  (listify-custom-initialize-hook
+   'server-after-make-frame-hook
+   )
   (unless (server-running-p)
      (server-start))
   (listify-set
@@ -456,6 +358,9 @@
 ;;
 (eval-when-compile (listify-requires 'shell))
 (with-eval-after-load 'shell
+  (listify-custom-initialize-hooks
+   'comint-password-function
+   )
   (listify-requires
    'no-process-query-on-exit
    )
@@ -472,7 +377,7 @@
 ;;
 (eval-when-compile (listify-requires 'asm-mode))
 (with-eval-after-load 'asm-mode
-  (defun init-set-tab-width-8()
+  (defun init-set-tab-width-8 ()
     (interactive)
     (setq tab-width 8))
   (listify-set-hooks
@@ -549,8 +454,8 @@
 ;;
 ;; ess-site > R
 ;;
-(eval-when-compile (listify-requires 'ess-site))
-(with-eval-after-load 'ess-site
+(eval-when-compile (listify-requires 'ess-custom))
+(with-eval-after-load 'ess-custom
   (listify-set
    '(ess-ask-for-ess-directory nil)
    ))
@@ -611,25 +516,10 @@
     ("<\\?xml " nxml-mode)
     )))
 
-;; auto-mode-alistのデータを検証できるようにcustom-typeを設定
-(put 'auto-mode-alist 'custom-type
-     '(repeat
-       (choice
-        (cons
-         (regexp :tag "Regexp matching file name")
-         (symbol :tag "Major mode function"))
-        (list
-         (regexp :tag "Regexp matching file name")
-         (symbol :tag "Function")
-         (sexp :tag "NON-NIL stands for anything that is not nil")))))
-
 ;; auto-mode-alistで、既存のメジャーモード設定を上書きする
-(listify-update-cdrs-variable
- 'auto-mode-alist
- '(
-   (makefile-gmake-mode makefile-bsdmake-mode)
-   (web-mode mhtml-mode)
-   ))
+(listify-update-cdrs
+ '(auto-mode-alist ((makefile-gmake-mode makefile-bsdmake-mode) (web-mode mhtml-mode)))
+ )
 
 (listify-set
  '(auto-mode-alist
