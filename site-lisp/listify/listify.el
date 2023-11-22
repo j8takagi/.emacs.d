@@ -42,7 +42,7 @@ Unless, cons cell (KEY . VALUE) is added."
       (setq newalist (push (cons key value) newalist)))
     newalist))
 
-(defun listify-update-cdrs (alist cdrs-new-old)
+(defun listify-update-cdrs-alist (alist cdrs-new-old)
   "Update cdrs of ALIST using CDRS-NEW-OLD alist.
 Arguments has the form:
 
@@ -63,29 +63,30 @@ Arguments has the form:
   (interactive "vVariable name: ")
   (listify-message (listify-get-variable-comment var)))
 
-(defun listify-create-variable-comment (&optional add-comment)
-  "Create variable comment of VAR by loading file or buffer file and ADD-COMMENT."
-  (let (acomm afile)
-    (when (setq afile (or load-file-name buffer-file-name (buffer-name)))
-      (setq acomm (format "set in `%s'." afile)))
-    (when add-comment
-      (setq acomm (concat add-comment (when acomm " ") acomm)))
-    acomm))
+(defun listify-setting-file ()
+  "Return the file name setting varables."
+  (or load-file-name buffer-file-name (buffer-name)))
 
-(defun listify-validate-custom-variable-type (custom-variable &optional value)
-  "Varidate VALUES is match CUSTOM-VARIABLE to
-custom-variable-type in symbol property.
-If VALUE matches custom-variable-type in symbol properties list, t.
+(defun listify-validate-variable (var &optional value)
+  "Varidate VALUE in variable VAR matches custom-type
+in symbol property.
+If value matches `custom-type' in symbol property, return t.
+Otherwise, value does not match nor custom-type is not set, return nil.
 When VALUE is ommited or nil, current value of
-CUSTOM-VARIABLE is validated."
-  (let (atype)
-    (when (null value)
-      (setq value (symbol-value custom-variable)))
-    (when (setq atype (custom-variable-type custom-variable))
-      (widget-apply (widget-convert atype) :match value))))
+VAR is validated."
+  (let ((atype (custom-variable-type var)) (res nil))
+    (if (null atype)
+        (listify-message "Warning: Property `custom-type' for variable `%s' is not set." var)
+      (unless value
+        (setq value (symbol-value var)))
+      (or
+       (setq res (widget-apply (widget-convert atype) :match value))
+       (listify-message "Warning: Value `%S' for variable `%s' does not match type `%s'."
+                        value var atype)))
+    res))
 
-(defun listify-message-set-variables()
-  (let ( cusvars ovars)
+(defun listify-message-set-variables ()
+  (let (cusvars ovars)
     (dolist (avar listify-init-set-variables)
       (if (custom-variable-p avar)
           (setq cusvars (append cusvars (list avar)))
@@ -106,43 +107,72 @@ Arguments form:
 
     SYM VAL [ NOW[ REQ[ COMMENT]]]
 
-Validation of `listify-validate-custom-variable-type' is done
-before setting. If fail, it cancels setting."
-  (let ((oldval (purecopy (symbol-value sym))) (varstruct "Variable"))
-    (when (and oldval (listp oldval))
-      (setq varstruct
-            (if (consp (car oldval))
-                "Alist variable"
-              "List variable")))
+Validation of `listify-validate-variable' is done
+before setting. If failed, it cancels setting."
+  (let (
+        (oldval (purecopy (symbol-value sym)))
+        (atype (custom-variable-type sym))
+        (res nil)
+        )
     (if (equal val oldval)
-        (listify-message "Info: alist variable `%s': value `%s' is not changed.\n" sym oldval)
-      (if (null (listify-validate-custom-variable-type sym val))
-          (listify-message "Warning: variable `%s' type mismatches value. -- Type: %s; Value: %s"
-                   sym (custom-variable-type sym) val)
+        (listify-message "Info: variable `%s': value `%s' is not changed." sym oldval)
+      (when (null atype)
+        (listify-message "Info: Type of variable `%s' is not defined." sym))
+      (if (null (listify-validate-variable sym val))
+            (listify-message "Warning: variable `%s': value `%s' is not validated. Type:" sym oldval atype)
         (custom-set-variables `(,sym ',val ,now ,req ,comment))
-        (listify-message "%s `%s': value `%s' is changed to `%s'." varstruct sym oldval (symbol-value sym))))
-    sym))
+        (setq res sym)))
+    res))
 
-(defun listify-set-variable-standard-value (sym)
+(defun listify-set-standard-value (sym)
   "Set current value of variable SYM to standard-value property."
-  (if (null (boundp sym))
-      (listify-message (format "`%s' is void." sym))
-    (let (
-          (val (purecopy (symbol-value sym)))
-          (stdval (get sym 'standard-value))
-          )
-      (if stdval
-          (listify-message "Variable %s: symbol property `standard-value' is already set. symbol property value: %s" sym stdval)
-        (put sym 'standard-value `(',val))
-        (listify-message "Variable %s: current value is set as property `standard-value'. value: %s" sym (get sym 'standard-value))))
-    sym))
+  (let ((res nil))
+    (if (null (boundp sym))
+        (listify-message "Warning: In listify-set-standard-value, Variable `%s' is void." sym)
+      (let (
+            (val (purecopy (symbol-value sym)))
+            (stdval (get sym 'standard-value))
+            )
+        (if stdval
+            (listify-message "Variable %s: symbol property `standard-value' is already set. symbol property value: %s" sym stdval)
+          (put sym 'standard-value
+               ;;;; -- from: source code of defcustom in custom.el
+               ;; (if lexical-binding
+               ;;     ;; The STANDARD arg should be an expression that evaluates to
+               ;;     ;; the standard value.  The use of `eval' for it is spread
+               ;;     ;; over many different places and hence difficult to
+               ;;     ;; eliminate, yet we want to make sure that the `standard'
+               ;;     ;; expression is checked by the byte-compiler, and that
+               ;;     ;; lexical-binding is obeyed, so quote the expression with
+               ;;     ;; `lambda' rather than with `quote'.
+               ;;     ``(funcall #',(lambda () "" ,val))
+               ;;   `(',val)))
+               `(',val))
+          (listify-message "Property `standard-value' of variable `%s' is set as current value  by listify-set-standard-value. value: %s" sym (get sym 'standard-value))
+          (setq res sym))))
+    res))
 
-(defun listify-set-variables-standard-value (&rest syms)
-  "Set current value of variable list in SYMS to standard-value property."
-  (mapc
-   (lambda(sym)
-     (listify-set-variable-standard-value sym))
-   syms))
+(defun listify-set-standard-values (&rest syms)
+  "Set current value of variable list SYMS to standard-value property."
+  (mapcar (lambda(sym) (listify-set-standard-value sym)) syms))
+
+(defun listify-set-variable-type (sym type)
+  "Set TYPE of variable SYM. TYPE is set as SYM's variable property `custom-type'."
+  (let (oldtype (res nil))
+    (setq oldtype (get sym 'custom-type))
+    (if oldtype
+        (listify-message "Info: type of variable `%s' is already set. Type: %s" sym oldtype)
+      (put sym 'custom-type type)
+      (listify-message "Type of variable `%s' is set by listyfy-set-variable-type. Type: %s" sym (get sym 'custom-type))
+      (setq res sym))
+    res))
+
+(defun listify-set-variable-types (&rest sym-types)
+  "Set TYPE of variable SYM. TYPE is set as SYM's variable property `custom-type'.
+Each SYM-TYPE has the form:
+
+(SYMBOL TYPE)"
+  (mapcar (lambda (asymtype) (listify-set-variable-type (car asymtype) (cadr asymtype))) sym-types))
 
 (defun listify-set-alist (sym exp)
   "Add or update alist values of a custom variable.
@@ -209,9 +239,9 @@ update or add each element when EXP is association list (alist)."
     (setq listify-init-set-variables (append listify-init-set-variables vars))
     vars))
 
-(defun listify-update-cdrs-variable (sym cdrs-new-old)
+(defun listify-update-cdrs (&rest args)
   "Update cdrs of alist variable SYM using CDRS-NEW-OLD alist.
-Arguments has the form:
+The arguments should each be a list of the form:
 
     SYM ((CDR-NEW1 . CDR-OLD1) (CDR-NEW2 . CDR-OLD2)) ..."
   (let ((newval nil) (oldval nil))
