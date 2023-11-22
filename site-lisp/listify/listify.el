@@ -1,10 +1,12 @@
-;;; listify.el --- Listify Emacs initialization files. -*- lexical-binding:t -*-
+;;; listify.el -*- lexical-binding: t -*-
 ;; Copyright (C) 2017-2023 by Kazubito Takagi
 
 ;; Authors: Kazubito Takagi
 ;; Keywords: init
 
 ;;; Commentary:
+;;; Listify enable to use simple lists to edit Emacs init files.
+
 ;;; Code:
 (require 'custom)
 (require 'cus-edit)
@@ -12,24 +14,39 @@
 
 (defgroup listify nil
   "Emacs start-up utilities."
-  :group 'initialization)
+  :prefix "listify-"
+  :group 'initialization
+  :group 'convenience
+  )
+
+(defcustom listify-inhibit-echo t
+  "Non-nil means calls to `listify-message' are
+not displaied in echo area, but still logged to
+*Messages* buffer."
+  :group 'listify
+  :type 'boolean
+  )
+
+(defcustom listify-inhibit-message nil
+  "Non-nil means calls to `listify-message' are
+not displaied in echo area and not logged to
+*Messages* buffer."
+  :group 'listify
+  :type 'boolean
+  )
 
 (defvar listify-init-set-variables nil
   "Variables set in listify functions,
 mainly from initialization files."
 )
 
-(defvar listify-inhibit-message nil
-  "Non-nil means calls to `listify-message' are
-not display and not logged to th *Messages* buffer."
-)
-
 (defun listify-message (format-string &rest args)
-  "Display a message using `message' if `listify-inhibit-message' is nil."
-  (when noninteractive
-    (setq listify-inhibit-message t))
-  (unless listify-inhibit-message
-    (apply #'message format-string args)))
+  "Display a message using `message' if `listify-inhibit-message' is nil.
+If `listify-inhibit-echo' is t, the message is not dispalayed in echo area,
+and it is still logged to the *Meaasge* buffer."
+  (let ((inhibit-message listify-inhibit-echo))
+    (unless (or noninteractive listify-inhibit-message)
+      (apply #'message format-string args))))
 
 (defun listify-add-or-update-alist (alist key value)
   "return ALIST which value is updated or added.
@@ -181,15 +198,15 @@ Arguments form:
 
     ALIST-NAME ((KEY1 VALUE1) (KEY2 VALUE2) ...)"
   (let ((newval nil))
-    (unless (boundp sym)
-      (error (format "In listify-set-alist, the 1st argument: `%s' is not a symbol." sym)))
-    (unless (listp exp)
-      (error (format "In listify-set-alist, the 2nd argument is not list.\nArgument: %s" exp)))
-    (setq newval (copy-alist (symbol-value sym)))
-    (dolist (akeyval exp)
-      (unless (consp akeyval)
-        (error (format "In listify-set-alist, element in the 2nd argument is not cons cell.\nElement: %s; argument: %s" akeyval exp)))
-      (setq newval (listify-add-or-update-alist newval (car akeyval) (cadr akeyval))))
+    (if (null (boundp sym))
+        (listify-message "Warning: In listify-set-alist, the 1st argument: `%s' is not a symbol." sym)
+      (if (null (listp exp))
+          (listify-message "Warning: In listify-set-alist, the 2nd argument is not list.\nArgument: %s" exp)
+        (setq newval (copy-alist (symbol-value sym)))
+        (dolist (akeyval exp)
+          (if (null (consp akeyval))
+              (listify-message "Warning: In listify-set-alist, element in the 2nd argument is not cons cell. Element: %s; argument: %s" akeyval exp)
+            (setq newval (listify-add-or-update-alist newval (car akeyval) (cadr akeyval)))))))
     newval))
 
 (defun listify-add-list (sym exp)
@@ -199,15 +216,15 @@ Arguments form:
 
     LIST-VARIABLE-NAME (VALUE1 VALUE2 ...)"
   (let ((newval nil))
-    (unless (boundp sym)
-      (error (format "In listify-add-list, the 1st argument: `%s' is not a symbol." sym)))
-    (unless (listp exp)
-      (error (format "In listify-add-list, the 2nd argument is not list.\nArgument: %s" exp)))
-    (setq newval (copy-sequence (symbol-value sym)))
-    (dolist (aexp exp)
-      (unless (member aexp newval)
-        (push aexp newval)))
-    newval))
+    (if (null (boundp sym))
+        (listify-message "Warning: In listify-add-list, the 1st argument: `%s' is not a symbol." sym)
+      (if (null (listp exp))
+          (listify-message "Warning: In listify-add-list, the 2nd argument is not list.\nArgument: %s" exp)
+        (setq newval (nreverse (copy-sequence (symbol-value sym))))
+        (dolist (aexp exp)
+          (unless (member aexp newval)
+            (push aexp newval)))))
+    (nreverse newval)))
 
 (defun listify-set (&rest args)
   "Set custom variable values specified in ARGS.
@@ -219,85 +236,136 @@ The ARGS form is same to `custom-set-variables'.
 Except EXP need no quote when EXP is SYMBOL,
 and / or add each element when EXP is list,
 update or add each element when EXP is association list (alist)."
-  (let (asym exp anow areq acomm vars (newval nil))
+  (let
+      (asym exp anow areq acomm avar vars
+            (oldval nil) (newval nil) afunc varstruct)
     (dolist (arg args)
       (setq
-       asym (nth 0 arg) exp (nth 1 arg) anow (nth 2 arg) areq (nth 3 arg)
-       acomm (listify-create-variable-comment (nth 4 arg)))
+       asym (nth 0 arg) exp (nth 1 arg)
+       anow (nth 2 arg) areq (nth 3 arg) acomm (nth 4 arg)
+       oldval (purecopy (symbol-value asym)))
       (unless (custom-variable-p asym)
-        (listify-set-variable-standard-value asym))
-      (setq newval
-              (if (and exp (listp exp) (listp (cdr exp)))
-                  (funcall
-                   (if (consp (car exp))
-                       'listify-set-alist
-                    'listify-add-list)
-                   asym exp)
-                exp))
-      (setq vars
-            (push (listify-set-variable asym newval anow areq acomm) vars)))
-    (setq listify-init-set-variables (append listify-init-set-variables vars))
+        (listify-set-standard-value asym))
+      (if (or (null exp) (null (and (listp exp) (listp (cdr exp)))))
+          (setq newval exp varstruct "Variable")
+        (if (consp (car exp))
+            (setq afunc 'listify-set-alist varstruct "Variable alist")
+          (setq afunc 'listify-add-list varstruct "Variable list"))
+        (setq newval (funcall afunc asym exp)))
+      (setq avar
+            (listify-set-variable
+             asym newval anow areq
+             (if acomm
+                 acomm
+               (format "Set in `%s' by `listify-set'." (listify-setting-file)))
+             ))
+      (when avar
+        (listify-message "%s `%s': value `%s' is changed to `%s' by listify-set."
+                         varstruct asym oldval (symbol-value asym))
+        (unless (member avar listify-init-set-variables)
+          (push avar listify-init-set-variables)))
+      (push avar vars))
     vars))
 
 (defun listify-update-cdrs (&rest args)
   "Update cdrs of alist variable SYM using CDRS-NEW-OLD alist.
 The arguments should each be a list of the form:
 
-    SYM ((CDR-NEW1 . CDR-OLD1) (CDR-NEW2 . CDR-OLD2)) ..."
-  (let ((newval nil) (oldval nil))
-    (setq
-     oldval (copy-alist (symbol-value sym))
-     newval (listify-update-cdrs auto-mode-alist cdrs-new-old))
-    (if (null (listify-validate-custom-variable-type sym newval))
-        (listify-message "Warning: variable `%s' -- type is mismatch.\nType: %s\nValue: %s"
-                 sym (custom-variable-type sym) newval)
-      (if (equal newval oldval)
-          (listify-message "Alist variable `%s': value `%s' is not changed." sym oldval)
-        (custom-set-variables `(,sym ',newval nil nil ,(listify-create-variable-comment "By update-cdrs-variable,")))
-        (listify-message "Variable `auto-mode-alist': value `%s' is changed to `%s'."
-                 oldval (symbol-value sym))))
-    sym))
+    (SYMBOL ((CDR-NEW1 . CDR-OLD1) (CDR-NEW2 . CDR-OLD2) ... )
+[NOW [REQUEST [COMMENT]]])"
+  (let
+      (asym cdrs anow areq acomm
+            newval oldval avar vars)
+    (dolist (arg args)
+      (setq
+       asym (nth 0 arg) cdrs (nth 1 arg)
+       anow (nth 2 arg) areq (nth 3 arg) acomm (nth 4 arg)
+       newval (purecopy (symbol-value asym))
+       oldval (purecopy newval))
+      (setq newval (listify-update-cdrs-alist newval cdrs))
+      (setq avar
+            (listify-set-variable
+             asym newval anow areq
+             (if acomm
+                 acomm
+               (format "Set in `%s' by `listify-update-cdrs'." (listify-setting-file)))))
+      (when avar
+        (listify-message "Alist variable `%s': value `%s' is changed to `%s' by listify-update-cdrs."
+                         asym oldval (symbol-value asym))
+        (unless (member avar listify-init-set-variables)
+          (push avar listify-init-set-variables)))
+      (push avar vars))
+    vars))
 
 (defun listify-defaliases (&rest sym-def)
   "Set SYMBOL’s function definition to DEFINITION in SYM-DEF.
-Each SYM-DEF has the form (SYMBOL DEFINITION &optional DOCSTRING)."
-  (let (asym adef)
+Each SYM-DEF has the form:
+
+(SYMBOL DEFINITION [DOCSTRING])."
+  (let ((syms nil))
     (dolist (asymdef sym-def)
-     (when (fboundp (setq asym (car asymdef)))
-       (listify-message "Info: Function `%s' is already defined as %s." asym (indirect-function asym)))
-     (if (not (fboundp (setq adef (cadr asymdef))))
-         (listify-message "Warning: In setting alias, symbol `%s' is not function." adef)
-       (defalias asym adef (nth 3 asymdef))
-       (listify-message "`%s' is defined as alias of `%s'." asym adef)))))
+      (let ((asym (nth 0 asymdef)) (adef (nth 1 asymdef)) (adoc (nth 2 asymdef)) (res nil))
+        (when (fboundp asym)
+          (listify-message "Function `%s' is already defined as %s." asym (indirect-function asym)))
+        (if (null (fboundp adef))
+            (listify-message "Warning: In setting alias, symbol `%s' is not function." adef)
+          (defalias asym adef adoc)
+          (listify-message "Alias `%s' is defined as function `%s' by listify-defaliases." asym adef)
+          (setq res asym))
+        (push res syms)))
+    syms))
 
 (defvar listify-system-name-simple
   (replace-regexp-in-string "\\..*\\'" "" (system-name))
   "The simple host name of the machine Emacs is running on,
 which is without domain information.")
 
-(defun listify-requires (&rest feature)
-  "Require FEATURE, and the result is printed
+(defun listify-require (feat)
+  "Require feature FEAT, and the result is printed
 into the `*Messages' buffer,
 or the standard error stream in batch mode."
-  (let (feats)
-    (dolist (afeat feature)
-      (if (featurep afeat)
-          (listify-message "Info: Feature `%s' is already required." afeat)
-        (if (not (locate-library (symbol-name afeat)))
-            (listify-message "Warning: Feature `%s' is NOT found." afeat)
-          (if (null (require afeat nil 1))
-              (listify-message "Warning: Fails to require feature - %s" afeat)
-            (setq feats (append feats (list afeat)))))))
-    (listify-message "Features are required - %s" feats)))
+  (let ((res nil))
+    (if (featurep feat)
+        (listify-message "Info: Feature `%s' is already required." feat)
+      (if (null (locate-library (symbol-name feat)))
+          (listify-message "Warning: Feature `%s' is NOT found." feat)
+        (if (null (require feat nil 1))
+            (listify-message "Warning: require feature `%s' is failed" feat)
+          (setq res feat))))
+    res))
+
+(defun listify-requires (&rest features)
+  "Require FEATURES, and the result is printed
+into the `*Messages' buffer,
+or the standard error stream in batch mode."
+  (let ((feats nil))
+    (dolist (afeat features)
+      (let ((res (listify-require afeat)))
+        (when res
+          (push res feats))))
+    (setq feats (nreverse feats))
+    (when feats
+      (listify-message "Features are required by listify-requires. - %s" feats))
+    feats))
 
 (defun listify-requires-by-system (&rest sys-features)
-  "If current system type or window system got by VARIABLE is match to SYSTEM,
+  "If current system type or window system
+got by VARIABLE is match to SYSTEM,
 Require FEATURE by `listify-requires' in SYS-FEATURES.
+Each SYS-FEATURES has the form:
 
-Each element of SYS-FEATURES has the form (VARIABLE SYSTEM FEATURE)."
-  (dolist (asysfeat sys-features)
-    (when (equal (eval (car asysfeat)) (cadr asysfeat))
-      (listify-requires (nth 2 asysfeat)))))
+    (SYSTEMTYPE SYSTEM FEATURE)"
+  (let ((feats nil))
+    (dolist (asysfeat sys-features)
+      (let
+          ((res nil) (asystype (nth 0 asysfeat))
+           (asys (nth 1 asysfeat)) (afeat (nth 2 asysfeat)))
+        (when (equal (eval asystype) asys)
+          (listify-message "Feature `%s' of which system type `%s' matches `%s' is required by listify-requires-by-system." afeat asystype asys)
+          (setq res (listify-require afeat))
+          (when res
+            (push res feats)))))
+    feats))
 
 (defun listify-autoloads-set (&rest func-file-doc)
   "Define autoload functions from FUNC-FILE-DOC.
@@ -315,11 +383,12 @@ or the standard error stream in batch mode."
               (listify-message "Info: In setting autoload functions, function `%s' is already defined." afunc)
             (condition-case aerr
                 (push (autoload afunc afile adoc 1) funcs)
-              (error
-               (listify-message "Warning: In setting autoload functions, fails to set autoload `%s' from `%s'.\n%s" afunc afile aerr)))))))
+              (listify-message "Warning: In setting autoload functions, fails to set autoload `%s' from `%s'.\n%s" afunc afile aerr))))))
     (if (not funcs)
         (listify-message "Autoload functions is not defined.")
-      (listify-message "Autoload functions are defined. - %s" (reverse funcs)))))
+      (setq funcs (nreverse funcs))
+      (listify-message "Autoload functions are defined by listify-autoloads-set. - %s" funcs)
+      funcs)))
 
 (defun listify-global-set-keys (&rest key-cmd)
   "Give global binding as KEY-CMD by global-set-key.
@@ -329,22 +398,30 @@ Each KEY-CMD has the form:
 
 If CMD is void, warning message is printed into the `*Messages' buffer,
 or the standard error stream in batch mode."
-  (dolist (akeycmd key-cmd)
-    (let ((akey (car akeycmd)) (acmd (cadr akeycmd)) (oldval nil))
-      (setq oldval (keymap-lookup (current-global-map) akey))
-      (if (not (fboundp acmd))
-          (listify-message "Warning: In setting keybind, command `%s' is void." acmd)
-        (if (equal oldval acmd)
-            (listify-message "Key `%s' command `%s' is not changed." akey oldval)
-          ;; (global-set-key (kbd akey) acmd)
-          (keymap-global-set akey acmd)
-          (listify-message "Key `%s' command `%s' is changed to `%s'"
-                   akey oldval (keymap-lookup (current-global-map) akey))
-        )))))
+  (let ((res nil))
+    (dolist (akeycmd key-cmd)
+      (let ((akey (car akeycmd)) (acmd (cadr akeycmd)) (oldval nil))
+        (setq oldval (keymap-lookup (current-global-map) akey))
+        (if (not (fboundp acmd))
+            (listify-message "Warning: In setting keybind, command `%s' is void." acmd)
+          (if (equal oldval acmd)
+              (listify-message "Key `%s' command `%s' is not changed." akey oldval)
+            ;; (global-set-key (kbd akey) acmd)
+            (keymap-global-set akey acmd)
+            (listify-message "Key `%s' command `%s' is changed to `%s' by listify-global-set-keys"
+                             akey oldval (keymap-lookup (current-global-map) akey))
+            (push akey res)))))
+    res))
 
 (defun listify-global-unset-keys (&rest keys)
-  (dolist (akey keys)
-    (keymap-global-unset akey)))
+  (let ((res nil))
+    (dolist (akey keys)
+      (let ((oldval (keymap-lookup (current-global-map) akey)))
+        (keymap-global-unset akey)
+        (listify-message "Key `%s' command `%s' is unset by listify-global-unset-keys."
+                         akey oldval)
+        (push akey res)))
+    res))
 
 (defun listify-modemap-set-keys (&rest modemap)
   "Give KEY binding of MODEMAP as MAPKEYS after LIBRARY is loaded.
@@ -364,17 +441,18 @@ into the `*Messages' buffer, or  the standard error stream in batch mode."
        funcname (read (concat "listify-" amapname "-keybind"))
        funcdef
        `(lambda ()
+          "Add keymap settings. This function is defined in `listify-modemap-set-keys'.
+To display Source code of this function, use `symbol-function'."
           (dolist (keyfunc ',keyfuncs)
             (let ((inhibit-message 1) (akey (car keyfunc)) (afunc (cadr keyfunc)) (oldval nil))
               (setq oldval (keymap-lookup ,amap akey))
               (if (not (fboundp afunc))
-                  (listify-message
-                   ,(concat "Warning: In setting `" amapname "' keybind, function `%s' is void.") afunc)
+                  (listify-message ,(concat "In setting `" amapname "' keybind, function `%s' is void.") afunc)
                 (keymap-set ,amap akey afunc)
-                (listify-message "Key `%s' command `%s' in global map, `%s' in modemap `%s', is changed to `%s'"
-                         akey
-                         (keymap-lookup (current-global-map) akey) oldval ,amapname
-                         (keymap-lookup ,amap akey)))))))
+                (listify-message
+                 ,(concat "Key `%s' command `%s' in global map, `%s' in modemap `" amapname "', is changed to `%s' by " (symbol-name funcname) ".")
+                 akey (keymap-lookup (current-global-map) akey)
+                 oldval (keymap-lookup ,amap akey)))))))
       (fset funcname funcdef)
       (eval-after-load alib
         (if (null ahook)
@@ -400,7 +478,7 @@ or the standard error stream in batch mode."
         (setq newval (eval amode))
         (if (equal oldval newval)
             (listify-message "Info: minor mode - `%s': value `%s' is not changed." amode oldval)
-          (listify-message "Minor mode - `%s': value `%s' is changed to `%s'." amode oldval newval))))))
+          (listify-message "Minor mode - `%s': value `%s' is changed to `%s' by listify-set-minor-modes." amode oldval newval))))))
 
 (defun listify-custom-initialize-hooks (&rest hooks)
   (mapcar (lambda(ahook) (listify-custom-initialize-hook ahook)) hooks)
@@ -410,15 +488,17 @@ or the standard error stream in batch mode."
   "Initialize HOOK as a custom variable.
 Set properties of standard-value and custom-type
 of variable HOOK, if not set yet.
-If HOOK is not define, return nil.
-In other case, return HOOK."
-  (if (not (boundp hook))
-      nil
-    (unless (custom-variable-p hook)
-      (listify-set-variable-standard-value hook))
-    (unless (get hook 'custom-type)
-      (put hook 'custom-type 'hook))
-    hook))
+If HOOK is not defined, or
+HOOK is already set as custom variable,
+return nil. In other case, return HOOK."
+  (let ((res nil))
+    (if (null (boundp hook))
+        (listify-message "Info: Hook `%s is not bound." hook)
+      (unless (custom-variable-p hook)
+        (setq res (listify-set-standard-value hook)))
+      (unless (get hook 'custom-type)
+        (setq res (listify-set-variable-type hook 'hook))))
+    res))
 
 (defun listify-set-hooks (&rest hook-funcs)
   "Set functions to each hook by list:
@@ -428,24 +508,38 @@ In other case, return HOOK."
 If FUNCTION or HOOK is void,
 warning message is printed into the `*Messages' buffer,
 or the standard error stream in batch mode."
-  (dolist (ahookfuncs hook-funcs)
-    (let ((ahook (car ahookfuncs)) (funcs (cadr ahookfuncs)))
-      (if (null (listify-custom-initialize-hook ahook))
-          (listify-message "Hook `%s' is not defined." ahook)
-        (listify-set `(,ahook ,funcs))))))
+  (let ((res nil))
+    (dolist (ahookfuncs hook-funcs)
+      (let ((ahook (car ahookfuncs)) (funcs (cadr ahookfuncs)))
+        (listify-custom-initialize-hook ahook)
+        (listify-set `(,ahook ,funcs))
+        (push ahook res)))
+    res))
 
 (defun listify-setenv (&rest env-val)
   "Add system environment variables to values by list of ENV-VAL.
-Each ENV-VAL form is (ENVIRONMENT VALUE)."
-  (dolist (aenvval env-val)
-    (setenv (car aenvval) (cadr aenvval))))
+Each ENV-VAL form:
+
+(ENVIRONMENT VALUE)"
+  (let ((res nil))
+    (dolist (aenvval env-val)
+      (let ((env (car aenvval)) (newval (cadr aenvval)) oldval)
+        (setq oldval (getenv env))
+        (if (equal oldval newval)
+            (listify-message "Info: System environment is not changed. Value: %s" oldval)
+          (setenv env newval)
+          (listify-message
+           "System environment variable `%s': value `%s' is changed to `%s'."
+           env oldval (getenv env))
+          (push env res))))
+    res))
 
 (defun listify-eval-buffer ()
   "Execute the accessible portion of current buffer as Lisp code
 by `eval-buffer' and message evaluted."
   (interactive)
   (eval-buffer)
-  (listify-message "%s is evaluted." (buffer-file-name)))
+  (message "%s is evaluted." (buffer-file-name)))
 
 (provide 'listify)
 ;;; listify.el ends here
