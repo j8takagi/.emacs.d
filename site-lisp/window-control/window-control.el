@@ -216,14 +216,51 @@
             (throw 'end-flag t)))))))
       (run-hooks 'wctl-frame-resize-hook))
 
-(defun wctl-get-frame-font-size ()
-  "Return the font size of the current frame in Emacs."
-  (frame-parameter nil 'font))
+
+(defun wctl-visible-all-frames ()
+  "Make all live frames visible."
+  (interactive)
+  (let ((sfrm (selected-frame)) (res nil))
+    (setq
+     res
+     (mapcar
+      (lambda (frm)
+        (let ((vp (frame-visible-p frm)))
+          (when (or (eq 'icon vp) (null vp))
+            (make-frame-visible frm)
+            (lower-frame frm))
+          ))
+      (frame-list)))
+    (raise-frame sfrm)
+    res
+  ))
+
+(defun wctl-iconify-other-frames ()
+  "Make all live frames except selected frame into an icon."
+  (interactive)
+  (let ((sfrm (selected-frame)))
+    (mapcar
+     (lambda (frm)
+       (unless (eq frm sfrm)
+         (iconify-frame frm)))
+     (frame-list)
+     )))
+
+(defun wctl-invisible-other-frames ()
+  "Make all live frames except selected frame invisible."
+  (interactive)
+  (let ((sfrm (selected-frame)))
+    (mapcar
+     (lambda (frm)
+       (unless (eq frm sfrm)
+         (make-frame-invisible frm)))
+     (frame-list)
+     )))
 
 (defun wctl-xlfd-pixels (xlfd)
   "Get pixels of font size from font-spec string XLFD."
   (let ((elmts (split-string xlfd "-")))
-    ;; xlfd 7th element: font
+    ;; xlfd 7th element: pixels of font size
     (string-to-number (nth 7 elmts))))
 
 (defun wctl-frame-fontsize ()
