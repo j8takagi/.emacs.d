@@ -260,6 +260,7 @@
  '(truncate-partial-width-windows nil)  ; 行を切り捨てない
  '(use-dialog-box nil)                  ; ダイアログボックスは使わない
  '(user-mail-address "j8takagi@nifty.com") ; ChangeLogなどで用いるメールアドレスの設定
+ '(vc-find-revision-no-save 1)             ; vcで作成した履歴ファイルは保存しない
  '(version-control t)                   ; バックアップファイルにバージョン番号を付ける
  '(view-read-only 1)                    ; view-modeで開いたファイルをread-onlyに
  '(yank-excluded-properties t)          ; ヤンクで、テキストプロパティは捨てる
@@ -715,7 +716,7 @@
  '("C-x g" magit-status)
  '("C-x m" man)
  '("C-x q" bury-buffer)
- '("C-x v e" vc-plus-latest-current)
+ '("C-x v e" vc-plus-ediff)
  '("C-x v f" vc-plus-find-file-revision)
  '("C-x v -" vc-revision-other-window)
  '("M-?" help)
@@ -750,7 +751,7 @@
     ("C-c i" image-dired)
     ("C-c r" exopen-dired-file)
     ("C-c w" wdired-change-to-wdired-mode)
-    ("E" vc-plus-dired-latest-current)
+    ("E" vc-plus-dired-ediff)
     ("r" exopen-dired-file)
     ("s" dired-toggle-sort)
     (";" replace-plus-dired-string-files)
