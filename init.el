@@ -63,6 +63,7 @@
  'continue-scratch                 ; *scratch*の永続化
  'daily-log                        ; 毎日のログ
  'exopen                           ; 外部プログラムでファイルを開く
+ 'file-name-history-add            ; dired-modeで開いたファイルをfile-name-historyに追加
  'fill-region-with-n               ; 1行あたりの文字数を指定してfill-region
  'japanese-plus                    ; 全角半角変換
  'jaword                           ; 日本語の単語をきちんと扱う
@@ -142,6 +143,7 @@
  '(desktop-locals-to-save (buffer-undo-list compile-history)) ;undo-listをdesktopで保存
  '(dired-always-read-filesystem t)      ; ディレクトリ変更を検索前に反映
  '(dired-auto-revert-buffer t)          ; ディレクトリ変更を反映
+ '(dired-kill-when-opening-new-dired-buffer t) ; 別のディレクトリを表示した時、バッファを削除
  '(disabled-command-function nil)       ; すべてのコマンドの使用制限を解除する
  '(display-buffer-alist (("^\\*shell\\*$" (display-buffer-same-window)) ("^\\*?magit: .+" (display-buffer-same-window)))) ; バッファの表示方法
  '(enable-recursive-minibuffers t)      ; 再帰的にミニバッファを使う
