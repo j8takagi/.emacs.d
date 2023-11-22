@@ -204,6 +204,9 @@
    )
   )
 
+;; compile-historyをローカル変数に
+(make-variable-buffer-local 'compile-history)
+
 ;; Infoの設定
 (eval-when-compile (listify-requires 'info))
 (with-eval-after-load 'info
