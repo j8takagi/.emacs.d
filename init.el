@@ -596,6 +596,8 @@
  '("C-x 4 s" split-shell-current-directory)
  '("C-x 4 |" toggle-split-next-window)
  '("C-x 4 ~" swap-buffer-next-window)
+ '("C-x 5 -" wctl-iconify-other-frames)
+ '("C-x 5 =" wctl-visible-all-frames)
  '("C-x 5 C-s" new-frame-scratch)
  '("C-x 5 m" new-frame-messages)
  '("C-x 5 s" new-frame-shell-current-directory)
