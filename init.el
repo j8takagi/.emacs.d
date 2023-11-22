@@ -135,6 +135,7 @@
  'gitignore-mode
  'gnuplot
  'graphviz-dot-mode
+ 'gtags-mode
  'inf-ruby
  'js2-mode
  'magit
@@ -191,7 +192,6 @@
  '(crontab-mode "crontab-mode" "Major mode for editing crontab files")
  '(ert-mode "ert-mode" "Major mode for editing ERT files")
  '(eukleides-mode "eukleides" "Major mode for editing Eukleides files")
- '(gtags-mode "gtags")
  '(mediawiki-mode "mediawiki" "Major mode for editing Mediawiki articles")
  '(mpv-ts-mode "mpv-ts-mode" "Major mode for editing transcription using mpv")
  '(review-mode "review-mode" "Re:VIEW text editing mode")
