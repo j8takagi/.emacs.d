@@ -2,26 +2,30 @@ CP := cp -v
 ECHO := echo
 EMACS := /Applications/MacPorts/Emacs.app/Contents/MacOS/Emacs
 GREPV := grep -v
-INSTALL = install
+INSTALL = install -C -v
 MKDIR := mkdir
 TEST := test
 RMR := $(RM) -R
-RSYNC := rsync
-RSYNCFLAG := -avz --delete
 
 COMPILE.el := $(EMACS) -batch -l set-compile.el -f batch-byte-compile
 NATIVE-COMPILE.el := $(EMACS) -batch -l set-compile.el -l native-compile.el -f init-native-compile
 CLEAN.rsync := $(GREPV) "^\(sent\)\|\(total\)\|\(sending\)"
-INSTALLDIR := ~/.emacs.d
+
+INSTALL-DIR := ~/.emacs.d/
+
+INIT-FILES := init early-init
+INIT-EL-FILES := $(addsuffix .el,$(INIT-FILES))
+INIT-ELC-FILES := $(addsuffix .elc,$(INIT-FILES))
+
 
 .PHONY: all init native-compile site-lisp install install-init.sys.d install-site-lisp check test
 
 all: init native-compile init.sys.d insert install-site-lisp
 
-init: init.elc native-compile
+init: $(INIT-EL-FILES) native-compile
 
-native-compile: init.el
-	$(NATIVE-COMPILE.el) $<
+native-compile: $(INIT-EL-FILES)
+	$(NATIVE-COMPILE.el) $^
 
 init.sys.d:
 	$(MAKE) -C $@
@@ -37,29 +41,30 @@ save-abbrev:
 
 install: install-init install-init.sys.d install-site-lisp install-insert save-abbrev
 
-install-init: $(INSTALLDIR) init
-	@$(RSYNC) $(RSYNCFLAG) init.el init.elc $(INSTALLDIR)/ | $(CLEAN.rsync)
+install-init: $(INSTALL-DIR) init
+	$(INSTALL) $(INIT-EL-FILES) $(INIT-ELC-FILES) $(INSTALL-DIR)
 
-install-init.sys.d: init.sys.d $(INSTALLDIR)/init.sys.d
+install-init.sys.d: init.sys.d $(INSTALL-DIR)/init.sys.d
 	$(MAKE) -sC init.sys.d install
 
-$(INSTALLDIR)/init.sys.d: $(INSTALLDIR)
-	@(if $(TEST) ! -d $@; then $(MKDIR) $@; fi)
+$(INSTALL-DIR)/init.sys.d: $(INSTALL-DIR)
+	$(INSTALL) -d $@
 
-install-site-lisp: site-lisp $(INSTALLDIR)/site-lisp
+install-site-lisp: site-lisp $(INSTALL-DIR)/site-lisp
 	@$(MAKE) -sC site-lisp install
 
-$(INSTALLDIR)/site-lisp: $(INSTALLDIR)
-	@(if $(TEST) ! -d $@; then $(MKDIR) $@; fi)
+$(INSTALL-DIR)/site-lisp: $(INSTALL-DIR)
+	$(INSTALL) -d $@
 
-install-insert: insert $(INSTALLDIR)/insert
+install-insert: insert $(INSTALL-DIR)/insert
 	@$(MAKE) -sC insert install
 
-$(INSTALLDIR)/insert: $(INSTALLDIR)
-	@(if $(TEST) ! -d $@; then $(MKDIR) $@; fi)
+$(INSTALL-DIR)/insert: $(INSTALL-DIR)
+	$(INSTALL) -d $@
 
-$(INSTALLDIR):
-	@(if $(TEST) ! -d $@; then $(MKDIR) $@; fi)
+
+$(INSTALL-DIR):
+	$(INSTALL) -d $@
 
 %.elc: %.el
 	$(COMPILE.el) $<
@@ -87,3 +92,6 @@ insert-clean:
 
 site-lisp-clean:
 	$(MAKE) -C site-lisp clean
+
+uninstall-all:
+	$(RMR) ~/.emacs.d/
