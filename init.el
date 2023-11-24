@@ -376,7 +376,7 @@
    'no-process-query-on-exit
    )
   (listify-set
-   '(shell-prompt-pattern "[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ") ; プロンプトの表示設定
+   '(shell-prompt-pattern "\\([a-zA-Z0-9-.]*:\\)?[~/][~/A-Za-z0-9_^$!#%&{}`'.,:()-]* \\[[0-9:]+\\] *$ ") ; プロンプトの表示設定
    )
   (listify-set-hooks
    '(shell-mode-hook (ansi-color-for-comint-mode-on))
