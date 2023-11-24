@@ -40,6 +40,11 @@ not displaied in echo area and not logged to
 mainly from initialization files."
 )
 
+(defvar listify-system-name-simple
+  (replace-regexp-in-string "\\..*\\'" "" (system-name))
+  "The simple host name of the machine Emacs is running on,
+which is without domain information.")
+
 (defun listify-message (format-string &rest args)
   "Display a message using `message' if `listify-inhibit-message' is nil.
 If `listify-inhibit-echo' is t, the message is not dispalayed in echo area,
@@ -297,6 +302,16 @@ The arguments should each be a list of the form:
       (push avar vars))
     vars))
 
+(defun listify-variable-buffer-local (&rest vars)
+  "Make VARIABLE become buffer-local by `make-variable-buffer-local'."
+  (let ((res nil))
+    (dolist (avar vars)
+      (push (make-variable-buffer-local avar) res)
+      (if (local-variable-if-set-p avar)
+          (listify-message "Local variable `%s'." avar)
+        (listify-message "Global variable `%s'." avar)))
+    res))
+
 (defun listify-defaliases (&rest sym-def)
   "Set SYMBOL’s function definition to DEFINITION in SYM-DEF.
 Each SYM-DEF has the form:
@@ -314,11 +329,6 @@ Each SYM-DEF has the form:
           (setq res asym))
         (push res syms)))
     syms))
-
-(defvar listify-system-name-simple
-  (replace-regexp-in-string "\\..*\\'" "" (system-name))
-  "The simple host name of the machine Emacs is running on,
-which is without domain information.")
 
 (defun listify-require (feat)
   "Require feature FEAT, and the result is printed
@@ -480,10 +490,6 @@ or the standard error stream in batch mode."
             (listify-message "Info: minor mode - `%s': value `%s' is not changed." amode oldval)
           (listify-message "Minor mode - `%s': value `%s' is changed to `%s' by listify-set-minor-modes." amode oldval newval))))))
 
-(defun listify-custom-initialize-hooks (&rest hooks)
-  (mapcar (lambda(ahook) (listify-custom-initialize-hook ahook)) hooks)
-  )
-
 (defun listify-custom-initialize-hook (hook)
   "Initialize HOOK as a custom variable.
 Set properties of standard-value and custom-type
@@ -499,6 +505,10 @@ return nil. In other case, return HOOK."
       (unless (get hook 'custom-type)
         (setq res (listify-set-variable-type hook 'hook))))
     res))
+
+(defun listify-custom-initialize-hooks (&rest hooks)
+  (mapcar (lambda(ahook) (listify-custom-initialize-hook ahook)) hooks)
+  )
 
 (defun listify-set-hooks (&rest hook-funcs)
   "Set functions to each hook by list:
