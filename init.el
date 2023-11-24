@@ -127,6 +127,12 @@
  '(tool-bar-mode -1)                  ; ツールバーを表示しない
 )
 
+;; ローカル変数に
+(listify-variable-buffer-local
+ 'compile-history
+ 'grep-history
+ )
+
 ; 変数
 (listify-set
  '(auto-insert-alist nil)               ; auto-insert-alistの初期化
@@ -204,8 +210,6 @@
    )
   )
 
-;; compile-historyをローカル変数に
-(make-variable-buffer-local 'compile-history)
 
 ;; Infoの設定
 (eval-when-compile (listify-requires 'info))
