@@ -1,4 +1,4 @@
-;; -*- mode: Emacs-Lisp; -*-
+;; init-w32.el -*- lexical-binding: t -*-
 ;; MS-Windowsの設定
 
 (message "Start of loading %s." load-file-name)
@@ -21,19 +21,19 @@
     (font
      ,(fontset-set
        '(
-         (ascii (font-spec :family "Consolas" :weight 'normal :size 24))
+         (ascii (font-spec :family "Consolas" :weight 'normal :size 25))
          (unicode (font-spec :family "メイリオ"))
          )
        "mydefault_w32"))
-    (width 160)
-    (height 48)
+    (width 180)
+    (height 56)
     (top 0)
     (left 0)
     )))
 
 (fontsets-set
  '((
-    (unicode (font-spec :family "游明朝" :weight 'normal :slant 'normal :size 14))
+    (unicode (font-spec :family "游明朝" :weight 'normal :slant 'normal :size 25))
     )
    "my_mincho")
  '((
@@ -41,7 +41,7 @@
     )
    "my_yugothic")
  '((
-    (unicode (font-spec :family "源ノ角ゴシック Code JP R" :weight 'normal :slant 'normal :size 12))
+    (unicode (font-spec :family "源ノ角ゴシック Code JP R" :weight 'normal :slant 'normal :size 25))
     )
    "my_sourcehancode")
  )
@@ -64,17 +64,13 @@
       ))))
 
 (listify-global-set-keys
- '("<M-kanji>" ignore)             ; IME切り替え時に undefined のエラーメッセージが表示されるのを抑制
+ '("M-<kanji>" ignore)             ; IME切り替え時に undefined のエラーメッセージが表示されるのを抑制
  '("<kanji>" toggle-input-method)
  )
 
 ;; フックの設定
-(listify-set
+(listify-set-hooks
  '(shell-mode-hook (set-buffer-process-coding-system-cp932))
- ;; '(w32-ime-on-hook (ime-cursor-set-color))
- ;; '(w32-ime-off-hook (ime-cursor-unset-color))
  )
-
-(cd "~")
 
 (provide 'init-w32)
