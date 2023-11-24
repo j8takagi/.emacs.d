@@ -65,6 +65,8 @@
  'exopen                           ; 外部プログラムでファイルを開く
  'file-name-history-add            ; dired-modeで開いたファイルをfile-name-historyに追加
  'fill-region-with-n               ; 1行あたりの文字数を指定してfill-region
+ 'fontset-set                      ; フォントセットの設定
+ 'fontsize-set                     ; フォントサイズの設定関数
  'japanese-plus                    ; 全角半角変換
  'jaword                           ; 日本語の単語をきちんと扱う
  'list-fontfamilies-display        ; フォントファミリー一覧作成コマンド

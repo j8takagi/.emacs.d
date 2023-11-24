@@ -8,6 +8,7 @@
  'fontset-set
  'dictionary_app
  'quicklook
+ 'window-control
  )
 
 ;; Mac OS Xのpath_helperでPATHを取得し、あらためてPATHとして設定
@@ -38,8 +39,8 @@
     (
      (width 180)
      (height 56)
-     (top 25)
-     (left 0)
+     (top ,(wctl-monitor-workarea-top))
+     (left ,(wctl-monitor-workarea-left))
      (font
       ,(fontset-set
         '(
@@ -112,7 +113,7 @@
    "my_alternative")
  )
 
-(set-face-fontset 'italic (fontset-set-alias2spec "my_italic"))
+(fontset-set-face 'italic (fontset-set-alias2spec "my_italic"))
 
 ;; view-modeの設定
 (with-eval-after-load 'set-view-mode
