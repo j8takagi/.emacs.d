@@ -22,29 +22,31 @@
   :type 'string
   :group 'display)
 
-(defun set-face-fontset (face fontset &optional frame)
+(defun fontset-set-face (face fontset &optional frame)
   (unless frame
     (setq frame (selected-frame)))
   (set-face-attribute face frame :font fontset :fontset fontset))
 
-(defun buffer-fontset-set (fontset)
+(defun fontset-set-buffer (fontset)
   "Set buffer font and fontset to FONTSET."
   (interactive
    (let ((completion-ignore-case t))
      (list
       (completing-read
-       "Fontset name: " (fontset-list) nil t nil 'fontset-history))))
-  (set-face-fontset (make-local-variable 'buffer-fontset-face) fontset)
+       "Fontset name: " (fontset-list) nil t nil 'fontset-set-history))))
+  (fontset-set-face (make-local-variable 'buffer-fontset-face) fontset)
   (buffer-face-set 'buffer-fontset-face))
 
-(defun frame-fontset-set (fontset)
+(defun fontset-set-frame (fontset)
   "Set frame font to FONTSET."
   (interactive
-   (let ((completion-ignore-case t))
-     (list
-      (completing-read
-       "Fontset name: " (fontset-list) nil t nil 'fontset-history))))
-  (set-face-fontset 'default fontset))
+    (let ((completion-ignore-case t))
+      (list
+       (completing-read
+        "Fontset name: " (fontset-list) nil t nil 'fontset-set-history))))
+  (let ((wp (frame-pixel-width)) (hp (frame-pixel-height)))
+    (fontset-set-face 'default fontset)
+    (set-frame-size nil wp hp 1)))
 
 (defun fontset-set-font-spec (fontset charset fontspec)
   "Use FONTSPEC for character set CHARSET."
@@ -110,6 +112,5 @@ It returns a name of the created fontset."
             (append fontsets
                     (list (fontset-set (car fs) (cadr fs))))))
     fontsets))
-
 (provide 'fontset-set)
 ;;; fontset-set.el ends here
