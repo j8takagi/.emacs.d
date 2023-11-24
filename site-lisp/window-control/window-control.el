@@ -47,26 +47,33 @@
   :prefix "wctl-"
   :version "25.2"
   :group 'windows
+  :group 'frame
   :group 'convenience
   )
 
 
-(defcustom wctl-system-display-width 1440
-  "Width pixel unit of system display."
-  :type 'natnum
-  )
+(defun wctl-monitor-workarea ()
+  (cdr (assoc 'workarea (car (display-monitor-attributes-list))))
+    )
 
-(defcustom wctl-system-display-height 672
-  "Height pixel unit of system display."
-  :type 'natnum
-  )
+(defun wctl-monitor-workarea-left ()
+  (nth 0 (wctl-monitor-workarea)))
 
-(defcustom wctl-frame-shift-right-size 20
+(defun wctl-monitor-workarea-top ()
+  (nth 1 (wctl-monitor-workarea)))
+
+(defun wctl-monitor-workarea-right ()
+  (nth 2 (wctl-monitor-workarea)))
+
+(defun wctl-monitor-workarea-bottom ()
+  (nth 3 (wctl-monitor-workarea)))
+
+(defcustom wctl-frame-shift-right-size (/ (display-pixel-width) 72)
   "Shift right pixel unit size when new frame opens."
   :type 'natnum
   )
 
-(defcustom wctl-frame-shift-down-size 20
+(defcustom wctl-frame-shift-down-size (/ (display-pixel-height) 72)
   "Shift down pixel unit size when new frame opens."
   :type 'natnum
   )
@@ -271,24 +278,27 @@
     fontsize))
 
 (defun wctl-frame-shift-rightdown (&optional frame)
-  (let
+  (let*
       (
-       (leftcell (assoc 'left default-frame-alist))
-       (topcell (assoc 'top default-frame-alist))
-       (awidth (cdr (assoc 'width default-frame-alist)))
-       (aheight (cdr (assoc 'height default-frame-alist)))
-       (afontsize (wctl-frame-fontsize))
+       (aframe-alist (copy-alist default-frame-alist))
+       (leftcell (assoc 'left aframe-alist))
+       (topcell (assoc 'top aframe-alist))
+       (awidth (cdr (assoc 'width aframe-alist)))
+       (aheight (cdr (assoc 'height aframe-alist)))
+       (afontwidth (frame-char-width))
+       (afontheight (frame-char-height))
        (newleft 0) (newtop 0)
        )
     (when frame (ignore))
     (when (and leftcell awidth)
       (setq newleft (+ (cdr leftcell) wctl-frame-shift-right-size))
-      (when (<= (+ newleft (* 0.5 afontsize awidth)) wctl-system-display-width)
+      (when (<= (+ newleft (* afontwidth awidth)) (wctl-monitor-workarea-right))
         (setcdr leftcell newleft)))
     (when (and topcell aheight)
       (setq newtop (+ (cdr topcell) wctl-frame-shift-down-size))
-      (when  (<= (+ newtop (* afontsize aheight)) wctl-system-display-height)
+      (when  (<= (+ newtop (* afontheight aheight)) (wctl-monitor-workarea-bottom))
         (setcdr topcell newtop)))
+    (setq default-frame-alist aframe-alist)
     `(,newleft ,newtop)))
 
 (defun wctl-frame-shift-leftup (&optional frame)
@@ -301,11 +311,11 @@
     (when frame (ignore))
     (when leftcell
       (setq newleft (- (cdr leftcell) wctl-frame-shift-right-size))
-      (when (>= newleft 0)
+      (when (>= newleft (wctl-monitor-workarea-left))
         (setcdr leftcell newleft))
     (when topcell
       (setq newtop (- (cdr topcell) wctl-frame-shift-down-size))
-      (when (>= newtop 0)
+      (when (>= newtop (wctl-monitor-workarea-top))
         (setcdr topcell newtop)))
     `(,newleft ,newtop))))
 
