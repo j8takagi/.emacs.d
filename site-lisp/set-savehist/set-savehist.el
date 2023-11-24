@@ -18,7 +18,7 @@ load-history and :prompt-history to savehist-additional-variables
 so that variabels are saved to `savehist-file'."
     (let ((addval nil) (histvars nil) (inhibit-message 1) (loadmsg nil))
       (setq histvars
-            (apropos-internal "-\\(\\(history\\)\\|\\(ring\\)\\)$" 'boundp))
+            (apropos-internal "-\\(\\(history\\)\\|\\(ring\\)\\)\\'" 'boundp))
       (mapc
        (lambda (elt)
          (setq histvars
