@@ -1,6 +1,6 @@
-;;; xlfd-at.el --- 
+;;; xlfd-at.el -*- lexical-binding: t -*-
 
-;; Copyright (C) 2017 by Kazubito Takagi
+;; Copyright (C) 2017, 2023 by Kazubito Takagi
 
 ;; Authors: Kazubito Takagi
 ;; Keywords: 

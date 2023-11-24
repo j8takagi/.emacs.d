@@ -1,6 +1,6 @@
-;;; list-fontfamilies-display.el ---
+;;; list-fontfamilies-display.el -*- lexical-binding: t -*-
 
-;; Copyright (C) 2017 by Kazubito Takagi
+;; Copyright (C) 2017, 2023 by Kazubito Takagi
 
 ;; Authors: Kazubito Takagi
 ;; Keywords:
@@ -9,11 +9,17 @@
 
 
 ;;; Code:
+(defgroup list-fontfamilies nil
+  "List font famlies."
+  :group 'faces
+  :prefix "list-fontfamilies-"
+  )
+
 (defcustom list-fontfamilies-sample-text
   "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789 !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
   "Text string to display as the sample text for `list-fontfamilies-display'."
+  :group 'list-fontfamilies
   :type 'string
-  :group 'display
   )
 
 (defun list-fontfamilies-display (&optional regexp)
@@ -46,13 +52,13 @@ argument, prompt for a regular expression using `read-regexp'."
         (setq truncate-lines t)
         (dolist (afontfamily fontfamilies)
           (insert (propertize (format line-format afontfamily) 'face (list :overline t)))
-          (let ((apos (point)) (abeg (line-beginning-position)))
+          (let ((apos (point)))
             (insert (propertize list-fontfamilies-sample-text 'face (list :family afontfamily)))
             (insert "\n")
-            (list-fontfamilies-line-up apos abeg max-length)))
+            (list-fontfamilies-line-up apos max-length)))
         (goto-char (point-min))))))
 
-(defun list-fontfamilies-line-up (pos line-begin max-length)
+(defun list-fontfamilies-line-up (pos max-length)
   "If the sample text has multiple lines, line up all of them."
   (goto-char pos)
   (forward-line 1)

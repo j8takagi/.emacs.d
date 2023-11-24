@@ -1,6 +1,6 @@
 ;;; fontset-set.el -*- lexical-binding: t -*-
 
-;; Copyright (C) 2017 by Kazubito Takagi
+;; Copyright (C) 2017, 2023 by Kazubito Takagi
 
 ;; Authors: Kazubito Takagi
 ;; Keywords: 
@@ -11,7 +11,7 @@
 ;;; Code:
 (require 'fontset)
 
-(defvar fontset-history nil
+(defvar fontset-set-history nil
   "History list for fontset.")
 
 (defvar fontfamily-history nil
@@ -99,7 +99,8 @@ Each FONTSET-SPEC has the form:
 
 CHARSET-FONT-ALIST is association list of:
 
-(TARGET . FONTSPEC).
+(TARGET . FONTSPEC)
+
 FONTSET-BASENAME is a string.
 
 If CHARSET-FONT-ALIST is nil,

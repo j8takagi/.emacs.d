@@ -1,6 +1,6 @@
-;;; list-fonts-display.el ---
+;;; list-fonts-display.el -*- lexical-binding: t -*-
 
-;; Copyright (C) 2017 by Kazubito Takagi
+;; Copyright (C) 2017, 2023 by Kazubito Takagi
 
 ;; Authors: Kazubito Takagi
 ;; Keywords:
@@ -69,7 +69,7 @@ KEY must be a valid font property name listed below:
   (let (aalist afonts)
     (dolist (afontfamily (delete-dups (sort (font-family-list) #'string-lessp)))
       (when (or (zerop (length regexp)) (string-match-p regexp afontfamily))
-        (condition-case aerr
+        (condition-case nil
             (setq afonts
                   (x-list-fonts
                    (font-xlfd-name
@@ -84,9 +84,7 @@ KEY must be a valid font property name listed below:
   "List fonts in FONTLIST, using the same sample text in each.
 The sample text is a string that comes from the variable
 `list-fonts-sample-text'."
-  (let
-      ((max-length 0) (abuf "*Fonts*")
-       afontfamily aface line-format)
+  (let ((max-length 0) (abuf "*Fonts*") aface line-format)
     (dolist (afont fontslist)
       (setq max-length (max (length afont) max-length)))
     (setq max-length (1+ max-length)
@@ -98,15 +96,15 @@ The sample text is a string that comes from the variable
       (dolist (afont fontslist)
         (insert (propertize (format line-format afont) 'face (list :overline t)))
         (setq aface (make-local-variable (intern (concat "list-fonts-" afont "-face"))))
-        (condition-case aerr
+        (condition-case nil
             (set-face-attribute aface (selected-frame) :font afont)
           (error
            (set-face-attribute aface (selected-frame)
                                :foreground
                                (face-attribute 'default ':background))))
-        (let ((apos (point)) (abeg (line-beginning-position)))
+        (let ((apos (point)))
           (insert (propertize list-fonts-sample-text 'face aface) "\n")
-          (list-fontfamilies-line-up apos abeg max-length)))
+          (list-fontfamilies-line-up apos max-length)))
       (goto-char (point-min)))))
 
 (provide 'list-fonts-display)
