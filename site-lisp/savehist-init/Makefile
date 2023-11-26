@@ -1,4 +1,4 @@
-TARGET := set-savehist
+TARGET := savehist-init
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

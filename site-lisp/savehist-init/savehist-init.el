@@ -1,4 +1,4 @@
-;;; set-savehist.el --- -*- lexical-binding: t -*-
+;;; savehist-init.el --- -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2023 by Kazubito Takagi
 
@@ -11,7 +11,7 @@
 ;;; Code:
 (require 'savehist)
 
-(defun set-savehist-additional-variables (&optional file)
+(defun savehist-init-additional-variables (&optional file)
     "Set all history or ring variables,
 except variables in `desktop-globals-to-save',
 load-history and :prompt-history to savehist-additional-variables
@@ -36,8 +36,8 @@ so that variabels are saved to `savehist-file'."
        histvars)
       (when addval
         (if file
-          (setq loadmsg (format "After loading `%s', set in set-savehist; " file))
-        (setq loadmsg "Set in set-savehist; "))
+          (setq loadmsg (format "After loading `%s', set in savehist-init; " file))
+        (setq loadmsg "Set in savehist-init; "))
         (message (concat loadmsg (format "List variable savehist-additional-variables value is added: %s." addval)))
         (custom-set-variables
          `(
@@ -49,12 +49,12 @@ so that variabels are saved to `savehist-file'."
 
 (mapc
  (lambda (ahook)
-   (unless (memq 'set-savehist-additional-variables (eval ahook))
-     (add-hook ahook 'set-savehist-additional-variables)))
+   (unless (memq 'savehist-init-additional-variables (eval ahook))
+     (add-hook ahook 'savehist-init-additional-variables)))
  '(
    after-init-hook
    after-load-functions
    ))
 
-(provide 'set-savehist)
-;;; set-savehist.el ends here
+(provide 'savehist-init)
+;;; savehist-init.el ends here
