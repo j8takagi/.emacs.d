@@ -21,6 +21,8 @@
 
 (defvar vc-plus-revision-buffer nil)
 
+(defvar vc-plus-revision-history nil)
+
 (defvar vc-plus-window-configuration nil)
 
 (defun vc-plus-save-window-configuration ()
@@ -67,6 +69,13 @@ If rev is omitted or nil, compare latest and current."
           (add-hook 'ediff-quit-hook afunc)
           (ediff-buffers-internal arevbuf currbuf nil nil 'vc-plus-ediff))))))
 
+(defun vc-plus-get-git-revisions (file)
+  "Get a list of Git revisions for the specified FILE."
+  (let* ((default-directory (file-name-directory file))
+         (git-log-output (shell-command-to-string (format "git log --pretty=format:'%%h' %s" file)))
+         (git-revisions (split-string git-log-output)))
+    git-revisions))
+
 ;;;###autoload
 (defun vc-plus-find-file-revision (&optional file revision)
   "find-file FILE REVISION.
@@ -83,10 +92,10 @@ Or, input FILE as 'FILE.~REVISON~' and FILE and REVISION is specified."
     (error (format "%s is not under version control." file)))
   (unless (stringp revision)
     (setq revision
-          (vc-read-revision
+          (completing-read
            (format
             "Revision (default %s's working revision): " (file-name-nondirectory file))
-           (list file))))
+           (vc-plus-get-git-revisions file) nil t nil vc-plus-revision-history "HEAD")))
   (when (string= revision "")
     (setq revision nil))
   (set-buffer (find-file-noselect file))
