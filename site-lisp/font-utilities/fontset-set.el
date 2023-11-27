@@ -91,7 +91,7 @@ It returns a name of the created fontset."
    (fontset-set-create-fontset basename)
    charset-font-alist))
 
-(defun fontsets-set (&rest fontset-spec)
+(defun fontset-sets (&rest fontset-spec)
   "Create fontset using FONTSET-SPEC.
 Each FONTSET-SPEC has the form:
 

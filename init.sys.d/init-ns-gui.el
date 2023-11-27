@@ -5,10 +5,8 @@
 (require 'listify)
 
 (listify-requires
- 'fontset-set
  'dictionary_app
  'quicklook
- 'window-control
  )
 
 ;; Mac OS Xのpath_helperでPATHを取得し、あらためてPATHとして設定
@@ -39,8 +37,8 @@
     (
      (width 180)
      (height 56)
-     (top ,(wctl-monitor-workarea-top))
-     (left ,(wctl-monitor-workarea-left))
+     (top ,(frame-control-workarea-top))
+     (left ,(frame-control-workarea-left))
      (font
       ,(fontset-set
         '(
@@ -53,7 +51,7 @@
  '(ns-alternate-modifier none)
  )
 
-(fontsets-set
+(fontset-sets
  '((
     (ascii (font-spec :family "Menlo" :weight 'bold :slant 'normal :size 12))
     (unicode (font-spec :family "Hiragino Sans" :weight 'bold :slant 'normal))
