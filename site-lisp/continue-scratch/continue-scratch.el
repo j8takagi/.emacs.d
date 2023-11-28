@@ -31,7 +31,7 @@ return list of buffer string and point."
     )
   `(,continue-scratch-buffer-string ,continue-scratch-point))
 
-(defun continue-scratch-load()
+(defun continue-scratch-load ()
   "Load buffer string and point to *Scratch* buffer
 from variable `continue-scratch-buffer-string' and
 `continue-scratch-point'."
