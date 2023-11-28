@@ -36,19 +36,15 @@
 
 
 ;; マイナーモードの定義
+;;;###autoload
 (define-minor-mode auto-elc-mode
-"Toggle auto-elc-mode.
-With a prefix argument ARG, enable Auto elc mode if ARG
-is positive, and disable it otherwise.  If called from Lisp,
-enable the mode if ARG is omitted or nil.
-
-byte compile automatically emacs lisp buffer file after saving."
-
-:lighter: " elc"
+"Toggle automatic byte-compile when emacs lisp file is saved. (Auto elc mode)"
+:init-value nil
+:lighter " elc"
 
 ;;; ファイルをバイトコンパイルする
 (defun auto-elc-byte-compile-current-buffer ()
-  "byte compile current emacs lisp buffer when file is saved."
+  "Automatic byte-compile when emacs lisp file is saved."
   (interactive)
   (when (and auto-elc-mode (equal (file-name-extension (buffer-file-name)) "el"))
     (byte-compile-file buffer-file-name)))
