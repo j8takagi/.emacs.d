@@ -1,6 +1,6 @@
-;;; japanese-plus.el --- 
+;;; japanese-plus.el -*- lexical-binding: t -*-
 
-;; Copyright (C) 2016 by Kazubito Takagi
+;; Copyright (C) 2016, 2023 by Kazubito Takagi
 
 ;; Authors: Kazubito Takagi
 ;; Keywords: 
@@ -52,7 +52,7 @@
       (while (re-search-forward "\\ck" nil t)
         (let* ((hankaku (preceding-char))
                (composition (get-char-code-property hankaku 'kana-composition))
-               next slot)
+               slot)
           (if (and composition (setq slot (assq (following-char) composition)))
               (japanese-replace-region (match-beginning 0) (1+ (point))
                                        (cdr slot))
