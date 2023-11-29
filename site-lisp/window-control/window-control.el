@@ -42,6 +42,7 @@
 ;;
 ;; from: window-resizer - http://d.hatena.ne.jp/khiker/20100119/window_resize
 
+
 (defgroup window-control nil
   "Windows and frame control utilities."
   :prefix "window-control-"
@@ -51,6 +52,90 @@
   )
 
 (defvar window-control-resize-hook)
+
+;; 隣のウィンドウのバッファを削除する。
+;; 引数kill-buffer-only-pがnilの場合、ウィンドウも閉じる
+(defun window-control-other-kill-buffer (&optional delete-buffer-p)
+  "kill other window buffer.
+If KILL-BUFFER-ONLY-P is nil, delete the other window.
+Otherwise, the other window is not deleted."
+  (interactive "P")
+  (if (one-window-p)
+      (message "one window")
+    (let* ((win (next-window))
+           (buf (window-buffer win)))
+      (unless (eq (window-buffer) buf)
+        (kill-buffer buf))
+      (when delete-buffer-p
+        (delete-window win)))))
+
+;; 隣のウィンドウのバッファを削除し、ウィンドウを閉じ、
+;; 現在のバッファも削除
+(defun window-control-current-other-kill-buffer ()
+  "Kill current buffer and the buffer of other window.
+And, delete the other window."
+  (interactive)
+  (window-control-other-kill-buffer 1)
+  (kill-buffer (current-buffer)))
+
+(defun window-control-toggle-horizontal-vertical ()
+  "Toggle split horizontally or vertically between
+selected window and other window.
+If selected window and other window is splitted vertically,
+split them horizontally.
+If splitted horizontally, vice versa."
+  (interactive)
+  (let ((selected-edges (window-edges (selected-window)))
+        (other-edges (window-edges (next-window)))
+        (other-buf (window-buffer (next-window))))
+    (cond
+     ((one-window-p) (message "One window, cannot toggle split."))
+     ((and
+       (= (nth 0 selected-edges) (nth 0 other-edges))
+       (= (nth 2 selected-edges) (nth 2 other-edges)))
+      (delete-window (next-window))
+      (set-window-buffer (split-window-horizontally) other-buf))
+     ((and
+       (= (nth 1 selected-edges) (nth 1 other-edges))
+       (= (nth 3 selected-edges) (nth 3 other-edges)))
+      (delete-window (next-window))
+      (set-window-buffer (split-window-vertically) other-buf)))))
+
+;; 隣のウインドウとバッファを交換する
+(defun window-control-swap ()
+  "Swap buffers bettween selected window and other window."
+  (interactive)
+  (let ((other-buf (window-buffer (next-window))))
+    (set-window-buffer (next-window) (window-buffer (selected-window)))
+    (set-window-buffer (selected-window) other-buf)))
+
+;; 隣のウインドウを *scratch* バッファにする
+(defun window-control-other-scratch ()
+  "Open scratch buffer in next window."
+  (interactive)
+  (switch-to-buffer-other-window (get-buffer "*scratch*")))
+
+;; カレントディレクトリのシェルバッファを開く
+(defun window-control-other-shell ()
+  "Spilt the frame and switch the above window to
+shell of default directory in current buffer."
+  (interactive)
+  (let (abuf)
+    (save-window-excursion
+      (setq abuf (shell)))
+    (switch-to-buffer-other-window abuf)))
+
+;; 隣のウインドウを *Messages* バッファにする
+(defun window-control-other-message ()
+  "Open Message buffer in next window."
+  (interactive)
+  (switch-to-buffer-other-window (get-buffer "*Messages*")))
+
+;; 隣のウィンドウを終了する
+(defun window-control-other-quit ()
+  "Quit other buffer and bury its buffer."
+  (interactive)
+  (quit-window nil (next-window)))
 
 (defun window-control-resize ()
   "Resize window."

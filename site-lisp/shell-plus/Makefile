@@ -1,10 +1,10 @@
-TARGET := frame-control
-TARGETDIR := $(TARGET)
+TARGET := shell-plus
+TARGETDIR := shell-plus
 
 EMACS := /Applications/MacPorts/Emacs.app/Contents/MacOS/Emacs
-COMPILE.el := $(EMACS) -batch -l set-compile.el -f batch-byte-compile
+COMPILE.el := $(EMACS) -batch -f batch-byte-compile
 
-NATIVE-COMPILE.el := $(EMACS) -batch -l native-compile.el -l set-compile.el -f init-native-compile
+NATIVE-COMPILE.el := $(EMACS) -batch -l native-compile.el -f init-native-compile
 
 INSTALL := install -C -v
 
@@ -22,7 +22,8 @@ INSTALL-DIR := $(INSTALL-BASE)/$(TARGETDIR)/
 all: $(ELCFILES) native-compile
 
 install: $(INSTALL-DIR) all
-	$(INSTALL) $(ELFILES) $(ELCFILES) $(INSTALL-DIR)
+	$(foreach TGT,$(ELFILES),$(INSTALL) $(TGT) $(INSTALL-DIR)/$(TGT);)
+	$(foreach TGT,$(ELCFILES),$(INSTALL) $(TGT) $(INSTALL-DIR)/$(TGT);)
 
 $(INSTALL-DIR):
 	$(INSTALL) -d $(INSTALL-DIR)

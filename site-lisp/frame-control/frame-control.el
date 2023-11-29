@@ -29,7 +29,7 @@
 ;;
 ;; 2. Emacsの設定ファイル（~/.emacs.d/init.el など）に以下の行を追加する
 ;;
-;; (require 'frame-control)
+(require 'shell-plus)
 
 (defgroup frame-control nil
   "Frame control utilities."
@@ -39,9 +39,28 @@
   :group 'convenience
   )
 
+(defcustom frame-control-shift-right-size (/ (display-pixel-width) 72)
+  "Shift right pixel unit size when new frame opens."
+  :type 'natnum
+  )
+
+(defcustom frame-control-shift-down-size (/ (display-pixel-height) 72)
+  "Shift down pixel unit size when new frame opens."
+  :type 'natnum
+  )
+
+(defcustom frame-control-resize-hook nil
+  "Hooks to run in `frame-control-resize' after finishing frame resize."
+  :type 'hook
+  )
+
+(defcustom frame-control-move-hook nil
+  "Hooks to run in `frame-control-move' after finishing frame rmove."
+  :type 'hook
+  )
+
 (defun frame-control-workarea ()
-  (cdr (assoc 'workarea (frame-monitor-attributes)))
-    )
+  (cdr (assoc 'workarea (frame-monitor-attributes))))
 
 (defun frame-control-workarea-left ()
   (nth 0 (frame-control-workarea)))
@@ -54,27 +73,6 @@
 
 (defun frame-control-workarea-bottom ()
   (nth 3 (frame-control-workarea)))
-
-(defcustom frame-control-shift-right-size (/ (display-pixel-width) 72)
-  "Shift right pixel unit size when new frame opens."
-  :type 'natnum
-  )
-
-(defcustom frame-control-shift-down-size (/ (display-pixel-height) 72)
-  "Shift down pixel unit size when new frame opens."
-  :type 'natnum
-  )
-
-
-(defcustom frame-control-resize-hook nil
-  "Hooks to run in `frame-control-resize' after finishing frame resize."
-  :type 'hook
-  )
-
-(defcustom frame-control-move-hook nil
-  "Hooks to run in `frame-control-move' after finishing frame rmove."
-  :type 'hook
-  )
 
 (defun frame-control-resize ()
   "Resize frame"
@@ -269,6 +267,32 @@
       (when (>= newtop (frame-control-workarea-top))
         (setcdr topcell newtop)))
     `(,newleft ,newtop))))
+
+;; 新しいフレームを開き、*scratch*バッファにする
+(defun frame-control-open-scratch ()
+  "Open scratch buffer in new frame."
+  (interactive)
+  (let ((new-frame (make-frame-command)))
+    (select-frame-set-input-focus new-frame)
+    (switch-to-buffer (get-buffer "*scratch*"))))
+
+;; 新しいフレームに、カレントディレクトリのシェルバッファを開く
+(defun frame-control-open-shell ()
+  "Make a new frame, and switch the new frame window
+to shell of default directory in current buffer."
+  (interactive)
+  (let ((new-frame (make-frame-command)))
+    (select-frame-set-input-focus new-frame)
+    (shell)))
+
+;; 新しいフレームを開き、*Messages*バッファにする
+(defun frame-control-open-messages ()
+  "Open Message buffer in new frame."
+  (interactive)
+  (let ((new-frame (make-frame-command)))
+    (select-frame-set-input-focus new-frame)
+    (switch-to-buffer (get-buffer "*Messages*"))))
+
 
 (add-hook 'before-make-frame-hook 'frame-control-shift-rightdown)
 
