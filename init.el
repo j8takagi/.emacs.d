@@ -19,7 +19,9 @@
 ;;
 ;; パッケージ
 ;;
-(listify-requires 'listify-packages)
+(eval-and-compile
+  (listify-require 'listify-packages)
+)
 
 ;; パッケージアーカイブの指定
 (listify-packages-add-archives
@@ -368,13 +370,9 @@
 ;;
 ;; Shell-mode
 ;;
-(eval-when-compile (listify-requires 'shell))
 (with-eval-after-load 'shell
   (listify-custom-initialize-hooks
    'comint-password-function
-   )
-  (listify-requires
-   'no-process-query-on-exit
    )
   (listify-set-hooks
    '(shell-mode-hook (ansi-color-for-comint-mode-on))
@@ -508,7 +506,6 @@
 ;;
 ;; mpv-ts-mode
 ;;
-(eval-when-compile (listify-requires 'mpv-ts-mode))
 (with-eval-after-load 'mpv-ts-mode
   (listify-set
    '(auto-insert-alist ((mpv-ts-mode "template.ts")) 1 (mpv-ts-mode))))
@@ -578,6 +575,7 @@
  '("C-' l" windmove-right)
  '("C-," scroll-up-one-line)
  '("C-." scroll-down-one-line)
+ '("C-=" toggle-skeleton-pair)
  '("C-M-g" keyboard-escape-quit)
  '("C-`" expand-abbrev)
  '("C-c +" make-directory)
