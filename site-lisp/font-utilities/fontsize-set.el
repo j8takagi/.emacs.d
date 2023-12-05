@@ -32,7 +32,7 @@
   (interactive
    (list (read-number
           (format "Font size (now: %d): " (fontsize-set-get-font-pixels))
-          nil fontsize-set-history)))
+          nil 'fontsize-set-history)))
   (let (oldxlfd newxlfd oldsize)
     (setq
      oldxlfd (frame-parameter nil 'font)
