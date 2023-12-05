@@ -59,8 +59,8 @@
  'autoinsert
  'ediff
  'server
+ 'url-util
  ;; ~/.emacs.d/site-lisp
- 'buffer-window-plus               ; バッファとウィンドウの操作関数
  'count-japanese                   ; 日本語の文字数をカウント
  'continue-scratch                 ; *scratch*の永続化
  'daily-log                        ; 毎日のログ
@@ -69,6 +69,7 @@
  'fill-region-with-n               ; 1行あたりの文字数を指定してfill-region
  'fontset-set                      ; フォントセットの設定
  'fontsize-set                     ; フォントサイズの設定関数
+ 'frame-control                    ; フレームの制御
  'japanese-plus                    ; 全角半角変換
  'jaword                           ; 日本語の単語をきちんと扱う
  'list-fontfamilies-display        ; フォントファミリー一覧作成コマンド
@@ -76,16 +77,17 @@
  'not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
  'scroll-one-line                  ; 1行スクロール
  'replace-plus                     ; 置換の追加機能
- 'set-savehist                     ; 履歴を保存するsavehist-modeの設定
+ 'savehist-init                    ; 履歴を保存するsavehist-modeの設定
  'set-view-mode                    ; read-onlyファイルをview-modeで開く
  'set-whitespace                   ; whitespace-modeの設定
+ 'shell-plus                       ; シェルの追加機能
  'symbol-properties                ; シンボルのプロパティ名リスト取得
  'temp-buffer                      ; 一時バッファの作成
  'toggle-skeleton-pair             ; skeleton-pairのトグル
  'url-util-plus                    ; URLに関するユーティリティ
  'vc-plus                          ; vcの追加関数
  'view-mode-vi-bindings            ; view-modeでviのキーバインド
- 'window-control                   ; ウィンドウとフレームのサイズを調整
+ 'window-control                   ; ウィンドウの制御
  'xlfd-at                          ; フォント情報の表示
  ;; ~/.emacs.d/insert
  'skeleton-file-name               ; skeletonにより、プロンプトで補完入力したファイル名を挿入
@@ -129,6 +131,7 @@
  '(jaword-mode 1)                     ; 日本語の単語をきちんと扱う
  '(menu-bar-mode -1)                  ; メニューバーを表示しない
  '(savehist-mode 1)                   ; 履歴を永続的に保存
+; '(shell-plus-ssh-track-mode 1)       ; shellでSSH接続時にdefault-directoryを自動設定
  '(tool-bar-mode -1)                  ; ツールバーを表示しない
 )
 
@@ -151,7 +154,7 @@
  '(delete-by-moving-to-trash t)         ; ファイルの削除で、ゴミ箱を使う
  '(delete-old-versions t)               ; 古いバックアップファイルを自動的に削除する
  '(desktop-files-not-to-save "\\(\\`/[^/:]*:\\|(ftp)\\'\\)\\|\\(~[0-9a-f]+~\\'\\)")
- '(desktop-locals-to-save (buffer-undo-list compile-history)) ;undo-listをdesktopで保存
+ '(desktop-locals-to-save (buffer-undo-list compile-history grep-history)) ;ローカル変数としてdesktopで保存
  '(dired-always-read-filesystem t)      ; ディレクトリ変更を検索前に反映
  '(dired-auto-revert-buffer t)          ; ディレクトリ変更を反映
  '(dired-kill-when-opening-new-dired-buffer t) ; 別のディレクトリを表示した時、バッファを削除
@@ -161,7 +164,7 @@
  '(eval-expression-print-length nil)    ; evalした結果を全部表示する
  '(history-delete-duplicates t)         ; 重複する履歴は削除
  '(history-length t)                    ; 履歴の数を無制限に
- '(indent-line-function indent-to-left-margin) ; インデント用のファンクション
+ '(indent-line-function indent-to-left-margin) ; インデント用の関数
  '(indent-tabs-mode nil)                ; インデントにタブを使わない
  '(inhibit-startup-screen t)            ; 起動時の画面を表示しない
  '(initial-scratch-message nil)         ; *scratch* にメッセージを表示しない
@@ -203,7 +206,6 @@
        ))))
 
 ;; C言語ソースの場所
-(eval-when-compile (listify-requires 'find-func))
 (with-eval-after-load 'find-func
   (listify-set-standard-values
    'find-function-C-source-directory
@@ -212,19 +214,16 @@
    `(find-function-C-source-directory
      ,(expand-file-name
        (concat "~/src/emacs-" emacs-version "/src/")))
-   )
-  )
+   ))
 
 
 ;; Infoの設定
-(eval-when-compile (listify-requires 'info))
 (with-eval-after-load 'info
   (listify-set
    '(Info-additional-directory-list ("~/share/info/ja" "~/share/info" )) ; Infoファイルの場所
    ))
 
 ;; skeletonの設定
-(eval-when-compile (listify-requires 'skeleton))
 (with-eval-after-load 'skeleton
   (listify-set
    '(skeleton-end-newline nil)      ; skeletonの挿入後、改行しない
@@ -243,13 +242,13 @@
   (view-mode 1))
 
 ;; uniquify
-(eval-when-compile (listify-requires 'uniquify))
 (with-eval-after-load 'uniquify
   (listify-set
    '(uniquify-ignore-buffers-re "*[^*]+*")))
 
 ;; emacsclient
-(eval-when-compile (listify-requires 'server))
+(when noninteractive
+  (eval-and-compile (require 'server)))
 (with-eval-after-load 'server
   (listify-custom-initialize-hook
    'server-after-make-frame-hook
@@ -261,27 +260,25 @@
    ))
 
 ;; compile
-(eval-when-compile (listify-requires 'compile))
 (with-eval-after-load 'compile
   (listify-set
    '(compilation-scroll-output first-error) ; *compilation*バッファをスクロールして表示
    ))
 
 ;; ChangeLog
-(eval-when-compile (listify-requires 'add-log))
 (with-eval-after-load 'add-log
   (listify-set
    '(change-log-default-name "~/ChangeLog")
    ))
 
-(eval-when-compile (listify-requires 'vc-hooks))
 (with-eval-after-load 'vc-hooks
   (listify-set
    '(vc-follow-symlinks nil)            ; vc-follow-linkを無効にする 参考: https://abicky.net/2014/06/07/175130/
    ))
 
 ;; whitespace
-(eval-when-compile (listify-requires 'set-whitespace))
+(when noninteractive
+  (eval-and-compile (require 'set-whitespace)))
 (with-eval-after-load 'set-whitespace
   ; タブ	、全角スペース　、行末の空白  
   (when (set-whitespace-tabs-spaces-trailing)
@@ -301,7 +298,6 @@
 ;;
 ;; Ediff
 ;;
-(eval-when-compile (listify-requires 'ediff))
 (with-eval-after-load 'ediff
   (listify-set
    '(ediff-window-setup-function ediff-setup-windows-plain)
@@ -311,7 +307,6 @@
 ;;
 ;; dired
 ;;
-(eval-when-compile (listify-requires 'dired))
 (with-eval-after-load 'dired
   (listify-requires
    'dired-aux                           ; diredの拡張機能
@@ -334,13 +329,11 @@
    )
   )
 
-(eval-when-compile (listify-requires 'dired-aux))
 (with-eval-after-load 'dired-aux
   (listify-set
    '(dired-do-revert-buffer t)          ; dired-do操作のあと、diredバッファを更新
    ))
 
-(eval-when-compile (listify-requires 'find-dired))
 (with-eval-after-load 'find-dired
   (listify-set
    '(find-ls-option ("-exec ls -ldh {} +" . "-alh"))
@@ -349,12 +342,12 @@
 ;;
 ;; lisp-mode
 ;;
-(eval-when-compile (listify-requires 'lisp-mode))
 (with-eval-after-load 'lisp-mode
-  (listify-requires
-   'emacs-lisp-skeletons
-   'auto-elc-mode                    ; .elファイルの自動コンパイル
-   )
+  (eval-and-compile
+    (listify-requires
+     'emacs-lisp-skeletons
+     'auto-elc-mode                    ; .elファイルの自動コンパイル
+     ))
   (defun init-lisp-indent-line ()
     (set-variable 'indent-line-function 'lisp-indent-line)) ; インデントの設定
   (defun init-turn-on-auto-elc ()
@@ -382,7 +375,6 @@
 ;;
 ;; asm-mode
 ;;
-(eval-when-compile (listify-requires 'asm-mode))
 (with-eval-after-load 'asm-mode
   (defun init-set-tab-width-8 ()
     (interactive)
@@ -394,7 +386,6 @@
 ;;
 ;; CC-Mode
 ;;
-(eval-when-compile (listify-requires 'cc-mode))
 (with-eval-after-load 'cc-mode
   (listify-requires
    'c-skeletons
@@ -411,7 +402,6 @@
 ;;
 ;; tex-mode
 ;;
-(eval-when-compile (listify-requires 'tex-mode))
 (with-eval-after-load 'tex-mode
   (listify-requires
    'latex-skeletons
@@ -427,7 +417,6 @@
 ;;
 ;; web-mode
 ;;
-(eval-when-compile (listify-requires 'web-mode))
 (with-eval-after-load 'web-mode
   (listify-requires
    'web-skeletons
@@ -451,7 +440,6 @@
 ;;
 ;; nxml-mode
 ;;
-(eval-when-compile (listify-requires 'nxml-mode))
 (with-eval-after-load 'nxml-mode
   (listify-set
    '(nxml-child-indent 0)
@@ -461,7 +449,6 @@
 ;;
 ;; ess-site > R
 ;;
-(eval-when-compile (listify-requires 'ess-custom))
 (with-eval-after-load 'ess-custom
   (listify-set
    '(ess-ask-for-ess-directory nil)
@@ -470,7 +457,6 @@
 ;;
 ;; bison-mode
 ;;
-(eval-when-compile (listify-requires 'bison-mode))
 (with-eval-after-load 'bison-mode
   (listify-set
    '(bison-decl-token-column 0)
@@ -480,7 +466,6 @@
 ;;
 ;; graphviz-dot-mode
 ;;
-(eval-when-compile (listify-requires 'graphviz-dot-mode))
 (with-eval-after-load 'graphviz-dot-mode
   (defun init-unset-compile-command ()
     (kill-local-variable 'compile-command))
@@ -497,7 +482,6 @@
   )
 
 ;; markdown-mode
-(eval-when-compile (listify-requires 'markdown-mode))
 (with-eval-after-load 'markdown-mode
   (listify-set
    '(markdown-command "pandoc -s --self-contained -t html5 -c ~/.pandoc/github.css") ;markdownからHTML作成
@@ -562,13 +546,6 @@
 
 ;; global-key
 (listify-global-set-keys
- '("M-<down>" windmove-down)
- '("M-<f9>" gnuplot-make-buffer)
- '("M-<left>" windmove-left)
- '("M-<return>" expand-abbrev)
- '("M-<right>" windmove-right)
- '("M-<up>" windmove-up)
- '("C-=" toggle-skeleton-pair)
  '("C-' h" windmove-left)
  '("C-' j" windmove-down)
  '("C-' k" windmove-up)
@@ -577,6 +554,10 @@
  '("C-." scroll-down-one-line)
  '("C-=" toggle-skeleton-pair)
  '("C-M-g" keyboard-escape-quit)
+ '("C-\\" (keymap))
+ '("C-\\ f" frame-control-resize)
+ '("C-\\ m" frame-control-move)
+ '("C-\\ w" window-control-resize)
  '("C-`" expand-abbrev)
  '("C-c +" make-directory)
  '("C-c 1" daily-log-open)
@@ -592,32 +573,37 @@
  '("C-h TAB" info-lookup-symbol)
  '("C-j" newline)
  '("C-x '" just-one-space)
- '("C-x 4 C-k" delete-kill-next-window-buffer)
- '("C-x 4 C-s" scratch-other-window)
- '("C-x 4 K" delete-kill-next-window-buffer)
- '("C-x 4 k" kill-next-window-buffer)
- '("C-x 4 m" message-other-window)
- '("C-x 4 q" quit-next-window)
- '("C-x 4 s" split-shell-current-directory)
- '("C-x 4 |" toggle-split-next-window)
- '("C-x 4 ~" swap-buffer-next-window)
- '("C-x 5 -" wctl-iconify-other-frames)
- '("C-x 5 =" wctl-visible-all-frames)
- '("C-x 5 C-s" new-frame-scratch)
- '("C-x 5 m" new-frame-messages)
- '("C-x 5 s" new-frame-shell-current-directory)
+ '("C-x 4 C-s" window-control-other-shell)
+ '("C-x 4 K" window-control-current-other-kill-buffer)
+ '("C-x 4 k" window-control-other-kill-buffer)
+ '("C-x 4 m" window-control-other-message)
+ '("C-x 4 q" window-control-other-quit)
+ '("C-x 4 s" window-control-other-scratch)
+ '("C-x 4 |" window-control-toggle-horizontal-vertical)
+ '("C-x 4 ~" window-control-swap)
+ '("C-x 5 -" frame-control-iconify-other-frames)
+ '("C-x 5 =" frame-control-visible-all-frames)
+ '("C-x 5 C-s" frame-control-open-shell)
+ '("C-x 5 m" frame-control-open-messages)
+ '("C-x 5 s" frame-control-open-scratch)
  '("C-x C-M-b" electric-buffer-list)
  '("C-x C-M-f" exopen-find-file)
- '("C-x C-M-k" delete-kill-current-next-window-buffer)
+ '("C-x C-M-k" window-control-current-other-kill-buffer)
  '("C-x E" vc-plus-redisplay-current-frame)
  '("C-x K" kill-buffer-and-window)
  '("C-x RET u" ucs-normalize-NFC-buffer)
  '("C-x g" magit-status)
  '("C-x m" man)
  '("C-x q" bury-buffer)
+ '("C-x v -" vc-revision-other-window)
  '("C-x v e" vc-plus-ediff)
  '("C-x v f" vc-plus-find-file-revision)
- '("C-x v -" vc-revision-other-window)
+ '("M-<down>" windmove-down)
+ '("M-<f9>" gnuplot-make-buffer)
+ '("M-<left>" windmove-left)
+ '("M-<return>" expand-abbrev)
+ '("M-<right>" windmove-right)
+ '("M-<up>" windmove-up)
  '("M-?" help)
  '("M-[" backward-paragraph)
  '("M-]" forward-paragraph)
