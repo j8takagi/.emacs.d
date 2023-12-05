@@ -80,6 +80,7 @@
  'symbol-properties                ; シンボルのプロパティ名リスト取得
  'temp-buffer                      ; 一時バッファの作成
  'toggle-skeleton-pair             ; skeleton-pairのトグル
+ 'url-util-plus                    ; URLに関するユーティリティ
  'vc-plus                          ; vcの追加関数
  'view-mode-vi-bindings            ; view-modeでviのキーバインド
  'window-control                   ; ウィンドウとフレームのサイズを調整
