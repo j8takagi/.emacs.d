@@ -31,7 +31,7 @@
     (left 0)
     )))
 
-(fontsets-set
+(fontset-sets
  '((
     (unicode (font-spec :family "游明朝" :weight 'normal :slant 'normal :size 25))
     )
