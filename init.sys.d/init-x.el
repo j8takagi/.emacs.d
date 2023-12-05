@@ -1,4 +1,4 @@
-;; -*- mode: Emacs-Lisp; -*-
+;; -*- lexical-binding: t -*-
 ;;; X-Windowの設定
 
 (message "Start of loading %s." load-file-name)
@@ -6,11 +6,11 @@
 (require 'listify)
 
 (listify-requires
- 'exec-path-from-shell
  'fontset-set
+ 'set-view-mode
  )
 
-(exec-path-from-shell-initialize)
+;(exec-path-from-shell-initialize)
 
 ;; 標準のフォントサイズとフォントファミリーの設定
 (listify-set
