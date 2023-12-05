@@ -412,11 +412,10 @@ or the standard error stream in batch mode."
     (dolist (akeycmd key-cmd)
       (let ((akey (car akeycmd)) (acmd (cadr akeycmd)) (oldval nil))
         (setq oldval (keymap-lookup (current-global-map) akey))
-        (if (not (fboundp acmd))
+        (if (not (or (equal '(keymap) acmd) (fboundp acmd)))
             (listify-message "Warning: In setting keybind, command `%s' is void." acmd)
-          (if (equal oldval acmd)
+          (if (or (equal oldval acmd) (and (listp oldval) (listp acmd) (equal (car oldval) (car acmd))))
               (listify-message "Key `%s' command `%s' is not changed." akey oldval)
-            ;; (global-set-key (kbd akey) acmd)
             (keymap-global-set akey acmd)
             (listify-message "Key `%s' command `%s' is changed to `%s' by listify-global-set-keys"
                              akey oldval (keymap-lookup (current-global-map) akey))
