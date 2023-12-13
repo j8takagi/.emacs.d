@@ -16,10 +16,13 @@ TOUCH := touch
 all:
 	@($(foreach dir,$(SITELISPS),$(MAKE) -sC $(dir) all; ))
 
-install: .emacs.d/site-lisp all
+install: $(INSTALL-SITELISP) all
 	@($(foreach dir,$(SITELISPS),$(PRINTF) $(dir) && $(MAKE) -sC $(dir) install; ))
 
-.emacs.d/site-lisp:
+uninstall:
+	$(RM) -r $(INSTALL-SITELISP)
+
+$(INSTALL-SITELISP):
 	$(INSTALL) -d $@
 
 new:
