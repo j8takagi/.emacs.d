@@ -1,3 +1,4 @@
+-*- lexical-binding: t -*-
 (normal-top-level-add-subdirs-to-load-path)
 
 (require 'package)
@@ -10,15 +11,15 @@
    add-log
    asm-mode
    auto-elc-mode
-   bison-mode
+;   bison-mode
    cc-mode
    compile
    dired
    dired-aux
    ediff
-   ess-site
+;   ess-site
    find-dired
-   graphviz-dot-mode
+;   graphviz-dot-mode
    info
    lisp-mode
    listify
@@ -30,7 +31,7 @@
    shell
    skeleton
    tex-mode
-   undohist
+ ;  undohist
    uniquify
    vc-hooks
    view-mode-init
