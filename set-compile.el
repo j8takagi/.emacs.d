@@ -4,37 +4,39 @@
 (package-initialize)
 
 (add-to-list 'load-path default-directory)
-(require 'view)
-(require 'info)
-(require 'skeleton)
-(require 'uniquify)
-(require 'server)
-(require 'compile)
-(require 'add-log)
-(require 'vc-hooks)
-(require 'whitespace)
-(require 'ediff)
-(require 'dired)
-(require 'dired-aux)
-(require 'find-dired)
-(require 'lisp-mode)
-(require 'shell)
-(require 'asm-mode)
-(require 'cc-mode)
-(require 'tex-mode)
-(require 'web-mode)
-(require 'nxml-mode)
-(require 'ess-site)
-(require 'bison-mode)
-(require 'graphviz-dot-mode)
-(require 'markdown-mode)
-(require 'mpv-ts-mode)
-(require 'undohist)
-(require 'listify)
-(require 'listify-packages)
-(require 'auto-elc-mode)
-(require 'set-view-mode)
-(require 'set-whitespace)
+(mapcar
+ (lambda (pkg) (require pkg))
+ '(
+   add-log
+   asm-mode
+   auto-elc-mode
+   bison-mode
+   cc-mode
+   compile
+   dired
+   dired-aux
+   ediff
+   ess-site
+   find-dired
+   graphviz-dot-mode
+   info
+   lisp-mode
+   listify
+   listify-packages
+   markdown-mode
+   mpv-ts-mode
+   nxml-mode
+   server
+   shell
+   skeleton
+   tex-mode
+   undohist
+   uniquify
+   vc-hooks
+   view-mode-init
+   web-mode
+   whitespace-init
+   ))
 
 ;; Local Variables:
 ;; no-byte-compile: t

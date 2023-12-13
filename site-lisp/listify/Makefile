@@ -1,7 +1,7 @@
 TARGET := listify listify-packages
 TARGETDIR := listify
 
-EMACS := /Applications/MacPorts/Emacs.app/Contents/MacOS/Emacs
+EMACS := emacs
 COMPILE.el := $(EMACS) -batch -l set-compile.el -f batch-byte-compile
 
 NATIVE-COMPILE.el := $(EMACS) -batch -l native-compile.el -l set-compile.el -f init-native-compile

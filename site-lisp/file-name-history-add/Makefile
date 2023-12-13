@@ -1,7 +1,7 @@
 TARGET := file-name-history-add
 TARGETDIR := $(TARGET)
 
-EMACS := /Applications/MacPorts/Emacs.app/Contents/MacOS/Emacs
+EMACS := emacs
 COMPILE.el := $(EMACS) -batch -l set-compile.el -f batch-byte-compile
 
 NATIVE-COMPILE.el := $(EMACS) -batch -l native-compile.el -f init-native-compile

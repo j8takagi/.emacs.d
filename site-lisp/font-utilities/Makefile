@@ -1,7 +1,12 @@
 TARGET := fontset-set fontsize-set list-fonts-display list-fontfamilies-display xlfd-at
 TARGETDIR := font-utilities
 
-EMACS := /Applications/MacPorts/Emacs.app/Contents/MacOS/Emacs
+ifeq ($(shell uname -s),Darwin)
+    EMACS := /Applications/MacPorts/Emacs.app/Contents/MacOS/Emacs
+else
+    EMACS := emacs
+endif
+
 COMPILE.el := $(EMACS) -batch -l set-compile.el -f batch-byte-compile
 
 NATIVE-COMPILE.el := $(EMACS) -batch -l native-compile.el -l set-compile.el -f init-native-compile

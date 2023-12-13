@@ -464,13 +464,14 @@ Key bindings:
 (defun review-inline-region (pattern &optional _force start end)
   "選択領域を指定したインラインタグで囲みます。"
   (interactive "sタグ: \nP\nr")
-  (save-restriction
-    (narrow-to-region start end)
-    (goto-char (point-min))
-    (if (equal pattern "") (setq cmd "b") (setq cmd pattern)) ; default value
-    (insert "@<" cmd ">{")
-    (goto-char (point-max))
-    (insert "}")))
+  (let (cmd)
+    (save-restriction
+      (narrow-to-region start end)
+      (goto-char (point-min))
+      (if (equal pattern "") (setq cmd "b") (setq cmd pattern)) ; default value
+      (insert "@<" cmd ">{")
+      (goto-char (point-max))
+      (insert "}"))))
 
 ;; フォント付け
 (defun review-string-region (markb marke start end)
@@ -617,37 +618,37 @@ DTP担当へのメッセージ疑似マーカーを挿入します。"
   (insert (cdr (assoc key review-key-mapping))))
 
 (defun review-zenkaku-mapping-lparenthesis ()
-  (interactive) "全角(" (review-zenkaku-mapping "("))
+  "全角(" (interactive) (review-zenkaku-mapping "("))
 
 (defun review-zenkaku-mapping-rparenthesis ()
-  (interactive) "全角)" (review-zenkaku-mapping ")"))
+  "全角)" (interactive) (review-zenkaku-mapping ")"))
 
 (defun review-zenkaku-mapping-langle ()
-  (interactive) "全角[" (review-zenkaku-mapping "["))
+  "全角[" (interactive) (review-zenkaku-mapping "["))
 
 (defun review-zenkaku-mapping-rangle ()
-  (interactive) "全角[" (review-zenkaku-mapping "]"))
+  "全角[" (interactive) (review-zenkaku-mapping "]"))
 
 (defun review-zenkaku-mapping-minus ()
-  (interactive) "全角-" (review-zenkaku-mapping "-"))
+  "全角-" (interactive) (review-zenkaku-mapping "-"))
 
 (defun review-zenkaku-mapping-asterisk ()
-  (interactive) "全角*" (review-zenkaku-mapping "*"))
+  "全角*" (interactive) (review-zenkaku-mapping "*"))
 
 (defun review-zenkaku-mapping-slash ()
-  (interactive) "全角/" (review-zenkaku-mapping "/"))
+  "全角/" (interactive) (review-zenkaku-mapping "/"))
 
 (defun review-zenkaku-mapping-yen ()
-  (interactive) "全角￥" (review-zenkaku-mapping "\\"))
+  "全角￥" (interactive) (review-zenkaku-mapping "\\"))
 
 (defun review-zenkaku-mapping-space ()
-  (interactive) "全角 " (review-zenkaku-mapping " "))
+  "全角 " (interactive) (review-zenkaku-mapping " "))
 
 (defun review-zenkaku-mapping-colon ()
-  (interactive) "全角:" (review-zenkaku-mapping ":"))
+  "全角:" (interactive) (review-zenkaku-mapping ":"))
 
 (defun review-zenkaku-mapping-lbracket ()
-  (interactive) "<タグ" (review-zenkaku-mapping "<"))
+  "<タグ" (interactive) (review-zenkaku-mapping "<"))
 
 ;; 基本モードの変更
 (defun review-change-mode ()
@@ -661,8 +662,8 @@ DTP担当へのメッセージ疑似マーカーを挿入します。"
       (setq sum ( + sum 1))
       (if message
           (setq message (format "%s%d.%s " message sum element))
-	(setq message (format "%d.%s " sum element))
-	)
+    (setq message (format "%d.%s " sum element))
+    )
       (setq list (cdr list))
       )
     (message (concat "編集モード: " message ":"))
@@ -689,8 +690,8 @@ DTP担当を変更します。"
       (setq sum ( + sum 1))
       (if message
           (setq message (format "%s%d.%s " message sum element))
-	(setq message (format "%d.%s " sum element))
-	)
+    (setq message (format "%d.%s " sum element))
+    )
       (setq list (cdr list))
       )
     (message (concat "DTP担当: " message ":"))
@@ -727,7 +728,7 @@ DTP担当を変更します。"
       (setq review-index-buffer (buffer-substring-no-properties start end))
       (goto-char (point-min))
       (while (re-search-forward "\(\\|\)\\| " nil t)
-	(replace-match "" nil nil))
+    (replace-match "" nil nil))
       (goto-char (point-max))
       (insert "@" review-index-buffer))))
 
