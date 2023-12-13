@@ -1,4 +1,4 @@
-;;; amazon-url-simplify.el -*- lexical-binding: t -*-
+;;; url-util-plus.el -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2023 by Kazubito Takagi
 
@@ -28,5 +28,5 @@
   (kill-new (url-util-plus-amazon-url-simplify (car kill-ring)))
   (message "Simplified Amazon URL is pushed to kill-ring."))
 
-(provide 'amazon-url-simplify)
-;;; amazon-url-simplify.el ends here
+(provide 'url-util-plus)
+;;; url-util-plus.el ends here
