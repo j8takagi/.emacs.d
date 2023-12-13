@@ -278,20 +278,20 @@
 
 ;; whitespace
 (when noninteractive
-  (eval-and-compile (require 'set-whitespace)))
-(with-eval-after-load 'set-whitespace
+  (eval-and-compile (require 'whitespace-init)))
+(with-eval-after-load 'whitespace-init
   ; タブ	、全角スペース　、行末の空白  
-  (when (set-whitespace-tabs-spaces-trailing)
+  (when (whitespace-init-tabs-spaces-trailing)
     (listify-set-minor-modes '(whitespace-mode 1)))
   (listify-set
-   '(set-whitespace-disabled-major-mode-list
+   '(whitespace-init-disabled-major-mode-list
      (
      Custom-mode completion-list-mode help-mode
      magit-mode tetris-mode w3m-mode shell-mode
      )))
   (listify-set-hooks
-   '(view-mode-hook (set-whitespace-enable-mode))
-   '(after-change-major-mode-hook (set-whitespace-enable-mode))
+   '(view-mode-hook (whitespace-init-enable-mode))
+   '(after-change-major-mode-hook (whitespace-init-enable-mode))
    )
   )
 
