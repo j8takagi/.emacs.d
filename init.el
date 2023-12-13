@@ -78,8 +78,8 @@
  'scroll-one-line                  ; 1行スクロール
  'replace-plus                     ; 置換の追加機能
  'savehist-init                    ; 履歴を保存するsavehist-modeの設定
- 'set-view-mode                    ; read-onlyファイルをview-modeで開く
- 'set-whitespace                   ; whitespace-modeの設定
+ 'view-mode-init                   ; read-onlyファイルをview-modeで開く
+ 'whitespace-init                  ; whitespace-modeの設定
  'shell-plus                       ; シェルの追加機能
  'symbol-properties                ; シンボルのプロパティ名リスト取得
  'temp-buffer                      ; 一時バッファの作成

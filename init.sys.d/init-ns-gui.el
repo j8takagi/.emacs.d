@@ -114,9 +114,9 @@
 (fontset-set-face 'italic (fontset-set-alias2spec "my_italic"))
 
 ;; view-modeの設定
-(with-eval-after-load 'set-view-mode
+(with-eval-after-load 'view-mode-init
   (listify-set
-   '(set-view-mode-read-write-directory-patterns
+   '(view-mode-init-read-write-directory-patterns
      (
       "~/Documents"
       "~/.emacs.d/elpa" "/tmp" "/var"
