@@ -59,7 +59,6 @@
  'autoinsert
  'ediff
  'server
- 'url-util
  ;; ~/.emacs.d/site-lisp
  'count-japanese                   ; 日本語の文字数をカウント
  'continue-scratch                 ; *scratch*の永続化
@@ -123,16 +122,6 @@
 
 ; マイナーモード
 (listify-set-minor-modes
- '(blink-cursor-mode -1)              ; カーソルは点滅しない
- '(column-number-mode 1)              ; 列番号を表示
- '(desktop-save-mode 1)               ; 終了時の状態を永続的に保存
- '(electric-indent-mode -1)           ; 改行時の自動インデントを無効に
- '(global-auto-revert-mode 1)         ; すべてのバッファで、外部のファイル変更を反映
- '(jaword-mode 1)                     ; 日本語の単語をきちんと扱う
- '(menu-bar-mode -1)                  ; メニューバーを表示しない
- '(savehist-mode 1)                   ; 履歴を永続的に保存
-; '(shell-plus-ssh-track-mode 1)       ; shellでSSH接続時にdefault-directoryを自動設定
- '(tool-bar-mode -1)                  ; ツールバーを表示しない
 )
 
 ;; ローカル変数に
@@ -147,31 +136,41 @@
  `(auto-insert-directory ,(locate-user-emacs-file "insert")) ; auto-insertテンプレートディレクトリ
  '(auto-insert-query nil)               ; auto-insertでユーザーに尋ねない
  '(backup-directory-alist (("." "~/backup"))) ; バックアップディレクトリ
+ '(blink-cursor-mode nil)               ; カーソルは点滅しない
  '(case-replace nil)                    ; 置換時に大文字小文字を区別しない
+ '(column-number-mode t)                ; 列番号を表示
  '(completion-ignored-extensions (".bak" ".d" ".fls" ".log" ".dvi" ".xbb" ".out" ".prev" "_prev" ".idx" ".ind" ".ilg" ".tmp" ".synctex.gz" ".dplg" ".dslg" ".dSYM/" ".DS_Store" ":com.dropbox.attributes:$DATA")) ; ファイル名の補完入力の対象外にする拡張子。diredで淡色表示される
  `(custom-file ,(locate-user-emacs-file ".emacs-custom.el")) ; カスタムの設定値を書き込むファイル
  `(default-directory ,(expand-file-name "~")) ; カレントディレクトリ
  '(delete-by-moving-to-trash t)         ; ファイルの削除で、ゴミ箱を使う
  '(delete-old-versions t)               ; 古いバックアップファイルを自動的に削除する
  '(desktop-files-not-to-save "\\(\\`/[^/:]*:\\|(ftp)\\'\\)\\|\\(~[0-9a-f]+~\\'\\)")
- '(desktop-locals-to-save (buffer-undo-list compile-history grep-history)) ;ローカル変数としてdesktopで保存
+ '(desktop-locals-to-save (buffer-undo-list compile-history grep-history)) ; ローカル変数としてdesktopで保存
+ '(desktop-save-mode t) ; 終了時の状態を永続的に保存
  '(dired-always-read-filesystem t)      ; ディレクトリ変更を検索前に反映
  '(dired-auto-revert-buffer t)          ; ディレクトリ変更を反映
  '(dired-kill-when-opening-new-dired-buffer t) ; 別のディレクトリを表示した時、バッファを削除
  '(disabled-command-function nil)       ; すべてのコマンドの使用制限を解除する
  '(display-buffer-alist (("^\\*shell\\*$" (display-buffer-same-window)) ("^\\*?magit: .+" (display-buffer-same-window)))) ; バッファの表示方法
+ '(electric-indent-mode nil)            ; 改行時の自動インデントを無効に
  '(enable-recursive-minibuffers t)      ; 再帰的にミニバッファを使う
  '(eval-expression-print-length nil)    ; evalした結果を全部表示する
+ '(global-auto-revert-mode t)           ; すべてのバッファで、外部のファイル変更を反映
  '(history-delete-duplicates t)         ; 重複する履歴は削除
  '(history-length t)                    ; 履歴の数を無制限に
  '(indent-line-function indent-to-left-margin) ; インデント用の関数
  '(indent-tabs-mode nil)                ; インデントにタブを使わない
  '(inhibit-startup-screen t)            ; 起動時の画面を表示しない
  '(initial-scratch-message nil)         ; *scratch* にメッセージを表示しない
+ '(jaword-mode t)                       ; 日本語の単語をきちんと扱う
+ '(menu-bar-mode nil)                   ; メニューバーを表示しない
  '(ring-bell-function ignore)           ; エラー時、なにもしない
  '(save-interprogram-paste-before-kill t) ; 他アプリのコピーバッファをkill-ringに保存する
+ '(savehist-mode t)                     ; 履歴を永続的に保存
  '(scroll-conservatively 1)             ; 画面最下部で下向き、画面最上部で上向きにスクロールするとき、1行ずつスクロール
+; '(shell-plus-ssh-track-mode t)        ; shellでSSH接続時にdefault-directoryを自動設定
  '(tab-width 4)                         ; タブ幅は4
+ '(tool-bar-mode nil)                   ; ツールバーを表示しない
  '(truncate-partial-width-windows nil)  ; 行を切り捨てない
  '(use-dialog-box nil)                  ; ダイアログボックスは使わない
  '(user-mail-address "j8takagi@nifty.com") ; ChangeLogなどで用いるメールアドレスの設定
