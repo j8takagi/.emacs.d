@@ -10,6 +10,7 @@
 
 ;;; Code:
 (require 'savehist)
+(require 'desktop)
 
 (let ((newval (copy-sequence savehist-ignored-variables)))
   (mapc
@@ -24,28 +25,28 @@
     (custom-set-variables `(savehist-ignored-variables ',newval))))
 
 (defun savehist-init-other-saved-variables ()
-  (append
-   (copy-sequence savehist-minibuffer-history-variables)
-   (when desktop-save-mode
-     (mapcar
-      (lambda (var)
-        (when (boundp var)
-          (copy-sequence (eval var))))
-      '(desktop-globals-to-save desktop-locals-to-save)))))
+  (let (othervars)
+    (setq othervars
+          (append othervars
+                  (when desktop-save-mode
+                    (append
+                     desktop-globals-to-save
+                     desktop-locals-to-save
+                    ))
+                  savehist-minibuffer-history-variables
+                  savehist-ignored-variables
+            ))))
 
 (defun savehist-init-add-savehist-additional-variables (&optional file)
     "Set all history or ring variables,
 except variables in `desktop-globals-to-save',
 load-history and :prompt-history to savehist-additional-variables
 so that variabels are saved to `savehist-file'."
-    (let ((addval nil) (histvars nil) (inhibit-message 1) (loadmsg nil))
+    (let (addval newval histvars (inhibit-message 1) loadmsg)
       (setq histvars
             (apropos-internal "-\\(\\(history\\)\\|\\(ring\\)\\)\\'" 'boundp))
-      (mapc
-       (lambda (elt)
-         (setq histvars
-               (delete elt histvars)))
-       (append (savehist-init-other-saved-variables) savehist-ignored-variables))
+      (mapc (lambda (elt) (setq histvars (delete elt histvars)))
+            (savehist-init-other-saved-variables))
       (mapc
        (lambda (elt)
          (unless (member elt savehist-additional-variables)
@@ -53,13 +54,16 @@ so that variabels are saved to `savehist-file'."
        histvars)
       (when addval
         (if file
-          (setq loadmsg (format "After loading `%s', set in savehist-init; " file))
-        (setq loadmsg "Set in savehist-init; "))
+            (setq loadmsg (format "After loading `%s', set in savehist-init; " file))
+          (setq loadmsg "Set in savehist-init; "))
         (message (concat loadmsg (format "List variable savehist-additional-variables value is added: %s." addval)))
+        (setq newval (copy-sequence savehist-additional-variables))
+        (dolist (avl addval)
+          (push avl newval))
         (custom-set-variables
          `(
            savehist-additional-variables
-           ',(append addval savehist-additional-variables)
+           ',newval
            nil nil ,loadmsg
            )))
       savehist-additional-variables))
