@@ -1,6 +1,10 @@
 CP := cp -v
 ECHO := echo
-EMACS := /Applications/MacPorts/Emacs.app/Contents/MacOS/Emacs
+ifeq ($(shell uname -s),Darwin)
+    EMACS := /Applications/MacPorts/Emacs.app/Contents/MacOS/Emacs
+else
+    EMACS := emacs
+endif
 GREPV := grep -v
 INSTALL = install -C -v
 MKDIR := mkdir
