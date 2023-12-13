@@ -16,8 +16,11 @@ TOUCH := touch
 all:
 	@($(foreach dir,$(SITELISPS),$(MAKE) -sC $(dir) all; ))
 
-install: all
+install: .emacs.d/site-lisp all
 	@($(foreach dir,$(SITELISPS),$(PRINTF) $(dir) && $(MAKE) -sC $(dir) install; ))
+
+.emacs.d/site-lisp:
+	$(INSTALL) -d $@
 
 new:
 	$(INSTALL) -d $(TARGET)/; $(SED) -e "1s/TARGET := /TARGET := $(TARGET)/" makefile.template >$(TARGET)/Makefile; $(TOUCH) $(TARGET)/$(TARGET).el; $(INSTALL) native-compile.el $(TARGET)/native-compile.el; $(INSTALL) -d $(TARGET)/test
