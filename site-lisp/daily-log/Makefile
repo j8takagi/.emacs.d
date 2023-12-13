@@ -2,7 +2,7 @@ TARGET := daily-log
 TARGETDIR := $(TARGET)
 
 EMACS := emacs
-COMPILE.el := $(EMACS) -batch -l set-compile.el -f batch-byte-compile
+COMPILE.el := $(EMACS) -batch -f batch-byte-compile
 
 NATIVE-COMPILE.el := $(EMACS) -batch -l native-compile.el -f init-native-compile
 
