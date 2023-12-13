@@ -3,10 +3,10 @@
 	url = https://github.com/j8takagi/browse-kill-ring.git
 [submodule "site-lisp/undohist"]
 	path = site-lisp/undohist
-	url = https://github.com/emacsorphanage/undohist.git
+	url = https://github.com/j8takagi/undohist
 [submodule "site-lisp/jaword"]
 	path = site-lisp/jaword
-	url = https://github.com/zk-phi/jaword.git
+	url = https://github.com/j8takagi/jaword
 [submodule "site-lisp/tinysegmenter"]
 	path = site-lisp/tinysegmenter
-	url = https://github.com/myuhe/tinysegmenter.el.git
+	url = https://github.com/j8takagi/tinysegmenter.el
