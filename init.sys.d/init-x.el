@@ -7,7 +7,7 @@
 
 (listify-requires
  'fontset-set
- 'set-view-mode
+ 'view-mode-init
  )
 
 ;(exec-path-from-shell-initialize)
@@ -19,7 +19,7 @@
      (font
       ,(fontset-set
         '(
-          (ascii (font-spec :family "Noto Sans Mono" :weight 'normal :slant 'normal :size 15))
+          (ascii (font-spec :family "Noto Sans Mono" :weight 'normal :slant 'normal :size 13))
           (unicode (font-spec :family "Noto Sans CJK JP" :weight 'light :size 13))
           )
         "mydefault_x"))
@@ -32,7 +32,7 @@
 ;; view-modeの設定
 (with-eval-after-load 'view
   (listify-set
-   '(set-view-mode-read-write-directory-patterns
+   '(view-mode-init-read-write-directory-patterns
      (
       "~" "/tmp" "/var"
       ))))
