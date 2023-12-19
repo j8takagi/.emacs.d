@@ -64,7 +64,7 @@ If PROCESS is omitted or nil, child processes of current buffer process."
             (when
                 (and
                  (equal ppid (cdr (assoc 'ppid (process-attributes pid))))
-                 (equal "R" (cdr (assoc 'state (process-attributes pid))))
+                 (member (cdr (assoc 'state (process-attributes pid))) '("R" "S"))
                  (equal "ssh" (cdr (assoc 'comm (process-attributes pid))))
                  )
               (setq match-pid pid)
