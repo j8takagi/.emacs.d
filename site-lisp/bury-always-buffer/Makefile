@@ -1,4 +1,4 @@
-TARGET := not-kill-but-bury-buffer
+TARGET := bury-always-buffer
 TARGETDIR := $(TARGET)
 
 EMACS := emacs

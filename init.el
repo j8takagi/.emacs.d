@@ -73,7 +73,7 @@
  'jaword                           ; 日本語の単語をきちんと扱う
  'list-fontfamilies-display        ; フォントファミリー一覧作成コマンド
  'list-fonts-display               ; フォント一覧作成コマンド
- 'not-kill-but-bury-buffer         ; *scratch* と *Messages* のバッファを削除しない
+ 'bury-always-buffer               ; *scratch* と *Messages* のバッファを削除しない
  'scroll-one-line                  ; 1行スクロール
  'replace-plus                     ; 置換の追加機能
  'savehist-init                    ; 履歴を保存するsavehist-modeの設定
